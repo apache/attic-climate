@@ -1,0 +1,8 @@
+Regional Climate Model Evaluation System
+
+Installation instructions:
+   1) For python to discover this package you need to set the PYTHONPATH environment variable to point to this directory that the rcmes directory sits in.
+
+Usage instructions:
+   1) import rcmes
+

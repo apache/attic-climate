@@ -1,0 +1,57 @@
+Regional Climate Modeling Evaluation Toolkit Use Case
+
+User = Scientist
+System = RCMES
+
+Goal:  Compute Metrics on a Local Climate Model
+Main Success Scenario
+1.  User logs into System
+2.  User selects a model file
+3.  User selects model latitude, longitude, time and parameter
+4.  User selects observation datasets and parameters
+5.  System returns the time range information where Obs and Model
+parameters overlap.
+6.  User selects time range.
+7.  System returns VALID re-gridding options for Space and Time.  
+(VALID meaning smaller grid to a larger grid step)
+8.  User selects the re-gridding options
+9.  Optional Processing (SEE OPEN ISSUES SECTION)
+
+
+Extensions:
+1a:  User has no account setup
+	.1:  User will create an account
+	.2:  System will create an upload directory for the account
+	and email instructions about how to FTP the model files into
+	the new directory
+	Main Success Scenario Step 1
+
+2a:  User has no models in the System to choose
+	.1:  User will FTP their model file(s) into their upload directory
+	Main Success Scenario Step 2
+
+# This could be prevented if Step 4 ONLY returns Datasets with a proper
+#  temporal overlap.  This might be an enhancement in the future.
+5a:  The Model and Observational Datasets don't have a time overlap
+	.1:  System will return a message explaining the lack of overlap
+	Main Success Scenario Step 4
+
+
+OPEN QUESTIONS/ISSUES
+
+***Optional Processing***
+Masked Region:  Does this work today?
+Seasonal Cycles:  Does this option work?
+
+User will select the Metric they want to compute.  [Should we consider limiting
+this list based on what is being selected in the model and observations]
+Metrics:
+-Bias: mean bias across full time range
+-Mean Absolute Error: across full time range  
+-Difference: calculated at each time unit
+-Anomaly Correlation
+-Pattern Correlation
+*Probability Distribution Function similarity score
+-Root Mean Square Error
+
+Customize Plots:  Does this work today?  

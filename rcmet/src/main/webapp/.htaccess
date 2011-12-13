@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /
+
+# Send all other non-static requests to the main controller
+RewriteCond %{REQUEST_URI} !/static/(.*)$
+RewriteCond %{REQUEST_URI} !/scripts/(.*)$
+RewriteCond %{REQUEST_URI} !/global/(.*)$
+RewriteCond %{REQUEST_URI} !index\.php/.+$
+RewriteRule ^(.+)$ ./index\.php/$1 [L,NC]
+

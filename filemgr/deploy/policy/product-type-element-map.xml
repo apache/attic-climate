@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cas:producttypemap xmlns:cas="http://oodt.jpl.nasa.gov/1.0/cas">
+ <!--  can set the "parent" attribute on types below to allow inheritance
+       of elements between the types 
+  -->
+   <type id="urn:oodt:GenericFile">
+       <element id="urn:oodt:ProductReceivedTime"/>
+       <element id="urn:oodt:ProductName"/>
+       <element id="urn:oodt:ProductId"/>
+       <element id="urn:oodt:ProductType"/>
+       <element id="urn:oodt:ProductStructure"/>
+       <element id="urn:oodt:Filename"/>
+       <element id="urn:oodt:FileLocation"/>
+       <element id="urn:oodt:MimeType"/>
+       <element id="urn:test:DataVersion"/>
+   </type>
+   <type id="urn:wrm:DataSet" parent="urn:oodt:GenericFile">
+    <element id="urn:wrm:DatasetID"/>
+    <element id="urn:wrm:longName"/>
+    <element id="urn:wrm:shortName"/>
+    <element id="urn:wrm:description"/>
+    <element id="urn:wrm:source"/>
+    <element id="urn:wrm:referenceURL"/>
+    <element id="urn:wrm:cellMethod"/>
+    <element id="urn:wrm:missingDataFlag"/>
+    <element id="urn:wrm:GranuleID"/>
+    <element id="urn:wrm:filename"/>
+    <element id="urn:wrm:DataPointID"/>
+    <element id="urn:wrm:time"/>
+    <element id="urn:wrm:latitude"/>
+    <element id="urn:wrm:longitude"/>
+    <element id="urn:wrm:vertical"/>
+    <element id="urn:wrm:value"/>
+    <element id="urn:wrm:ParameterID"/>
+    <element id="urn:wrm:paraLongName"/>
+    <element id="urn:wrm:paraShortName"/>
+    <element id="urn:wrm:paraDescription"/>
+    <element id="urn:wrm:paraReferenceURL"/>
+    <element id="urn:wrm:units"/>
+   </type>
+</cas:producttypemap>

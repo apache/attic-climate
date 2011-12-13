@@ -1,0 +1,16 @@
+/**
+ * Balance Widget Styling
+ */
+div.bal_widget {
+	border:solid 1px #ccc;
+	padding:5px;
+}
+
+/**
+ * Balance default footer styling
+ */
+div.bal_footer {
+	border-top:solid 1px #ccc;
+	color:#888;
+	font-size:80%;	
+}

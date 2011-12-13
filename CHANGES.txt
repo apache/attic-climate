@@ -1,0 +1,30 @@
+WRM Regional Climate Model Evaluation Database
+JIRA located here:  http://oodt.jpl.nasa.gov/jira/browse/WRM
+
+
+Release Notes - Water Resource Management Infrastructure - Version 1.0.0 - 09/24/2010
+
+
+** Bug
+    * [WRM-9] - AIRSL3NetCDF extractor should not extract 'data points' for parameter definitions
+    * [WRM-13] - Granule Segments coming into the Catalog are being counted as new Granules
+    * [WRM-14] - Granule Segments coming into the Catalog are being counted as new Datasets
+    * [WRM-15] - ISO timestamp support in WRM means we need to change the TYPE of all time columns to VARCHAR20
+    * [WRM-16] - Catalog needs to insert the variable name into shortName instead of longName (parameter TABLE)
+
+
+** New Feature
+    * [WRM-8] - Create a met extractor for AIRS NetCDF files
+    * [WRM-10] - Python Query API for controlled access to the WRM infrastructure via Python scripts
+
+** Task
+    * [WRM-1] - File Manager Policy checked into SVN
+    * [WRM-2] - Schema and supporting doc. checked into SVN
+    * [WRM-3] - Develop metadata extractor for sample data
+    * [WRM-4] - Develop a config script for running the ExternMetExtractor
+    * [WRM-5] - Create JIRA Components to represent the different aspects of the WRM project
+    * [WRM-6] - Create a development structure in SVN that reflects all aspects of project effort
+    * [WRM-7] - Create a deployment process that makes it easy to quickly build a working production environment
+    * [WRM-12] - Enable GRIB Extractor to take in Command Line Arguments
+    * [WRM-17] - Set up basic website that provides information about the contents of the WRM databse
+

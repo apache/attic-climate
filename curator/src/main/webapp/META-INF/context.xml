@@ -1,0 +1,37 @@
+<!--
+ // Copyright (c) 2008, California Institute of Technology.
+// ALL RIGHTS RESERVED. U.S. Government sponsorship acknowledged.
+// 
+// $Id$
+-->
+   
+<Context path="/cas-curator" docBase="/data/wrm/deploy/curator/wrm-curator-1.1.0-dev.war">
+
+    <Parameter name="gov.nasa.jpl.oodt.cas.curator.projectName"
+        value="WRM Curator"/>
+
+	<Parameter name="gov.nasa.jpl.oodt.cas.curator.metExtractorConf.uploadPath"
+		value="/data/wrm/deploy/metextraction"/>
+
+	<Parameter name="gov.nasa.jpl.oodt.cas.curator.dataDefinition.uploadPath"
+		value="/data/wrm/deploy/filemgr/policy" />
+		
+    <Parameter name="gov.nasa.jpl.oodt.cas.curator.stagingAreaPath"
+        value="/data/wrm/data"/>>
+    
+    <Parameter name="gov.nasa.jpl.oodt.cas.curator.metAreaPath"
+    value="/data/wrm/met-out"/>
+    
+    <Parameter name="gov.nasa.jpl.oodt.cas.curator.fmProps"
+        value="/data/wrm/deploy/filemgr/etc/filemgr.properties"/>
+    
+    <Parameter name="gov.nasa.jpl.oodt.cas.curator.metExtension"
+        value=".met"/>
+		
+	<Parameter name="gov.nasa.jpl.oodt.cas.fm.url"
+	    value="http://localhost:9091"/>
+	    
+	<Parameter name="gov.nasa.jpl.oodt.cas.security.sso.implClass"
+	          value="gov.nasa.jpl.oodt.cas.security.sso.DummyImpl"/>
+
+</Context>

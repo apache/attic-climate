@@ -1,0 +1,23 @@
+#!/bin/bash
+#use this to extract metadata for all files in the 
+#target directory
+#
+#sample usage:   ./wrm_ERAdirExtract /path/to/dir/to/extract
+
+PYTHON_EXTRACTOR='/usr/local/wrm/dev/metextraction/ERASurfaceNetCDFExtractor.py'
+MET_OUT_DIR=/proj/wrm-data/era-met-out;
+#MAX_RECORDS=1000000
+
+DATA_DIR=$1
+
+for file in $DATA_DIR/* ; do
+
+ncfilename=`basename $file`
+
+echo $ncfilename "is being processed now!"
+
+####need to feed the extracted file into the extractor script below
+# Extract the data into segments
+python $PYTHON_EXTRACTOR $DATA_DIR $MET_OUT_DIR #$MAX_RECORDS
+
+done

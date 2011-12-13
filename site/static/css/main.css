@@ -1,0 +1,145 @@
+@charset "UTF-8";
+body { 
+	margin: 0; 
+	padding: 0; 
+	/*text-align: center; */
+	/* this centers the wrapper in IE 5* browsers. Left-align within wrapper */ 
+	background-image: url(../img/bg.gif); 
+	background-repeat: no-repeat; 
+	background-color: #213452; 
+	font-family: Helvetica, Arial, Verdana, sans-serif; color: #4b5c68; 
+     }
+/*** vertical margin control **************************/
+
+h1, h2, h3, h4, h5, h6, p, blockquote, ul, ol, dl, address { /* this zeroes out all margins */ margin: 1em 0; padding: 0px; }
+h1, h2, h3, h4, h5, h6 { margin-top: .7em; margin-bottom: 0px; /* margin is created by the top margin of the element beneath it */ }
+blockquote { margin: 2em 10%; }
+img { border: 0; }
+
+/*** presentation styles ******************************/
+.form_field { font-size: .7em; background-color: #213e59; border: 1px solid #687b8e; color: #FFFFFF; }
+.form_field_inner { background-color: #fff; border: 1px solid #cdcfd0; height: 18px; padding-left:5px; color: #666666; vertical-align: middle; }
+h1 { font-size: 1.4em; color: #43545e; }
+h2 { font-size: 1.3em; color: #9cabb7; }
+h3 { font-size: 1em; color: #447caf; }
+h4 { font-size: .9em; color:#43545e; }
+
+#footer p { color:#868a8d; font-size: 0.8em; }
+#footer A:link { text-decoration:none; color:#868a8d; font-size: 1em; line-height:.5em; }
+#footer A:visited { text-decoration:none; color:#868a8d; font-size: 1em; line-height:.5em; }
+#footer A:active { text-decoration:none; color:#868a8d; font-size: 1em; line-height:.5em; }
+#footer A:hover { text-decoration:none; color:#fff; font-size: 1em; line-height:.5em; }
+/*************** end presentation styles *******************/
+
+#wrapper_top { 
+	width: 989px;  /* using 20px less than a full 800px width allows for browser chrome and avoids a horizontal scroll bar */ 
+	margin: 0 auto; /* the auto margins (in conjunction with a width) center the page */ 
+	text-align: left; /* this overrides the text-align: center on the body element. */
+	margin-top: 5px; 
+	margin-bottom: 5px; 
+	border: 2px solid #1f3243; 
+	position: relative; 
+	}
+#top { padding: 0;  /* this padding matches the left alignment of the elements in the divs that appear beneath it. If an image is used in the #header instead of text, you may want to remove the padding. */ height: 88px; background: url(../img/mast.jpg); }
+
+#nav_tier_0 a { position: absolute; text-decoration: none; }
+#nav_tier_0 i { visibility:hidden; }
+a#nasa { top: 5px; left: 10px; width: 85px; height: 80px; }
+a#jplhome0 { top: 15px; left: 100px; width: 300px; height: 30px; }
+a#caltech { top: 50px; left: 100px; width: 300px; height: 20px; }
+/* nav tier 1 (JPL HOME, EARTH, SOLAR SYSTEM, STARS & GALAXIES, SCI/TECH) begin */
+
+#nav_tier_1 { padding: 0; margin: 0; width: 507px; height: 10px; left: 480px; position: relative; top: 10px; }
+#nav_tier_1 ul#tier_1 li a { /* image replacement for nav */ text-indent: -9999px; overflow: hidden; text-decoration: none; }
+#tier_1 { width: 507px; height: 10px; background:url(../img/tnav1.gif); margin: 0; padding: 0; /* aligns tier 1 nav to the right */ position: relative; }
+#tier_1 li { margin: 0; padding: 0; list-style:none; position:absolute; top: 0; }
+#tier_1 li, #tier_1 a { height: 10px; display: block; }
+#jplhome { left: 0px; width: 65px; }
+#earth { left: 65px; width: 54px; }
+#solarsystem { left: 119px; width: 105px; }
+#starsgalaxies { left: 225px; width: 118px; }
+#scitech { left: 342px; width:158px; }
+#jplhome a:hover { background: transparent url(../img/tnav1.gif) 0px -10px no-repeat; } /* these negative values position the rollover image */
+#earth a:hover { background: transparent url(../img/tnav1.gif) -65px -10px no-repeat; }
+#solarsystem a:hover { background: transparent url(../img/tnav1.gif) -119px -10px no-repeat; }
+#starsgalaxies a:hover { background: transparent url(../img/tnav1.gif) -225px -10px no-repeat; }
+#scitech a:hover { background: transparent url(../img/tnav1.gif) -342px -10px no-repeat; }
+/* end nav tier 1 */
+
+/* begin nav tier 2 */
+#nav_tier_2 { padding: 0; margin: 0; position: relative; top: 15px; margin-left: 480px; }
+#tier_2 { height: 10px; margin: 0; padding: 0; position: relative; }
+#tier_2 li { margin: 0; padding: 0; list-style:none; position:absolute; top: 0; }
+#jplemailnews { left: 221px; width:105px; }
+#rss { left: 335px; width:38px; }
+#podcast { left: 382px; width:57px; }
+#mobile { left: 382px; width:57px; }
+#video { left: 452px; width:43px; }
+#jplemailnews a:hover { background: transparent url(../img/tnav2.gif) -221px -10px no-repeat; }
+#rss a:hover { background: transparent url(../img/tnav2.gif) -335px -10px no-repeat; }
+#podcast a:hover { background: transparent url(../img/tnav2.gif) -382px -10px no-repeat; }
+#mobile a:hover { background: transparent url(../img/tnav2.gif) -382px -10px no-repeat; }
+#video a:hover { background: transparent url(../img/tnav2.gif) -452px -10px no-repeat; }
+/* end nav tier 2 */
+
+/* begin nav tier 3 - primary navigation:
+
+To fix the rollover effect for the navigation bar with your links, edit the left and width property of the #news, #missions, #multimedia, #kids, 
+#education, #public, #work, and #about.  Use these width values to replace the first set of negative values on #news a:hover, 
+#missions a:hover, #multimedia a:hover, #kids a:hover, #education a:hover, #public a:hover, #work a:hover, #about a:hover 
+
+See below for how this works with current navigation bar */
+
+#nav_tier_3 { padding: 0; margin: 0; width: 989px; height: 26px; position: relative; }
+#nav_tier_3 ul#tier_3 li a { text-indent: -9999px; overflow: hidden; text-decoration: none; }
+#tier_3 { width: 989px; height: 26px; background:url(../img/pnav.gif); margin: 0; padding: 0; position: relative; }
+#tier_3 li { margin: 0; padding: 0; list-style: none; position: absolute; top:0; }
+#tier_3 li, #tier_3 a { height: 26px; display: block; }
+#news { left: 0px; width: 90px; }
+#missions { left: 90px; width: 103px; }
+#multimedia { left: 194px; width: 116px; }
+#kids { left: 310px; width: 105px; }
+#education { left: 415px; width:105px; }
+#public { left: 520px; width:122px; }
+#work { left: 642px; width:143px; }
+#about { left: 785px; width:205px; }
+#news a:hover { background: transparent url(../img/pnav.gif) 0px -26px no-repeat; }
+#missions a:hover { background: transparent url(../img/pnav.gif) -90px -26px no-repeat; }
+#multimedia a:hover { background: transparent url(../img/pnav.gif) -194px -26px no-repeat; }
+#kids a:hover { background: transparent url(../img/pnav.gif) -310px -26px no-repeat; }
+#education a:hover { background: transparent url(../img/pnav.gif) -415px -26px no-repeat; }
+#public a:hover { background: transparent url(../img/pnav.gif) -520px -26px no-repeat; }
+#work a:hover { background: transparent url(../img/pnav.gif) -642px -26px no-repeat; }
+#about a:hover { background: transparent url(../img/pnav.gif) -785px -26px no-repeat; }
+/**** end nav tier 3 - main navigation ****/
+
+/**** home elements only ****/
+#form_wrap { position: relative; width: 280px; height: 20px; left: 690px; top: 30px; text-align: right; }
+.searchbutton { vertical-align: middle; }
+#wrapper_middle_2 { width: 993px; margin: 0 auto; text-align: left; padding: 0; }
+#middle_2_border { padding: 0; border: 2px solid #1f3243; background-color:#FFFFFF; clear: both; margin: 5px 0 5px 0; }
+#wrapper_bottom { width: 993px; margin: 0 auto; }
+#inner_body_content { font-size:.7em; }
+/****** end home elements ******/
+
+/****** link elements ******/
+A:link { text-decoration: none; color: #275ec3 }
+A:visited { text-decoration: none; color: #275ec3 }
+A:hover { text-decoration: underline; }
+A:active { text-decoration: none; color: #275ec3 }
+/******* end link elements ******/
+
+/******* begin footer elements *****/
+#footer { padding: 0; margin: 0 auto; border: 2px solid #1f3243; margin-bottom: 10px; background-color: #0e171f; height: 62px; }
+#footer p { margin: 0; padding: 0; }
+#footer .usa_gov { width: 200px; margin-top: 10px; float: left; margin-left: 10px; }
+#footer .footer_credits { float:right; margin-right: 20px; margin-top: 24px; line-height: 1em; text-align: left; }
+#footer .footer_nav { margin-top: 24px; }
+#footer .footer_nav_inner { margin-top: 24px; margin-left: 200px; }
+/****** end footer elements ******/
+
+
+/***** Customizations to the JPL Header Content ******/
+table.jpl_universe td {
+	padding: 2px 3px;
+}

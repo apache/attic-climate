@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#use this to extract metadata for all files in the 
+#target directory
+#
+#sample usage:   ./wrm_dirExtract /usr/local/wrm/data/AIRX3STD/2002
+
+
+EXTRACTOR_BIN='/usr/local/wrm/deploy/metextraction/AIRSNetCDFExtractor.php';
+NCDUMP_BIN='/usr/local/netcdf-4.1.1/bin/ncdump';
+MET_OUT_DIR=/usr/local/wrm/met-out;
+
+DATA_DIR=$1
+
+for file in $DATA_DIR/* ; do
+
+#this could unzip the files but for now
+#we are assuming the files are uncompressed
+# Un gzip each in the DATA_DIR
+#gunzip -v $file;
+
+ncfilename=`basename $file`
+
+echo $ncfilename "is being processed now!"
+
+####need to feed the extracted file into the extractor script below
+# Extract the data into segments
+$EXTRACTOR_BIN $NCDUMP_BIN  $DATA_DIR/$ncfilename $MET_OUT_DIR \
+Temperature_A,Temperature_D,TotH2OVap_A,TotH2OVap_D,H2OVapMMR_A,H2OVapMMR_D,TotCldLiqH2O_A,TotCldLiqH2O_D,CloudFrc_A,CloudFrc_D,SurfAirTemp_A,SurfAirTemp_D,SurfSkinTemp_A,SurfSkinTemp_D,GPHeight_A,GPHeight_D,FineCloudFrc_A,FineCloudFrc_D,RelHumid_A,RelHumid_D 1500000;
+
+done
