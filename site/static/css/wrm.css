@@ -106,7 +106,8 @@ div#content-container {
 div#content {
 	margin-top:60px;
 	padding:12px 20px;
-	min-height:583px;
+	min-height:374px;
+	position:relative;
 }
 
 div#content h2 {
@@ -364,6 +365,70 @@ div.twtr-hd {
 div.twtr-hd h3 {
 	border:none;
 }
+
+/*** SLIDE SHOW **/
+
+.slides_container div {
+        width:470px;
+        height:170px;
+        display:block;
+}
+
+#slides {                                                                                                            
+  left: 50px;
+  position: absolute;
+  top: 15px;
+  z-index: 100;
+}
+
+.slides_container {
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+#slides .next, #slides .prev {                                                                                       
+  display: block;
+  height: 43px;
+  left: -39px;
+  position: absolute;
+  top: 107px;
+  width: 24px;
+  z-index: 101;
+}
+
+
+#slides .next {                                                                                                      
+  left: 585px;
+}
+
+.pagination {
+  margin: 26px auto 0;
+  width:100px;
+}
+
+ol, ul {
+  list-style:none outside none;
+}
+
+.pagination li {
+  float:left;
+  margin:0 1px;
+}
+
+.pagination li a {
+  background-image:url('../img/pagination.png');
+  background-position: 0 0;
+  display: block;
+  float:left;
+  height: 0;
+  overflow: hidden;
+  padding-top:12px;
+  width:12px;
+}
+
+
+
 
 /************
  * Clear fixin' 
