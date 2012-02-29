@@ -370,8 +370,10 @@ div.twtr-hd h3 {
 
 .slides_container div {
         width:470px;
-        height:170px;
+        height:285px;
         display:block;
+	margin-top:5px;
+	margin-left:-3px;
 }
 
 #slides {                                                                                                            
@@ -392,6 +394,7 @@ div.twtr-hd h3 {
   height: 43px;
   left: -39px;
   position: absolute;
+  overflow:hidden;
   top: 107px;
   width: 24px;
   z-index: 101;
@@ -417,7 +420,7 @@ ol, ul {
 }
 
 .pagination li a {
-  background-image:url('../img/pagination.png');
+  background-image:url('../img/slides/pagination.png');
   background-position: 0 0;
   display: block;
   float:left;
@@ -427,7 +430,13 @@ ol, ul {
   width:12px;
 }
 
+.pagination li.current a {
+  background-position: 0 -12px;
+}
 
+#frame {
+  margin-left:-54px;
+}
 
 
 /************
