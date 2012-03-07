@@ -12,10 +12,11 @@ a part to make them small enough to be ingested.
 
 Author:  Cameron.E.Goodale@jpl.nasa.gov
 Created: February 14, 2012
-Updated: February 14, 2012
+Updated: March 6, 2012
 
 '''
 import numpy
+import numpy.ma as ma
 import nio
 import sys, datetime
 import os.path as path  #work with filenames
@@ -29,8 +30,7 @@ import MetMaker as M
 if len(sys.argv) == 1:
     print "No arguments found, use the -h option for more details"
     sys.exit(1)
-
-
+  
 
 # Options Parsing Block with Help
 usage = "usage: ./MERRA_Extractor.py  [options] arg1 arg2"
@@ -48,6 +48,28 @@ lat_name = 'YDim_EOSGRID'
 lon_name = 'XDim_EOSGRID'
 h = 0
 start_datetime = datetime.datetime(1979,1,1,0,0,0)
+
+# Dictionary to hold the North American Region Bounding Box
+# We can use these values to MASK the XDIM and YDim Arrays i think
+NA_Region = {'westbc': -160,
+             'eastbc': -30,
+             'southbc': 20,
+             'northbc': 60
+             }
+
+def createMaskedArray(one_d_arr, arr_min, arr_max):
+    '''This will take in a 1 dimensional array object, and the valid value range for the
+    array.
+    Example: longitude array arr = [-180 ... 179.999]
+            westbc value arr_min = -160
+            eastbc value arr_max = -30
+            return masked array = [--, --, ...-160 ... -30, --, ...--, --]
+    '''
+    min_masked = ma.masked_less(one_d_arr, arr_min)
+    full_mask = ma.masked_greater(min_masked, arr_max)
+    filled_mask = ma.filled(full_mask, 999)
+    return filled_mask
+
 
 
 def parse_file(f=options.filename, p=options.param, t=t_name, lat=lat_name, lon=lon_name):
@@ -101,15 +123,27 @@ t = numpy.delete(full_time,[1,3],0)
 
 # Converting Nio Objecting in Numpy arrays improves process speeds
 # considerably
-lat = numpy.array(nio_lat)
-lon = numpy.array(nio_lon)
+lat_full = numpy.array(nio_lat)
+lon_full = numpy.array(nio_lon)
+
+# Mask the Lat and Lon Arrays using the NA_Region Dict
+lat = createMaskedArray(lat_full, NA_Region['southbc'], NA_Region['northbc'])
+lon = createMaskedArray(lon_full, NA_Region['westbc'], NA_Region['eastbc'])
 
 x = numpy.ndenumerate(param)
 # declare empty list to append readings to
 reading_list = []
 for position,value in x:
-    reading = build_datapoint(position,value)
-    reading_list.append(reading)
+    
+    # ADD IN CHECK if position[1] OR position[2] are == '--' DON'T construct a reading
+    if lat[int(position[1])] == 999:
+        pass
+    elif lon[int(position[2])] == 999:
+        pass
+    else:
+        print position[1], position[2]
+        reading = build_datapoint(position,value)
+        reading_list.append(reading)
 # stage3 = time() - stage2
 # print "Looping over the param array took %s seconds" % stage3
 # stall = time()
