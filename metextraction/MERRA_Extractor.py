@@ -141,7 +141,6 @@ for position,value in x:
     elif lon[int(position[2])] == 999:
         pass
     else:
-        print position[1], position[2]
         reading = build_datapoint(position,value)
         reading_list.append(reading)
 # stage3 = time() - stage2
