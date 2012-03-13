@@ -12,7 +12,7 @@ a part to make them small enough to be ingested.
 
 Author:  Cameron.E.Goodale@jpl.nasa.gov
 Created: February 14, 2012
-Updated: March 6, 2012
+Updated: March 13, 2012
 
 '''
 import numpy
@@ -114,15 +114,10 @@ filename = path.basename(options.filename)
 # Open the file and get the important stuff out
 full_param, nio_lat, nio_lon, full_time = parse_file()
 
-# Need to handle the idea that we only want to use 
-# t[0] (00:00) and t[2] (12:00)
-# THis will mean we need to update the t array 
-# as well as the param array.
-param = numpy.delete(full_param,[1,3],0)
-t = numpy.delete(full_time,[1,3],0)
-
 # Converting Nio Objecting in Numpy arrays improves process speeds
 # considerably
+param = numpy.array(full_param)
+t = numpy.array(full_time)
 lat_full = numpy.array(nio_lat)
 lon_full = numpy.array(nio_lon)
 
@@ -143,9 +138,6 @@ for position,value in x:
     else:
         reading = build_datapoint(position,value)
         reading_list.append(reading)
-# stage3 = time() - stage2
-# print "Looping over the param array took %s seconds" % stage3
-# stall = time()
 
 # Build the Metadata Object up
 met = M.CAS_Met()
@@ -162,8 +154,6 @@ met.add_met(param_key, [full_param.standard_name])
 data_key = 'data_%s' % options.param
 met.add_met(data_key, reading_list)
 
-# MERRA100.prod.assim.inst6_3d_ana_Np.19790101.hdf_SLP.met 
+# MERRA100.prod.assim.inst6_3d_ana_Np.19790101.hdf_<param_id>.met 
 output_file = '%s/%s_%s.met' % (options.output, filename, options.param)
 met.write_met(output_file)
-# dun = time() - stall
-# print "Met writing took %s seconds" % dun
