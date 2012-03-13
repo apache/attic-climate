@@ -110,7 +110,7 @@ See below for how this works with current navigation bar */
 #education a:hover { background: transparent url(../img/pnav.gif) -415px -26px no-repeat; }
 #public a:hover { background: transparent url(../img/pnav.gif) -520px -26px no-repeat; }
 #work a:hover { background: transparent url(../img/pnav.gif) -642px -26px no-repeat; }
-#about a:hover { background: transparent url(../img/pnav.gif) -785px -26px no-repeat; }
+#about_jpl a:hover { background: transparent url(../img/pnav.gif) -785px -26px no-repeat; }
 /**** end nav tier 3 - main navigation ****/
 
 /**** home elements only ****/
