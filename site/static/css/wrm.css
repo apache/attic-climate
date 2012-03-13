@@ -28,28 +28,37 @@ div.header {
 	position:relative;
 	border-top:solid 5px #a3a600;
 	border-bottom:solid 3px #0b2a43;
-	padding:5px 0px 10px 340px;
+	padding:5px 0px 10px 120px;
 	margin-top:2px; 
 }
 div.header h1 {
 	color:#fff;
 	margin: 4px 0px -1px 0px;
-	font-size:1.6em;
+	font-size:1.4em;
+        text-align: center;
+        letter-spacing: 0.04.em;
 }
 div.header h2 {
 	letter-spacing:0.13em;
 	color:#fff;
 	border-top:dotted 1px #353;
-	padding-top:8px;
-	font-size:14px;
-	font-weight:bold;
+	padding-top:5px;
+        margin-top:5px;
+	font-size:1em;
+	font-weight:normal;
+        text-align:center;
 }
 img#rcmes-logo {
-	margin-right:20px;
+	/*margin-right:20px;
 	margin-top:-95px;
 	margin-left:8px;
+        */
+        z-index:200;
+        width: 112px;
+        height: 99px;
 }
 
+/* not used currently commenting out incase we want to bring it back
 div#left-nav {
 	position:relative;
 	float:left;
@@ -60,16 +69,17 @@ div#left-nav {
 	border-right:solid 1px #aaa;
 	border-bottom:solid 1px #aaa;	
 }
+*/
 div#site-menu {
-	position:relative;
-	float:left;
-	margin:0px;
-	width:669px;
-	background-color:#668000;
-	
+    position:relative;
+    float:left;
+    margin:0px;
+    padding-left:120px;
+    width:869px;
+    background-color:#668000;
+    z-index:10;	
 
 }
-
 div#site-menu ul {
     display: block;
     list-style: none outside none;
@@ -77,34 +87,62 @@ div#site-menu ul {
     padding: 0;
     width: 100%;
 }
+/* -- Top Level Navigation Elements -- */
 div#site-menu ul li {
+/*
     border-right: 1px solid #333333;
+*/
     color: #CCCCCC;
     display: block;
     float: left;
     font-family: 'Actor',sans-serif;
-    padding: 20px 0;
+    padding: 5px 10px 10px;
     text-align: center;
-    width: 120px;
+    width: auto;
 }
 div#site-menu ul li.active {
     background: url("../img/tri.png") no-repeat scroll center bottom transparent;
     background-color:#557000;
 }
 div#site-menu ul li a {
-	color: #FFFFFF;
+    color: #FFFFFF;
     text-decoration: none;
     text-shadow: 1px 1px 0 #555555;
 }
+/* -- Level 2 Drop Down List -- */
+div#site-menu ul li ul {
+    position: absolute;
+    left: -999em;
+    background-color:#557000;
+    top:32px;
+    margin-left:-10px;
+}
+/* Special Widths for Each Sub-Menu and EXTREMELY
+   specific to over-ride any cascading styles */
+div#site-menu ul li ul#about {
+    width: 8em;
+}
+div#site-menu ul li ul#collab {
+    width: 6em;
+}
+div#site-menu ul li ul#pubs{
+    width: 7.5em;
+}
+div#site-menu ul li ul#data {
+    width: 7em;
+}
+div#site-menu ul li ul#training {
+    width: 10.5em;
+}
 
 div#content-container {
-	width:669px;
+	width:100%;
 	margin:0px;
 	padding:0px;
 	background-color:#fff;
 }
 div#content {
-	margin-top:60px;
+	margin-top:32px;
 	padding:12px 20px;
 	min-height:374px;
 	position:relative;
@@ -212,6 +250,17 @@ div.breadcrumbs {
 /**********
  * FOOTER
 **/
+
+div#logo {
+   position: relative;
+   margin-top: -5px;
+   margin-bottom: -105px;
+   padding-left: 10px;
+   z-index:100;
+   width:112px;
+   /*border: 2px dashed #990000;*/
+}
+
 div#site-footer {
 	font-size:90%;
 	text-align:center;
@@ -380,7 +429,7 @@ div.twtr-hd h3 {
   left: 50px;
   position: absolute;
   top: 15px;
-  z-index: 100;
+  z-index: 5;
 }
 
 .slides_container {

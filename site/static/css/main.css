@@ -134,7 +134,7 @@ A:active { text-decoration: none; color: #275ec3 }
 #footer p { margin: 0; padding: 0; }
 #footer .usa_gov { width: 200px; margin-top: 10px; float: left; margin-left: 10px; }
 #footer .footer_credits { float:right; margin-right: 20px; margin-top: 24px; line-height: 1em; text-align: left; }
-#footer .footer_nav { margin-top: 24px; }
+#footer .footer_nav { margin-top: 24px; margin-left: 30px; }
 #footer .footer_nav_inner { margin-top: 24px; margin-left: 200px; }
 /****** end footer elements ******/
 
