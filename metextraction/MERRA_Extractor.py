@@ -7,9 +7,6 @@ the output dir where you want the met file to be written.
 All of the met filenames are <filename.ext>.met and will be
 valid OODT cas-xml.
 
-It is unclear at the moment if we will need to break the files
-a part to make them small enough to be ingested.
-
 Author:  Cameron.E.Goodale@jpl.nasa.gov
 Created: February 14, 2012
 Updated: March 13, 2012
