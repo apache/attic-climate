@@ -1,9 +1,6 @@
 <!-- Footer, Only Parts that can be modified are indicated -->
 	<div id="footer">
-		<div class="usa_gov">&nbsp;</div>
 		<div class="footer_credits">
-
-            
 		<!-- This Line is Modifiable -->            
 		<p>Webmaster: <a href="https://js.jpl.nasa.gov/_layouts/jplspace/tools/JPLOrgs/orgs.aspx?uid=ahart">Andrew F. Hart</a></p>
 
@@ -26,7 +23,9 @@
 		    <a href="http://www.jpl.nasa.gov/imagepolicy/">Image Policy</a>
 		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
                     <a href="http://www.jpl.nasa.gov/copyrights.cfm">Privacy</a>
-	 	  </p>
+		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
+		    <?php echo Puny::status();?>
+		    </p>
  		</div>
 		<div class="clear"></div>
 	</div>
