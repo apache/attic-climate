@@ -1,79 +1,147 @@
 <?php
-	$activeTab='home';
+$activeTab='home';
+
+//App::Get()->response->addJavascript('static/js/slides.jquery.js');
+App::Get()->response->addJavascript('https://raw.github.com/twitter/bootstrap/master/js/bootstrap-transition.js');
+App::Get()->response->addJavascript('https://raw.github.com/twitter/bootstrap/master/js/bootstrap-carousel.js');
+App::Get()->response->addStylesheet('http://twitter.github.com/bootstrap/assets/css/bootstrap.css');
+
+
 ?>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$.get('<?php echo SITE_ROOT?>/newsfeeds/channel.do',
-			{"channel" : "news" },
-			function(data) {
-				$('#newsfeed').html(data);
-				$('.nf_author').addClass('quiet').prepend('Posted by: ');
-		});
-		
-
-	});
-	
-	$(document).ready(function() {
-	   $.get('<?php echo SITE_ROOT?>/prodrss/rss.do', 
-	      {"channel" : "ALL",
-		   "perPage" : 10},
-	      function(data){
-	         $('#prods').html(data);
-	      }
-	   );
-	});
+<script type="text/javascript">	
+  $(document).ready(function() {
+		      //$('#slides').slides();
+		      $('.carousel').carousel();
+  });
 </script>
+<style type="text/css">
+body {
+  background-color:#213452;
+  font-size:16px;
 
-	<h2>Welcome to RCMES</h2>
-	
-	<p>The <strong>R</strong>egional
-		   <strong>C</strong>limate
-		   <strong>M</strong>odel
-		   <strong>E</strong>valuation
-		   <strong>S</strong>ystem (RCMES) is empowering the regional climate modeling
-		   community by dramatically 
-		   simplifying the process of acquiring and utilizing observational data in
-		   support of regional climate model evaluation. 
-		
-	<h3>About this Site</h3>
-	<p>This site serves as the public face for both the data and tools provided by the Regional Climate 
-	Model Evaluation System. RCMES is composed of two complementary subsystems:
-	<dl>
-		<dt>RCME<strong>D</strong></dt>
-		<dd>Regional Climate Model Evaluation Database. A scalable data store containing decades of observational measurements 
-		    from NASA and other sources. You can learn more about RCMED by clicking
-		    on the <a href="<?php echo SITE_ROOT?>/data/">Data</a> tab above.</dd>
-		<dt>RCME<strong>T</strong></dt>
-		<dd>Regional Climate Model Evaluation Toolkit. A comprehensive suite of tools for working with the data and performing 
-			common model evaluation tasks. You can learn more about RCMET by clicking
-			on the <a href="<?php echo SITE_ROOT?>/tools/">Tools</a> tab above.</dd>
-	</dl>
-	
+}
 
-	<h3>Background</h3>   
-	<p>The project is a collaboration between
-		the NASA Jet Propulsion Laboratory (JPL) and the UCLA Joint Institute for 
-		Regional Earth System Science and Engineering (JIFRESSE). The project initially
-		targeted the water resources management community by supporting efforts at model-
-		to-observational data comparisons in the California delta region near Sacramento, CA.
-		</p>
-	<p>Based largely on the success of that project, the scope of the RCMES has been expanded
-	   to support the broader international community of regional climate modelers, and to
-	   serve as both a resource and platform for performing data-intensive model evaluation
-	   experiments. More information about the project can be found by clicking on the 
-	   <a href="<?php echo SITE_ROOT?>/about/">About</a> tab, above.</p> 
+h1 { 
+font-size:30px;
+  line-height:18px;
+}
 
-	<div class="span-10 colborder">
-		<h3 id="latest-news" name="news">Latest News...</h3>
-		<div id="newsfeed">
-			<span class="quiet">Latest News Loading...</span>
-		</div>
-		
-	</div>
-	<div class="span-7 colborder">
-	    <h2>Latest Data Products...</h2>
-	    <br/>
-	    <div id="prods">
-	       <span class="quiet">Latest Products Loading...</span>
-	    </div>
-	</div>
+#left {
+background-color:#eee;
+width:280px;
+border-right:solid 1px #ccc;
+padding:5px;
+min-height:320px;
+float:left;
+}
+
+#right {
+
+width:630px;
+margin-left:320px;
+}
+div.header {
+  margin-top:0px;
+}
+
+#slides {
+
+}
+</style>
+<div id="left">
+<h2 style="margin-top:10px;">Welcome!</h2>
+<?php echo Puny::Container()->load('home.blurb');?>
+</div>
+<div id="right">
+    <div id="carousel" class="carousel">
+      <!-- Carousel items -->
+      <div class="carousel-inner">
+      <div class="active item">
+        <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-01.jpg"/>
+        <div class="carousel-caption">
+          <h4>Comparing Models to Observations</h4>
+<p>RCMES provides uniform access to billions of observational measurements, as well as a robust 
+   set of tools for performing common analysis tasks using the data...
+  &nbsp;<a href="<?php echo SITE_ROOT?>/about/overview">Learn more...</a>
+</p>
+        </div>
+      </div>
+   
+      <div class="item">
+        <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-02.jpg"/>
+        <div class="carousel-caption">
+          <h4>Regional Decision Making</h4>
+          <p>Observational data from RCMES helps validate models used by public policy makers at
+   local, state, and national levels.
+   &nbsp;<a href="<?php echo SITE_ROOT?>/about/project-history">Learn more...</a>
+</p>
+        </div>
+      </div>
+
+      <div class="item">
+        <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-03.jpg"/>
+        <div class="carousel-caption">
+          <h4>Collaborations with ExArch</h4>
+          <p>RCMES is developing connections with the multinational, multi-institutional ExArch project
+             to faciliate broader access to RCMES data.
+  &nbsp;<a href="<?php echo SITE_ROOT?>/collaborations/exarch">Learn more...</a>
+</p>
+        </div>
+     </div>
+
+ 
+     <div class="item">
+        <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-04.jpg"/>
+  <div class="carousel-caption">
+          <h4>Collaborations with CORDEX/IPCC</h4>
+   <p>RCMES is supporting the efforts of the Intergovernmental Panel on Climate Change and the 
+      COordinated Regional Downscaling EXperiment. 
+   &nbsp;<a href="<?php echo SITE_ROOT?>/collaborations/cordex">Learn more...</a>
+   </p>
+        </div>
+     </div>
+
+<div class="item">
+  <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-05.jpg"/>
+  <div class="carousel-caption">
+          <h4>Collaborations with NARCCAP/NCA</h4>
+   <p>RCMES is supporting the efforts of the North American Regional Climate Change Assessment Program
+      by providing access to data and tools for climate model validation.
+      &nbsp;<a href="<?php echo SITE_ROOT?>/collaborations/narccap">Learn More...</a>
+      </p>
+   </div>
+     </div>
+
+
+
+
+    </div>
+    <!-- Carousel nav -->
+    <a class="carousel-control left" href="#carousel" data-slide="prev">&lsaquo;</a>
+    <a class="carousel-control right" href="#carousel" data-slide="next">&rsaquo;</a>
+</div>
+<!--
+<div id="slides">
+  <div class="slides_container">
+    <div>
+     <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide1.png" style="width:570px;height:270px;padding:5px;"/>
+    </div>
+    <div>
+     <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide2.png" style="width:570px;height:270px;padding:5px;"/>
+    </div>
+    <div>
+
+    </div>
+    <div>
+
+    </div>
+  </div>
+<a href="#" class="prev"><img src="<?php echo SITE_ROOT?>/static/img/slides/arrow-prev.png" 
+   width="24" height="43" alt="Arrow Prev"></a>
+<a href="#" class="next"><img src="<?php echo SITE_ROOT?>/static/img/slides/arrow-next.png" 
+   width="24" height="43" alt="Arrow Next"></a>
+</div>
+<img id="frame" width="739" height="341" alt="Example Frame" src="<?php echo SITE_ROOT?>/static/img/slides/example-frame.png">
+-->
+
+</div>
