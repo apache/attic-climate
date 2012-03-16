@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>WRM - Regional Climate Model Evaluation Database</title>
+	<title>Regional Climate Model Evaluation Database</title>
 	
 	<link rel="stylesheet" href="<?php echo SITE_ROOT ?>/global/static/css/blueprint/screen.css"/>
 	<!--[if lt IE 8]><link rel="stylesheet" href="<?php echo SITE_ROOT ?>/global/static/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
@@ -12,7 +12,9 @@
 	<!-- Dynamically added stylesheets appear below -->
 	<!-- STYLESHEETS -->
 	
-	<script type="text/javascript" src="<?php echo SITE_ROOT?>/static/js/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="<?php echo SITE_ROOT?>/static/js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="<?php echo SITE_ROOT?>/static/js/jquery.hoverIntent.minified.js"></script>
+        <script type="text/javascript" src="<?php echo SITE_ROOT?>/static/js/script.js"></script>
 	<!-- Dynamically added javascripts appear below -->
 	<!-- JAVASCRIPTS -->
 	
@@ -26,16 +28,26 @@
 	<!-- End RSS feed -->
 </head>
 <body>
-<div id="wrapper_top">
-	<?php include HOME.'/views/common/headerNoNav.php'; ?>
+<div id="wrapper_top">    
+    <?php include HOME.'/views/common/headerNoNav.php'; ?>
+    <div id="logo">
+        <a href="<?php echo SITE_ROOT . '/'?>">
+            <img id="rcmes-logo" src="<?php echo SITE_ROOT?>/static/img/rcmes-logo.png" alt="RCMES Logo"/>
+        </a>
+    </div>
 </div>
 <!-- end #wrapper_top -->
 
 <div id="page" class="container">
 	<div class="header">
 		<h1>Regional Climate Model Evaluation System</h1>
+
+<!--
 		<h2>Connecting Observational Data to Regional Climate Model Evaluation</h2>
+-->
 	</div>
+
+<!-- 
 	<div id="left-nav">
 		<img id="rcmes-logo" src="<?php echo SITE_ROOT?>/static/img/rcmes-logo.png" alt="RCMES Logo"/>
 		<br/><br/>
@@ -51,7 +63,7 @@
 		  rpp: 12,
 		  interval: 30000,
 		  width: 265,
-		  height: 400,
+		  height: 200,
 		  theme: {
 		    shell: {
 		      background: '#cccccc',
@@ -72,17 +84,68 @@
 		}).render().setUser('rcmes').start();
 		</script>
 	</div>
+-->
+
 	<div id="content-container" class="clearfix">
-		<div id="site-menu" class="clearfix">
-			<ul>
-				<li class="<?php echo ($activeTab == 'home') ? 'active' : '';?>"><a href="<?php echo SITE_ROOT . '/'?>">Home</a></li>
-				<li class="<?php echo ($activeTab == 'data') ? 'active' : '';?>"><a href="<?php echo SITE_ROOT . '/data/'?>">Data</a></li>
-				<li class="<?php echo ($activeTab == 'tools') ? 'active' : '';?>"><a href="<?php echo SITE_ROOT . '/tools/'?>">Tools</a></li>
-				<li class="<?php echo ($activeTab == 'resources') ? 'active' : '';?>"><a href="<?php echo SITE_ROOT . '/resources/'?>">Resources</a></li>
-				<li class="<?php echo ($activeTab == 'about') ? 'active' : '';?>"><a href="<?php echo SITE_ROOT . '/about/'?>">About</a></li>
-			</ul>
-		</div>
-		<div><a name="bruno"></a></div>
+
+	    <div id="site-menu" class="clearfix">
+	        <ul>
+		    <li class="<?php echo ($activeTab == 'about') ? 'active' : '';?>">
+                        <a href="<?php echo SITE_ROOT . '/about/'?>">ABOUT</a>
+                        <ul id="about">
+                            <li><a href="<?php echo SITE_ROOT . '/about/overview'?>">Overview</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/about/project-history'?>">Project History</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/about/team'?>">Team</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/about/contact'?>">Contact</a></li>
+                        </ul>
+                    </li>
+		    <li class="<?php echo ($activeTab == 'collaborations') ? 'active' : '';?>">
+                        <a href="<?php echo SITE_ROOT . '/collaborations/'?>">COLLABORATIONS</a>
+                        <ul id="collab">
+                            <li><a href="<?php echo SITE_ROOT . '/collaborations/cordex'?>">CORDEX</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/collaborations/exarch'?>">Ex-Arch</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/collaborations/narccap'?>">NARCCAP</a></li>
+                        </ul>
+                    </li>
+		    <li class="<?php echo ($activeTab == 'publications') ? 'active' : '';?>">
+                        <a href="<?php echo SITE_ROOT . '/publications/'?>">PUBLICATIONS</a>
+                        <ul id="pubs">
+                            <li><a href="<?php echo SITE_ROOT . '/publications/papers'?>">Papers</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/publications/posters'?>">Posters</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/publications/presentations'?>">Presentations</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/publications/reports'?>">Reports</a></li>
+                        </ul>
+                    </li>
+		    <li class="<?php echo ($activeTab == 'data') ? 'active' : '';?>">
+                        <a href="<?php echo SITE_ROOT . '/data/'?>">DATA</a>
+                        <ul id="data">
+                            <li><a href="<?php echo SITE_ROOT . '/data/'?>">Overview</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/rcmed/datasets/'?>">Datasets</a></li>
+                            <li><a href="<?php echo SITE_ROOT . '/rcmed/parameters'?>">Parameters</a></li>
+                            <li>Data Points
+                                <!--  NEED TO FIND THE RIGHT PAGE FOR THIS LINK
+                                <a href="<?php echo SITE_ROOT . '/data/data-points'?>">Data Points</a>
+                                -->
+                            </li>
+                        </ul>
+                    </li>
+		    <li class="<?php echo ($activeTab == 'training') ? 'active' : '';?>">
+                        <a href="<?php echo SITE_ROOT . '/training/'?>">TRAINING</a>
+                        <ul id="training">
+                            <li><a href="<?php echo SITE_ROOT . '/training/rcmet-overview'?>">RCMET Overview</a></li>
+                            <li>RCMET User Guide</li>
+                            <!--<li><a href="<?php echo SITE_ROOT . '/training/rcmet-user-guide'?>">RCMET User Guide</a></li>-->
+                            <li><a href="<?php echo SITE_ROOT . '/training/rcmed-api-spec'?>">RCMED API Spec</a></li>
+                            <li>Videos</li>
+                            <!--<li><a href="<?php echo SITE_ROOT . '/training/videos'?>">Videos</a></li>-->
+                        </ul>
+                    </li>
+		    <li class="<?php echo ($activeTab == 'links') ? 'active' : '';?>">
+                        <a href="<?php echo SITE_ROOT . '/links'?>">LINKS</a>
+                    </li>
+		</ul>
+	    </div>
+	<div><a name="bruno"></a></div>
 		<div id="content">
 		
 		
