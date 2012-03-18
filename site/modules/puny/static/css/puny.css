@@ -1,0 +1,71 @@
+@CHARSET "UTF-8";
+
+[puny] {
+	
+	background-color:#fcfae6 !important;
+	color:#222 !important;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+[puny] a {
+	color:#225 !important;
+	
+}
+#editor_overlay {
+	position:absolute;
+	z-index:10000;
+	width:100%;
+	height:100%;
+	top:0px;
+	left:0px;
+	background-color:white;
+	display:none;
+}
+
+#editor_container {
+	border:solid 2px #888;
+	padding:5px;
+	display:none;
+	
+	position:absolute;
+    top:50%;
+    left:50%;
+    background-color:#ddd;
+    z-index:15000;
+    overflow:auto;
+    width:700px;
+    height:450px;
+    margin-left:-350px;
+    margin-top:-225px;
+    
+    -webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.punyEditor {
+	padding-right:5px;
+}
+
+.punyEditor textarea, .punyEditor select {
+	width:100%;
+}
+
+.punyEditor textarea {
+	height:330px;
+}
+
+.punyEditor select {
+	padding:2px;
+}
+
+.punyEditor select option {
+	padding:2px;
+}
+
+.punyEditor tr.actions td {
+	text-align:right;
+}

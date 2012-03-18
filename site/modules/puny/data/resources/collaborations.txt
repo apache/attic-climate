@@ -1,0 +1,12 @@
+##RCMES Partners
+
+The RCMES team is collaborating with a number of national and international efforts. We will highlight three such efforts on this page.
+
+###ExArch
+The NSF [ExArch]([SITE_ROOT]/collaborations/exarch) project is funded by the G8 initiative and focuses on developing an Exascale suite of software and tools for analyzing climate data from models and observations.
+
+###CORDEX
+[CORDEX]([SITE_ROOT]/collaborations/cordex) is a WCRP-sponsored program to organize an international coordinated framework to produce an improved generation of regional climate change projections world-wide for input into impact and adaptation studies within the AR5 timeline and beyond. RCMES is working with the CORDEX Africa, CORDEX East Asia and CORDEX Arctic communities to define how the tool can be used to assist in the CORDEX model runs and simulations.
+
+###NARCCAP
+[NARCCAP]([SITE_ROOT]/collaborations/narccap) is an international program that serves the high resolution climate scenario needs of the United States, Canada, and northern Mexico, using regional climate model, coupled global climate model, and time-slice experiments. The RCMES team is funded under a NASA National Climate Assessment Proposal to provide technical input to the NARCCAP using 5 Regional Climate Model outputs.

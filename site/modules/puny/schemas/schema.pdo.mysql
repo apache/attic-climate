@@ -1,0 +1,11 @@
+--
+-- Table structure for table `puny_resource`
+--
+
+CREATE TABLE IF NOT EXISTS `puny_resource` (
+  `resourceId` varchar(60) NOT NULL,
+  `version` int(10) unsigned NOT NULL,
+  `parser` varchar(60) NOT NULL,
+  `content` text NOT NULL,
+  PRIMARY KEY  (`resourceId`,`version`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Puny content resources';

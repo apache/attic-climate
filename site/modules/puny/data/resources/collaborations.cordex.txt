@@ -1,0 +1,13 @@
+##CORDEX
+
+![CORDEX Map]([SITE_ROOT]/static/img/slides/rcmes-slide1.png)
+
+In the United Nations Intergovernmental Panel on Climate Change (IPCC)’s 5th Assessment Report (AR5), due to begin in 2013, a new area of development centers around comparison of remote sensing observations to models. 
+
+This is an area that our team has significant experience in considering that we have led several workshops focusing on NASA’s contribution to AR5 in the obs4MIPs project. The AR5 scoping workshop identified this movement as a means to help verify climate model predictions on a timescale of decades to centuries, and identified that a (possibly weighted) measurement/assessment of the skill of a model using observations will prove valuable in conducting these measurements.
+
+In addition to this shift, AR5 will also include models that focus more on regional scales incorporating understanding of regional climate and impact activities in the African continent. Africa is a vibrant, rapidly developing cohort of cooperating nations perhaps exemplified in many ways by the flurry of activity in the South African region. South Africa has seen an increasing set of infrastructure and technological investments (e.g., to help meet the growing deluge of data that will be collected from next generation climate-related related instruments. In climate, one prominent international regional-focused modeling group that is part of the upcoming deluge is the [Coordinated Regional climate Downscaling Experiment (CORDEX)](http://www.meteo.unican.es/en/projects/CORDEX), in particular those members working on the CORDEX-Africa region. CORDEX is an international project to develop regional-scale climate projections based on multiple state-of-the-art global and regional climate models and their ensembles.
+
+At the Africa-focused CORDEX Workshop in Trieste, Italy in March 2011 held at the International Centre for Theoretical Physics (ICTP), members of the RCMES team including Drs. Duane Waliser and Chris Mattmann presented the current status of the RCMES system. Since the workshop, the RCMES has grown to include collaborations with principal members of the CORDEX community, specifically with colleagues at the University of Cape Town (UCT) and with the Rossby Centre. 
+
+In addition, we recently in September 2011 forged collaborations with the principals of the CORDEX East Asia efforts, with team members Dr. Jinwon Kim and Mr. Cameron Goodale attending and presenting at their meeting in South Korea.

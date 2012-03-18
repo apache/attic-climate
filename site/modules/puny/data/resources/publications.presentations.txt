@@ -1,0 +1,7 @@
+# Presentations
+
+* Mattmann, International Conference on the Coordinated Regional Climate Downscaling Experiment - CORDEX” in Trieste, Italy in March, 2011. 
+
+* Kim, J., D.E. Waliser, C. Mattmann, C. Goodale, A. Hart, P.Zimdars, G. Nikulin, C. Jones, B. Hewitson, C. Lennard, and A. Favre, 2011: Multi-RCM CORDEX-Africa hindcast evaluation using the JPL Regional Climate Model Evaluation System (RCMES). December 23, 2011, Seoul National University, Seoul, Korea. 
+
+

@@ -1,0 +1,8 @@
+## Reports
+
+* Waliser, D., Jinwon Kim, Y. Xue, Y. Chao, A. Eldering, R. Fovell, Q. Li, K.-N. Liou, J. McWilliams, F. De Sale, and Y. Yu, 2009: Simulating the Sierra Nevada snowpack: the impact of snow albedo and multi-layer snow physics. California Climate Change Report, CEC-500-2009-030-D, California Energy Commission. 
+
+* Kim, Jinwon, R. Fovell, A. Hall, Q. Li, K.-N. Liou, J. McWilliams, Y. Xue, X. Qu, and S. Kapnick, 2009: A projection of the cold season hydroclimate in California in mid-twenty-first century under the SRES-A1B emission scenario. California Climate Change Report, CEC-500-2009-029-D, California Energy Commission.
+
+* Hughes, M., A. Hall, and Jinwon Kim, 2009: Anthropogenic reduction of Santa Ana winds. California Climate Change Report, CEC-500-2009-015-D, California Energy Commission.
+Waliser, D.E., J. Kim, C. Mattmann, and L. Mearns, 2012: Regional climate model evaluation: A critical component of the scientific basis and decision support elements of NCA. National Climate Assessment 2013 Input.

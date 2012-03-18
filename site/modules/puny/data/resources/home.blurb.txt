@@ -1,0 +1,5 @@
+<br />
+
+The Regional Climate Model Evaluation System (RCMES) is designed to make it easier to conduct model-to-observational data comparisons by providing standardized access to a large quantity of observational measurements, as well as tools for performing common analysis and visualization tasks.
+
+Browse this site to get a better idea of RCMES. Please see our [contact page](about/contact) for information on how to reach out the team and to inquire about the project.

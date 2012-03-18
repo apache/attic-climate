@@ -1,0 +1,9 @@
+##About RCMES
+
+This site serves as the public face for both the data and tools provided by the Regional Climate Model Evaluation System. RCMES is composed of two complementary subsystems:
+
+###RCMED
+*    Regional Climate Model Evaluation Database. A scalable data store containing decades of observational measurements from NASA and other sources. You can learn more about RCMED by clicking on the [Data]([SITE_ROOT]/data) tab above.
+
+### RCMET
+*    Regional Climate Model Evaluation Toolkit. A comprehensive suite of tools for working with the data and performing common model evaluation tasks. You can learn more about RCMET by clicking on the [Training](../training) tab above. 

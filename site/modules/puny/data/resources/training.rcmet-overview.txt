@@ -1,0 +1,20 @@
+##RCMET
+
+### About the RCMES Toolkit...
+The Regional Climate Model Evaluation Toolkit (RCMET) is a comprehensive suite of algorithms, libraries, and interfaces designed to standardize and streamline the process of interacting with large quantities of observational data (such as is provided by the RCMED) and conducting regional climate model evaluations.
+
+RCMET consists of a Python library for common model evaluation tasks (e.g.: area averaging, regridding, bias calculation) as well as a set of user-friendly interfaces for quickly configuring a large-scale regional model evaluation task.
+
+Users can interact with the RCMET either by including the Python library directly in their code, or by way of the flexible, RESTful Application Programmer Interface (API). The API, also implemented in Python, allows RCMET users to integrate the capabilities of the toolkit into their workflow regardless of language and environment, provided they have the ability to make HTTP requests.
+
+### At a Glance...
+RCMET is usually packaged as a Virtual Machine image that contains all of the dependencies, libraries, and configuration interfaces needed to quickly get up and running with a model evaluation experiment. The virtual machine packaging dramatically reduces the time required to obtain the necessary environment for experimenting with RCMET tools and RCMED data.<img class="figure" src="[SITE_ROOT]/static/img/figures/rcmet-flow.png" style="width:320px;float:right;"/>
+
+### How the RCMET is Organized...
+The RCMET supports a wide variety of use cases, from simple non-connected tasks like performing re-gridding of model and observational data, to a complete model evaluation workflow from configuration to output plots. Internally the RCMET is comprised of a set of components, mostly written in Python, that perform various tasks and can be strung together to create more complicated processing workflows. For the common model evaluation use case, a web-based interface helps guide users through the entire process of selecting model and observational data to compare, choosing and configuring the processing steps, and customizing the output.
+
+RCMET is designed to work transparently with the RCMED, making it even easier to work with the large volumes of observational data required for full-scale model evaluation tasks. Furthermore, results can be generated in 
+<img class="figure" src="/site/static/img/figures/rcmet-output.png" style="width:320px;float:left;margin-left:0px;margin-right:30px;margin-top:15px;"/>
+a number of output formats, from serialized Python arrays that can be directly injected into Python code, to colorful and detailed plots that provide immediate visual feedback on the results of the model evaluation run (see image left).
+
+For more information on RCMET, please [contact]([SITE_ROOT]/about/contact) us!

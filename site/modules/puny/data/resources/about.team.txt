@@ -1,0 +1,80 @@
+##The RCMES Team
+<img class="figure" src="[SITE_ROOT]/static/img/people/waliser.jpg" style="width:320px;float:right;margin-top:10px;"/>
+
+### Dr. Duane Waliser
+
+####Role: Principal Investigator
+
+Dr. Duane Waliser is Chief Scientist, Earth Science and Technology Directorate, a Visiting Associate in the Geological and Planetary Sciences Division at Caltech and an Adjunct Professor in the Atmospheric and Oceanic Sciences Department at UCLA. His principle research interests lie in climate dynamics and in global atmosphere-ocean modeling, prediction and predictability, with emphasis on the Tropics. He joined JPL in 2004 with interests in utilizing new and emerging satellite data sets to study weather and climate as well as advance our model simulation and forecast capabilities, particularly for long-range weather and short-term climate applications. 
+
+<br /><br /><br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/mattmann.jpg" style="width:320px;float:right;"/>
+
+### Dr. Chris Mattmann
+
+#### Role: Data System Lead
+
+Dr. Chris Mattmann is the Data System Lead for the Regional Climate Model Evaluation System and leads the team of developers building the data system for Dr. Duane Waliser. Mattmann is a Co-I on a Winning NASA National Climate Assessment Proposal to construct the RCMES and to use in regional model comparisions with satellite remote sensing data, for NARCCAP and for the broader community including CORDEX. Mattmann has a Ph.D. in Computer Science from USC, and has worked at JPL for 11 years.
+
+<br /><br /><br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/jinwon.jpg" style="width:320px;float:right;"/>
+
+### Dr. Jinwon Kim
+
+#### Role: Regional Climate Modeling/Science Lead
+
+Dr. Jinwon Kim is a Visiting Scholar in the Joint Institute for Regional Earth System Science and Engineering at UCLA and Professor at Yonsei University, South Korea. Dr. Kim is the lead scientist on JPL and JIFRESSEʼs Regional Climate Model Evaluation System (RCMES) and an expert in the area of climate modeling, including work in multi-model ensembles and regional climate comparisons.
+
+
+<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/lean.png" style="width:320px;float:right;margin-top:10px;"/>
+
+### Dr. Peter Lean - Alumni
+
+####Role: RCMET Core Developer and Python Ninja
+
+Dr. Lean is a meteorologist with almost 10 years experience working on the evaluation and development of numerical weather prediction models.
+
+During this time he has developed strong technical skills in the efficient handling and manipulation of large scientific data sets and designing complex IT systems.
+
+Specialties include numerical weather prediction at convective scales,
+model development and evaluation, atmospheric predictability at short time scales, forecast product development, database design, and working with large scientific data sets.
+
+<br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/ahart.jpg" style="width:320px;float:right;"/>
+
+### Andrew Hart
+
+#### Role: Data Management Developer and Webmaster
+
+Andrew is a staff software engineer at the NASA Jet Propulsion Laboratory (JPL) where he works in the Data Management Systems and Technologies group. He brings his computer science background and creative talents to the design and development of data management components and web interfaces for a wide range of projects including an informatics infrastructure for the National Cancer Institute’s [_Early Detection Research Network_](http://cancer.gov/edrn) (EDRN), data modeling and architectural support for the Laura P. and Leland K. Whittier [_Virtual Pediatric Intensive Care Unit_](http://vpicu.net) (Whittier VPICU) at Children’s Hospital Los Angeles, and web services for JPL’s Airborne Cloud Computing Environment (ACCE).
+
+<br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/cgoodale.jpg" style="width:320px;float:right;"/>
+
+### Cameron Goodale
+
+#### Role: Data Management Developer
+
+Avid 1988 Honda CRX Driver who enjoys slinging Python and has been through the IDL trial by fire.
+
+<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/pramirez.jpg" style="width:320px;float:right;"/>
+
+### Paul Ramirez
+
+#### Role: Senior Data Management Developer
+
+Paul Ramirez is a Senior Software Engineer for the Jet Propulsion Laboratory where he has worked on _stuff_ related mostly to data management systems since 2001. An avid endorser of software reuse and open source that loves to explore the wonderland of search technologies and GIS. Curator of a Star Wars museum in building 171-255 (i.e. his office).
+
+<br /><br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/pzimdars.jpg" style="width:320px;float:right;"/>
+
+### Paul Zimdars
+
+#### Role: Infrastructure Overlord
+
+Paul Zimdars is a Senior System Administrator for the RCMES project. He has worked over 10 years on multiple JPL flight and non-flight related projects. He has extensive knowledge in Linux and Unix administration including advanced Network / Storage / and Web application troubleshooting and support.
+
+
+ 
