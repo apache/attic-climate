@@ -5,7 +5,7 @@
 
 ####Role: Principal Investigator
 
-Dr. Duane Waliser is Chief Scientist, Earth Science and Technology Directorate, a Visiting Associate in the Geological and Planetary Sciences Division at Caltech and an Adjunct Professor in the Atmospheric and Oceanic Sciences Department at UCLA. His principle research interests lie in climate dynamics and in global atmosphere-ocean modeling, prediction and predictability, with emphasis on the Tropics. He joined JPL in 2004 with interests in utilizing new and emerging satellite data sets to study weather and climate as well as advance our model simulation and forecast capabilities, particularly for long-range weather and short-term climate applications. 
+Dr. Duane Waliser is Chief Scientist, Earth Science and Technology Directorate, a Visiting Associate in the Geological and Planetary Sciences Division at Caltech and an Adjunct Professor in the Atmospheric and Oceanic Sciences Department at UCLA. His principle research interests lie in climate dynamics and in global atmosphere-ocean modeling, with emphasis on prediction and predictability, and model evaluation and improvement. He joined JPL in 2004 with interests in utilizing new and emerging satellite data sets to study weather and climate as well as advance our model simulation and forecast capabilities, particularly for long-range weather and short-term climate applications. 
 
 <br /><br /><br /><br /><br /><br /><br /><br />
 <img class="figure" src="[SITE_ROOT]/static/img/people/mattmann.jpg" style="width:320px;float:right;"/>
