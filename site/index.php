@@ -30,11 +30,21 @@ define ("DEBUG", true); // Change this to `false` when no longer debugging
 // Application root directory path (should never need to change this)
 define ("HOME",  dirname(__FILE__));
 
+// Temporary PEAR repository
+set_include_path(dirname(__FILE__) . '/PEAR' . PATH_SEPARATOR . get_include_path());
+
+// Timezone setting
+date_default_timezone_set('America/Los_Angeles');
+
 /* Set up application environment ***************************************/
 require_once("Org/Apache/Oodt/Balance/Boot/bootstrap.php");
 
 /* Initialize the application with the settings from config.ini *********/
 $app = $GLOBALS['app'] = App::Create(parse_ini_file(HOME . '/config.ini'));
+
+/* Initialize any globally required modules here ... */
+App::Get()->loadModule('puny');
+require_once('./modules/puny/classes/Puny.class.php');
 
 /* Generate and send a response to the browser **************************/
 $response = $app->getResponse()->send();
