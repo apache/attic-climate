@@ -36,19 +36,7 @@ Dr. Jinwon Kim is a Visiting Scholar in the Joint Institute for Regional Earth S
 
 Dan Crichton is a principal computer scientist, program manager and principal investigator at NASA's Jet Propulsion Laboratory which he joined in 1995. He leads data system efforts in solar system exploration, earth science and technology. He has served as principal investigator of several distributed data system projects for NASA and the NIH. He also architected a software framework for sharing data that won runner-up for NASA Software of the Year and is now hosted by the Apache Software Foundation as a top-level project. He has published over 60 papers on data intensive systems including five book chapters. He holds an M.S. degree in Computer Science from the University of Southern California and a B.S. degree in Information and Computer Science from the University of California at Irvine.
 
-<br /><br /><br /><br /><br />
-<img class="figure" src="[SITE_ROOT]/static/img/people/lean.png" style="width:320px;float:right;margin-top:10px;"/>
 
-### Dr. Peter Lean - Alumni
-
-####Role: RCMET Core Developer and Python Ninja
-
-Dr. Lean is a meteorologist with almost 10 years experience working on the evaluation and development of numerical weather prediction models.
-
-During this time he has developed strong technical skills in the efficient handling and manipulation of large scientific data sets and designing complex IT systems.
-
-Specialties include numerical weather prediction at convective scales,
-model development and evaluation, atmospheric predictability at short time scales, forecast product development, database design, and working with large scientific data sets.
 
 <br /><br /><br /><br />
 <img class="figure" src="[SITE_ROOT]/static/img/people/ahart.jpg" style="width:320px;float:right;"/>
@@ -87,4 +75,18 @@ Paul Ramirez is a Senior Software Engineer for the Jet Propulsion Laboratory whe
 Paul Zimdars is a Senior System Administrator for the RCMES project. He has worked over 10 years on multiple JPL flight and non-flight related projects. He has extensive knowledge in Linux and Unix administration including advanced Network / Storage / and Web application troubleshooting and support.
 
 
+<br /><br /><br /><br /><br />
+<br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/lean.png" style="width:320px;float:right;margin-top:10px;"/>
+
+### Dr. Peter Lean - Alumni
+
+####Role: RCMET Core Developer and Python Ninja
+
+Dr. Lean is a meteorologist with almost 10 years experience working on the evaluation and development of numerical weather prediction models.
+
+During this time he has developed strong technical skills in the efficient handling and manipulation of large scientific data sets and designing complex IT systems.
+
+Specialties include numerical weather prediction at convective scales,
+model development and evaluation, atmospheric predictability at short time scales, forecast product development, database design, and working with large scientific data sets.
  
