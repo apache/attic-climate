@@ -26,7 +26,17 @@ Dr. Chris Mattmann is the Data System Lead for the Regional Climate Model Evalua
 Dr. Jinwon Kim is a Visiting Scholar in the Joint Institute for Regional Earth System Science and Engineering at UCLA and Professor at Yonsei University, South Korea. Dr. Kim is the lead scientist on JPL and JIFRESSEʼs Regional Climate Model Evaluation System (RCMES) and an expert in the area of climate modeling, including work in multi-model ensembles and regional climate comparisons.
 
 
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<img class="figure" src="[SITE_ROOT]/static/img/people/crichton.jpg" style="width:320px;float:right;"/>
+
+### Dan Crichton
+
+#### Role: Data Systems and Technology Program Manager
+
+
+Dan Crichton is a principal computer scientist, program manager and principal investigator at NASA's Jet Propulsion Laboratory which he joined in 1995. He leads data system efforts in solar system exploration, earth science and technology. He has served as principal investigator of several distributed data system projects for NASA and the NIH. He also architected a software framework for sharing data that won runner-up for NASA Software of the Year and is now hosted by the Apache Software Foundation as a top-level project. He has published over 60 papers on data intensive systems including five book chapters. He holds an M.S. degree in Computer Science from the University of Southern California and a B.S. degree in Information and Computer Science from the University of California at Irvine.
+
+<br /><br /><br /><br /><br />
 <img class="figure" src="[SITE_ROOT]/static/img/people/lean.png" style="width:320px;float:right;margin-top:10px;"/>
 
 ### Dr. Peter Lean - Alumni
