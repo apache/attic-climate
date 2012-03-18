@@ -7,5 +7,5 @@ $activeTab = 'about';
     About RCMES
 
 </div>
-<h2>About RCMES...</h2>
-    <p>Additional high-level information about the RCMES will be made available here shortly...</p>
+
+    <?php echo Puny::container()->load('home.welcome');?>
