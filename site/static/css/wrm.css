@@ -33,9 +33,8 @@ div.header {
 }
 div.header h1 {
 	color:#fff;
-	margin: 4px 0px -1px 0px;
+	margin: 4px 0px -1px 12px;
 	font-size:1.4em;
-        text-align: center;
         letter-spacing: 0.04.em;
 }
 div.header h2 {
