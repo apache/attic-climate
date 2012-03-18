@@ -94,7 +94,7 @@
                         <a href="<?php echo SITE_ROOT . '/about/'?>">ABOUT</a>
                         <ul id="about">
                             <li><a href="<?php echo SITE_ROOT . '/about/overview'?>">Overview</a></li>
-                            <li><a href="<?php echo SITE_ROOT . '/about/project-history'?>">Project History</a></li>
+<!--                        <li><a href="<?php echo SITE_ROOT . '/about/project-history'?>">Project History</a></li>-->
                             <li><a href="<?php echo SITE_ROOT . '/about/team'?>">Team</a></li>
                             <li><a href="<?php echo SITE_ROOT . '/about/contact'?>">Contact</a></li>
                         </ul>
