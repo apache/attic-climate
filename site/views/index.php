@@ -56,30 +56,38 @@ div.header {
     <div id="carousel" class="carousel">
       <!-- Carousel items -->
       <div class="carousel-inner">
+
       <div class="active item">
-        <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-01.jpg"/>
-        <div class="carousel-caption">
-          <h4>Comparing Models to Observations</h4>
-<p>RCMES provides uniform access to billions of observational measurements, as well as a robust 
-   set of tools for performing common analysis tasks using the data...
-  &nbsp;<a href="<?php echo SITE_ROOT?>/about/overview">Learn more...</a>
-</p>
-        </div>
-      </div>
-   
-      <div class="item">
+        <a href="<?php echo SITE_ROOT?>/about/overview">
         <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-02.jpg"/>
+        </a>
         <div class="carousel-caption">
           <h4>Regional Decision Making</h4>
-          <p>Observational data from RCMES helps validate models used by public policy makers at
+          <p>Observational data from RCMES helps analyze models used by public policy makers at
    local, state, and national levels.
    &nbsp;<a href="<?php echo SITE_ROOT?>/about/project-history">Learn more...</a>
 </p>
         </div>
       </div>
 
+   <div class="item">
+        <a href="<?php echo SITE_ROOT?>/about/overview">
+        <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-01.jpg"/>
+        </a>
+        <div class="carousel-caption">
+          <h4>Comparing Models to Observations</h4>
+   <p>RCMES provides uniform access to billions of observational measurements, as well as a robust
+   set of tools for performing common analysis tasks using the data...
+  &nbsp;<a href="<?php echo SITE_ROOT?>/about/overview">Learn more...</a>
+</p>
+        </div>
+      </div>
+
+
       <div class="item">
+        <a href="<?php echo SITE_ROOT?>/collaborations/exarch">
         <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-03.jpg"/>
+        </a>
         <div class="carousel-caption">
           <h4>Collaborations with ExArch</h4>
           <p>RCMES is developing connections with the multinational, multi-institutional ExArch project
@@ -91,7 +99,9 @@ div.header {
 
  
      <div class="item">
+        <a href="<?php echo SITE_ROOT?>/collaborations/cordex">
         <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-04.jpg"/>
+        </a>
   <div class="carousel-caption">
           <h4>Collaborations with CORDEX/IPCC</h4>
    <p>RCMES is supporting the efforts of the Intergovernmental Panel on Climate Change and the 
@@ -102,7 +112,9 @@ div.header {
      </div>
 
 <div class="item">
+  <a href="<?php echo SITE_ROOT?>/collaborations/narccap">
   <img src="<?php echo SITE_ROOT?>/static/img/slides/rcmes-slide-05.jpg"/>
+  </a>
   <div class="carousel-caption">
           <h4>Collaborations with NARCCAP/NCA</h4>
    <p>RCMES is supporting the efforts of the North American Regional Climate Change Assessment Program
