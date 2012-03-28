@@ -44,7 +44,6 @@ t_name = 'TIME_EOSGRID'
 lat_name = 'YDim_EOSGRID'
 lon_name = 'XDim_EOSGRID'
 h = 0
-start_datetime = datetime.datetime(1979,1,1,0,0,0)
 
 # Dictionary to hold the North American Region Bounding Box
 # We can use these values to MASK the XDIM and YDim Arrays i think
@@ -117,6 +116,8 @@ param = numpy.array(full_param)
 t = numpy.array(full_time)
 lat_full = numpy.array(nio_lat)
 lon_full = numpy.array(nio_lon)
+raw_time = full_time.units.lstrip('minutes since ')
+start_datetime = datetime.datetime.strptime(raw_time, '%Y-%m-%d %H:%M:%S')
 
 # Mask the Lat and Lon Arrays using the NA_Region Dict
 lat = createMaskedArray(lat_full, NA_Region['southbc'], NA_Region['northbc'])
