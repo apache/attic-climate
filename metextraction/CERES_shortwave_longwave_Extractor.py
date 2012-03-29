@@ -35,7 +35,7 @@ parser.add_option("-o", "--output", dest="output",
 (options, args) = parser.parse_args()
 
 def get_var_name(var):
-    x = str(var).split('\n')[0].lstrip('Variable: ')
+    x = str(var).split('\n')[0].replace('Variable: ','')
     return x
 
 def write_metadata(var, readings, file_counter):
