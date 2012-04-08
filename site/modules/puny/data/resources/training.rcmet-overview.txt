@@ -14,7 +14,7 @@ RCMET is usually packaged as a Virtual Machine image that contains all of the de
 The RCMET supports a wide variety of use cases, from simple non-connected tasks like performing re-gridding of model and observational data, to a complete model evaluation workflow from configuration to output plots. Internally the RCMET is comprised of a set of components, mostly written in Python, that perform various tasks and can be strung together to create more complicated processing workflows. For the common model evaluation use case, a web-based interface helps guide users through the entire process of selecting model and observational data to compare, choosing and configuring the processing steps, and customizing the output.
 
 RCMET is designed to work transparently with the RCMED, making it even easier to work with the large volumes of observational data required for full-scale model evaluation tasks. Furthermore, results can be generated in 
-<img class="figure" src="/site/static/img/figures/rcmet-output.png" style="width:320px;float:left;margin-left:0px;margin-right:30px;margin-top:15px;"/>
+<img class="figure" src="[SITE_ROOT]/static/img/figures/rcmet-output.png" style="width:320px;float:left;margin-left:0px;margin-right:30px;margin-top:15px;"/>
 a number of output formats, from serialized Python arrays that can be directly injected into Python code, to colorful and detailed plots that provide immediate visual feedback on the results of the model evaluation run (see image left).
 
 For more information on RCMET, please [contact]([SITE_ROOT]/about/contact) us!

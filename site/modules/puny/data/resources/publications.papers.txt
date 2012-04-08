@@ -16,6 +16,9 @@
 
 ## Conference Papers
 
+* Waliser, D.E., J. Kim, C. Mattmann, L. Mearns, C. Goodale, A. Hart, D. Crichton, S. Mcginnis, 2012: Evaluations of the monthly surface air temperatures and precipitation over the conterminous U.S. in the NARCCAP multi-RCM hindcast experiment. in preparation.
+
+
 * Kim. J., D. Waliser, Q. Li, K. Liou, C. Cai, Y. Chao, A. Eldering, R. Fovell, A. Hall, X. Qu, and Y. Xue, 2007: The JIFRESSE Regional Earth System Model and its application to air quality in California. AGU Fall meeting, GC21A-0137, December 11, 2007, San Francisco, California, American Geophysical Union.
 
 * Eldering, A., A. Hall, J. Kim, R. Fovell, Y. Chao, Q. Li, K.-N. Liou, J. McWilliams, D. Waliser, and Y. Xu, 2008: A projection of climate change on the hydroclimate in California based on CCSM3 and JIFRESSE RESM: A joint UCLA-JPL research effort on modeling and observing the Earth system on regional scales. US CLIVAR Summit,14-16  July 2008, Irvine, California.

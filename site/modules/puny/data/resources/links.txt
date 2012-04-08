@@ -10,3 +10,4 @@
 * [United States Global Change Research Program (USGCRP)](http://www.globalchange.gov/)
 * [World Climate Research Programme (WCRP)](http://www.wcrp-climate.org/) 
 * [California Department of Water Resources](http://www.water.ca.gov)
+* [Program for Climate Model Diagnostics and Intercomparison (PCMDI)](http://www-pcmdi.llnl.gov/)

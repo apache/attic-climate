@@ -5,7 +5,7 @@ Here are a few of the ways to get in contact or keep in touch with the project:
 ##RCMES Science
 
 * [Duane Waliser](mailto:duane.waliser@jpl.nasa.gov)
-* [Jinwon Kim](mailto:jinwon.kim@jpl.nasa.gov)
+* [Jinwon Kim](mailto:jkim@atmos.ucla.edu)
 
 
 ##RCMES Data Systems

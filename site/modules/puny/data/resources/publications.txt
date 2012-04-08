@@ -6,15 +6,16 @@ The RCMES team has produced a broad swath of papers, presentations, reports, and
 ## Papers
 Browse the team's [Papers]([SITE_ROOT]/publications/papers).
 
+<br />
+## Posters
+Browse the team's [Posters]([SITE_ROOT]/publications/posters)
+
 
 <br />
 ## Presentations
 Browse the team's [Presentations]([SITE_ROOT]/publications/presentations)
 
 
-<br />
-## Posters
-Browse the team's [Posters]([SITE_ROOT]/publications/posters)
 
 
 <br />
