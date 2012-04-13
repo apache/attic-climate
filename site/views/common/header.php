@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>Regional Climate Model Evaluation Database</title>
+	<title>Regional Climate Model Evaluation System</title>
 	
 	<link rel="stylesheet" href="<?php echo SITE_ROOT ?>/global/static/css/blueprint/screen.css"/>
 	<!--[if lt IE 8]><link rel="stylesheet" href="<?php echo SITE_ROOT ?>/global/static/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->

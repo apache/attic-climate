@@ -8,11 +8,11 @@
 		</div>
   		<div class="footer_nav">
 		  <p>
-		    <a href="<?php echo SITE_ROOT?>" class="first">About</a>
+		    <a href="<?php echo SITE_ROOT . '/about/'?>" class="first">About</a>
 		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
-                    <a href="<?php echo SITE_ROOT?>/datasets/">Datasets</a>
+                    <a href="<?php echo SITE_ROOT?>/rcmed/datasets/">Datasets</a>
 		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
-                    <a href="<?php echo SITE_ROOT?>/parameters">Parameters</a>
+                    <a href="<?php echo SITE_ROOT?>/rcmed/parameters">Parameters</a>
 		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
                     <a href="http://wrm.jpl.nasa.gov/query-api/query.php">Search API</a>
 		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
@@ -23,8 +23,8 @@
 		    <a href="http://www.jpl.nasa.gov/imagepolicy/">Image Policy</a>
 		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
                     <a href="http://www.jpl.nasa.gov/copyrights.cfm">Privacy</a>
-		    &nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;
-		    <?php echo Puny::status();?>
+		    &nbsp;&nbsp;&nbsp;
+		    <!-- <?php echo Puny::status();?> -->
 		    </p>
  		</div>
 		<div class="clear"></div>
