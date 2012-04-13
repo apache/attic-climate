@@ -68,7 +68,8 @@ for ($i = 0; $i < count($labels); $i++) {
 		<div class="stat">
 			<img src="<?php echo SITE_ROOT?>/static/img/paper-200.jpg" alt="image of bleached paper"/>
 			<div class="number"><?php echo $dpCount . $dpLabel?></div>
-			<p><a href="<?php echo SITE_ROOT?>/browse-rcmed/">Data Points</a></p>
+		<!--	<p><a href="<?php echo SITE_ROOT?>/browse-rcmed/">Data Points</a></p>
+		-->	<p>Data Points</p>
 		</div>
 	</div>
 	
