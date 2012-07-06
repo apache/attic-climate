@@ -1,4 +1,6 @@
 #!/usr/local/bin/python
+#comment
+#svn commit -m "commit message" filename
 
 import sys
 sys.path.append('../lib')
