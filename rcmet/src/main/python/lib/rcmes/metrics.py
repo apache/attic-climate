@@ -4,13 +4,18 @@
 # Module storing functions to calculate statistical metrics from numpy arrays
 #
 #	Peter Lean 	March 2010
-#
+#   Kim Whitehall June 2012
+#    
 ###########################################################################
 '''
 
 def calc_annual_cycle_means(t2,time):
   '''
   # Calculate monthly means for every grid point
+  #inputs: 2 arrays modelData and modelTimes
+  #         modelData is masked array of the model data list
+  #         modelData is 3D - time,lon,lat
+  #         modelTimes is an array of python datetime objects
   '''
 
   import numpy as np
@@ -22,6 +27,7 @@ def calc_annual_cycle_means(t2,time):
   for t in np.arange(len(time)):
      months[t]=time[t].month
 
+    #if there is data varying in t and space
   if t2.ndim==3:
     means=ma.empty((12,t2.shape[1],t2.shape[2])) # empty array to store means
 
@@ -29,8 +35,10 @@ def calc_annual_cycle_means(t2,time):
     for i in np.arange(12)+1:
       means[i-1,:,:]=t2[months==i,:,:].mean(0)
 
+  #if the data is a timeseries over area-averaged values
   if t2.ndim==1:
-    means=np.empty((12)) # empty array to store means
+    # TODO - Investigate using ma per KDW
+    means=np.empty((12)) # empty array to store means??WHY NOT ma?
 
     # Calculate means month by month
     for i in np.arange(12)+1:
@@ -58,7 +66,7 @@ def calc_annual_cycle_std(t2,time):
 
   # Calculate means month by month
   for i in np.arange(12)+1:
-    stds[i-1,:,:]=t2[months==i,:,:].std(0)
+    stds[i-1,:,:]=t2[months==i,:,:].std(axis=0,ddof=1)
   
   return stds
 
@@ -102,7 +110,7 @@ def calc_annual_cycle_domain_std(t2,time):
 
   # Calculate means month by month
   for i in np.arange(12)+1:
-    stds[i-1]=t2[months==i,:,:].std()
+    stds[i-1]=t2[months==i,:,:].std(ddof=1)
   
   return stds
 
@@ -240,6 +248,8 @@ def calc_temporal_pat_cor(t1,t2):
    #    patcor - a 2d array of time series pattern correlation coefficients at each grid point.
    #
    #    Peter Lean  March 2011
+   # Editing: Kim Whitehall June 2012
+   #         reason: std_dev to be standarized on (n-1) not n
    '''
    import numpy
 
@@ -248,13 +258,9 @@ def calc_temporal_pat_cor(t1,t2):
 
    nt = t1.shape[0]
 
-   #for t in xrange(nt):
- 
-   #sigma_t1=np.sqrt(((t1[t,:,:]-mt1)**2).sum()/(nt-1))
-   #sigma_t2=np.sqrt(((t2[t,:,:]-mt2)**2).sum()/(nt-1))
-
-   sigma_t1 = t1.std(axis=0)
-   sigma_t2 = t2.std(axis=0)
+   sigma_t1=t1.std(axis=0, ddof=1)
+   sigma_t2=t2.std(axis=0, ddof=1)
+   # TODO - What is the implication of using ddof=1?  Will a user want to change this value?
 
    patcor = (( ( (t1[:,:,:]-mt1) * (t2[:,:,:]-mt2) ).sum(axis=0)) / (nt) ) / (sigma_t1*sigma_t2)
    
@@ -273,6 +279,8 @@ def calc_pat_cor(t1,t2):
    #    patcor - a 1d array (time series) of pattern correlation coefficients.
    #
    #    Peter Lean  March 2011
+   #    Editing: Kim Whitehall June 2012
+   #        reason: std_dev not standardized on N-1
    '''
    import numpy
 
@@ -282,17 +290,24 @@ def calc_pat_cor(t1,t2):
    patcor = []
 
    for t in xrange(nt):
-
+    # find mean and std_dev 
      mt1 = t1[t,:,:].mean()
      mt2 = t2[t,:,:].mean()
 
+     sigma_t1 = t1[t,:,:].std(ddof=1)
+     sigma_t2 = t2[t,:,:].std(ddof=1)
+
+      # TODO: make means and standard deviations weighted by grid box area.
+ ##### Debugging print statements to show the difference the n-1 makes....
+#http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
+     print t, mt1, mt2, sigma_t1, sigma_t2
      sigma_t1 = t1[t,:,:].std()
      sigma_t2 = t2[t,:,:].std()
-   
-     # TODO: make means and standard deviations weighted by grid box area.
- 
-     patcor.append(((( ( (t1[t,:,:]-mt1) * (t2[t,:,:]-mt2) ).sum()) / (t1.shape[1]*t1.shape[2]) ) / (sigma_t1*sigma_t2)))
+     print t, mt1, mt2, sigma_t1, sigma_t2
 
+     # TODO: make means and standard deviations weighted by grid box area.
+
+     patcor.append(((( ( (t1[t,:,:]-mt1) * (t2[t,:,:]-mt2) ).sum()) / (t1.shape[1]*t1.shape[2]) ) / (sigma_t1*sigma_t2)))
      print t,mt1.shape,mt2.shape, sigma_t1.shape, sigma_t2.shape, patcor[t]
    
      # TODO: deal with missing data appropriately, i.e. mask out grid points with missing data above tolerence level
@@ -305,6 +320,52 @@ def calc_pat_cor(t1,t2):
 
    return patcor
 
+###########################################################################
+# Anomaly Correlation
+
+def calc_anom_corn(t1,t2,t4):
+    '''
+        # Calculate the Anomaly Correlation
+        # Kim Whitehall June 2012
+        # Edited according to new metrics 
+        # input three arrays, modelData, obsData and climoData
+        # Assumes climoData is for same time period 
+        # TODO:  Rename function vars to declare what they are
+    '''
+    import numpy as np
+    import glob
+    # store results in list for convenience (then convert to numpy array at the end)
+    anomcor = []    
+    nt = t1.shape[0]
+    #prompt for the third file, i.e. climo file...  
+    #include making sure the lat, lon and times are ok for comparision
+    # find the climo in here and then using for eg, if 100 yrs 
+    # is given for the climo file, but only looking at 10yrs
+    # ask if want to input climo dataset for use....if no, call previous 
+   
+    
+    climoFileOption=raw_input('Would you like to use the full observation dataset as the climatology in this calculation? [y/n] \n>')
+    if climoFileOption == 'y':
+       print 'in if'
+       t3 = t4
+    else:
+       print 'in else'
+       t3 = t2
+    
+    #---------------------------------------------------------------------
+
+    for t in xrange(nt):
+        mt3 = t3[t,:,:].mean()
+        anomcor.append((((t1[t,:,:]-mt3)*(t2[t,:,:]-mt3)).sum())/np.sqrt(((t1[t,:,:]-mt3)**2).sum()*((t2[t,:,:]-mt3)**2).sum()))
+        print t,mt3.shape,anomcor[t]
+
+    # TODO: deal with missing data appropriately, i.e. mask out grid points with missing data above tolerence level
+    
+    # convert from list into numpy array
+    anomcor = np.array(anomcor)
+    print anomcor.shape, anomcor.ndim, anomcor
+    
+    return anomcor
 
 ###########################################################################
 # Anomaly Correlation
@@ -323,8 +384,8 @@ def calc_anom_cor(t1,t2):
  
      mt2=t2[t,:,:].mean()
 
-     sigma_t1 = t1[t,:,:].std()
-     sigma_t2 = t2[t,:,:].std()
+     sigma_t1 = t1[t,:,:].std(ddof=1)
+     sigma_t2 = t2[t,:,:].std(ddof=1)
 
      # TODO: make means and standard deviations weighted by grid box area.
 
@@ -336,40 +397,123 @@ def calc_anom_cor(t1,t2):
 
    # convert from list into numpy array
    anomcor = numpy.array(anomcor)
-  
+   print anomcor.shape, anomcor.ndim, anomcor
    return anomcor
 
 ###########################################################################
 # Coefficient of Efficiency
+# Nash-sutcliff coefficient of efficiency (E)
+def calc_nash_sutcliff(t1,t2):
+    '''
+    #Routine to calculate the Nash-Sutcliff coefficient of efficiency (E)
+    # Input: 
+    #       t1 - 3d array of model data
+    #       t2 - 3d array of obs data
+    #
+    # Output:
+    #       ns_coeff - a 1d array of the Nash-Sutcliff Coefficient of efficiency
+    # Kim Whitehall June 2012 
+    '''
+    import numpy as np
+    nt = t1.shape[0]
+    nashcor = []
+    for t in xrange(nt):
+       mt2 = t2[t,:,:].mean()
+    
+       nashcor.append(1 - ( (( (t2[t,:,:]-t1[t,:,:]) **2).sum()) / ((t2[t,:,:]-mt2)**2).sum()))
+       print t, mt2.shape, nashcor[t]
 
+    nashcor=np.array(nashcor)
+    print nashcor.shape, nashcor.ndim, nashcor
+
+    return nashcor
 
 ###########################################################################
 # Probability Distribution Function
 
-def calc_pdf(data):
-   '''
+def calc_pdf(t1,t2):
+    '''
    #################################################################################################
    # Routine to calculate a normalised PDF with bins set according to data range.
    # Input:
-   #     data  - numpy data array
+   #     2 data  arrays, modelData and obsData
    # Output:
-   #     edges        - numpy array describing the edges of the bins
-   #     distribution - numpy array of values for each bin
+   #     PDF for the year
    #
    #   Peter Lean July 2010 
-   #
+   #   Edited: KDW July 2012
+   #   Reason: according to new metrics given.Equation from Perkins et al. 2007
    #################################################################################################
    '''
 
-   import numpy as np
+    import numpy as np
+    #import statistics as stats
+    
+    #list to store PDFs of modelData and obsData
+    pdfMod = []
+    pdfObs = []
+    # float to store the final PDF similarity score
+    pdfss = 0.0
 
-   # Define bin ranges
-   nbins=10
-   mybins=np.linspace(t2.min(),t2.max(),nbins)
+    print 'min modelData', t1[:,:,:].min()
+    print 'max modelData', t1[:,:,:].max()
+    print 'min obsData', t2[:,:,:].min()
+    print 'max obsData', t2[:,:,:].max()
+    # find a distribution for the entire dataset
+    #prompt the user to enter the min, max and number of bin values. The max, min info above is to help guide the user with these choises
+    print '****PDF input values from user required **** \n'
+    nbins = int (raw_input('Please enter the number of bins to use. \n'))
+    minEdge = float(raw_input('Please enter the minimum value to use for the edge. \n'))
+    maxEdge = float(raw_input('Please enter the maximum value to use for the edge. \n'))
+    
+    mybins=np.linspace(minEdge,maxEdge, nbins)
+    print 'nbins is', nbins, 'mybins are', mybins
+    pdfMod,edges=np.histogram(t1,bins=mybins,normed=True,new=True)  
+    print 't1 distribution and edges', pdfMod, edges
+    pdfObs,edges=np.histogram(t2,bins=mybins,normed=True,new=True)           
+    print 't2 distribution and edges', pdfObs, edges    
+    
+    #*****************************************************
+    #considering using pdf function from statistics package. It is not installed. Have to test on Mac.
+    #http://bonsai.hgc.jp/~mdehoon/software/python/Statistics/manual/index.xhtml#TOC31 
+    #pdfMod, edges = stats.pdf(t1, bins=mybins)
+    #print 't1 distribution and edges', pdfMod, edges
+    #pdfObs,edges=stats.pdf(t2,bins=mybins)           
+    #print 't2 distribution and edges', pdfObs, edges 
+    #*****************************************************
 
-   # Calculate the number of occurrences in each bin
-   distribution,edges=np.histogram(t2,bins=mybins,normed=True,new=True)
-   
-   return edges, distribution
+    #find minimum at each bin between lists 
+    i =0
+    for modVal in pdfMod :
+         print 'modVal is', modVal, 'pdfObs[',i,'] is', pdfObs[i]
+         if modVal < pdfObs[i]:
+           pdfss = pdfss + modVal
+         else:
+           pdfss = pdfss + pdfObs[i] 
+         i = i + 1 
+    print 'pdfss is', pdfss
+    return pdfss
 
+###########################################################################
+# Standard deviation
+# Kim Whitehall June 2012
+# inputs: 1 parameter, the model dataset or obs dataset
+def calc_stdev(t1):
+ 
+    ''' 
+        # Input: a dataset
+        # Output: an array of the std_dev for each month in the dataset entered
+	   # use build in function from numpy
+        # Calculate standard deviation in a given dataset
+	
+        '''
+    import numpy as np
+    nt = t1.shape[0]
+    sigma_t1 = []
+    for t in xrange(nt):
+    	  sigma_t1.append(t1[t,:,:].std(ddof=1))
+    sigma_t1=np.array(sigma_t1)
+    print sigma_t1, sigma_t1.shape
+    return sigma_t1
 
+###########################################################################

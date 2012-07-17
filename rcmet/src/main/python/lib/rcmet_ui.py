@@ -408,10 +408,13 @@ def rcmet_ui():
   print '[0] Bias: mean bias across full time range'
   print '[1] Mean Absolute Error: across full time range'
   print '[2] Difference: calculated at each time unit'
-  print '[3] Anomaly Correlation> '
-  print '[4] Pattern Correlation> '
-  print '[5] TODO: Probability Distribution Function similarity score'
+  print '[3] Anomaly Correlation Timeseries> '
+  print '[4] Pattern Correlation Timeseries> '
+  print '[5] Probability Distribution Function similarity score'
   print '[6] RMS error'
+  print '[7] Coefficient of Efficiency'
+  print '[8] Standard deviation'  
+  print '[9] new Anomaly Correlation'  
   choice = int(raw_input('Please make a selection from the options above\n> '))
   if choice==0:
       metricOption = 'bias'
@@ -427,8 +430,13 @@ def rcmet_ui():
       metricOption = 'pdf'
   if choice==6:
       metricOption = 'rms'
-
-  ###################################################################################################
+  if choice==7:
+      metricOption = 'coe'
+  if choice==8:
+      metricOption = 'stddev'
+  if choice==9:
+      metricOption = 'nacc'
+   ###################################################################################################
   # Section 11: Select Plot Options
   ###################################################################################################
   modifyPlotOptions = raw_input('Do you want to modify the default plot options? [y/n]\n> ').lower()

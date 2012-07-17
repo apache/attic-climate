@@ -58,18 +58,24 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
  import subprocess
  import datetime
  import pickle
- import numpy; import numpy as np; import numpy.ma as ma; import Nio
+ import numpy; import numpy.ma as ma 
+ # import Nio - NOT USED
+ # import numpy as np - NOT USED 
  import rcmes.plots
  import rcmes.fortranfile
  import rcmes.db; import rcmes.files; import rcmes.process; import rcmes.metrics
  from rc_model import Model
 
+ global modData
+ global obData
+ global mmt1
+ global sigma_tt1
  ##################################################################################################################
  # Part 1: retrieve observation data from the database
  #       NB. automatically uses local cache if already retrieved.
  ##################################################################################################################
  obsLats,obsLons,obsLevs,obsTimes,obsData = rcmes.db.extract_data_from_db(obsDatasetId,obsParameterId,latMin,latMax,lonMin,lonMax,startTime,endTime,cachedir)
-
+#extract climo data
  ##################################################################################################################
  # TEMPORARY INELEGANT UNIT CORRECTION TO CONVERT UNITS FOR CRU DATA WHICH WAS INGESTED INTO DB WITH WRONG UNITS
  # REMOVE THIS SECTION ONCE THE CRU DATA HAS BEEN RE-INGESTED CORRECTLY INTO DB
@@ -350,6 +356,8 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
    modelData = rcmes.metrics.calc_annual_cycle_means(modelData,modelTimes)
    obsData = rcmes.metrics.calc_annual_cycle_means(obsData,modelTimes)
 
+   modData= modelData
+   obData = obsData 
 
  ##################################################################################################################
  # Part 7: metric calculation
@@ -388,7 +396,22 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
    metricData = rcmes.metrics.calc_anom_cor(modelData,obsData)
    metricTitle = 'Anomaly Correlation'
 
+ if metricOption=='nacc':
+   metricData = rcmes.metrics.calc_anom_corn(modelData,obsData)
+   metricTitle = 'Anomaly Correlation'
 
+ if metricOption=='pdf':
+   metricData = rcmes.metrics.calc_pdf(modelData,obsData)
+   metricTitle = 'Probability Distribution Function'
+
+ if metricOption=='coe':
+   metricData = rcmes.metrics.calc_nash_sutcliff(modelData,obsData)
+   metricTitle = 'Coefficient of Efficiency'
+
+ if metricOption=='stddev':
+   metricData = rcmes.metrics.calc_stdev(modelData)
+   data2 = rcmes.metrics.calc_stdev(obsData)
+   metricTitle = 'Standard Deviation'
  ##################################################################################################################
  # Part 8: Plot production
  #
@@ -404,10 +427,10 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
  # 1 dimensional data, e.g. Time series plots
  ##################################################################################################################
  if metricData.ndim==1:
-   print 'Producing time series plots'
-
+   print 'Producing time series plots ****'
+   print metricData
    year_labels = True
-   mytitle = 'Area-average model v obs'
+#   mytitle = 'Area-average model v obs'
 
    ################################################################################################################
    # If producing seasonal cycle plots, don't want to put year labels on the time series plots.
@@ -424,23 +447,36 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
    # Special case for pattern correlation plots. TODO: think of a cleaner way of doing this.
    # Only produce these plots if the metric is NOT pattern correlation.
    ################################################################################################################
-   if (metricOption!='patcor')&(metricOption!='acc'):  # for anomaly and pattern correlation, 
-                                                           # can't plot time series of model, obs as these are 3d fields
-                               # TODO: think of a cleaner way of dealing with this.
+
+   # TODO - Clean up this if statement
+   #KDW: change the if statement to if else to accommodate the 2D timeseries plots
+   if (metricOption!='patcor')&(metricOption!='acc')&(metricOption!='nacc')&(metricOption!='coe')&(metricOption!='pdf'):
+     # for anomaly and pattern correlation,
+     # can't plot time series of model, obs as these are 3d fields
+     # ^^ This is the reason modelData has been swapped for metricData in
+     # the following function
+     # TODO: think of a cleaner way of dealing with this.
 
      ##############################################################################################################
      # Produce the time series plots with two lines: obs and model
      ##############################################################################################################
-     status = rcmes.plots.draw_time_series_plot(modelData,times,plotFileNameOption+'both',workdir,data2=obsData,mytitle=mytitle,ytitle='Y',xtitle='time',year_labels=year_labels)
+     print 'two line timeseries'
+#     mytitle = titleOption
+     mytitle = 'Area-average model v obs'
+     if titleOption=='default':
+        mytitle = metricTitle+' model & obs'
+     #status = rcmes.plots.draw_time_series_plot(modelData,times,plotFileNameOption+'both',workdir,data2=obsData,mytitle=mytitle,ytitle='Y',xtitle='time',year_labels=year_labels)
+     status = rcmes.plots.draw_time_series_plot(metricData,times,plotFileNameOption+'both',workdir,data2,mytitle=mytitle,ytitle='Y',xtitle='time',year_labels=year_labels)
 
-
+   else: 
    ################################################################################################################
    # Produce the metric time series plot (one line only)
    ################################################################################################################
-   mytitle = titleOption
-   if titleOption=='default':
+     mytitle = titleOption
+     if titleOption=='default':
         mytitle = metricTitle+' model v obs'
-   status = rcmes.plots.draw_time_series_plot(metricData,times,plotFileNameOption,workdir,mytitle=mytitle,ytitle='Y',xtitle='time',year_labels=year_labels)
+     print 'one line timeseries'
+     status = rcmes.plots.draw_time_series_plot(metricData,times,plotFileNameOption,workdir,mytitle=mytitle,ytitle='Y',xtitle='time',year_labels=year_labels)
 
  ##################################################################################################################
  # 2 dimensional data, e.g. Maps
