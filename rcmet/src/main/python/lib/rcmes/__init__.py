@@ -17,7 +17,7 @@ class RCMED(object):
             http_request = requests.get(self.param_uri)
         except:
             print "HTTPRequest failed.  Bottle WebServer is offline"
-            return None
+            raise
         # TODO Check the request status code if it is 400 or 500 range then 
         #      return None
         # if the status code is 200 then return the request.text's param list
@@ -38,4 +38,12 @@ class RCMED(object):
         
         
         return filtered_params
+
+
+class RCMET(object):
+    
+    def __init__(self):
+        self.none = None
+    
+
         

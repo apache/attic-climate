@@ -53,14 +53,16 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
  '''
 
  import sys
+ import os
+ import math
+ import subprocess
  import datetime
- import numpy
- import numpy.ma as ma
- import rcmes.db
- import rcmes.files
- import rcmes.process
- import rcmes.metrics
+ import pickle
+ import numpy; import numpy as np; import numpy.ma as ma; import Nio
  import rcmes.plots
+ import rcmes.fortranfile
+ import rcmes.db; import rcmes.files; import rcmes.process; import rcmes.metrics
+ from rc_model import Model
 
  ##################################################################################################################
  # Part 1: retrieve observation data from the database
@@ -81,8 +83,26 @@ def do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime
  #if(obsParameterId==35):
  #       obsData = obsData + 273.15
 
+  # assign parameters that must be preserved throughout the process
+ if maskOption==1: seasonalCycleOption=1
+ T00=273.16    # the triple-point temperature
+ yymm0=startTime.strftime("%Y%m"); yymm1=endTime.strftime("%Y%m"); print 'start & end eval period = ',yymm0,yymm1
+  # check the number of model data files
+ numMDLs=len(filelist)
+ if numMDLs < 1:         # no input data file
+   print 'No input model data file. EXIT'; sys.exit()
+
+  ##################################################################################################################
+  ## Part 1: retrieve observation data from the database
+  ##       NB. automatically uses local cache if already retrieved.
+  ##################################################################################################################
+ print obsDatasetId,obsParameterId,latMin,latMax,lonMin,lonMax,startTime,endTime,cachedir
+ obsLats,obsLons,obsLevs,obsTimes,obsData =  \
+   rcmes.db.extract_data_from_db(obsDatasetId,obsParameterId,latMin,latMax,lonMin,lonMax,startTime,endTime,cachedir)
+ #print 'obsTimes= ',obsTimes; return 0
+
  ##################################################################################################################
- # Part 2: load in model data from file/s
+ # Part 2: load in model data from file(s)
  ##################################################################################################################
  modelLats,modelLons,modelTimes,modelData = rcmes.files.read_data_from_file_list(filelist,modelVarName,modelTimeVarName, modelLatVarName, modelLonVarName)
 

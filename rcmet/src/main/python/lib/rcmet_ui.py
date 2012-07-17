@@ -11,16 +11,28 @@ def rcmet_ui():
   # Peter Lean   March 2011
   #
   ###################################################################################################
-
+  
+  # Native Python Module Imports
   import glob
   import datetime
   import time
+  import sys
 
+  # RCMES Imports
   import rcmes.files
   import rcmes.process
   import do_rcmes_processing_sub
+  from rcmes import RCMED
 
   print 'Regional Climate Model Evaluation System BETA'
+
+
+  print "Establishing a connection to RCMED.."
+  try:
+      database = RCMED()
+  except:
+      sys.exit()
+
 
   ###################################################################################################
   # Section 0: Collect directories to store RCMET working files.
@@ -151,16 +163,40 @@ def rcmet_ui():
   ###################################################################################################
   # META DATA API GOES HERE! HARD CODED HERE FOR NOW. 
   # (WILL EVENTUALLY BE PICKED UP DYNAMICALLY FROM DATABASE)
-  db_datasets = ['TRMM','ERA-Interim','AIRS','MODIS','URD','CRU']
-  db_dataset_ids = [3,1,2,5,4,6]
-
-  db_dataset_startTimes = [datetime.datetime(1998,1,1,0,0,0,0),datetime.datetime(1989,01,01,0,0,0,0),datetime.datetime(2002,8,31,0,0,0,0),datetime.datetime(2000,2,24,0,0,0,0),datetime.datetime(1948,1,1,0,0,0,0),datetime.datetime(1901,1,1,0,0,0,0)]
-
-  db_dataset_endTimes = [datetime.datetime(2010,1,1,0,0,0,0),datetime.datetime(2009,12,31,0,0,0,0),datetime.datetime(2010,1,1,0,0,0,0),datetime.datetime(2010,5,30,0,0,0,0),datetime.datetime(2010,1,1,0,0,0,0),datetime.datetime(2006,12,1,0,0,0,0)]
+  
+  parameters = database.params
+  
+  # db_datasets = ['TRMM','ERA-Interim','AIRS','MODIS','URD','CRU']
+  # replace with list comprehension
+  db_datasets = [parameter['longName'] for parameter in parameters]
+  
+  
+  # db_dataset_ids = [3,1,2,5,4,6]
+  # db_dataset_startTimes = [datetime.datetime(1998,1,1,0,0,0,0),datetime.datetime(1989,01,01,0,0,0,0),datetime.datetime(2002,8,31,0,0,0,0),datetime.datetime(2000,2,24,0,0,0,0),datetime.datetime(1948,1,1,0,0,0,0),datetime.datetime(1901,1,1,0,0,0,0)]
+  # db_dataset_endTimes = [datetime.datetime(2010,1,1,0,0,0,0),datetime.datetime(2009,12,31,0,0,0,0),datetime.datetime(2010,1,1,0,0,0,0),datetime.datetime(2010,5,30,0,0,0,0),datetime.datetime(2010,1,1,0,0,0,0),datetime.datetime(2006,12,1,0,0,0,0)]
 
   db_parameters = [['daily precip','monthly precip'],['2m temp','2m dew point'],['2m temp'],['cloud fraction'],['precip'],['tavg','tmax','tmin','precip']]
 
-  db_parameter_ids = [[14,36],[12,13],[15],[31],[30],[33,34,35,32]]
+  # db_parameter_ids = [[14,36],[12,13],[15],[31],[30],[33,34,35,32]]
+  db_parameter_ids = [parameter['parameter_id'] for parameter in parameters]
+
+  # Not sure this is needed anymore since we have a parameters list object to work with
+  db_dataset_ids = [parameter['dataset_id'] for parameter in parameters]
+  
+  try:
+      db_dataset_startTimes = [datetime.datetime.strptime(parameter['start_date'], '%Y-%m-%d') for parameter in parameters]
+  except:
+      print "Error parsing the start dates from RCMED. Expected Format 'YYYY-MM-DD'"
+  
+  try:
+      db_dataset_endTimes = [datetime.datetime.strptime(parameter['end_date'], '%Y-%m-%d') for parameter in parameters]
+  except:
+      print "Error parsing the end dates from RCMED. Expected Format 'YYYY-MM-DD'" 
+
+  db_parameters = [parameter['dataset_id'] for parameter in parameters]
+  
+  
+  
   # META DATA API GOES HERE!
   ###################################################################################################
 
@@ -168,26 +204,48 @@ def rcmet_ui():
   ###################################################################################################
   # Section 3b: Select Dataset from list
   ###################################################################################################
+  """
   counter = 0
   for dataset in db_datasets:
      print '[',counter,'] ',dataset
      counter += 1
+  REPLACED WITH THIS"""
+  for parameter in parameters:
+      """( 38 ) - CRU3.1 Daily-Mean Temperature : monthly"""
+      print "({:^2}) - {:<35} :: {:<10}".format(parameter['parameter_id'], parameter['longName'], parameter['timestep'])
 
   try:
-    dataset_choice = raw_input('Please select which observational dataset you wish to compare against:\n> ') 
-    obsDatasetId = db_dataset_ids[int(dataset_choice)]
-    obsStartTime = db_dataset_startTimes[int(dataset_choice)]
-    obsEndTime = db_dataset_endTimes[int(dataset_choice)]
+    dataset_choice = int(raw_input('Please select which observational dataset you wish to compare against:\n> ')) 
+    selection = next((p for p in parameters if p['parameter_id'] == dataset_choice), None)
+    obsDatasetId = selection['dataset_id']
+    obsStartTime = datetime.datetime.strptime(selection['start_date'], "%Y-%m-%d")
+    obsEndTime = datetime.datetime.strptime(selection['end_date'], "%Y-%m-%d")
+    obsParameterId = selection['parameter_id']
+    #obsDatasetId = db_dataset_ids[int(dataset_choice)]
+    #obsStartTime = db_dataset_startTimes[int(dataset_choice)]
+    #obsEndTime = db_dataset_endTimes[int(dataset_choice)]
 
   except:
     dataset_choice = raw_input('There was a problem with your selection, please try again:\n> ') 
-    obsDatasetId = db_dataset_ids[int(dataset_choice)]
-    obsStartTime = db_dataset_startTimes[int(dataset_choice)]
-    obsEndTime = db_dataset_endTimes[int(dataset_choice)]
+    selection = next((p for p in parameters if p['parameter_id'] == dataset_choice), None)
+    obsDatasetId = selection['dataset_id']
+    obsStartTime = datetime.datetime.strptime(selection['start_date'], "%Y-%m-%d")
+    obsEndTime = datetime.datetime.strptime(selection['end_date'], "%Y-%m-%d")
+    obsParameterId = selection['parameter_id']
+    #obsDatasetId = db_dataset_ids[int(dataset_choice)]
+    #obsStartTime = db_dataset_startTimes[int(dataset_choice)]
+    #obsEndTime = db_dataset_endTimes[int(dataset_choice)]
 
+
+  """ This Section has been removed.  In the previous step the DataSet
   ###################################################################################################
   # Section 3c: Select Parameter from list of available parameters in dataset (selected above)
   ###################################################################################################
+  
+   
+  AND Parameter are Selected at the sametime.  These variables have been
+  declared in that section
+   
   counter = 0
   for parameter in db_parameters[int(dataset_choice)]:
      print '[',counter,'] ',parameter
@@ -197,7 +255,7 @@ def rcmet_ui():
     obsParameterId = db_parameter_ids[int(dataset_choice)][int(raw_input('Please select a parameter:\n> '))]
   except:
     obsParameterId = db_parameter_ids[int(dataset_choice)][int(raw_input('There was a problem with your selection, please try again:\n> '))]
-
+  """
 
   ###################################################################################################
   # Section 4: Select time range to evaluate (defaults to overlapping times between model and obs)
