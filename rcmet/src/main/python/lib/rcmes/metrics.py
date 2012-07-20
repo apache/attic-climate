@@ -8,6 +8,9 @@
 #    
 ###########################################################################
 '''
+from bottle import route, run, debug #sets up bottle, imports necessary bottle methods 
+
+debug(True) #temporary helper that tracks errors in bottle
 
 def calc_annual_cycle_means(t2,time):
   '''
@@ -517,3 +520,5 @@ def calc_stdev(t1):
     return sigma_t1
 
 ###########################################################################
+
+run(host='localhost', port=8080) #final function that enables bottle
