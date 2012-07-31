@@ -269,13 +269,17 @@ def calc_temporal_pat_cor(t1, t2):
     return patcor
 
 ###########################################################################
-def calc_pat_cor(t1, t2):
+def calc_pat_cor(dataset_1, dataset_2):
     '''
-    # Calculate the Pattern Correlation
+    # Purpose: Calculate the Pattern Correlation
+    #
+    #  Assumption(s):  Both dataset_1 and dataset_2 are the same shape.
+                       lat, lon must match up
+                       time steps must align (i.e. months vs. months)
     #
     #  Input:
-    #    t1 - 3d array of model data
-    #    t2 - 3d array of obs data
+    #    dataset_1 - 3d (time, lat, lon) array of data
+    #    dataset_2 - 3d (time, lat, lon) array of data
     #     
     #  Output:
     #    patcor - a 1d array (time series) of pattern correlation coefficients.
@@ -283,34 +287,53 @@ def calc_pat_cor(t1, t2):
     #    Peter Lean  March 2011
     #    Editing: Kim Whitehall June 2012
     #        reason: std_dev not standardized on N-1
-    '''
+    #  
+    # Output: time series of pattern correlation coefficients.
     
-    nt = t1.shape[0]
+    TODO: ADD THIS TO THE DOC STRING
+     # Calculate the Pattern Correlation Timeseries
+
+   # called in do_rcmes_processing_sub.py 
+   # Inputs:2 arrays of data
+   #        t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
+   #             is the number of time values eg for time period 199001010000 - 199201010000 
+   #              if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
+   #          if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)    
+   #  Output:
+   #    patcor - a 1d array (time series) of pattern correlation coefficients.
+   #
+   #    Peter Lean  March 2011
+   #    Editing: Kim Whitehall June 2012
+   #        reason: std_dev not standardized on N-1
+           ##### Debugging print statements to show the difference the n-1 makes.
+        #http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
+    '''
+    # TODO:  Add in try block to ensure the shapes match
+    
+    
+    
+    nt = dataset_1.shape[0]
     
     # store results in list for convenience (then convert to numpy array)
     patcor = []
     
     for t in xrange(nt):
         # find mean and std_dev 
-        mt1 = t1[t, :, :].mean()
-        mt2 = t2[t, :, :].mean()
+        mt1 = dataset_1[t, :, :].mean()
+        mt2 = dataset_2[t, :, :].mean()
         
-        sigma_t1 = t1[t, :, :].std(ddof=1)
-        sigma_t2 = t2[t, :, :].std(ddof=1)
-        
-        # TODO: make means and standard deviations weighted by grid box area.
-        ##### Debugging print statements to show the difference the n-1 makes.
-        #http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
-        print t, mt1, mt2, sigma_t1, sigma_t2
-        sigma_t1 = t1[t, :, :].std()
-        sigma_t2 = t2[t, :, :].std()
-        print t, mt1, mt2, sigma_t1, sigma_t2
+        sigma_t1 = dataset_1[t, :, :].std(ddof=1)
+        sigma_t2 = dataset_2[t, :, :].std(ddof=1)
         
         # TODO: make means and standard deviations weighted by grid box area.
+
         
-        patcor.append((((((t1[t, :, :] - mt1) * 
-                          (t2[t, :, :] - mt2)).sum()) / 
-                        (t1.shape[1] * t1.shape[2])) / (sigma_t1 * sigma_t2)))
+        # TODO: make means and standard deviations weighted by grid box area.
+        # Equation from Santer_et_al 1995 
+        #     patcor = (1/(N*M_std*O_std))*sum((M_i-M_bar)*(O_i-O_bar))
+        patcor.append((((((dataset_1[t, :, :] - mt1) * 
+                          (dataset_2[t, :, :] - mt2)).sum()) / 
+                        (dataset_1.shape[1] * dataset_1.shape[2])) / (sigma_t1 * sigma_t2)))
         print t, mt1.shape, mt2.shape, sigma_t1.shape, sigma_t2.shape, patcor[t]
         
         # TODO: deal with missing data appropriately, i.e. mask out grid points
@@ -327,42 +350,43 @@ def calc_pat_cor(t1, t2):
 ###########################################################################
 # Anomaly Correlation
 
-def calc_anom_corn(t1, t2, t4):
+def calc_anom_corn(dataset_1, dataset_2, climatology=None):
     '''
+    
         # Calculate the Anomaly Correlation
         # Kim Whitehall June 2012
         # Edited according to new metrics 
-        # input three arrays, modelData, obsData and climoData
-        # Assumes climoData is for same time period 
+        # input three arrays, dataset_1, dataset_2 and climatology
+        # Assumes climatology is for same time period 
         # TODO:  Rename function vars to declare what they are
     '''
 
     # store results in list for convenience (then convert to numpy array)
     anomcor = []    
-    nt = t1.shape[0]
+    nt = dataset_1.shape[0]
     #prompt for the third file, i.e. climo file...  
     #include making sure the lat, lon and times are ok for comparision
     # find the climo in here and then using for eg, if 100 yrs 
     # is given for the climo file, but only looking at 10yrs
     # ask if want to input climo dataset for use....if no, call previous 
    
-    
-    climoFileOption = raw_input('Would you like to use the full observation dataset as the climatology in this calculation? [y/n] \n>')
-    if climoFileOption == 'y':
-        print 'in if'
-        t3 = t4
-    else:
-        print 'in else'
-        t3 = t2
+    if climatology != None:
+        
+        climoFileOption = raw_input('Would you like to use the full observation dataset as the climatology in this calculation? [y/n] \n>')
+        if climoFileOption == 'y':
+            base_dataset = climatology
+
+        else:
+            base_dataset = dataset_2
     
     #---------------------------------------------------------------------
 
     for t in xrange(nt):
-        mt3 = t3[t, :, :].mean()
-        anomcor.append((((t1[t, :, :] - mt3) * (t2[t, :, :] - mt3)).sum()) / 
-                       np.sqrt(((t1[t, :, :] - mt3) ** 2).sum() * 
-                               ((t2[t, :, :] - mt3) ** 2).sum()))
-        print t, mt3.shape, anomcor[t]
+        mean_base = base_dataset[t, :, :].mean()
+        anomcor.append((((dataset_1[t, :, :] - mean_base) * (dataset_2[t, :, :] - mean_base)).sum()) / 
+                       np.sqrt(((dataset_1[t, :, :] - mean_base) ** 2).sum() * 
+                               ((dataset_2[t, :, :] - mean_base) ** 2).sum()))
+        print t, mean_base.shape, anomcor[t]
 
     # TODO: deal with missing data appropriately, i.e. mask out grid points 
     # with missing data above tolerence level
@@ -375,9 +399,10 @@ def calc_anom_corn(t1, t2, t4):
 
 ###########################################################################
 # Anomaly Correlation
+
 def calc_anom_cor(t1, t2):
     '''
-    # Calculate the Anomaly Correlation
+    # Calculate the Anomaly Correlation (Deprecated)
     '''
     
     nt = t1.shape[0]
@@ -411,27 +436,33 @@ def calc_anom_cor(t1, t2):
 ###########################################################################
 # Coefficient of Efficiency
 # Nash-sutcliff coefficient of efficiency (E)
-def calc_nash_sutcliff(t1, t2):
+def calc_nash_sutcliff(dataset_1, dataset_2):
     '''
-    #Routine to calculate the Nash-Sutcliff coefficient of efficiency (E)
-    # Input: 
-    #       t1 - 3d array of model data
-    #       t2 - 3d array of obs data
-    #
-    # Output:
-    #       ns_coeff - 1d array of the Nash-Sutcliff Coefficient of efficiency
-    # Kim Whitehall June 2012 
+    Routine to calculate the Nash-Sutcliff coefficient of efficiency (E)
+
+      Assumption(s):  Both dataset_1 and dataset_2 are the same shape.
+                      lat, lon must match up
+                      time steps must align (i.e. months vs. months)
+    
+      Input:
+        dataset_1 - 3d (time, lat, lon) array of data
+        dataset_2 - 3d (time, lat, lon) array of data
+    
+     Output:
+           nashcor - 1d array aligned along the time dimension of the input
+           datasets. Time Series of Nash-Sutcliff Coefficient of efficiency
+     Kim Whitehall June 2012 
     '''
 
-    nt = t1.shape[0]
+    nt = dataset_1.shape[0]
     nashcor = []
     for t in xrange(nt):
-        mt2 = t2[t, :, :].mean()
+        mean_dataset_2 = dataset_2[t, :, :].mean()
         
-        nashcor.append(1 - ((((t2[t, :, :] - t1[t, :, :]) ** 2).sum()) / 
-                            ((t2[t, :, :] - mt2) ** 2).sum()))
+        nashcor.append(1 - ((((dataset_2[t, :, :] - dataset_1[t, :, :]) ** 2).sum()) / 
+                            ((dataset_2[t, :, :] - mean_dataset_2) ** 2).sum()))
         
-        print t, mt2.shape, nashcor[t]
+        print t, mean_dataset_2.shape, nashcor[t]
         
     nashcor = np.array(nashcor)
     print nashcor.shape, nashcor.ndim, nashcor
@@ -441,10 +472,32 @@ def calc_nash_sutcliff(t1, t2):
 ###########################################################################
 # Probability Distribution Function
 
-def calc_pdf(t1, t2):
+def calc_pdf(dataset_1, dataset_2, 
+             d1_max=dataset_1.amax(),
+             d1_min=dataset_1.amin()):
     '''
    #################################################################################################
-   # Routine to calculate a normalised PDF with bins set according to data range.
+   # 
+   #################################################################################################
+   # Routine to calculate a normalised Probability Distribution Function with 
+   # bins set according to data range.
+   # Equation from Perkins et al. 2007
+   #     PS=sum(min(Z_O_i, Z_M_i)) where Z is the distribution (histogram of the data for either 
+   #                set)
+   # called in do_rcmes_processing_sub.py 
+   # Inputs:2 arrays of data
+   #        t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
+   #             is the number of time values eg for time period 199001010000 - 199201010000 
+   #              if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
+   #          if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)
+   # User inputs: number of bins to use and edges (min and max)
+   # Output:
+   #     one float which represents the PDF for the year
+   #
+   #   Peter Lean July 2010 
+   #   Edited: KDW July 2012
+   #################################################################################################
+    Routine to calculate a normalised PDF with bins set according to data range.
    # Input:
    #     2 data  arrays, modelData and obsData
    # Output:
@@ -459,15 +512,15 @@ def calc_pdf(t1, t2):
     #import statistics as stats
     
     #list to store PDFs of modelData and obsData
-    pdfMod = []
-    pdfObs = []
+    pdf_mod = []
+    pdf_obs = []
     # float to store the final PDF similarity score
-    pdfss = 0.0
+    similarity_score = 0.0
 
-    print 'min modelData', t1[:, :, :].min()
-    print 'max modelData', t1[:, :, :].max()
-    print 'min obsData', t2[:, :, :].min()
-    print 'max obsData', t2[:, :, :].max()
+    print 'min modelData', dataset_1[:, :, :].min()
+    print 'max modelData', dataset_1[:, :, :].max()
+    print 'min obsData', dataset_2[:, :, :].min()
+    print 'max obsData', dataset_2[:, :, :].max()
     # find a distribution for the entire dataset
     #prompt the user to enter the min, max and number of bin values. 
     # The max, min info above is to help guide the user with these choises
@@ -482,34 +535,35 @@ def calc_pdf(t1, t2):
     
     # TODO:  there is no 'new' kwargs for numpy.histogram 
     # per: http://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
-    pdfMod, edges = np.histogram(t1, bins=mybins, normed=True, new=True)  
-    print 't1 distribution and edges', pdfMod, edges
-    pdfObs, edges = np.histogram(t2, bins=mybins, normed=True, new=True)           
-    print 't2 distribution and edges', pdfObs, edges    
+    # PLAN: Replace new with density param.
+    pdf_mod, edges = np.histogram(dataset_1, bins=mybins, normed=True, new=True)  
+    print 'dataset_1 distribution and edges', pdf_mod, edges
+    pdf_obs, edges = np.histogram(dataset_2, bins=mybins, normed=True, new=True)           
+    print 'dataset_2 distribution and edges', pdf_obs, edges    
     
     """
     *****************************************************
     #considering using pdf function from statistics package. It is not 
     # installed. Have to test on Mac.  
     # http://bonsai.hgc.jp/~mdehoon/software/python/Statistics/manual/index.xhtml#TOC31 
-    #pdfMod, edges = stats.pdf(t1, bins=mybins)
-    #print 't1 distribution and edges', pdfMod, edges
-    #pdfObs,edges=stats.pdf(t2,bins=mybins)           
-    #print 't2 distribution and edges', pdfObs, edges 
+    #pdf_mod, edges = stats.pdf(dataset_1, bins=mybins)
+    #print 'dataset_1 distribution and edges', pdf_mod, edges
+    #pdf_obs,edges=stats.pdf(dataset_2,bins=mybins)           
+    #print 'dataset_2 distribution and edges', pdf_obs, edges 
     *****************************************************
     """
 
     #find minimum at each bin between lists 
     i = 0
-    for modVal in pdfMod :
-        print 'modVal is', modVal, 'pdfObs[', i, '] is', pdfObs[i]
-        if modVal < pdfObs[i]:
-            pdfss = pdfss + modVal
+    for model_value in pdf_mod :
+        print 'model_value is', model_value, 'pdf_obs[', i, '] is', pdf_obs[i]
+        if model_value < pdf_obs[i]:
+            similarity_score += model_value
         else:
-            pdfss = pdfss + pdfObs[i] 
-        i = i + 1 
-    print 'pdfss is', pdfss
-    return pdfss
+            similarity_score += pdf_obs[i] 
+        i += 1 
+    print 'similarity_score is', similarity_score
+    return similarity_score
 
 ###########################################################################
 # Standard deviation
