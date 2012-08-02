@@ -24,14 +24,14 @@ import rcmes.metrics as mtx
 ##########################################################################################
 
 #basic first page. Explanation could be more comprehensive
-@route('/RCMET_bottle')	
+@route('/rcmet/metrics')	
 def show_possible_metics():
 	return '''<html>
 		<head> RCMET Metrics through Bottle </head>
 		<body>
 		<p>Please selecte the metric you will use.</p>
 		<p>Enter the metric name into the URI, preceded by "/".
-		A sample URI might read .../RCMET_bottle/calc_rms </p>
+		A sample URI might read .../rcmet/metrics/calc_rms </p>
 		<p> Metrics with one variable: 
 		"calc_stdev" to return standard deviation</p>
 		<p> Metrics with two variables: 
@@ -58,16 +58,16 @@ def show_possible_metics():
 #CHECK THIS WHOLE FUNCTION TO MAEKE SURE IT WORKS
 
 #creates introductory page to explain how to use bottle
-@route('/RCMET_bottle/<metric_name>')
+@route('/rcmet/metrics/<metric_name>')
 def basic_info(metric_name):
 	if metric_name in how_many_var:
 		return "For metric %s , you need %d variables, which will represent: %s" 
 			%(metric_name, how_many_var[metric_name], name_of_var[metric_name][:]),
 			'''<p>Will you enter variables (which are arrays) through the command line or 
 			will you search the RCMES Database?</p>
-			<a href="/RCMET_bottle/"+ metric_name+"/commandline">
+			<a href="/rcmet/metrics/"+ metric_name+"/commandline">
 			command line</a>
-			<a href="/RCMET_bottle/"+metric_name+"/RCMEDdata">
+			<a href="/rcmet/metrics/"+metric_name+"/RCMEDdata">
 			RCMED</a>
 			</body>
 			</html>'''
@@ -126,16 +126,16 @@ name_of_var={
 ##########################################################################################
 
 #Tells the user how to send variables from the command line
-@route('/RCMET_bottle/<metric_name>/commandline')
+@route('/rcmet/metrics/<metric_name>/commandline')
 def command_line_offered_arrays(metric_name):
 	return "please use your command line to POST a form with the array. Send either a "
-		"file or serialized string. Name each form: array." 
-		"Send the form to: http://.../RCMET_bottle/getting_array/(name of metric)\n"
+		"file or serialized string. Name the form: array." 
+		"Send the form to: http://.../rcmet/metrics/getting_array/(name of metric)\n"
 		"Once the computer receives all variables, you will be redirected to the metrics"
 		"portion of the website."
 	
 #this is the function that gets the array from the command line. The user will never see this page. They are automatically redirected
-@route('/RCMET_bottle/getting_array/<metric_name>', method='POST')
+@route('/rcmet/metrics/getting_array/<metric_name>', method='POST')
 def command_line_array(metric_name):
 	count=1
 	array=request.forms.get('array')
@@ -151,17 +151,17 @@ def command_line_array(metric_name):
 	if another_array==y:
 		count=count+1
 		if count<=how_many_var[metric_name]:
-			redirect('/RCMET_bottle/'+metric_name+'/commandline')
+			redirect('/rcmet/metrics/'+metric_name+'/commandline')
 		else:
 			print "Too many arrays for this metric."
-			redirect('/RCMET_bottle/'+<metric_name+'/calculate')
+			redirect('/rcmet/metrics/'+<metric_name+'/calculate')
 
 	if another_array==n:
 		if count=how_many_var[metric_name]:
-			redirect('/RCMET_bottle/'+metric_name+'/calculate')
+			redirect('/rcmet/metrics/'+metric_name+'/calculate')
 		else:
 			print "Too few arrays for this metric."
-			redirect('/RCMET_bottle/'+metric_name+'/commandline')
+			redirect('/rcmet/metrics/'+metric_name+'/commandline')
 
 #this function basically names the arrays and publishes them to the entire module
 #I used global for these variabels because it makes it possible for the user to submit 
@@ -196,14 +196,14 @@ def name_the_array(count, array)
 
 #this whole section is messy right now. I am mostly avoiding it out of fear
 
-@route('/RCMET_bottle/<metric_name>/RCMEDdata')
+@route('/rcmet/metrics/<metric_name>/RCMEDdata')
 def explain_dynamic_links(metric_name):
 	return show_possible_metrics(), '''<html>
 		<head> Possible Data Parameters to Choose From </head>
 		<body>
 		<p>#LOOK UP AND ENTER THE PARAMETERS!</p>
 		<p>Writing a URI:</p>
-		<p>your URI will read http.../RCMET_bottle/RCMEDdata/(ID of parameter 1)/
+		<p>your URI will read http.../rcmet/metrics/RCMEDdata/(ID of parameter 1)/
 		(start time)/(end time)/(ID parameter 2)/(start time)/(end time)/
 		(ID of parameter 3)/(start time)/(end time)</p>
 		<p>Only enter as many parameters as you need. Do not end 
@@ -219,7 +219,7 @@ def explain_dynamic_links(metric_name):
 def get_arrays_from_dyn_links():
 	try:	
 		#a uri for metrics w/ 3 arrays obtained via Dynamic Links
-		@route('/RCMET_bottle/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<IDtwo>/'+
+		@route('/rcmet/metrics/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<IDtwo>/'+
 			'<sttwo>/<ettwo>/<IDthree>/<stthree>/<etthree>') 
 		def three_arrays(metric_name,IDone,stone,etone,IDtwo,sttwo,ettwo,IDthree,
 			stthree,etthree):
@@ -231,13 +231,13 @@ def get_arrays_from_dyn_links():
 				global array1
 				global array2
 				global array3
-				redirect('/RCMET_bottle/<metric_name>/calculate')
+				redirect('/rcmet/metrics/<metric_name>/calculate')
 				
 			except TypeError:
 				return ("Too many/too few values entered. Please enter only BLANK or",
-					'''<a href="/RCMET_bottle/<metric_name>/RCMEDdata">Return to main page</a>''')	
+					'''<a href="/rcmet/metrics/<metric_name>/RCMEDdata">Return to main page</a>''')	
 		
-		@route('/RCMET_bottle/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<IDtwo>/'+
+		@route('/rcmet/metrics/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<IDtwo>/'+
 			'<sttwo>/<ettwo>') 
 		def two_arrays(metric_name,IDone,stone,etone,IDtwo,sttwo,ettwo):
 			try:
@@ -249,9 +249,9 @@ def get_arrays_from_dyn_links():
 				
 			except TypeError:
 				return ("Too many/too few values entered. Please enter only BLANK or",
-					'''<a href="/RCMET_bottle/<metric_name>/RCMEDdata">Return to main page</a>''')
+					'''<a href="/rcmet/metrics/<metric_name>/RCMEDdata">Return to main page</a>''')
 				
-		@route('/RCMET_bottle/RCMEDdata/<IDone>/<stone>/<etone>') 
+		@route('/rcmet/metrics/RCMEDdata/<IDone>/<stone>/<etone>') 
 		def two_arrays(metric_name,IDone,stone,etone):
 			try:
 				method=getattr(CAMERONS_CLASS, WHATEVER_FUNCTION_GETS_THE_ARRAYS)
@@ -260,23 +260,23 @@ def get_arrays_from_dyn_links():
 
 			except TypeError:
 				return ("Too many/too few values entered. Please enter only BLANK or",
-					'''<a href="/RCMET_bottle/<metric_name>/RCMEDdata">Return to main page</a>''')	
+					'''<a href="/rcmet/metrics/<metric_name>/RCMEDdata">Return to main page</a>''')	
 
 	except AttributeError:
 		return ("The selected function doesn't exist. Please enter a new one or", 
-			'''<a href='/RCMET_bottle/<metric_name>/RCMEDdata'>
+			'''<a href='/rcmet/metrics/<metric_name>/RCMEDdata'>
 			Return to main page</a>''')	
 	
 	except ValueError:
 		return ("Invalid variable. Please make sure the variables ARE IN THIS FORMAT!!! or",
-			'''<a href='/RCMET_bottle/<metric_name>/RCMEDdata'>
+			'''<a href='/rcmet/metrics/<metric_name>/RCMEDdata'>
 			Return to main page</a>''')	
 
 ##########################################################################################
 #running the metrics
 ##########################################################################################
 #this function actually runs the metrics
-@route('/RCMET_bottle/<metric_name>/calculate')
+@route('/rcmet/metrics/<metric_name>/calculate')
 def run_metrics(metric_name):
 	
 	try:
