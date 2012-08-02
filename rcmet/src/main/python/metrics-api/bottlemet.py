@@ -29,40 +29,72 @@ def show_possible_metics():
 	return '''<html>
 		<head> RCMET Metrics through Bottle </head>
 		<body>
-		<p>Please selecte the metric you will use.</p>
-		<p>Enter the metric name into the URI, preceded by "/".
-		A sample URI might read .../rcmet/metrics/calc_rms </p>
+		<p>Please select the metric you will use.</p>
+		
 		<p> Metrics with one variable: 
-		"calc_stdev" to return standard deviation</p>
+		<a href='/rcmet/metrics/calc_stdev'>"calc_stdev" to return standard deviation</a>
+		</p>
+	
 		<p> Metrics with two variables: 
-		"calc_annual_cycle_means" to return monthly means,
-		"calc_annual_cycle_std" to return monthly standard deviation,
-		"calc_annual_cycle_domain_means" to return monthly domain means,
-		"calc_annual_cycle_domain_std" to return monthly standard deviation,
-		"calc_bias" to return mean difference,
-		"calc_bias_dom" to return domain mean difference,
-		"calc_difference" to return difference,
-		"calc_mae" to return mean absolute error,
-		"calc_rms" to return root mean square error,
-		"calc_rms_dom" to return domain root mean square error,
-		"calc_temporal_pat_cor" to return temporal pattern correlation,
-		"calc_pat_cor" to return pattern correlation,
-		"calc_anom_cor" to return anomaly correlation,
-		"calc_nash_sutcliff" to return Nash-Sutcliff coefficient of efficiency,
-		"calc_pdf" to return probability distribution function.</p>
-		<p> Metrics with three variables: 
-		"calc_anom_cor" to return anomaly correlation</p>
+		
+		<a href='/rcmet/metrics/calc_annual_cycle_means'>"calc_annual_cycle_means" to 
+		return monthly means</a>
+		
+		<a href='/rcmet/metrics/calc_annual_cycle_std'>""calc_annual_cycle_std" to return 
+		monthly standard deviation</a>	
+		
+		<a href='/rcmet/metrics/calc_annual_cycle_domain_means'>"calc_annual_cycle_domain_
+		means" to return monthly domain means</a>	
+		
+		<a href='/rcmet/metrics/calc_annual_cycle_domain_std'>"calc_annual_cycle_domain_
+		std" to return monthly standard deviation</a>	
+		
+		<a href='/rcmet/metrics/calc_bias'>"calc_bias" to return mean difference</a>	
+		
+		<a href='/rcmet/metrics/calc_bias_dom'>"calc_bias_dom" to return domain mean 
+		difference</a>	
+		
+		<a href='/rcmet/metrics/calc_difference'>"calc_difference" to return difference
+		</a>	
+		
+		<a href='/rcmet/metrics/calc_mae'>"calc_mae" to return mean absolute error</a>	
+		
+		<a href='/rcmet/metrics/calc_rms'>"calc_rms" to return root mean square error
+		</a>	
+		
+		<a href='/rcmet/metrics/calc_rms_dom'>"calc_rms_dom" to return domain root mean 
+		square error</a>	
+		
+		<a href='/rcmet/metrics/calc_temporal_pat_cor'>"calc_temporal_pat_cor" to return 
+		temporal pattern correlation</a>
+		
+		<a href='/rcmet/metrics/calc_pat_cor'>"calc_pat_cor" to return pattern correlation
+		</a>
+		
+		<a href='/rcmet/metrics/calc_anom_cor'>"calc_anom_cor" to return anomaly 
+		correlation</a>
+		
+		<a href='/rcmet/metrics/calc_nash_sutcliff'>"calc_nash_sutcliff" to return 
+		Nash-Sutcliff coefficient of efficiency</a>
+		
+		
+		<a href='/rcmet/metrics/calc_pdf'>"calc_pdf" to return probability distribution 
+		function</a>
+		
+		<p> Metrics with three variables:
+		 
+		<a href='/rcmet/metrics/calc_anom_cor'>"calc_anom_cor" to return anomaly 
+		correlation</a> </p>
 		</body>
 		<html>'''
 
-#CHECK THIS WHOLE FUNCTION TO MAEKE SURE IT WORKS
+#CHECK THIS WHOLE FUNCTION TO MAKE SURE IT WORKS
 
 #creates introductory page to explain how to use bottle
 @route('/rcmet/metrics/<metric_name>')
 def basic_info(metric_name):
 	if metric_name in how_many_var:
-		return "For metric %s , you need %d variables, which will represent: %s" 
-			%(metric_name, how_many_var[metric_name], name_of_var[metric_name][:]),
+		return "For metric %s , you need %d variables, which will represent: %s" %(metric_name, how_many_var[metric_name], name_of_var[metric_name][:]),
 			'''<p>Will you enter variables (which are arrays) through the command line or 
 			will you search the RCMES Database?</p>
 			<a href="/rcmet/metrics/"+ metric_name+"/commandline">
@@ -129,66 +161,59 @@ name_of_var={
 @route('/rcmet/metrics/<metric_name>/commandline')
 def command_line_offered_arrays(metric_name):
 	return "please use your command line to POST a form with the array. Send either a "
-		"file or serialized string. Name the form: array." 
-		"Send the form to: http://.../rcmet/metrics/getting_array/(name of metric)\n"
-		"Once the computer receives all variables, you will be redirected to the metrics"
-		"portion of the website."
+		"file or serialized string. Name the form: array. Include also, a form that names"
+		" the array. Call this form name. A sample would be array=<array_here> and name="
+		"<array_name_here>. Send the form to: http://.../rcmet/metrics/getting_array/"
+		"(name of metric)\n Once the computer receives all variables, you will be "
+		"redirected to the metrics portion of the website."
 	
 #this is the function that gets the array from the command line. The user will never see this page. They are automatically redirected
 @route('/rcmet/metrics/getting_array/<metric_name>', method='POST')
 def command_line_array(metric_name):
 	count=1
+	global count
+	
 	array=request.forms.get('array')
 	if type(array)==str:
 		array=pickle.loads(array)
 	else: 
 		array=pickle.load(array)
-
-	name_the_array(count, array)
+		
+	#this system seems to me sort of unsophisticated and really long	
+	if count==1:
+		array1=array
+		global array1
+		array1_name=request.forms.get('name')
+		global array1_name
+	if count==2:
+		array2=array
+		global array2
+		array2_name=request.forms.get('name')
+		global array2_name
+	if count==3:
+		array3=array
+		global array3
+		array3_name=request.forms.get('name')
+		global array3_name
+		
+	print "Variable received as %s. Will represent %s" % (array_name, name_of_var[metric_name][count-1])
 	
-#NEED SOME SORT OF POST SYSTEM TO PICK UP THE RAW_INPUT
 	another_array=raw_input("Will you send another array? [y/n]")
-	if another_array==y:
+	if another_array=='y':
 		count=count+1
+		global count #TEST THIS!!
 		if count<=how_many_var[metric_name]:
 			redirect('/rcmet/metrics/'+metric_name+'/commandline')
 		else:
 			print "Too many arrays for this metric."
 			redirect('/rcmet/metrics/'+<metric_name+'/calculate')
 
-	if another_array==n:
+	if another_array=='n':
 		if count=how_many_var[metric_name]:
 			redirect('/rcmet/metrics/'+metric_name+'/calculate')
 		else:
 			print "Too few arrays for this metric."
 			redirect('/rcmet/metrics/'+metric_name+'/commandline')
-
-#this function basically names the arrays and publishes them to the entire module
-#I used global for these variabels because it makes it possible for the user to submit 
-#their variables on one page, through one function or another and no matter what means 
-#they use to submit them, I can then run the metrics the same way for both because the 
-#variables are already global
-
-def name_the_array(count, array)	
-	if count==1:
-		array_name="array1"
-		array1=array
-		global array1
-	if count==2:
-		array_name="array2"
-		array2=array
-		global array2
-	if count==3:
-		array_name="array3"
-		array3=array
-		global array3
-	print "variable received. Defined as %s. Will represent %s" 
-		% (array_name, name_of_var[metric_name][count-1])
-
-
-##if I global the count, it might be easier to have someone send one variable via online
-##and get another through RCMED, or vice versa. If having a count is even the most 
-##practical way to do this
 
 ##########################################################################################
 #getting variables through RCMED
