@@ -94,10 +94,16 @@ def show_possible_metics():
 @route('/rcmet/metrics/<metric_name>')
 def basic_info(metric_name):
 	
+	#provision for tracking # of variables later on
+	count=0
+	global count
+		
 	if metric_name in how_many_var:
 		return "For metric %s , you need %d variables, which will represent: %s" %(metric_name, 
 			how_many_var[metric_name], name_of_var[metric_name][:]),
-			'''<p>Will you enter variables (which are arrays) through the command line or 
+			'''<html>
+			<body>
+			<p>Will you enter variables (which are arrays) through the command line or 
 			will you search the RCMES Database?</p>
 			<a href="/rcmet/metrics/"+ metric_name+"/commandline">
 			command line</a>
@@ -109,9 +115,7 @@ def basic_info(metric_name):
 	else:
 		return "The metric you entered doesn't exist."
 	
-	#provision for tracking # of variables later on
-	count=0
-	global count
+
 		
 ##########################################################################################
 #error-catching dictionaries (I'm not sure this was the best way to go, 
@@ -173,7 +177,7 @@ list_of_arrays=[]
 @route('/rcmet/metrics/<metric_name>/commandline')
 def command_line_offered_arrays(metric_name):
 	
-	if how_many_var[metric_name]-count<=0"
+	if how_many_var[metric_name]-count<=0:
 		print "You have already submitted all the needed variables for this metric."
 		redirect('/rcmet/metrics/'+metric_name+'/calculate')
 	else:
@@ -218,10 +222,10 @@ def command_line_array(metric_name):
 			redirect('/rcmet/metrics/'+metric_name+'/commandline')
 		else:
 			print "Too many arrays for this metric."
-			redirect('/rcmet/metrics/'+<metric_name+'/calculate')
+			redirect('/rcmet/metrics/'+metric_name+'/calculate')
 
 	if another_array=='n':
-		if count=how_many_var[metric_name]:
+		if count==how_many_var[metric_name]:
 			redirect('/rcmet/metrics/'+metric_name+'/calculate')
 		else:
 			print "Too few arrays for this metric."
@@ -282,30 +286,27 @@ def get_arrays_from_RCMED(metric_name,IDone,stone,etone):
 def run_metrics(metric_name):
 	method=getattr(mtx, metric_name)
 	
-	if how_many_var[metric_name]==1
+	if how_many_var[metric_name]==1:
 		return explain_metric(metric_name), 
 			str(method(list_of_arrays[0]))
 			
-	if how_many_var[metric_name]==2
+	if how_many_var[metric_name]==2:
 		return explain_metric(metric_name), 
 			str(method(list_of_arrays[0], list_of_arrays[1]))
 			
-	if how_many_var[metric_name]==3
+	if how_many_var[metric_name]==3:
 		return explain_metric(metric_name), 
 			str(method(list_of_arrays[0], list_of_arrays[1], list_of_arrays[2]))
 		
 
-def explain_metric(metric_name)
+def explain_metric(metric_name):
 	return mtx.method.__doc__, "This metric %s, with %d variable(s)--%s--entered as %s ",
 		"respectively, yields:" % (metric_name, how_many_var[metric_name],
 		name_of_var[metric_name][:],names_of_arrays[:])
 
 ##########################################################################################
-#final commands to tie everything together
+#final command to start bottle
 ##########################################################################################
-
-#runs the function that runs the metrics
-run_metrics()
 
 #final function starts up bottle at http://localhost:8080
 run(host='localhost', port=8080)
