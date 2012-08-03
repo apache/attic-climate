@@ -93,8 +93,10 @@ def show_possible_metics():
 #creates introductory page to explain how to use bottle
 @route('/rcmet/metrics/<metric_name>')
 def basic_info(metric_name):
+	
 	if metric_name in how_many_var:
-		return "For metric %s , you need %d variables, which will represent: %s" %(metric_name, how_many_var[metric_name], name_of_var[metric_name][:]),
+		return "For metric %s , you need %d variables, which will represent: %s" %(metric_name, 
+			how_many_var[metric_name], name_of_var[metric_name][:]),
 			'''<p>Will you enter variables (which are arrays) through the command line or 
 			will you search the RCMES Database?</p>
 			<a href="/rcmet/metrics/"+ metric_name+"/commandline">
@@ -103,8 +105,13 @@ def basic_info(metric_name):
 			RCMED</a>
 			</body>
 			</html>'''
+	
 	else:
 		return "The metric you entered doesn't exist."
+	
+	#provision for tracking # of variables later on
+	count=0
+	global count
 		
 ##########################################################################################
 #error-catching dictionaries (I'm not sure this was the best way to go, 
@@ -152,6 +159,11 @@ name_of_var={
 	"calc_pdf" :[],
 	"calc_anom_cor" :[]
 }				
+
+#two lists that will help with user explanation later; so much better than global variables	
+names_of_arrays=[]		
+
+list_of_arrays=[]
 		
 ##########################################################################################
 #getting arrays through the command line
@@ -160,45 +172,45 @@ name_of_var={
 #Tells the user how to send variables from the command line
 @route('/rcmet/metrics/<metric_name>/commandline')
 def command_line_offered_arrays(metric_name):
-	return "please use your command line to POST a form with the array. Send either a "
-		"file or serialized string. Name the form: array. Include also, a form that names"
-		" the array. Call this form name. A sample would be array=<array_here> and name="
-		"<array_name_here>. Send the form to: http://.../rcmet/metrics/getting_array/"
-		"(name of metric)\n Once the computer receives all variables, you will be "
-		"redirected to the metrics portion of the website."
 	
-#this is the function that gets the array from the command line. The user will never see this page. They are automatically redirected
+	if how_many_var[metric_name]-count<=0"
+		print "You have already submitted all the needed variables for this metric."
+		redirect('/rcmet/metrics/'+metric_name+'/calculate')
+	else:
+		return "please use your command line to POST a form with the array. Send either a",
+			" file or serialized string. Name the form: array. Include also, a form that ",
+			"names the array. Call this form name. A sample would be array=<array_here> ",
+			"and name=<array_name_here>. Send the form to: http://.../rcmet/metrics/",
+			"getting_array/(name of metric)\n Once the computer receives all variables, ",
+			"you will be redirected to the metrics portion of the website.",
+			"Currently, you have submitted %d variables and need %d more. The next ",
+			"variable you submit will represent the variable %s in %s" %(count, 
+			(how_many_var[metric_name]-count),name_of_var[metric_name][count], metric_name)
+	
+#this function  gets the array from the command line. The user will never see this page.
 @route('/rcmet/metrics/getting_array/<metric_name>', method='POST')
 def command_line_array(metric_name):
-	count=1
-	global count
 	
 	array=request.forms.get('array')
+	array_name=request.forms.get('name')
 	if type(array)==str:
 		array=pickle.loads(array)
-	else: 
-		array=pickle.load(array)
-		
-	#this system seems to me sort of unsophisticated and really long	
-	if count==1:
-		array1=array
-		global array1
-		array1_name=request.forms.get('name')
-		global array1_name
-	if count==2:
-		array2=array
-		global array2
-		array2_name=request.forms.get('name')
-		global array2_name
-	if count==3:
-		array3=array
-		global array3
-		array3_name=request.forms.get('name')
-		global array3_name
-		
-	print "Variable received as %s. Will represent %s" % (array_name, name_of_var[metric_name][count-1])
+	else:
+		try: 
+			array=pickle.load(array)
+		except #NAME THE ERROR!
+			print "The form you sent contains an invalid data format. Send only a file",
+				" or serialized string."
 	
-	another_array=raw_input("Will you send another array? [y/n]")
+	#much shorter, and cleaner later on
+	list_of_arrays.append(array)
+	names_of_arrays.append(array_name)
+	
+	print "Variable received as %s. Will represent %s" % (array_name, 
+		name_of_var[metric_name][count-1])
+	
+	#uses the command line to ask the user if they want more input
+	another_array=raw_input("Will you send another array on the command line? [y/n]")
 	if another_array=='y':
 		count=count+1
 		global count #TEST THIS!!
@@ -219,8 +231,7 @@ def command_line_array(metric_name):
 #getting variables through RCMED
 ##########################################################################################
 
-#this whole section is messy right now. I am mostly avoiding it out of fear
-
+#explains how to enter information into a dynamic link
 @route('/rcmet/metrics/<metric_name>/RCMEDdata')
 def explain_dynamic_links(metric_name):
 	return show_possible_metrics(), '''<html>
@@ -228,110 +239,66 @@ def explain_dynamic_links(metric_name):
 		<body>
 		<p>#LOOK UP AND ENTER THE PARAMETERS!</p>
 		<p>Writing a URI:</p>
-		<p>your URI will read http.../rcmet/metrics/RCMEDdata/(ID of parameter 1)/
-		(start time)/(end time)/(ID parameter 2)/(start time)/(end time)/
-		(ID of parameter 3)/(start time)/(end time)</p>
-		<p>Only enter as many parameters as you need. Do not end 
-		URI with a slash.</p>
+		<p>your URI will read http.../rcmet/metrics/(metric_name)/RCMEDdata/
+		(ID of parameter)/(start time)/(end time)/(string that describes your array></p>
+		<p>Please enter one variable at a time.</p>
 		</body>
-		</html>'''
+		</html>''',
+		"Currently, you have submitted %d variables and need %d more. The next variable ",
+		"you submit will represent the variable %s in %s" %(count, 
+		(how_many_var[metric_name]-count),name_of_var[metric_name][count], metric_name)
 	
-#DO THE ARRAYS FROM RCMED NEED PICKLE TOO?
-
-#MAKE THIS ONE FUNCTION THAT CAN REPEAT THREE TIMES MAX		
-#or do something that makes it less redundant and ugly. 
-
-def get_arrays_from_dyn_links():
-	try:	
-		#a uri for metrics w/ 3 arrays obtained via Dynamic Links
-		@route('/rcmet/metrics/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<IDtwo>/'+
-			'<sttwo>/<ettwo>/<IDthree>/<stthree>/<etthree>') 
-		def three_arrays(metric_name,IDone,stone,etone,IDtwo,sttwo,ettwo,IDthree,
-			stthree,etthree):
-			try:
-				method=getattr(CAMERONS_CLASS, WHATEVER_FUNCTION_GETS_THE_ARRAYS)
-				array1=method(IDone,stone,etone)
-				array2=method(IDtwo,sttwo,ettwo)
-				array3=method(IDthree,stthree,etthree)
-				global array1
-				global array2
-				global array3
-				redirect('/rcmet/metrics/<metric_name>/calculate')
-				
-			except TypeError:
-				return ("Too many/too few values entered. Please enter only BLANK or",
-					'''<a href="/rcmet/metrics/<metric_name>/RCMEDdata">Return to main page</a>''')	
+@route('/rcmet/metrics/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<array_name>') 
+def get_arrays_from_RCMED(metric_name,IDone,stone,etone):
+	
+	if how_many_var[metric_name]-count==0:
+		print "You've already submitted all variables for this function."
+		redirect('/rcmet/metrics/'+metric_name+'/calculate')
+	
+	else:		
+		try:
+			method=getattr(CAMERONS_CLASS, WHATEVER_FUNCTION_GETS_THE_ARRAYS)
+			array=method(IDone,stone,etone)
+			list_of_arrays.append(array)
+			names_of_arrays.append(array_name)
+			count=count+1
+			global count
+	
+		#in case the user searches for the disneyland function or something weird like that
+		except AttributeError:
+			return ("There is not metric matches your parameters. ",
+				"Please enter new parameters", 
+				'''<a href='/rcmet/metrics/<metric_name>/RCMEDdata'>
+				Return to main page</a>''')	
 		
-		@route('/rcmet/metrics/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<IDtwo>/'+
-			'<sttwo>/<ettwo>') 
-		def two_arrays(metric_name,IDone,stone,etone,IDtwo,sttwo,ettwo):
-			try:
-				method=getattr(CAMERONS_CLASS, WHATEVER_FUNCTION_GETS_THE_ARRAYS)
-				array1=method(IDone,stone,etone)
-				array2=method(IDtwo,sttwo,ettwo)
-				global array1
-				global array2
-				
-			except TypeError:
-				return ("Too many/too few values entered. Please enter only BLANK or",
-					'''<a href="/rcmet/metrics/<metric_name>/RCMEDdata">Return to main page</a>''')
-				
-		@route('/rcmet/metrics/RCMEDdata/<IDone>/<stone>/<etone>') 
-		def two_arrays(metric_name,IDone,stone,etone):
-			try:
-				method=getattr(CAMERONS_CLASS, WHATEVER_FUNCTION_GETS_THE_ARRAYS)
-				array1=method(IDone,stone,etone)
-				global array1
-
-			except TypeError:
-				return ("Too many/too few values entered. Please enter only BLANK or",
-					'''<a href="/rcmet/metrics/<metric_name>/RCMEDdata">Return to main page</a>''')	
-
-	except AttributeError:
-		return ("The selected function doesn't exist. Please enter a new one or", 
-			'''<a href='/rcmet/metrics/<metric_name>/RCMEDdata'>
-			Return to main page</a>''')	
-	
-	except ValueError:
-		return ("Invalid variable. Please make sure the variables ARE IN THIS FORMAT!!! or",
-			'''<a href='/rcmet/metrics/<metric_name>/RCMEDdata'>
-			Return to main page</a>''')	
+		#my next goal is to add more error handlers here. 
 
 ##########################################################################################
 #running the metrics
 ##########################################################################################
+
 #this function actually runs the metrics
 @route('/rcmet/metrics/<metric_name>/calculate')
 def run_metrics(metric_name):
+	method=getattr(mtx, metric_name)
 	
-	try:
-		if how_many_var[metric_name]==3
-			try:
-				method=getattr(mtx,metric_name)
-				return mtx.method.__doc__, "This metric %s, with 3 variables (%s) entered" 
-					" as %s, yields:" % (metric_name, name_of_var[metric_name][:],
-					FIGURE OUT HOW TO NAME ARRAYS),str(method(array1, array2, array3)),
-				
-		if how_many_var[metric_name]==2
-			try:
-				method=getattr(mtx,metric_name)
-				return mtx.method.__doc__, "This metric %s, with 2 variables (%s) entered" 
-					" as %s, yields:" % (metric_name, name_of_var[metric_name][:],
-					FIGURE OUT HOW TO NAME ARRAYS), str(method(array1,array2))
-		
-		if how_many_var[metric_name]==1
-			try:
-				method=getattr(mtx,metric_name)
-				return mtx.method.__doc__, "This metric %s, with 1 variable (%s) entered" 
-					" as %s, yields:" % (metric_name, name_of_var[metric_name][:],
-					FIGURE OUT HOW TO NAME ARRAYS), str(method(array1))
+	if how_many_var[metric_name]==1
+		return explain_metric(metric_name), 
+			str(method(list_of_arrays[0]))
 			
-#"figure out how to name arrays" refers to me wanted to come up with a system
-#that's going to give each array a description (picked by the user), so that they are 
-#better identified than array1, array2, etc.
-#My function will still call them array1,2,3 because it's standardized, but they will have
-#some sort of name attached to then somehow that the user will be able to identify them by. 
-#*by which the user will be able to identify them.* Whatever. 
+	if how_many_var[metric_name]==2
+		return explain_metric(metric_name), 
+			str(method(list_of_arrays[0], list_of_arrays[1]))
+			
+	if how_many_var[metric_name]==3
+		return explain_metric(metric_name), 
+			str(method(list_of_arrays[0], list_of_arrays[1], list_of_arrays[2]))
+		
+
+def explain_metric(metric_name)
+	return mtx.method.__doc__, "This metric %s, with %d variable(s)--%s--entered as %s ",
+		"respectively, yields:" % (metric_name, how_many_var[metric_name],
+		name_of_var[metric_name][:],names_of_arrays[:])
 
 ##########################################################################################
 #final commands to tie everything together
@@ -342,8 +309,4 @@ run_metrics()
 
 #final function starts up bottle at http://localhost:8080
 run(host='localhost', port=8080)
-
-
-
-
 
