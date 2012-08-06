@@ -1,12 +1,17 @@
+# Import Statements
+from math import floor, log
+import matplotlib
+import matplotlib.dates
+import Ngl
+import numpy
+import pylab
+
+
 def pow_round(x):
     '''
     # Function to round x to the nearest power of 10
     '''
-    from math import floor, log
-
     return 10**(floor(log(x,10)-log(0.5,10)))
-
-
 
 def calc_nice_color_bar_values(mymin,mymax,target_nlevs):
   '''
@@ -35,7 +40,6 @@ def calc_nice_color_bar_values(mymin,mymax,target_nlevs):
   #     Peter Lean      March 2011
   #
   '''
-  import numpy
 
   myrange = mymax - mymin
 
@@ -77,7 +81,6 @@ def calc_nice_color_bar_values(mymin,mymax,target_nlevs):
 
   return newmin,newmax,new_nlevs
 
-
 def draw_map_color_filled(data,lats,lons,filename,workdir,mytitle='',rangeMax='not set', rangeMin='not set', diff=False, nsteps=20,colorTable='rainbow',niceValues=False):
     '''
     # Function to draw a color filled contour map using the masked array data
@@ -100,8 +103,6 @@ def draw_map_color_filled(data,lats,lons,filename,workdir,mytitle='',rangeMax='n
     #
     #              Peter Lean August 2010
     '''
-    import Ngl
-    import numpy
 
     # set optional argument if not set by user
     if(rangeMax=='not set'):
@@ -205,9 +206,6 @@ def draw_map_color_filled(data,lats,lons,filename,workdir,mytitle='',rangeMax='n
     del resources
     del wks
 
-    return
-
-
 def draw_time_series_plot(data,times,myfilename,myworkdir, data2='',mytitle='',ytitle='Y',xtitle='time',year_labels=True):
     '''
     # Function to draw a time series plot
@@ -226,10 +224,6 @@ def draw_time_series_plot(data,times,myfilename,myworkdir, data2='',mytitle='',y
     #
     #              Peter Lean August 2010
     '''
-    import pylab
-    import matplotlib
-    import matplotlib.dates
-
     print 'Producing time series plot'
 
     fig = pylab.figure()
@@ -275,9 +269,6 @@ def draw_time_series_plot(data,times,myfilename,myworkdir, data2='',mytitle='',y
 
     fig.savefig(myworkdir+'/'+myfilename+'.png')
 
-    return
-
-
 def draw_time_series_plot_old(data,times,myfilename,myworkdir, mytitle='',ytitle='Y',xtitle='time'):
     '''
     # DEPRECATED: This old version used PyNGL which couldn't handle dates.
@@ -298,8 +289,6 @@ def draw_time_series_plot_old(data,times,myfilename,myworkdir, mytitle='',ytitle
     #
     #              Peter Lean August 2010
     '''
-    import Ngl
-    import numpy
 
     wks_type = "png"
     wks = Ngl.open_wks(wks_type,myworkdir+'/'+myfilename)  # Open a workstation.
@@ -351,7 +340,3 @@ def draw_time_series_plot_old(data,times,myfilename,myworkdir, mytitle='',ytitle
     del wks
 
     #Ngl.end()
-
-    return
-
-
