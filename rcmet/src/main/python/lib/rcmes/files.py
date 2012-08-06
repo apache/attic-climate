@@ -1,3 +1,8 @@
+import Nio
+import numpy as np
+import numpy.ma as ma
+import rcmes.process
+
 def findunique(seq):
     keys = {}
     for e in seq:
@@ -21,8 +26,6 @@ def find_time_var_name_from_file(filelist):
    #  
    #
    #       Peter Lean   February 2011
-
-   import Nio
 
    filename = filelist[0]
 
@@ -62,7 +65,6 @@ def find_time_var_name_from_file(filelist):
 
    return success, timename, var_name_list
 
-
 def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
    # Function to return the latitude and longitude ranges of the data in a file,
    # given the identifying variable names.
@@ -76,8 +78,6 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
    #            latMin, latMax, lonMin, lonMax - self explanatory
    #
    #                    Peter Lean      March 2011
-
-   import Nio
 
    filename = filelist[0]
 
@@ -101,8 +101,6 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
  
      return 0,0,0,0
 
-
-
 def find_latlon_var_from_file(filelist):
    # Function to find what the latitude and longitude variables are called in a model file.
    # Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
@@ -125,8 +123,6 @@ def find_latlon_var_from_file(filelist):
    #                    NB. if unsuccessful then all variables will be empty except the final list of variable names.
    #
    #       Peter Lean   February 2011
-
-   import Nio
 
    filename = filelist[0]
 
@@ -204,7 +200,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
    #    myvar    - string containing name of variable to load in (as it appears in file)
    # Output:
    #    lat, lon - 2D array of latitude and longitude values
-   #    times    - list of times
+   #    timestore    - list of times
    #    t2store  - numpy array containing data from all files    
    #
    #  NB. originally written specific for WRF netCDF output files
@@ -213,14 +209,11 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
    #   Peter Lean July 2010 
    ##################################################################################
    '''
-   import Nio
-   import numpy as np
-   import numpy.ma as ma
-   import rcmes.process
 
    filelist.sort()
 
    # Crash nicely if 'filelist' is zero length
+   """TODO:  Throw Error instead via try Except"""
    if len(filelist)==0:
       print 'Error: no files have been passed to read_data_from_file_list()'
       return -1,-1,-1,-1
@@ -235,6 +228,8 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
    lonsraw = tmp.variables[lonVarName][:]
    lonsraw[lonsraw>180] = lonsraw[lonsraw>180]-360.  # convert to -180,180 if necessary
 
+   """TODO:  Guard against case where latsraw and lonsraw are not the same dim?"""
+   
    if(latsraw.ndim == 1):
      lon,lat = np.meshgrid(lonsraw,latsraw)
    if(latsraw.ndim == 2):
@@ -272,6 +267,9 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
      #   e.g. if for single level then often data have 4 dimensions, when 3 dimensions will do.
      #  Code requires data to have dimensions, (time,lat,lon)
      #    i.e. remove level dimensions
+     # Remove 1d axis from the t2raw array
+     # Example: t2raw.shape == (365, 180, 360 1) <maps to (time, lat, lon, height)>
+     # After the squeeze you will be left with (365, 180, 360) instead
      t2tmp = t2raw.squeeze()
      # Nb. if this happens to be data for a single time only, then we just flattened it by accident
      #     lets put it back... 
@@ -296,11 +294,13 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
    # Decode model times into python datetime objects
    timestore = rcmes.process.decode_model_times(filelist, timeVarName)
 
-   return lat, lon, timestore, t2store
-
-
-
-
+   data_dict = {}
+   data_dict['lats'] = lat
+   data_dict['lons'] = lon
+   data_dict['times'] = timestore
+   data_dict['data'] = t2store
+   #return lat, lon, timestore, t2store
+   return data_dict
 
 def select_var_from_file(myfile,fmt='not set'):
    '''
@@ -316,7 +316,6 @@ def select_var_from_file(myfile,fmt='not set'):
    #    Peter Lean  September 2010
    '''
 
-   import Nio
    print fmt
 
    if fmt=='not set':
@@ -350,8 +349,6 @@ def select_var_from_wrf_file(myfile):
    #
    #    Peter Lean  September 2010
    '''
-
-   import Nio
 
    f = Nio.open_file(myfile,format='nc')
 
