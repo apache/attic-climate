@@ -1,4 +1,14 @@
 #!/usr/local/bin/python
+""" 
+    Step by Step Wizard that demonstrates how the underlying RCMES code can
+    be used to generate climate dataset intercomparisons
+"""
+# Empty dictionaries to collect all of the user's inputs 
+options = {}
+mask = {}
+model = {}
+params = {}
+settings = {}
 
 def rcmet_ui():
   ###################################################################################################
@@ -37,21 +47,21 @@ def rcmet_ui():
   ###################################################################################################
   # Section 0: Collect directories to store RCMET working files.
   ###################################################################################################
-  workdir = raw_input('Please enter workdir:\n> ')   # This is where the images are created/stored
-  cachedir = raw_input('Please enter cachedir:\n> ') # This is where the database cache files are stored
+  settings['work_dir'] = raw_input('Please enter workdir:\n> ')   # This is where the images are created/stored
+  settings['cache_dir'] = raw_input('Please enter cachedir:\n> ') # This is where the database cache files are stored
 
   ###################################################################################################
   # Section 1a: Enter model file/s
   ###################################################################################################
   filelist_instructions = raw_input('Please enter model file (or specify multiple files using wildcard):\n> ')
-  filelist = glob.glob(filelist_instructions)
+  settings['file_list'] = glob.glob(filelist_instructions)
 
   ###################################################################################################
   # Section 1b (i): 
   #     Attempt to auto-detect latitude and longitude variable names
-  #     and lat,lon limits from first file in filelist 
+  #     and lat,lon limits from first file in settings['file_list'] 
   ###################################################################################################
-  status, modelLatVarName, modelLonVarName, latMin, latMax, lonMin, lonMax, var_name_list = rcmes.files.find_latlon_var_from_file(filelist)
+  status, model['lat_variable'], model['lon_variable'], params['lat_min'], params['lat_max'], params['lon_min'], params['lon_max'], var_name_list = rcmes.files.find_latlon_var_from_file(settings['file_list'])
 
   ###################################################################################################
   # Section 1b (ii)
@@ -71,40 +81,40 @@ def rcmet_ui():
         if user_var_choice == 'z':
                 lat_filename_instructions = raw_input('Please enter the full path of the file containing the latitudes and longitudes:\n> ')
                 latlon_filelist = glob.glob(lat_filename_instructions)
-                status, modelLatVarName, modelLonVarName, latMin, latMax, lonMin, lonMax, new_var_name_list = rcmes.files.find_latlon_var_from_file(latlon_filelist)
+                status, model['lat_variable'], model['lon_variable'], params['lat_min'], params['lat_max'], params['lon_min'], params['lon_max'], new_var_name_list = rcmes.files.find_latlon_var_from_file(latlon_filelist)
 
         ##################################################
         # Section 1b (iii)
         ##################################################
         if user_var_choice != 'z':
           try:
-            modelLatVarName = var_name_list[int(user_var_choice)]
+            model['lat_variable'] = var_name_list[int(user_var_choice)]
           except:
-            modelLatVarName = var_name_list[int(raw_input('Are you sure? The previous selection did not work, please try again:\n> '))]
+            model['lat_variable'] = var_name_list[int(raw_input('Are you sure? The previous selection did not work, please try again:\n> '))]
 
           try:
-            modelLonVarName = var_name_list[int(raw_input('..and which of the above variables is the longitude variable?\n> '))]
+            model['lon_variable'] = var_name_list[int(raw_input('..and which of the above variables is the longitude variable?\n> '))]
           except:
-            modelLonVarName = var_name_list[int(raw_input('Are you sure? The previous selection did not work, please try again:\n> '))]
+            model['lon_variable'] = var_name_list[int(raw_input('Are you sure? The previous selection did not work, please try again:\n> '))]
 
           # Find lat/lon ranges by loading the data using the user supplied variable names
-          latMin,latMax, lonMin, lonMax = rcmes.files.find_latlon_ranges(filelist, lat_var_name, lon_var_name) 
+          params['lat_min'],params['lat_max'], params['lon_min'], params['lon_max'] = rcmes.files.find_latlon_ranges(settings['file_list'], lat_var_name, lon_var_name) 
 
 
   print 'Found latitude and longitude variables in model data files: '
-  print 'Lat/Lon variable names : ',modelLatVarName, modelLonVarName
-  print 'Minimum Latitude: ',latMin
-  print 'Maximum Latitude: ',latMax
-  print 'Minimum Longitude: ',lonMin
-  print 'Maximum Longitude: ',lonMax
+  print 'Lat/Lon variable names : ',model['lat_variable'], model['lon_variable']
+  print 'Minimum Latitude: ',params['lat_min']
+  print 'Maximum Latitude: ',params['lat_max']
+  print 'Minimum Longitude: ',params['lon_min']
+  print 'Maximum Longitude: ',params['lon_max']
 
   ###################################################################################################
   # Section 1c (i) Attempt to auto-detect the time variable in the file.
   #     NB. name of time variable needs to passed into RCMET.
   ###################################################################################################
-  status, modelTimeVarName, var_name_list = rcmes.files.find_time_var_name_from_file(filelist)
+  status, model['time_variable'], var_name_list = rcmes.files.find_time_var_name_from_file(settings['file_list'])
 
-  print 'Found time variable name :',modelTimeVarName
+  print 'Found time variable name :',model['time_variable']
   if status==0:
         print 'Could not find time data in the file.'
         counter = 0
@@ -113,15 +123,15 @@ def rcmet_ui():
            counter += 1
 
         try:
-           modelTimeVarName = var_name_list[int(raw_input('Please help, by selecting which of the above variables in the file is the time variable:\n> '))]
+           model['time_variable'] = var_name_list[int(raw_input('Please help, by selecting which of the above variables in the file is the time variable:\n> '))]
         except:
-           modelTimeVarName = var_name_list[int(raw_input('There was a problem with your selection, please try again:\n> '))]
+           model['time_variable'] = var_name_list[int(raw_input('There was a problem with your selection, please try again:\n> '))]
 
   ###################################################################################################
   # Section 1c (ii): Attempt to decode model times into a python datetime object.
   ###################################################################################################
   try:
-    modelTimes = rcmes.process.decode_model_times(filelist,modelTimeVarName)
+    modelTimes = rcmes.process.decode_model_times(settings['file_list'],model['time_variable'])
     modelStartTime = min(modelTimes)
     modelEndTime = max(modelTimes)
 
@@ -141,19 +151,19 @@ def rcmet_ui():
 
   user_var_choice = raw_input('Which variable would you like to evaluate?\n> ')
   try:
-    modelVarName = var_name_list[int(user_var_choice)]
+    model['var_name'] = var_name_list[int(user_var_choice)]
   except:
     user_var_choice = raw_input('There was a problem with that selection, please try again:\n> ')    
-    modelVarName = var_name_list[int(user_var_choice)]
+    model['var_name'] = var_name_list[int(user_var_choice)]
 
   ###################################################################################################
   # Ask user if the above variable is precipitation data 
   # (as this needs some special treatment by RCMET, e.g. color tables, unit conversion etc)
   ###################################################################################################
-  precipFlag = False
+  options['precip'] = False
   precip_choice = raw_input('Is this precipitation data? [y/n]\n> ').lower()
   if precip_choice=='y':
-        precipFlag = True
+        options['precip'] = True
 
   ###################################################################################################
   # Section 3a: Select observation dataset from database
@@ -217,22 +227,22 @@ def rcmet_ui():
   try:
     dataset_choice = int(raw_input('Please select which observational dataset you wish to compare against:\n> ')) 
     selection = next((p for p in parameters if p['parameter_id'] == dataset_choice), None)
-    obsDatasetId = selection['dataset_id']
+    params['obs_dataset_id'] = selection['dataset_id']
     obsStartTime = datetime.datetime.strptime(selection['start_date'], "%Y-%m-%d")
     obsEndTime = datetime.datetime.strptime(selection['end_date'], "%Y-%m-%d")
-    obsParameterId = selection['parameter_id']
-    #obsDatasetId = db_dataset_ids[int(dataset_choice)]
+    params['obs_param_id'] = selection['parameter_id']
+    #params['obs_dataset_id'] = db_dataset_ids[int(dataset_choice)]
     #obsStartTime = db_dataset_startTimes[int(dataset_choice)]
     #obsEndTime = db_dataset_endTimes[int(dataset_choice)]
 
   except:
     dataset_choice = raw_input('There was a problem with your selection, please try again:\n> ') 
     selection = next((p for p in parameters if p['parameter_id'] == dataset_choice), None)
-    obsDatasetId = selection['dataset_id']
+    params['obs_dataset_id'] = selection['dataset_id']
     obsStartTime = datetime.datetime.strptime(selection['start_date'], "%Y-%m-%d")
     obsEndTime = datetime.datetime.strptime(selection['end_date'], "%Y-%m-%d")
-    obsParameterId = selection['parameter_id']
-    #obsDatasetId = db_dataset_ids[int(dataset_choice)]
+    params['obs_param_id'] = selection['parameter_id']
+    #params['obs_dataset_id'] = db_dataset_ids[int(dataset_choice)]
     #obsStartTime = db_dataset_startTimes[int(dataset_choice)]
     #obsEndTime = db_dataset_endTimes[int(dataset_choice)]
 
@@ -252,9 +262,9 @@ def rcmet_ui():
      counter += 1
 
   try:
-    obsParameterId = db_parameter_ids[int(dataset_choice)][int(raw_input('Please select a parameter:\n> '))]
+    params['obs_param_id'] = db_parameter_ids[int(dataset_choice)][int(raw_input('Please select a parameter:\n> '))]
   except:
-    obsParameterId = db_parameter_ids[int(dataset_choice)][int(raw_input('There was a problem with your selection, please try again:\n> '))]
+    params['obs_param_id'] = db_parameter_ids[int(dataset_choice)][int(raw_input('There was a problem with your selection, please try again:\n> '))]
   """
 
   ###################################################################################################
@@ -262,29 +272,29 @@ def rcmet_ui():
   ###################################################################################################
 
   # Calculate overlap
-  startTime = max(modelStartTime, obsStartTime)
-  endTime = min(modelEndTime, obsEndTime)
+  params['start_time'] = max(modelStartTime, obsStartTime)
+  params['end_time'] = min(modelEndTime, obsEndTime)
 
   print 'Model time range: ',modelStartTime.strftime("%Y/%m/%d %H:%M"),modelEndTime.strftime("%Y/%m/%d %H:%M")
   print 'Obs time range: ',obsStartTime.strftime("%Y/%m/%d %H:%M"), obsEndTime.strftime("%Y/%m/%d %H:%M")
-  print 'Overlapping time range: ',startTime.strftime("%Y/%m/%d %H:%M"), endTime.strftime("%Y/%m/%d %H:%M")
+  print 'Overlapping time range: ',params['start_time'].strftime("%Y/%m/%d %H:%M"), params['end_time'].strftime("%Y/%m/%d %H:%M")
 
   # If want sub-selection then enter start and end times manually
   choice = raw_input('Do you want to only evaluate data from a sub-selection of this time range? [y/n]\n> ').lower()
   if choice=='y':
       startTime_string = raw_input('Please enter the start time in the format YYYYMMDDHHmm:\n> ')
       try:
-         startTime = datetime.datetime(*time.strptime(startTime_string, "%Y%m%d%H%M")[:6])
+         params['start_time'] = datetime.datetime(*time.strptime(startTime_string, "%Y%m%d%H%M")[:6])
       except:
          print 'There was a problem with your entry'
 
       endTime_string = raw_input('Please enter the end time in the format YYYYMMDDHHmm:\n> ')
       try:
-         endTime = datetime.datetime(*time.strptime(endTime_string, "%Y%m%d%H%M")[:6])
+         params['end_time'] = datetime.datetime(*time.strptime(endTime_string, "%Y%m%d%H%M")[:6])
       except:
          print 'There was a problem with your entry'
 
-      print 'Selected time range: ',startTime.strftime("%Y/%m/%d %H:%M"), endTime.strftime("%Y/%m/%d %H:%M")
+      print 'Selected time range: ',params['start_time'].strftime("%Y/%m/%d %H:%M"), params['end_time'].strftime("%Y/%m/%d %H:%M")
   
   ###################################################################################################
   # Section 5: Select Spatial Regridding options
@@ -294,29 +304,29 @@ def rcmet_ui():
   print '[1] Use Model grid'
   print '[2] Define new regular lat/lon grid to use'
   try:
-     regridOption = int(raw_input('Please make a selection from above:\n> '))
+     options['regrid'] = int(raw_input('Please make a selection from above:\n> '))
   except:
-     regridOption = int(raw_input('There was a problem with your selection, please try again:\n> '))
+     options['regrid'] = int(raw_input('There was a problem with your selection, please try again:\n> '))
 
-  if regridOption>2:
+  if options['regrid']>2:
     try:
-     regridOption = int(raw_input('That was not an option, please make a selection from the list above:\n> '))
+     options['regrid'] = int(raw_input('That was not an option, please make a selection from the list above:\n> '))
     except:
-     regridOption = int(raw_input('There was a problem with your selection, please try again:\n> '))
+     options['regrid'] = int(raw_input('There was a problem with your selection, please try again:\n> '))
 
-  if regridOption==0:
-    regridOption = 'obs'
+  if options['regrid']==0:
+    options['regrid'] = 'obs'
 
-  if regridOption==1:
-    regridOption = 'model'
+  if options['regrid']==1:
+    options['regrid'] = 'model'
 
   # If requested, get new grid parameters
-  if regridOption==2:
-    regridOption = 'regular'
-    lonMin = float(raw_input('Please enter the longitude at the left edge of the domain:\n> '))
-    lonMax = float(raw_input('Please enter the longitude at the right edge of the domain:\n> '))
-    latMin = float(raw_input('Please enter the latitude at the lower edge of the domain:\n> '))
-    latMax = float(raw_input('Please enter the latitude at the upper edge of the domain:\n> '))
+  if options['regrid']==2:
+    options['regrid'] = 'regular'
+    params['lon_min'] = float(raw_input('Please enter the longitude at the left edge of the domain:\n> '))
+    params['lon_max'] = float(raw_input('Please enter the longitude at the right edge of the domain:\n> '))
+    params['lat_min'] = float(raw_input('Please enter the latitude at the lower edge of the domain:\n> '))
+    params['lat_max'] = float(raw_input('Please enter the latitude at the upper edge of the domain:\n> '))
     dLon = float(raw_input('Please enter the longitude spacing (in degrees) e.g. 0.5:\n> '))
     dLat = float(raw_input('Please enter the latitude spacing (in degrees) e.g. 0.5:\n> '))
 
@@ -331,40 +341,40 @@ def rcmet_ui():
   print '[3] Calculate daily means (from sub-daily data)'
 
   try:
-     timeRegridOption = int(raw_input('Please make a selection from above:\n> '))
+     options['time_regrid'] = int(raw_input('Please make a selection from above:\n> '))
   except:
-     timeRegridOption = int(raw_input('There was a problem with your selection, please try again:\n> '))
+     options['time_regrid'] = int(raw_input('There was a problem with your selection, please try again:\n> '))
 
-  if timeRegridOption>3:
+  if options['time_regrid']>3:
     try:
-     timeRegridOption = int(raw_input('That was not an option, please make a selection from above:\n> '))
+     options['time_regrid'] = int(raw_input('That was not an option, please make a selection from above:\n> '))
     except:
-     timeRegridOption = int(raw_input('There was a problem with your selection, please try again:\n> '))
+     options['time_regrid'] = int(raw_input('There was a problem with your selection, please try again:\n> '))
 
-  if timeRegridOption==0:
-        timeRegridOption='full'
+  if options['time_regrid']==0:
+        options['time_regrid']='full'
 
-  if timeRegridOption==1:
-        timeRegridOption='annual'
+  if options['time_regrid']==1:
+        options['time_regrid']='annual'
 
-  if timeRegridOption==2:
-        timeRegridOption='monthly'
+  if options['time_regrid']==2:
+        options['time_regrid']='monthly'
 
-  if timeRegridOption==3:
-        timeRegridOption='daily'
+  if options['time_regrid']==3:
+        options['time_regrid']='daily'
 
   ###################################################################################################
   # Section 7: Select whether to perform Area-Averaging over masked region
   ###################################################################################################
-  maskOption = 0
-  maskLonMin = 0
-  maskLonMax = 0
-  maskLatMin = 0
-  maskLatMax = 0
+  options['mask'] = False
+  mask['lon_min'] = 0
+  mask['lon_max'] = 0
+  mask['lat_min'] = 0
+  mask['lat_max'] = 0
 
   choice = raw_input('Do you want to calculate area averages over a masked region of interest? [y/n]\n> ').lower()
   if choice == 'y':
-     maskOption = 1
+     options['mask'] = True
      print '[0] Load spatial mask from file.'
      print '[1] Enter regular lat/lon box to use as mask.'
 
@@ -389,17 +399,19 @@ def rcmet_ui():
      # Section 7b
      # User enters mask region manually
      if maskInputChoice==1:
-        maskLonMin = float(raw_input('Please enter the longitude at the left edge of the mask region:\n> '))
-        maskLonMax = float(raw_input('Please enter the longitude at the right edge of the mask region:\n> '))
-        maskLatMin = float(raw_input('Please enter the latitude at the lower edge of the mask region:\n> '))
-        maskLatMax = float(raw_input('Please enter the latitude at the upper edge of the mask region:\n> '))
+        mask['lon_min'] = float(raw_input('Please enter the longitude at the left edge of the mask region:\n> '))
+        mask['lon_max'] = float(raw_input('Please enter the longitude at the right edge of the mask region:\n> '))
+        mask['lat_min'] = float(raw_input('Please enter the latitude at the lower edge of the mask region:\n> '))
+        mask['lat_max'] = float(raw_input('Please enter the latitude at the upper edge of the mask region:\n> '))
 
   ###################################################################################################
   # Section 8: Select whether to calculate seasonal cycle composites
   ###################################################################################################
-  seasonalCycleOption = raw_input('Seasonal Cycle: do you want to composite the data to show seasonal cycles? [y/n]\n> ').lower()
-  if seasonalCycleOption == 'y':
-        seasonalCycleOption = 1
+  options['seasonal_cycle'] = raw_input('Seasonal Cycle: do you want to composite the data to show seasonal cycles? [y/n]\n> ').lower()
+  if options['seasonal_cycle'] == 'y':
+        options['seasonal_cycle'] = True
+  else:
+        options['seasonal_cycle'] = False
     
   ###################################################################################################
   # Section 9: Select Peformance Metric
@@ -417,43 +429,43 @@ def rcmet_ui():
   print '[9] new Anomaly Correlation'  
   choice = int(raw_input('Please make a selection from the options above\n> '))
   if choice==0:
-      metricOption = 'bias'
+      options['metric'] = 'bias'
   if choice==1:
-      metricOption = 'mae'
+      options['metric'] = 'mae'
   if choice==2:
-      metricOption = 'difference'
+      options['metric'] = 'difference'
   if choice==3:
-      metricOption = 'acc'
+      options['metric'] = 'acc'
   if choice==4:
-      metricOption = 'patcor'
+      options['metric'] = 'patcor'
   if choice==5:
-      metricOption = 'pdf'
+      options['metric'] = 'pdf'
   if choice==6:
-      metricOption = 'rms'
+      options['metric'] = 'rms'
   if choice==7:
-      metricOption = 'coe'
+      options['metric'] = 'coe'
   if choice==8:
-      metricOption = 'stddev'
+      options['metric'] = 'stddev'
   if choice==9:
-      metricOption = 'nacc'
+      options['metric'] = 'nacc'
    ###################################################################################################
   # Section 11: Select Plot Options
   ###################################################################################################
   modifyPlotOptions = raw_input('Do you want to modify the default plot options? [y/n]\n> ').lower()
 
-  plotTitle = 'default'
-  plotFilenameStub = 'default'
+  options['plot_title'] = 'default'
+  options['plot_filename'] = 'default'
 
   if modifyPlotOptions=='y':
-     plotTitle = raw_input('Please enter the plot title:\n> ')
-     plotFilenameStub = raw_input('Please enter the filename stub to use, without suffix e.g. files will be named <YOUR CHOICE>.png\n> ')
+     options['plot_title'] = raw_input('Please enter the plot title:\n> ')
+     options['plot_filename'] = raw_input('Please enter the filename stub to use, without suffix e.g. files will be named <YOUR CHOICE>.png\n> ')
 
   ###################################################################################################
   # Section 13: Run RCMET, passing in all of the user options
   ###################################################################################################
   print 'Running RCMET....'
 
-  do_rcmes_processing_sub.do_rcmes(cachedir, workdir, obsDatasetId,obsParameterId,startTime,endTime,latMin,latMax,lonMin,lonMax,filelist,modelVarName,precipFlag,modelTimeVarName,modelLatVarName, modelLonVarName,regridOption,timeRegridOption,seasonalCycleOption,metricOption,plotTitle,plotFilenameStub,maskOption,maskLatMin,maskLatMax,maskLonMin,maskLonMax)
+  do_rcmes_processing_sub.do_rcmes( settings, params, model, mask, options )
 
 
 
