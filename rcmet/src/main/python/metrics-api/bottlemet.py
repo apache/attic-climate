@@ -16,6 +16,9 @@ from bottle import route, run, post, request, redirect, debug
 #temporary quick-fix to track errors, not for publication 
 debug(True)
 
+#imports pickle
+import pickle
+
 #imports metrics from RCMET
 import rcmes.metrics as mtx
 		
@@ -83,8 +86,7 @@ def basic_info(metric_name):
 		
 	if metric_name in how_many_var:
 		return "For metric %s , you need %d variable(s), which will represent: %s" %(metric_name, 
-			how_many_var[metric_name], name_of_var[metric_name][:]),
-			'''<html>
+			how_many_var[metric_name], name_of_var[metric_name][:]), '''<html>
 			<body>
 			<p>Will you enter variables (which are arrays) through the command line or 
 			will you search the RCMES Database?</p>
@@ -125,7 +127,7 @@ how_many_var={
 	"calc_anom_corn" : 3
 }		
 	
-#dictionary of metric names and the names of their variables. Needs to be filled in, but also will be helpful	
+#dictionary of metric names and the names of their variables.
 name_of_var={
 	"calc_stdev":['t1'],
 	"calc_annual_cycle_means" :['data','time'],
@@ -164,30 +166,34 @@ def command_line_offered_arrays(metric_name):
 		print "You have already submitted all the needed variables for this metric."
 		redirect('/rcmet/metrics/'+metric_name+'/calculate')
 	else:
-		return "please use your command line to POST a form with the array. Send either a",
-			" file or serialized string. Name the form: array. Include also, a form that ",
-			"names the array. Call this form name. A sample would be array=<array_here> ",
-			"and name=<array_name_here>. Send the form to: http://.../rcmet/metrics/",
-			"(name of metric)/commandline\n Once the computer receives all variables, ",
-			"you will be redirected to the metrics portion of the website.",
-			"Currently, you have submitted %d variable(s) and need %d more. The next ",
-			"variable you submit will represent the variable %s in %s" %(count, 
+		return "Please use your command line to POST a form with the array. Send either a"\
+			" pickled file or serialized string. Name the form: array. Include also, a "\
+			"form that describes/names the array. Call this form name. A sample would be"\
+			" array=<array_here> and name=<array_name_here>. Send the form to: "\
+			"http://.../rcmet/metrics/(name of metric)/commandline. Once the computer "\
+			"receives all variables, you will be redirected to the metrics portion of "\
+			"the website. Currently, you have submitted %d variable(s) and need %d more."\
+			" The next variable you submit will represent the variable %s in %s" %(count, 
 			(how_many_var[metric_name]-count),name_of_var[metric_name][count], metric_name)
 	
-#this function  gets the array from the command line. The user will never see this page.
+#this function  gets the array from the command line
 @route('/rcmet/metrics/<metric_name>/commandline', method='POST')
 def command_line_array(metric_name):
 	
 	array=request.forms.get('array')
 	array_name=request.forms.get('name')
 	if type(array)==str:
-		array=pickle.loads(array)
+		try:
+			array=pickle.loads(array)
+		except pickle.UnpicklingError:
+			print "This object cannot be unpickled. Send only a file"\
+			" or serialized string."	
 	else:
 		try: 
 			array=pickle.load(array)
-		except #NAME THE ERROR!
-			print "The form you sent contains an invalid data format. Send only a file",
-				" or serialized string."
+		except pickle.UnpicklingError:
+			print "This object cannot be unpickled. Send only a file"\
+			" or serialized string."
 	
 	#much shorter, and cleaner later on
 	list_of_arrays.append(array)
@@ -230,9 +236,8 @@ def explain_dynamic_links(metric_name):
 		(ID of parameter)/(start time)/(end time)/(string that describes your array)</p>
 		<p>Please enter one variable at a time.</p>
 		</body>
-		</html>''',
-		"Currently, you have submitted %d variable(s) and need %d more. The next variable ",
-		"you submit will represent the variable %s in %s" %(count, 
+		</html>''', "Currently, you have submitted %d variable(s) and need %d more. The next"\
+		" variable you submit will represent the variable %s in %s" %(count, 
 		(how_many_var[metric_name]-count),name_of_var[metric_name][count], metric_name)
 	
 @route('/rcmet/metrics/<metric_name>/RCMEDdata/<IDone>/<stone>/<etone>/<array_name>') 
@@ -252,19 +257,15 @@ def get_arrays_from_RCMED(metric_name,IDone,stone,etone):
 			global count
 			
 			return "Submit more variables?",
-				'''<a href='/rcmet/metrics/'+metric_name+'/RCMEDdata'>
-				Online</a>''',
-				'''<a href='/rcmet/metrics/'+metric_name+'/commandline'>
-				Via Command Line</a>''',
-				'''<a href='/rcmet/metrics/'+metric_name+'/calculate'>
-				No More Variables</a>''',
+			'''<a href='/rcmet/metrics/'+metric_name+'/RCMEDdata'>Online</a>''',
+			'''<a href='/rcmet/metrics/'+metric_name+'/commandline'>Command Line</a>''',
+			'''<a href='/rcmet/metrics/'+metric_name+'/calculate'>No More Variables</a>''',
 	
-		#in case the user searches for the disneyland function or something weird like that
+		#in case the user searches for the 'disneyland' function or something weird 
 		except AttributeError:
-			return ("There is not metric matches your parameters. ",
+			return ("There is not metric matches your parameters. "\
 				"Please enter new parameters", 
-				'''<a href='/rcmet/metrics/'+metric_name+'/RCMEDdata'>
-				Return to intro page</a>''')	
+				'''<a href='/rcmet/metrics/'+metric_name+'/RCMEDdata'>Return to intro page</a>''')	
 		
 		#my next goal is to add more error handlers here. 
 
@@ -278,11 +279,11 @@ def run_metrics(metric_name):
 
 	if how_many_var[metric_name]>count:
 		return "You have too many variables to run this function.",
-			'''<a href='/rcmet/metrics'>Start Over</a>''')
+		'''<a href='/rcmet/metrics'>Start Over</a>'''
 	
 	if how_many_var[metric_name]<count:
 		return "You have too few variables to run this function.",
-			'''<a href='/rcmet/metrics/'+metric_name>Add More</a>''')
+		'''<a href='/rcmet/metrics/'+metric_name>Add More</a>'''
 
 	else:
 
@@ -296,13 +297,14 @@ def run_metrics(metric_name):
 			
 		if how_many_var[metric_name]==3:
 			return explain_metric(metric_name), 
-				str(method(list_of_arrays[0], list_of_arrays[1], list_of_arrays[2]))
+			str(method(list_of_arrays[0], list_of_arrays[1], list_of_arrays[2]))
 		
 
 def explain_metric(metric_name):
-	return getattr(method,'__doc__'), "This metric %s, with %d variable(s)--%s--entered as %s ",
-		"respectively, yields:" % (metric_name, how_many_var[metric_name],
-		name_of_var[metric_name][:],names_of_arrays[:])
+	return "This metric %s, with %d variable(s)--%s--entered as %s respectively, "\
+	"yields:" % (metric_name, how_many_var[metric_name], name_of_var[metric_name][:],
+	names_of_arrays[:])
+
 
 ##########################################################################################
 #final command to start bottle
@@ -320,7 +322,7 @@ run(host='localhost', port=8080)
 #
 #	1.Bottle is set to run on 'localhost:8080' 
 #
-#	2.The dictionaries may need to be added to/deleted
+#	2.The dictionaries may need to be edited
 #
 #	3.None of the class RCMED methods or parameters are listed
 #
