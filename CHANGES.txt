@@ -1,3 +1,52 @@
+Regional Climate Model Evaluation System
+JIRA located here: https://oodt.jpl.nasa.gov/jira/browse/RCMES
+
+
+Release Notes - RCMES Project - Version 1.1.0 - 08/09/2012
+
+** The project has been renamed from Water Resource Management to Regional Climate Model Evaluation System
+
+
+** Bug
+    * [RCMES-59] - Drop Down Menu Lists are Broken @ http://rcmes.jpl.nasa.gov/
+	* [RCMES-58] - set group ownership to 'daemon' for rcmes puny content
+ 	* [RCMES-46] - wrm_merra_slp - Database is being written to extremely slowly
+ 	* [RCMES-10] - Fix the MySQL/PHP Timeout for Database Query Web Service
+ 	* [RCMES-8] - AIRSL3NetCDF extractor should not extract 'data points' for parameter definitions
+ 	* [RCMES-7] - Granule Segments coming into the Catalog are being counted as new Granules
+ 	* [RCMES-6] - Update the Query API page to include datasetId
+ 	* [RCMES-4] - Catalog needs to insert the variable name into shortName instead of longName (parameter TABLE)
+ 	* [RCMES-3] - Granule Segments coming into the Catalog are being counted as new Datasets
+ 	* [RCMES-1] - ISO timestamp support in WRM means we need to change the TYPE of all time columns to VARCHAR20
+
+
+** Improvement
+    * [RCMES-42] - Rebrand SVN home for RCMES away from WRM
+    * [RCMES-38] - Deploy RCMED under new URL
+    * [RCMES-37] - Get PAR for RCMES
+    * [RCMES-34] - Move mailing lists from wrm-general, wrm-dev, wrm-commits to rcmes-general, rcmes-dev and rcmes-commits
+    * [RCMES-32] - Deploy RCMES main portal
+    * [RCMES-31] - Drop un-used Tables from WRM_PROD database
+ 
+ 
+ ** New Feature
+    * [RCMES-13] - Create a met extractor for AIRS NetCDF files
+    * [RCMES-12] - Python Query API for controlled access to the WRM infrastructure via Python scripts
+
+
+** Task
+ 	* [RCMES-49] - 17 more Databases Needed for the RCMED
+ 	* [RCMES-48] - Create 10 more Databases
+ 	* [RCMES-44] - Create A set of Databases for the MERRA dataset
+ 	* [RCMES-28] - Schema and supporting doc. checked into SVN
+ 	* [RCMES-26] - File Manager Policy checked into SVN
+ 	* [RCMES-24] - Each Parameter needs a TIMESTEP Metadata Key with a single value from a restricted list.
+ 	* [RCMES-20] - Update - Python GRIB Extractor to read all variables in a file
+ 	* [RCMES-18] - Enable GRIB Extractor to take in Command Line Arguments
+ 	* [RCMES-17] - Set up basic website that provides information about the contents of the WRM databse
+ 	* [RCMES-16] - Develop metadata extractor for sample data
+
+
 WRM Regional Climate Model Evaluation Database
 JIRA located here:  http://oodt.jpl.nasa.gov/jira/browse/WRM
 
