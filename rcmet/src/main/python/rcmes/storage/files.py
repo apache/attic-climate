@@ -1,7 +1,23 @@
-import Nio
+"""Module for handling data input files.  Requires PyNIO and Numpy be 
+installed.
+
+This module can easily open NetCDF, HDF and Grib files.  Search the PyNIO
+documentation for a complete list
+"""
+
+try:
+    import Nio
+except ImportError:
+    import nio
+
 import numpy as np
 import numpy.ma as ma
-import rcmes.process
+import sys
+import os
+
+# Appending rcmes via relative path
+sys.path.append(os.path.abspath('../.'))
+import toolkit.process
 
 def findunique(seq):
     keys = {}

@@ -8,16 +8,17 @@ import sys
 import datetime
 import numpy
 import numpy.ma as ma 
-import rcmes.plots
-import rcmes.fortranfile
-import rcmes.db
-import rcmes.files
-import rcmes.process
-import rcmes.metrics
+import rcmes.toolkit.plots
+
+import rcmes.storage.db
+import rcmes.storage.files
+import rcmes.toolkit.process
+import rcmes.toolkit.metrics
 
 # NOT USED?
 # global mmt1
 # global sigma_tt1
+# import rcmes.fortranfile
 
 def do_rcmes(settings, params, model, mask, options):
     '''
