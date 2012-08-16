@@ -1,3 +1,6 @@
+"""Module that demonstrates how to initialize the RESTful web services that 
+power the RCMET GUI"""
+
 from bottle import route, run
 import list_vars_in_file
 import find_latlon_var

@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-
+"""Module used to launch the RESTful API"""
 import sys
 sys.path.append('../lib')
 from bottle import route, request

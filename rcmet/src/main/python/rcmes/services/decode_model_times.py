@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-
+"""Module to simplify handling of model times """
 def decodeTimeFromString(time_string):
     '''
     # Decodes string into a python datetime object

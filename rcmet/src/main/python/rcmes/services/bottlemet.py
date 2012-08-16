@@ -1,9 +1,5 @@
 '''
-##########################################################################################
-#
-# Module to create a web service for RCMET statistical metrics
-#	 
-##########################################################################################
+ Module to create a web service for RCMET statistical metrics
 '''
 
 
