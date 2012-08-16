@@ -11,7 +11,7 @@
 
 import numpy as np
 import numpy.ma as ma
-import rcmes.process
+import rcmes.toolkit.process
 
 def calc_annual_cycle_means(data, time):
     '''
@@ -472,9 +472,8 @@ def calc_nash_sutcliff(dataset_1, dataset_2):
 ###########################################################################
 # Probability Distribution Function
 
-def calc_pdf(dataset_1, dataset_2, 
-             d1_max=dataset_1.amax(),
-             d1_min=dataset_1.amin()):
+def calc_pdf(dataset_1, dataset_2):
+             
     '''
    #################################################################################################
    # 
@@ -516,6 +515,8 @@ def calc_pdf(dataset_1, dataset_2,
     pdf_obs = []
     # float to store the final PDF similarity score
     similarity_score = 0.0
+    d1_max=dataset_1.amax()
+    d1_min=dataset_1.amin()
 
     print 'min modelData', dataset_1[:, :, :].min()
     print 'max modelData', dataset_1[:, :, :].max()
