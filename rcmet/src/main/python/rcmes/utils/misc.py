@@ -1,21 +1,20 @@
+"""Module with a collection of helper functions"""
 
 def decode_wrf_times(xtimes, base_time):
    '''
-   #################################################################################################
-   #  Routine to convert from WRF time ('minutes since simulation start....') 
-   #  into a python datetime structure
-   #
-   #  Input:
-   #      xtimes - list of wrf 'XTIME' in units of 'minutes since simulation start'
-   #      base_time - a python datetime object describing simulation start date/time
-   #
-   #  Output:
-   #      times  - list of python datetime objects describing model data times
-   #
-   #
-   #     Peter Lean August 2010
-   #
-   #################################################################################################
+     Routine to convert from WRF time ('minutes since simulation start....') 
+     into a python datetime structure
+   
+     Input:
+         xtimes - list of wrf 'XTIME' in units of 'minutes since simulation start'
+         base_time - a python datetime object describing simulation start date/time
+   
+     Output:
+         times  - list of python datetime objects describing model data times
+   
+   
+        Peter Lean August 2010
+   
    '''
    import datetime
    times=[]
@@ -28,21 +27,19 @@ def decode_wrf_times(xtimes, base_time):
 
 def calc_base_time_wrf(filename):
    '''
-   #################################################################################################
-   #  Routine to calculate base_time (i.e. model initialization time)
-   #   for wrf files with timestamp in their filenames.
-   #  
-   #    NB. Only works if includes a timestamp in format 'YYYY-MM-DD_HH:MM:SS'
-   #    TODO: work out a more general way of doing this...
-   #  Input:
-   #      filename - full path to WRF netCDF file.
-   #
-   #  Output:
-   #      base_time  - a python datetime object describing model start time
-   #
-   #     Peter Lean August 2010
-   #
-   #################################################################################################
+     Routine to calculate base_time (i.e. model initialization time)
+      for wrf files with timestamp in their filenames.
+     
+       NB. Only works if includes a timestamp in format 'YYYY-MM-DD_HH:MM:SS'
+       TODO: work out a more general way of doing this...
+     Input:
+         filename - full path to WRF netCDF file.
+   
+     Output:
+         base_time  - a python datetime object describing model start time
+   
+        Peter Lean August 2010
+   
    '''
    import numpy
    import Nio
@@ -76,25 +73,23 @@ def calc_base_time_wrf(filename):
 
 def calc_period_precip_from_running_tot(running_precip):
    '''
-   #################################################################################################
-   # WRF precipitation accumulations are stored as running totals from the start of the model run
-   # To find out values during each output time period, you must subtract the previous total
-   #
-   #   e.g. running tot = 0,0,1,1,1,2,2,4,7,9,9,11 
-   #        period accu = 0,0,1,0,0,1,0,2,3,2,0,2
-   #
-   #  Input: 
-   #     running_precip   - numpy array containing precipitation data at more than one time level
-   #                         NB. assumes time dimension is the first one precip[time, lat, lon, level] 
-   #
-   #  Output:
-   #     acc_precip       - numpy array of same dimensions as input, 
-   #                        but with period accumulations instead of running total.
-   #
-   #
-   #    Peter Lean August 2010
-   #
-   #################################################################################################
+    WRF precipitation accumulations are stored as running totals from the start of the model run
+    To find out values during each output time period, you must subtract the previous total
+   
+      e.g. running tot = 0,0,1,1,1,2,2,4,7,9,9,11 
+           period accu = 0,0,1,0,0,1,0,2,3,2,0,2
+   
+     Input: 
+        running_precip   - numpy array containing precipitation data at more than one time level
+                            NB. assumes time dimension is the first one precip[time, lat, lon, level] 
+   
+     Output:
+        acc_precip       - numpy array of same dimensions as input, 
+                           but with period accumulations instead of running total.
+   
+   
+       Peter Lean August 2010
+   
    '''
    import numpy
 
@@ -117,20 +112,18 @@ def calc_period_precip_from_running_tot(running_precip):
 
 def decode_eraint_surf_times(xtimes):
    '''
-   #################################################################################################
-   #  Routine to convert from ERA-Interim time ('hours since 1900...') 
-   #  into a python datetime structure
-   #
-   #  Input:
-   #      xtimes - list of ERA-Interim times in units of 'hours since 1900'
-   #
-   #  Output:
-   #      times  - list of python datetime objects describing model data times
-   #
-   #
-   #     Peter Lean August 2010
-   #
-   #################################################################################################
+     Routine to convert from ERA-Interim time ('hours since 1900...') 
+     into a python datetime structure
+   
+     Input:
+         xtimes - list of ERA-Interim times in units of 'hours since 1900'
+   
+     Output:
+         times  - list of python datetime objects describing model data times
+   
+   
+        Peter Lean August 2010
+   
    '''
    import datetime
    import numpy
@@ -146,27 +139,27 @@ def decode_eraint_surf_times(xtimes):
 
 def read_total_precip_from_filelist(myfilelist):
    '''
-   #  WRF outputs precipitation data under several variables:
-   #   RAINC=  convective total precip
-   #   RAINNC= large scale total precip  ("no convective")
-   #   SNOWC=  convective snow
-   #   SNOWNC= large scale snow  ("no convective")
-   #
-   #  Therefore, real rain = (rainc+rainnc)-(snowc+snownc)
-   #             total precip = rainc+rainnc+snowc+snownc
-   #  Input:
-   #         myfilelist - a list of filename (including full path)
-   #        
-   #  Output:
-   #         precip - a numpy array of total precip values
-   #         lat, lon - 2D array of latitude and longitude values
-   #         times    - list of times
-   #
-   #  Peter Lean August 2010
-   #
-   #  NB. THIS ROUTINE IS NO LONGER NEEDED... I HAD MISUNDERSTOOD HOW PRECIP DATA WAS STORED IN WRF
-   #      TOTAL PRECIP  = RAINNC
-   #  -A SIMILAR ROUTINE MAY BE REQUIRED TO FIND THE INDIVIDUAL COMPONENTS THOUGH..
+     WRF outputs precipitation data under several variables:
+      RAINC=  convective total precip
+      RAINNC= large scale total precip  ("no convective")
+      SNOWC=  convective snow
+      SNOWNC= large scale snow  ("no convective")
+   
+     Therefore, real rain = (rainc+rainnc)-(snowc+snownc)
+                total precip = rainc+rainnc+snowc+snownc
+     Input:
+            myfilelist - a list of filename (including full path)
+           
+     Output:
+            precip - a numpy array of total precip values
+            lat, lon - 2D array of latitude and longitude values
+            times    - list of times
+   
+     Peter Lean August 2010
+   
+     NB. THIS ROUTINE IS NO LONGER NEEDED... I HAD MISUNDERSTOOD HOW PRECIP DATA WAS STORED IN WRF
+         TOTAL PRECIP  = RAINNC
+     -A SIMILAR ROUTINE MAY BE REQUIRED TO FIND THE INDIVIDUAL COMPONENTS THOUGH..
    '''
 
    myfilelist.sort()
@@ -188,22 +181,20 @@ def read_total_precip_from_filelist(myfilelist):
 
 def read_trmm_3b42_files(filelist,latMin,latMax,lonMin,lonMax):
    '''
-   ##################################################################################
-   # ** Alternate method of getting TRMM data from local repository if DB not available **
-   # Reads TRMM gridded precipitation data from netCDF files in local repository.
-   #
-   # Input:
-   #    filelist - list of filenames (including path)
-   #    latMin,latMax,lonMin,lonMax - define region to extract (in degrees)
-   # Output:
-   #    lat, lon   - 1D array of latitude and longitude values
-   #    timestore  - list of python datetime objects
-   #    mdata      - numpy masked array containing data from all files    
-   #
-   #  NB. written specific for TRMM netCDF output files
-   #
-   #   Peter Lean June 2010 
-   ##################################################################################
+    ** Alternate method of getting TRMM data from local repository if DB not available **
+    Reads TRMM gridded precipitation data from netCDF files in local repository.
+   
+    Input:
+       filelist - list of filenames (including path)
+       latMin,latMax,lonMin,lonMax - define region to extract (in degrees)
+    Output:
+       lat, lon   - 1D array of latitude and longitude values
+       timestore  - list of python datetime objects
+       mdata      - numpy masked array containing data from all files    
+   
+     NB. written specific for TRMM netCDF output files
+   
+      Peter Lean June 2010 
    '''
    import Nio
    import numpy as np
@@ -297,26 +288,24 @@ def read_trmm_3b42_files(filelist,latMin,latMax,lonMin,lonMax):
 
 def read_airs_lev3_files(filelist,myvar,latMin,latMax,lonMin,lonMax):
    '''
-   ##################################################################################
-   # ** For testing work before database was ready. **
-   # Reads AIRS level III gridded data from netCDF files.
-   #
-   # Input:
-   #    filelist - list of filenames (including path)
-   #    myvar    - name of variable to load
-   #    latMin,latMax,lonMin,lonMax - define region to extract (in degrees)
-   # Output:
-   #    lat, lon   - 1D array of latitude and longitude values
-   #    timestore  - list of python datetime objects
-   #    mdata      - numpy masked array containing data from all files    
-   #
-   #  NB. written specific for AIRS level III netCDF output files
-   #
-   #  NB. Ascending passes have local time of 1:30pm
-   #  NB. Descending passes have local time of 1:30am
-   #
-   #   Peter Lean June 2010 
-   ##################################################################################
+    ** For testing work before database was ready. **
+    Reads AIRS level III gridded data from netCDF files.
+   
+    Input:
+       filelist - list of filenames (including path)
+       myvar    - name of variable to load
+       latMin,latMax,lonMin,lonMax - define region to extract (in degrees)
+    Output:
+       lat, lon   - 1D array of latitude and longitude values
+       timestore  - list of python datetime objects
+       mdata      - numpy masked array containing data from all files    
+   
+     NB. written specific for AIRS level III netCDF output files
+   
+     NB. Ascending passes have local time of 1:30pm
+     NB. Descending passes have local time of 1:30am
+   
+      Peter Lean June 2010 
    '''
    import Nio
    import numpy as np
@@ -406,18 +395,18 @@ def read_airs_lev3_files(filelist,myvar,latMin,latMax,lonMin,lonMax):
 
 def read_urd_files(filelist,latMin,latMax,lonMin,lonMax):
    '''
-   # Routine to load in NCEP Unified Raingauge Database binary files
-   #
-   #  Input:
-   #     filelist - a list of URD data files
-   #
-   #
-   #  Output:
-   #     sublats, sublons: 2d arrays of latitude and longitude values for user selected region.
-   #     times - a list of python datetime objects
-   #     subdata - precipitation data for user selected region
-   #
-   #  Peter Lean  August 2010
+    Routine to load in NCEP Unified Raingauge Database binary files
+   
+     Input:
+        filelist - a list of URD data files
+   
+   
+     Output:
+        sublats, sublons: 2d arrays of latitude and longitude values for user selected region.
+        times - a list of python datetime objects
+        subdata - precipitation data for user selected region
+   
+     Peter Lean  August 2010
    '''   
    import numpy
    import numpy.ma as ma
@@ -531,17 +520,17 @@ def read_urd_files(filelist,latMin,latMax,lonMin,lonMax):
 
 def read_tmp_watershed(myfile, dom_num):
    '''
-   # Routine to read watershed weighting file mapped onto WRF model grids.
-   #  NB.this will be superceded by proper routines to read shape files and regrid onto any model grid.
-   #
-   #  Input:
-   #     myfile - file name of the watershed ascii file to load
-   #     dom_num - WRF domain number (specific to this experiment)
-   #
-   #  Output:
-   #     mymask - boolean mask array saying where the watershed is
-   #
-   #   Peter Lean    September 2010
+    Routine to read watershed weighting file mapped onto WRF model grids.
+     NB.this will be superceded by proper routines to read shape files and regrid onto any model grid.
+   
+     Input:
+        myfile - file name of the watershed ascii file to load
+        dom_num - WRF domain number (specific to this experiment)
+   
+     Output:
+        mymask - boolean mask array saying where the watershed is
+   
+      Peter Lean    September 2010
    '''
 
    import numpy
@@ -575,21 +564,19 @@ def read_tmp_watershed(myfile, dom_num):
 
 def read_eraint_surf_files(filelist,myvar,latMin,latMax,lonMin,lonMax):
    '''
-   ##################################################################################
-   # ** For testing work before database was ready. **
-   # Reads ERA-Interim surface netCDF files.
-   #
-   # Input:
-   #    filelist - list of filenames (including path)
-   #    myvar    - name of variable to load
-   #    latMin,latMax,lonMin,lonMax - define region to extract (in degrees)
-   # Output:
-   #    lat, lon   - 1D array of latitude and longitude values
-   #    timestore  - list of python datetime objects
-   #    mdata      - numpy masked array containing data from all files    
-   #
-   #   Peter Lean September 2010 
-   ##################################################################################
+    ** For testing work before database was ready. **
+    Reads ERA-Interim surface netCDF files.
+   
+    Input:
+       filelist - list of filenames (including path)
+       myvar    - name of variable to load
+       latMin,latMax,lonMin,lonMax - define region to extract (in degrees)
+    Output:
+       lat, lon   - 1D array of latitude and longitude values
+       timestore  - list of python datetime objects
+       mdata      - numpy masked array containing data from all files    
+   
+      Peter Lean September 2010 
    '''
    import os
    import datetime
@@ -698,16 +685,16 @@ def read_eraint_surf_files(filelist,myvar,latMin,latMax,lonMin,lonMax):
 
 def make_list_of_urd_files(startTime, endTime):
    '''
-   # Routine to make a list of URD file names (for use with local repository)
-   # 
-   #  Input:
-   #     startTime: datetime object of start time
-   #     endTime:   datetime object of end time
-   #
-   #  Output:
-   #     filenamelist - list of filename strings
-   #
-   #    Peter Lean  September 2010
+    Routine to make a list of URD file names (for use with local repository)
+    
+     Input:
+        startTime: datetime object of start time
+        endTime:   datetime object of end time
+   
+     Output:
+        filenamelist - list of filename strings
+   
+       Peter Lean  September 2010
    '''
 
    import datetime
@@ -734,17 +721,17 @@ def make_list_of_urd_files(startTime, endTime):
 
 def make_list_of_wrf_files(firstTime, lastTime, ident):
    '''
-   # Routine to make list of WRF filenames given time period.
-   #
-   #  Input:
-   #      firstTime - datetime object specifying start time
-   #      lastTime  - datetime object specifying end time
-   #      ident     - identifier for model run, e.g. 'd01'
-   #
-   #  Output:
-   #      filelist  - list of standard format WRF filenames
-   #
-   #      Peter Lean
+    Routine to make list of WRF filenames given time period.
+   
+     Input:
+         firstTime - datetime object specifying start time
+         lastTime  - datetime object specifying end time
+         ident     - identifier for model run, e.g. 'd01'
+   
+     Output:
+         filelist  - list of standard format WRF filenames
+   
+         Peter Lean
    '''
 
    import datetime
@@ -764,16 +751,16 @@ def make_list_of_wrf_files(firstTime, lastTime, ident):
 
 def make_list_of_trmm_files(firstTime, lastTime):
    '''
-   # Routine to make list of TRMM filenames given time period.
-   #
-   #  Input:
-   #      firstTime - datetime object specifying start time
-   #      lastTime  - datetime object specifying end time
-   #
-   #  Output:
-   #      filelist  - list of standard format WRF filenames
-   #
-   #      Peter Lean
+    Routine to make list of TRMM filenames given time period.
+   
+     Input:
+         firstTime - datetime object specifying start time
+         lastTime  - datetime object specifying end time
+   
+     Output:
+         filelist  - list of standard format WRF filenames
+   
+         Peter Lean
    '''
 
    import datetime
@@ -796,16 +783,16 @@ def make_list_of_trmm_files(firstTime, lastTime):
 
 def make_list_of_airs_files(firstTime, lastTime):
    '''
-   # Routine to make list of AIRS filenames given time period.
-   #
-   #  Input:
-   #      firstTime - datetime object specifying start time
-   #      lastTime  - datetime object specifying end time
-   #
-   #  Output:
-   #      filelist  - list of standard format WRF filenames
-   #
-   #      Peter Lean
+    Routine to make list of AIRS filenames given time period.
+   
+     Input:
+         firstTime - datetime object specifying start time
+         lastTime  - datetime object specifying end time
+   
+     Output:
+         filelist  - list of standard format WRF filenames
+   
+         Peter Lean
    '''
 
    import datetime
@@ -829,16 +816,16 @@ def make_list_of_airs_files(firstTime, lastTime):
 
 def make_list_of_urd_files(firstTime, lastTime):
    '''
-   # Routine to make list of URD filenames given time period.
-   #
-   #  Input:
-   #      firstTime - datetime object specifying start time
-   #      lastTime  - datetime object specifying end time
-   #
-   #  Output:
-   #      filelist  - list of standard format WRF filenames
-   #
-   #      Peter Lean
+    Routine to make list of URD filenames given time period.
+   
+     Input:
+         firstTime - datetime object specifying start time
+         lastTime  - datetime object specifying end time
+   
+     Output:
+         filelist  - list of standard format WRF filenames
+   
+         Peter Lean
    '''
 
    import datetime
@@ -863,16 +850,16 @@ def make_list_of_urd_files(firstTime, lastTime):
 
 def make_list_of_era_surf_files(firstTime, lastTime):
    '''
-   # Routine to make list of ERA-Interim surface filenames given time period.
-   #
-   #  Input:
-   #      firstTime - datetime object specifying start time
-   #      lastTime  - datetime object specifying end time
-   #
-   #  Output:
-   #      filelist  - list of standard format WRF filenames
-   #
-   #      Peter Lean
+    Routine to make list of ERA-Interim surface filenames given time period.
+   
+     Input:
+         firstTime - datetime object specifying start time
+         lastTime  - datetime object specifying end time
+   
+     Output:
+         filelist  - list of standard format WRF filenames
+   
+         Peter Lean
    '''
 
    import datetime
@@ -894,6 +881,3 @@ def make_list_of_era_surf_files(firstTime, lastTime):
       curTime += dt
    
    return filenamelist
-
-
-
