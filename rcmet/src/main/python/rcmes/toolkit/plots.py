@@ -1,3 +1,6 @@
+"""Module that handles the generation of data plots"""
+
+
 # Import Statements
 from math import floor, log
 import matplotlib
@@ -9,36 +12,36 @@ import pylab
 
 def pow_round(x):
     '''
-    # Function to round x to the nearest power of 10
+     Function to round x to the nearest power of 10
     '''
     return 10**(floor(log(x,10)-log(0.5,10)))
 
 def calc_nice_color_bar_values(mymin,mymax,target_nlevs):
   '''
-  # Function to help make nicer plots. 
-  # Calculates an appropriate min, max and number of intervals to use in a color bar 
-  # such that the labels come out as round numbers.
-  #
-  # i.e. often, the color bar labels will come out as  0.1234  0.2343 0.35747 0.57546
-  #             when in fact you just want  0.1, 0.2, 0.3, 0.4, 0.5 etc
-  #
-  #
-  # Method:
-  #     Adjusts the max,min and nlevels slightly so as to provide nice round numbers.
-  #
-  # Input:
-  #    mymin        - minimum of data range (or first guess at minimum color bar value)
-  #    mymax        - maximum of data range (or first guess at maximum color bar value)
-  #    target_nlevs - approximate number of levels/color bar intervals you would like to have
-  #
-  # Output:
-  #    newmin       - minimum value of color bar to use
-  #    newmax       - maximum value of color bar to use
-  #    new_nlevs    - number of intervals in color bar to use
-  #                             -when all of the above are used, the color bar should have nice round number labels.
-  #
-  #     Peter Lean      March 2011
-  #
+   Function to help make nicer plots. 
+   Calculates an appropriate min, max and number of intervals to use in a color bar 
+   such that the labels come out as round numbers.
+  
+   i.e. often, the color bar labels will come out as  0.1234  0.2343 0.35747 0.57546
+               when in fact you just want  0.1, 0.2, 0.3, 0.4, 0.5 etc
+  
+  
+   Method:
+       Adjusts the max,min and nlevels slightly so as to provide nice round numbers.
+  
+   Input:
+      mymin        - minimum of data range (or first guess at minimum color bar value)
+      mymax        - maximum of data range (or first guess at maximum color bar value)
+      target_nlevs - approximate number of levels/color bar intervals you would like to have
+  
+   Output:
+      newmin       - minimum value of color bar to use
+      newmax       - maximum value of color bar to use
+      new_nlevs    - number of intervals in color bar to use
+                               -when all of the above are used, the color bar should have nice round number labels.
+  
+       Peter Lean      March 2011
+  
   '''
 
   myrange = mymax - mymin
@@ -83,25 +86,25 @@ def calc_nice_color_bar_values(mymin,mymax,target_nlevs):
 
 def draw_map_color_filled(data,lats,lons,filename,workdir,mytitle='',rangeMax='not set', rangeMin='not set', diff=False, nsteps=20,colorTable='rainbow',niceValues=False):
     '''
-    # Function to draw a color filled contour map using the masked array data
-    # Input: data  -a masked numpy array of data masked by missing values
-    #        lats,lons  -1d numpy arrays of unique latitudes and longitudes of grid points
-    #        filename  -stub of png file created e.g. 'myfile' -> myfile.png
-    #        workdir - directory to save images in
-    #        mytitle - chart title
-    #        rangeMax - (optional) max range for color bar (including for difference plots)
-    #        rangeMin - (optional) min range for color bar
-    #        diff    - boolean flag to say if this is a difference plot or not
-    # 			(if true then uses different color scale and ranges)
-    #        nsteps  - (optional) number of color bar intervals
-    #	     colorTable - (optional) name of PyNGL color table
-    #        niceValues - (optional) use nice round values for color bar labels
-    #
-    # Output:
-    #	     no data returned from function
-    #        Image file produced with name {filename}.png
-    #
-    #              Peter Lean August 2010
+     Function to draw a color filled contour map using the masked array data
+     Input: data  -a masked numpy array of data masked by missing values
+            lats,lons  -1d numpy arrays of unique latitudes and longitudes of grid points
+            filename  -stub of png file created e.g. 'myfile' -> myfile.png
+            workdir - directory to save images in
+            mytitle - chart title
+            rangeMax - (optional) max range for color bar (including for difference plots)
+            rangeMin - (optional) min range for color bar
+            diff    - boolean flag to say if this is a difference plot or not
+     			(if true then uses different color scale and ranges)
+            nsteps  - (optional) number of color bar intervals
+    	     colorTable - (optional) name of PyNGL color table
+            niceValues - (optional) use nice round values for color bar labels
+    
+     Output:
+    	     no data returned from function
+            Image file produced with name {filename}.png
+    
+                  Peter Lean August 2010
     '''
 
     # set optional argument if not set by user
@@ -208,21 +211,21 @@ def draw_map_color_filled(data,lats,lons,filename,workdir,mytitle='',rangeMax='n
 
 def draw_time_series_plot(data,times,myfilename,myworkdir, data2='',mytitle='',ytitle='Y',xtitle='time',year_labels=True):
     '''
-    # Function to draw a time series plot
-    # Input: data   -a masked numpy array of data masked by missing values		
-    #        times  -a list of python datetime objects
-    #        myfilename  -stub of png file created e.g. 'myfile' -> myfile.png
-    #        myworkdir - directory to save images in
-    #        data2 - (optional) second data line to plot assumes same time values)
-    #        mytitle - (optional) chart title
-    #	     xtitle - (optional) y-axis title
-    #	     ytitle - (optional) y-axis title
-    #
-    # Output:
-    #	     no data returned from function
-    #        Image file produced with name {filename}.png
-    #
-    #              Peter Lean August 2010
+     Function to draw a time series plot
+     Input: data   -a masked numpy array of data masked by missing values		
+            times  -a list of python datetime objects
+            myfilename  -stub of png file created e.g. 'myfile' -> myfile.png
+            myworkdir - directory to save images in
+            data2 - (optional) second data line to plot assumes same time values)
+            mytitle - (optional) chart title
+    	     xtitle - (optional) y-axis title
+    	     ytitle - (optional) y-axis title
+    
+     Output:
+    	     no data returned from function
+            Image file produced with name {filename}.png
+    
+                  Peter Lean August 2010
     '''
     print 'Producing time series plot'
 
@@ -271,23 +274,23 @@ def draw_time_series_plot(data,times,myfilename,myworkdir, data2='',mytitle='',y
 
 def draw_time_series_plot_old(data,times,myfilename,myworkdir, mytitle='',ytitle='Y',xtitle='time'):
     '''
-    # DEPRECATED: This old version used PyNGL which couldn't handle dates.
-    #             New improved version (draw_time_series_plot) uses matplotlib which handles dates well.  
-    # Function to draw a time series plot
-    # Input: data   -a masked numpy array of data masked by missing values
-    #			NB. for multiple lines use a list of arrays
-    #        times  -a list of python datetime objects
-    #        myfilename  -stub of png file created e.g. 'myfile' -> myfile.png
-    #        myworkdir - directory to save images in
-    #        mytitle - (optional) chart title
-    #	     xtitle - (optional) y-axis title
-    #	     ytitle - (optional) y-axis title
-    #
-    # Output:
-    #	     no data returned from function
-    #        Image file produced with name {filename}.png
-    #
-    #              Peter Lean August 2010
+     DEPRECATED: This old version used PyNGL which couldn't handle dates.
+                 New improved version (draw_time_series_plot) uses matplotlib which handles dates well.  
+     Function to draw a time series plot
+     Input: data   -a masked numpy array of data masked by missing values
+    			NB. for multiple lines use a list of arrays
+            times  -a list of python datetime objects
+            myfilename  -stub of png file created e.g. 'myfile' -> myfile.png
+            myworkdir - directory to save images in
+            mytitle - (optional) chart title
+    	     xtitle - (optional) y-axis title
+    	     ytitle - (optional) y-axis title
+    
+     Output:
+    	     no data returned from function
+            Image file produced with name {filename}.png
+    
+                  Peter Lean August 2010
     '''
 
     wks_type = "png"

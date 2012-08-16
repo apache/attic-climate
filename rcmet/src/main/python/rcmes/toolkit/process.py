@@ -1,28 +1,30 @@
+"""Collection of functions that process numpy arrays of varying shapes.  
+Functions can range from subsetting to regridding"""
+
+
 def extract_subregion_from_data_array(data,lats,lons,latmin,latmax,lonmin,lonmax):
     '''
-    #################################################################################################
-    # Extract a sub-region from a data array.
-    #   e.g. the user may load a global model file, but only want to examine data over North America
-    #        This function extracts a sub-domain from the original data.
-    #        The defined sub-region must be a regular lat/lon bounding box,
-    #        but the model data may be on a non-regular grid (e.g. rotated, or Guassian grid layout).
-    #        Data are kept on the original model grid and a rectangular (in model-space) region 
-    #        is extracted which contains the rectangular (in lat/lon space) user supplied region.
-    #
-    # INPUT:
-    #   data - 3d masked data array
-    #   lats - 2d array of latitudes corresponding to data array
-    #   lons - 2d array of longitudes corresponding to data array
-    #   latmin, latmax, lonmin, lonmax - bounding box of required region to extract
-    #   
-    # OUTPUT:
-    #   data2 - subset of original data array containing only data from required subregion
-    #   lats2 - subset of original latitude data array
-    #   lons2 - subset of original longitude data array
-    #
-    #  Peter Lean      April 2011
-    #
-    #################################################################################################
+     Extract a sub-region from a data array.
+       e.g. the user may load a global model file, but only want to examine data over North America
+            This function extracts a sub-domain from the original data.
+            The defined sub-region must be a regular lat/lon bounding box,
+            but the model data may be on a non-regular grid (e.g. rotated, or Guassian grid layout).
+            Data are kept on the original model grid and a rectangular (in model-space) region 
+            is extracted which contains the rectangular (in lat/lon space) user supplied region.
+    
+     INPUT:
+       data - 3d masked data array
+       lats - 2d array of latitudes corresponding to data array
+       lons - 2d array of longitudes corresponding to data array
+       latmin, latmax, lonmin, lonmax - bounding box of required region to extract
+       
+     OUTPUT:
+       data2 - subset of original data array containing only data from required subregion
+       lats2 - subset of original latitude data array
+       lons2 - subset of original longitude data array
+    
+      Peter Lean      April 2011
+    
     '''
     import numpy
     import numpy.ma as ma
@@ -52,20 +54,18 @@ def extract_subregion_from_data_array(data,lats,lons,latmin,latmax,lonmin,lonmax
 
 def calc_area_mean(data,lats,lons,mymask='not set'):
     '''
-    #################################################################################################
-    # Calculate Area Average of data in a masked array
-    # INPUT:
-    #     data:  a masked array of data (NB. only data from one time expected to be passed at once)
-    #     lats:  2d array of regularly gridded latitudes
-    #     lons:  2d array of regularly gridded longitudes
-    #     mymask:  (optional) defines spatial region to do averaging over
-    # 
-    # OUTPUT:
-    #     area_mean: a value for the mean inside the area
-    #  
-    #   Peter Lean August 2010
-    #
-    #################################################################################################
+     Calculate Area Average of data in a masked array
+     INPUT:
+         data:  a masked array of data (NB. only data from one time expected to be passed at once)
+         lats:  2d array of regularly gridded latitudes
+         lons:  2d array of regularly gridded longitudes
+         mymask:  (optional) defines spatial region to do averaging over
+     
+     OUTPUT:
+         area_mean: a value for the mean inside the area
+      
+       Peter Lean August 2010
+    
     '''
     import numpy
     import numpy.ma as ma
@@ -111,18 +111,16 @@ def calc_area_mean(data,lats,lons,mymask='not set'):
 
 def calc_area_in_grid_box(latitude,dlat,dlon):
     '''
-    #################################################################################################
-    # Calculate area of regular lat-lon grid box
-    # INPUT:
-    #    latitude: latitude of grid box (degrees)
-    #    dlat:     grid length in latitude direction (degrees)
-    #    dlon:     grid length in longitude direction (degrees)
-    # OUTPUT:
-    #    A:        area of the grid box
-    #  
-    #   Peter Lean August 2010
-    #
-    #################################################################################################
+     Calculate area of regular lat-lon grid box
+     INPUT:
+        latitude: latitude of grid box (degrees)
+        dlat:     grid length in latitude direction (degrees)
+        dlon:     grid length in longitude direction (degrees)
+     OUTPUT:
+        A:        area of the grid box
+      
+       Peter Lean August 2010
+    
     '''
     import math
     import numpy
@@ -139,22 +137,20 @@ def calc_area_in_grid_box(latitude,dlat,dlon):
 
 def do_regrid(q,lat,lon,lat2,lon2,order=1,mdi=-999999999):
    '''
-   #################################################################################################
-   # Perform regridding from one set of lat,lon values onto a new set (lat2,lon2)
-   #
-   #  Input: 
-   #     q          - the variable to be regridded
-   #     lat,lon    - original co-ordinates corresponding to q values
-   #     lat2,lon2  - new set of latitudes and longitudes that you want to regrid q onto 
-   #     order      - (optional) interpolation order 1=bi-linear, 3=cubic spline
-   #     mdi  	    - (optional) fill value for missing data (used in creation of masked array)
-   #  Output:
-   #     q2  - q regridded onto the new set of lat2,lon2 
-   #     
-   #
-   #    Peter Lean August 2010
-   #
-   #################################################################################################
+    Perform regridding from one set of lat,lon values onto a new set (lat2,lon2)
+   
+     Input: 
+        q          - the variable to be regridded
+        lat,lon    - original co-ordinates corresponding to q values
+        lat2,lon2  - new set of latitudes and longitudes that you want to regrid q onto 
+        order      - (optional) interpolation order 1=bi-linear, 3=cubic spline
+        mdi  	    - (optional) fill value for missing data (used in creation of masked array)
+     Output:
+        q2  - q regridded onto the new set of lat2,lon2 
+        
+   
+       Peter Lean August 2010
+   
    '''
    from scipy.ndimage import map_coordinates
    import numpy as np
@@ -234,23 +230,20 @@ def do_regrid(q,lat,lon,lat2,lon2,order=1,mdi=-999999999):
 
 def create_mask_using_threshold(masked_array,threshold=0.5):
    '''
-   #################################################################################################
-   # Routine to create a mask, depending on the proportion of times with missing data.
-   # For each pixel, calculate proportion of times that are missing data,
-   #  if the proportion is above a specified threshold value,
-   #  then mark the pixel as missing data.
-   #
-   # Input:
-   #    masked_array - a numpy masked array of data (assumes time on axis 0, and space on axes 1 and 2.
-   #    threshold    - (optional) threshold proportion above which a pixel is marked as 'missing data'.
-   #                            NB. default threshold = 50%
-   #
-   # Output:
-   #    mymask       - a numpy array describing the mask. NB. not a masked array, just the mask itself.
-   #
-   #    Peter Lean   March 2011
-   #
-   #################################################################################################
+    Routine to create a mask, depending on the proportion of times with missing data.
+    For each pixel, calculate proportion of times that are missing data,
+     if the proportion is above a specified threshold value,
+     then mark the pixel as missing data.
+   
+    Input:
+       masked_array - a numpy masked array of data (assumes time on axis 0, and space on axes 1 and 2.
+       threshold    - (optional) threshold proportion above which a pixel is marked as 'missing data'.
+                               NB. default threshold = 50%
+   
+    Output:
+       mymask       - a numpy array describing the mask. NB. not a masked array, just the mask itself.
+   
+       Peter Lean   March 2011
    '''
    import numpy
 
@@ -275,25 +268,23 @@ def create_mask_using_threshold(masked_array,threshold=0.5):
 
 def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
    '''
-   #################################################################################################
-   # Routine to calculate averages on longer time units than the data exists on.
-   #  e.g. if the data is 6-hourly, calculate daily, or monthly means.
-   #
-   #  Input:
-   #         data     - data values
-   #         dateList - list of python datetime structures corresponding to data values
-   #         unit     - string describing time unit to average onto 
-   #                       e.g. 'monthly', 'daily', 'pentad','annual','decadal'
-   #   
-   #  Output:
-   #         meanstorem - numpy masked array of data values meaned over required time period
-   #         newTimesList - a list of python datetime objects representing the data in the new averagin period
-   #                            NB. currently set to beginning of averaging period, 
-   #                            i.e. mean Jan 1st - Jan 31st -> represented as Jan 1st, 00Z.
-   #
-   #   Peter Lean August 2010
-   #
-   #################################################################################################
+    Routine to calculate averages on longer time units than the data exists on.
+     e.g. if the data is 6-hourly, calculate daily, or monthly means.
+   
+     Input:
+            data     - data values
+            dateList - list of python datetime structures corresponding to data values
+            unit     - string describing time unit to average onto 
+                          e.g. 'monthly', 'daily', 'pentad','annual','decadal'
+      
+     Output:
+            meanstorem - numpy masked array of data values meaned over required time period
+            newTimesList - a list of python datetime objects representing the data in the new averagin period
+                               NB. currently set to beginning of averaging period, 
+                               i.e. mean Jan 1st - Jan 31st -> represented as Jan 1st, 00Z.
+   
+      Peter Lean August 2010
+   
    '''
    import datetime
    import numpy
@@ -473,20 +464,18 @@ def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
 
 def calc_running_accum_from_period_accum(data):
    '''
-   #################################################################################################
-   # Routine to calculate running total accumulations from individual period accumulations.
-   #    e.g.  0,0,1,0,0,2,2,1,0,0
-   #       -> 0,0,1,1,1,3,5,6,6,6
-   #
-   # Input:
-   #      data: numpy array with time in the first axis
-   #
-   # Output:
-   #      running_acc: running accumulations
-   #
-   #  Peter Lean August 2010
-   #
-   #################################################################################################
+    Routine to calculate running total accumulations from individual period accumulations.
+       e.g.  0,0,1,0,0,2,2,1,0,0
+          -> 0,0,1,1,1,3,5,6,6,6
+   
+    Input:
+         data: numpy array with time in the first axis
+   
+    Output:
+         running_acc: running accumulations
+   
+     Peter Lean August 2010
+   
    '''
    import numpy
 
@@ -511,18 +500,16 @@ def calc_running_accum_from_period_accum(data):
 
 def ignore_boundaries(data,rim=10):
    '''
-   #################################################################################################
-   # Routine to mask the lateral boundary regions of model data to ignore them from calculations.
-   # Input:
-   #     data - a masked array of model data
-   #     rim - (optional) number of grid points to ignore
-   #
-   # Output:
-   #     data - data array with boundary region masked
-   #
-   # Peter Lean August 2010
-   #
-   #################################################################################################
+    Routine to mask the lateral boundary regions of model data to ignore them from calculations.
+    Input:
+        data - a masked array of model data
+        rim - (optional) number of grid points to ignore
+   
+    Output:
+        data - data array with boundary region masked
+   
+    Peter Lean August 2010
+   
    '''
    import numpy.ma as ma
    import numpy
@@ -549,21 +536,19 @@ def ignore_boundaries(data,rim=10):
 
 def decode_model_times(filelist,timeVarName):
    '''
-   #################################################################################################
-   #  Routine to convert from model times ('hours since 1900...', 'days since ...') 
-   #  into a python datetime structure
-   #
-   #  Input:
-   #      filelist - list of model files
-   #      timeVarName - name of the time variable in the model files
-   #
-   #  Output:
-   #      times  - list of python datetime objects describing model data times
-   #
-   #
-   #     Peter Lean February 2011
-   #
-   #################################################################################################
+     Routine to convert from model times ('hours since 1900...', 'days since ...') 
+     into a python datetime structure
+   
+     Input:
+         filelist - list of model files
+         timeVarName - name of the time variable in the model files
+   
+     Output:
+         times  - list of python datetime objects describing model data times
+   
+   
+        Peter Lean February 2011
+   
    '''
    import datetime
    import re
@@ -652,16 +637,14 @@ def decode_model_times(filelist,timeVarName):
 
 def decodeTimeFromString(time_string):
     '''
-    #################################################################################################
-    # Decodes string into a python datetime object
-    # Method: tries a bunch of different time format possibilities and hopefully one of them will hit.
-    # 
-    #   Input:  time_string - a string that represents a date/time
-    #   Output: mytime - a python datetime object
-    #
-    #   Peter Lean   February 2011
-    #
-    #################################################################################################
+     Decodes string into a python datetime object
+     Method: tries a bunch of different time format possibilities and hopefully one of them will hit.
+     
+       Input:  time_string - a string that represents a date/time
+       Output: mytime - a python datetime object
+    
+       Peter Lean   February 2011
+    
     '''
     import time
     import datetime
@@ -721,23 +704,21 @@ def decodeTimeFromString(time_string):
 
 def regrid_wrapper(regrid_choice,obsdata,obslats,obslons,wrfdata,wrflats,wrflons):
    '''
-   #################################################################################################
-   # Wrapper routine for regridding.
-   # Either regrids model to obs grid, or obs to model grid, depending on user choice
-   #  Inputs:
-   #    regrid_choice - [0] = Regrid obs data onto model grid
-   #                  - [1] = Regrid model data onto obs grid
-   #    obsdata,wrfdata - data arrays
-   #    obslats,obslons - observation lat,lon arrays
-   #    wrflats,wrflons - model lat,lon arrays
-   #
-   #  Output:
-   #    rdata,rdata2 - regridded data
-   #	lats,lons    - latitudes and longitudes of regridded data
-   #
-   #   Peter Lean    September 2010
-   #
-   #################################################################################################
+    Wrapper routine for regridding.
+    Either regrids model to obs grid, or obs to model grid, depending on user choice
+     Inputs:
+       regrid_choice - [0] = Regrid obs data onto model grid
+                     - [1] = Regrid model data onto obs grid
+       obsdata,wrfdata - data arrays
+       obslats,obslons - observation lat,lon arrays
+       wrflats,wrflons - model lat,lon arrays
+   
+     Output:
+       rdata,rdata2 - regridded data
+   	lats,lons    - latitudes and longitudes of regridded data
+   
+      Peter Lean    September 2010
+   
    '''
    import numpy
    import numpy.ma
@@ -805,22 +786,20 @@ def regrid_wrapper(regrid_choice,obsdata,obslats,obslons,wrfdata,wrflats,wrflons
 
 def extract_sub_time_selection(allTimes,subTimes,data):
    '''
-   #################################################################################################
-   # Routine to extract a sub-selection of times from a data array.
-   #   e.g. suppose a data array has 30 time values for daily data for a whole month, 
-   #        but you only want the data from the 5th-15th of the month.
-   #
-   #   Input:
-   #      allTimes - list of datetimes describing what times the data in the data array correspond to
-   #      subTimes - the times you want to extract data from
-   #      data     - the data array
-   #
-   #   Output:
-   #      subdata     - subselection of data array
-   #  
-   #      Peter Lean  September 2010
-   #
-   #################################################################################################
+    Routine to extract a sub-selection of times from a data array.
+      e.g. suppose a data array has 30 time values for daily data for a whole month, 
+           but you only want the data from the 5th-15th of the month.
+   
+      Input:
+         allTimes - list of datetimes describing what times the data in the data array correspond to
+         subTimes - the times you want to extract data from
+         data     - the data array
+   
+      Output:
+         subdata     - subselection of data array
+     
+         Peter Lean  September 2010
+   
    '''
 
    import datetime

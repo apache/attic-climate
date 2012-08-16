@@ -1,12 +1,10 @@
 '''
-##########################################################################
-#
-# Module storing functions to calculate statistical metrics from numpy arrays
-#
-#	Peter Lean 	March 2010
-#   Kim Whitehall June 2012
-#    
-###########################################################################
+
+ Module storing functions to calculate statistical metrics from numpy arrays
+
+	Peter Lean 	March 2010
+   Kim Whitehall June 2012
+    
 '''
 
 import numpy as np
@@ -15,11 +13,11 @@ import rcmes.toolkit.process
 
 def calc_annual_cycle_means(data, time):
     '''
-    # Calculate monthly means for every grid point
-    #inputs: 2 arrays modelData and modelTimes
-    #         modelData is masked array of the model data list
-    #         modelData is 3D - time,lon,lat
-    #         modelTimes is an array of python datetime objects
+     Calculate monthly means for every grid point
+    inputs: 2 arrays modelData and modelTimes
+             modelData is masked array of the model data list
+             modelData is 3D - time,lon,lat
+             modelTimes is an array of python datetime objects
     '''
     
     # Extract months from time variable
@@ -51,9 +49,10 @@ def calc_annual_cycle_means(data, time):
 
 
 ###########################################################################
+
 def calc_annual_cycle_std(data, time):
     '''
-    # Calculate monthly standard deviations for every grid point
+     Calculate monthly standard deviations for every grid point
     '''
     
     # Extract months from time variable
@@ -71,12 +70,9 @@ def calc_annual_cycle_std(data, time):
     
     return stds
 
-
-
-###########################################################################
 def calc_annual_cycle_domain_means(data, time):
     '''
-    # Calculate domain means for each month of the year
+     Calculate domain means for each month of the year
     '''
     
     # Extract months from time variable
@@ -93,10 +89,9 @@ def calc_annual_cycle_domain_means(data, time):
     
     return means
 
-###########################################################################
 def calc_annual_cycle_domain_std(data, time):
     '''
-    # Calculate domain standard deviations for each month of the year
+     Calculate domain standard deviations for each month of the year
     '''
     
     # Extract months from time variable
@@ -113,7 +108,6 @@ def calc_annual_cycle_domain_std(data, time):
     
     return stds
 
-###########################################################################
 # Bias / Mean Error
 
 def calc_bias(t1, t2):
@@ -131,7 +125,6 @@ def calc_bias(t1, t2):
     
     print 'Calculating bias'
     
-    # 
     
     t1Mask = rcmes.process.create_mask_using_threshold(t1, threshold=0.75)
     t2Mask = rcmes.process.create_mask_using_threshold(t2, threshold=0.75)
@@ -147,27 +140,24 @@ def calc_bias(t1, t2):
     
     return bias
 
-
 def calc_bias_dom(t1, t2):
     '''
-    # Calculate domain mean difference between two fields over time
+     Calculate domain mean difference between two fields over time
     '''
     diff = t1 - t2
     bias = diff.mean()
     return bias
 
-###########################################################################
 # Difference
 
 def calc_difference(t1, t2):
     '''
-    # Calculate mean difference between two fields over time for each grid point
+     Calculate mean difference between two fields over time for each grid point
     '''
     print 'Calculating difference'
     diff = t1 - t2
     return diff
 
-###########################################################################
 # Mean Absolute Error
 
 def calc_mae(t1, t2):
@@ -204,7 +194,7 @@ def calc_mae(t1, t2):
 
 def calc_mae_dom(t1, t2):
     '''
-    # Calculate domain mean difference between two fields over time
+     Calculate domain mean difference between two fields over time
     '''
     diff = t1 - t2
     adiff = abs(diff)
@@ -212,12 +202,11 @@ def calc_mae_dom(t1, t2):
     return mae
 
 
-###########################################################################
 # RMS Error
 
 def calc_rms(t1, t2):
     '''
-    # Calculate mean difference between two fields over time for each grid point
+     Calculate mean difference between two fields over time for each grid point
     '''
     
     diff = t1 - t2
@@ -228,7 +217,7 @@ def calc_rms(t1, t2):
 
 def calc_rms_dom(t1, t2):
     '''
-    # Calculate domain mean difference between two fields over time
+     Calculate domain mean difference between two fields over time
     '''
     diff = t1 - t2
     sqdiff = diff ** 2
@@ -236,21 +225,20 @@ def calc_rms_dom(t1, t2):
     rms = np.sqrt(msd)
     return rms
 
-###########################################################################
 def calc_temporal_pat_cor(t1, t2):
     '''
-    # Calculate the Temporal Pattern Correlation
-    #
-    #  Input:
-    #    t1 - 3d array of model data
-    #    t2 - 3d array of obs data
-    #     
-    #  Output:
-    #    patcor - a 2d array of time series pattern correlation coefficients at each grid point.
-    #
-    #    Peter Lean  March 2011
-    # Editing: Kim Whitehall June 2012
-    #         reason: std_dev to be standarized on (n-1) not n
+     Calculate the Temporal Pattern Correlation
+    
+      Input:
+        t1 - 3d array of model data
+        t2 - 3d array of obs data
+         
+      Output:
+        patcor - a 2d array of time series pattern correlation coefficients at each grid point.
+    
+        Peter Lean  March 2011
+     Editing: Kim Whitehall June 2012
+             reason: std_dev to be standarized on (n-1) not n
     '''
     
     mt1 = t1[:, :, :].mean(axis=0)
@@ -269,44 +257,45 @@ def calc_temporal_pat_cor(t1, t2):
     return patcor
 
 ###########################################################################
+
 def calc_pat_cor(dataset_1, dataset_2):
     '''
-    # Purpose: Calculate the Pattern Correlation
-    #
-    #  Assumption(s):  Both dataset_1 and dataset_2 are the same shape.
+     Purpose: Calculate the Pattern Correlation
+    
+      Assumption(s):  Both dataset_1 and dataset_2 are the same shape.
                        lat, lon must match up
                        time steps must align (i.e. months vs. months)
-    #
-    #  Input:
-    #    dataset_1 - 3d (time, lat, lon) array of data
-    #    dataset_2 - 3d (time, lat, lon) array of data
-    #     
-    #  Output:
-    #    patcor - a 1d array (time series) of pattern correlation coefficients.
-    #
-    #    Peter Lean  March 2011
-    #    Editing: Kim Whitehall June 2012
-    #        reason: std_dev not standardized on N-1
-    #  
-    # Output: time series of pattern correlation coefficients.
+    
+      Input:
+        dataset_1 - 3d (time, lat, lon) array of data
+        dataset_2 - 3d (time, lat, lon) array of data
+         
+      Output:
+        patcor - a 1d array (time series) of pattern correlation coefficients.
+    
+        Peter Lean  March 2011
+        Editing: Kim Whitehall June 2012
+            reason: std_dev not standardized on N-1
+      
+     Output: time series of pattern correlation coefficients.
     
     TODO: ADD THIS TO THE DOC STRING
      # Calculate the Pattern Correlation Timeseries
 
-   # called in do_rcmes_processing_sub.py 
-   # Inputs:2 arrays of data
-   #        t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
-   #             is the number of time values eg for time period 199001010000 - 199201010000 
-   #              if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
-   #          if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)    
-   #  Output:
-   #    patcor - a 1d array (time series) of pattern correlation coefficients.
-   #
-   #    Peter Lean  March 2011
-   #    Editing: Kim Whitehall June 2012
-   #        reason: std_dev not standardized on N-1
-           ##### Debugging print statements to show the difference the n-1 makes.
-        #http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
+    called in do_rcmes_processing_sub.py 
+    Inputs:2 arrays of data
+           t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
+                is the number of time values eg for time period 199001010000 - 199201010000 
+                 if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
+             if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)    
+     Output:
+       patcor - a 1d array (time series) of pattern correlation coefficients.
+   
+       Peter Lean  March 2011
+       Editing: Kim Whitehall June 2012
+           reason: std_dev not standardized on N-1
+           Debugging print statements to show the difference the n-1 makes.
+        http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
     '''
     # TODO:  Add in try block to ensure the shapes match
     
@@ -352,13 +341,12 @@ def calc_pat_cor(dataset_1, dataset_2):
 
 def calc_anom_corn(dataset_1, dataset_2, climatology=None):
     '''
-    
-        # Calculate the Anomaly Correlation
-        # Kim Whitehall June 2012
-        # Edited according to new metrics 
-        # input three arrays, dataset_1, dataset_2 and climatology
-        # Assumes climatology is for same time period 
-        # TODO:  Rename function vars to declare what they are
+         Calculate the Anomaly Correlation
+         Kim Whitehall June 2012
+         Edited according to new metrics 
+         input three arrays, dataset_1, dataset_2 and climatology
+         Assumes climatology is for same time period 
+         TODO:  Rename function vars to declare what they are
     '''
 
     # store results in list for convenience (then convert to numpy array)
@@ -402,7 +390,7 @@ def calc_anom_corn(dataset_1, dataset_2, climatology=None):
 
 def calc_anom_cor(t1, t2):
     '''
-    # Calculate the Anomaly Correlation (Deprecated)
+     Calculate the Anomaly Correlation (Deprecated)
     '''
     
     nt = t1.shape[0]
@@ -436,6 +424,7 @@ def calc_anom_cor(t1, t2):
 ###########################################################################
 # Coefficient of Efficiency
 # Nash-sutcliff coefficient of efficiency (E)
+
 def calc_nash_sutcliff(dataset_1, dataset_2):
     '''
     Routine to calculate the Nash-Sutcliff coefficient of efficiency (E)
@@ -475,37 +464,33 @@ def calc_nash_sutcliff(dataset_1, dataset_2):
 def calc_pdf(dataset_1, dataset_2):
              
     '''
-   #################################################################################################
-   # 
-   #################################################################################################
-   # Routine to calculate a normalised Probability Distribution Function with 
-   # bins set according to data range.
-   # Equation from Perkins et al. 2007
-   #     PS=sum(min(Z_O_i, Z_M_i)) where Z is the distribution (histogram of the data for either 
-   #                set)
-   # called in do_rcmes_processing_sub.py 
-   # Inputs:2 arrays of data
-   #        t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
-   #             is the number of time values eg for time period 199001010000 - 199201010000 
-   #              if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
-   #          if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)
-   # User inputs: number of bins to use and edges (min and max)
-   # Output:
-   #     one float which represents the PDF for the year
-   #
-   #   Peter Lean July 2010 
-   #   Edited: KDW July 2012
+    Routine to calculate a normalised Probability Distribution Function with 
+    bins set according to data range.
+    Equation from Perkins et al. 2007
+        PS=sum(min(Z_O_i, Z_M_i)) where Z is the distribution (histogram of the data for either 
+                   set)
+    called in do_rcmes_processing_sub.py 
+    Inputs:2 arrays of data
+           t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
+                is the number of time values eg for time period 199001010000 - 199201010000 
+                 if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
+             if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)
+    User inputs: number of bins to use and edges (min and max)
+    Output:
+        one float which represents the PDF for the year
+   
+      Peter Lean July 2010 
+      Edited: KDW July 2012
    #################################################################################################
     Routine to calculate a normalised PDF with bins set according to data range.
-   # Input:
-   #     2 data  arrays, modelData and obsData
-   # Output:
-   #     PDF for the year
-   #
-   #   Peter Lean July 2010 
-   #   Edited: KDW July 2012
-   #   Reason: according to new metrics given.Equation from Perkins et al. 2007
-   #################################################################################################
+    Input:
+        2 data  arrays, modelData and obsData
+    Output:
+        PDF for the year
+   
+      Peter Lean July 2010 
+      Edited: KDW July 2012
+      Reason: according to new metrics given.Equation from Perkins et al. 2007
    '''
 
     #import statistics as stats
@@ -570,12 +555,13 @@ def calc_pdf(dataset_1, dataset_2):
 # Standard deviation
 # Kim Whitehall June 2012
 # inputs: 1 parameter, the model dataset or obs dataset
+
 def calc_stdev(t1):
     ''' 
-    # Input: a dataset
-    # Output: an array of the std_dev for each month in the dataset entered
-    # use build in function from numpy
-    # Calculate standard deviation in a given dataset
+     Input: a dataset
+     Output: an array of the std_dev for each month in the dataset entered
+     use build in function from numpy
+     Calculate standard deviation in a given dataset
     
     '''
 
