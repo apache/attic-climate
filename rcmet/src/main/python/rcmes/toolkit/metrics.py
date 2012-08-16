@@ -1,10 +1,5 @@
 '''
-
- Module storing functions to calculate statistical metrics from numpy arrays
-
-	Peter Lean 	March 2010
-   Kim Whitehall June 2012
-    
+Module storing functions to calculate statistical metrics from numpy arrays
 '''
 
 import numpy as np
@@ -14,10 +9,10 @@ import rcmes.toolkit.process
 def calc_annual_cycle_means(data, time):
     '''
      Calculate monthly means for every grid point
-    inputs: 2 arrays modelData and modelTimes
-             modelData is masked array of the model data list
-             modelData is 3D - time,lon,lat
-             modelTimes is an array of python datetime objects
+     
+     Inputs:: 
+     	data - masked 3d array of the model data (time, lon, lat)
+     	time - an array of python datetime objects
     '''
     
     # Extract months from time variable
@@ -229,16 +224,13 @@ def calc_temporal_pat_cor(t1, t2):
     '''
      Calculate the Temporal Pattern Correlation
     
-      Input:
+      Input::
         t1 - 3d array of model data
         t2 - 3d array of obs data
          
-      Output:
+      Output::
         patcor - a 2d array of time series pattern correlation coefficients at each grid point.
-    
-        Peter Lean  March 2011
-     Editing: Kim Whitehall June 2012
-             reason: std_dev to be standarized on (n-1) not n
+        **Note:** std_dev is standardized on 1 degree of freedom
     '''
     
     mt1 = t1[:, :, :].mean(axis=0)
@@ -260,42 +252,22 @@ def calc_temporal_pat_cor(t1, t2):
 
 def calc_pat_cor(dataset_1, dataset_2):
     '''
-     Purpose: Calculate the Pattern Correlation
+     Purpose: Calculate the Pattern Correlation Timeseries
+
+     Assumption(s)::  
+     	Both dataset_1 and dataset_2 are the same shape.
+        * lat, lon must match up
+        * time steps must align (i.e. months vs. months)
     
-      Assumption(s):  Both dataset_1 and dataset_2 are the same shape.
-                       lat, lon must match up
-                       time steps must align (i.e. months vs. months)
-    
-      Input:
+     Input::
         dataset_1 - 3d (time, lat, lon) array of data
         dataset_2 - 3d (time, lat, lon) array of data
          
-      Output:
+     Output:
         patcor - a 1d array (time series) of pattern correlation coefficients.
     
-        Peter Lean  March 2011
-        Editing: Kim Whitehall June 2012
-            reason: std_dev not standardized on N-1
-      
-     Output: time series of pattern correlation coefficients.
-    
-    TODO: ADD THIS TO THE DOC STRING
-     # Calculate the Pattern Correlation Timeseries
-
-    called in do_rcmes_processing_sub.py 
-    Inputs:2 arrays of data
-           t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
-                is the number of time values eg for time period 199001010000 - 199201010000 
-                 if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
-             if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)    
-     Output:
-       patcor - a 1d array (time series) of pattern correlation coefficients.
-   
-       Peter Lean  March 2011
-       Editing: Kim Whitehall June 2012
-           reason: std_dev not standardized on N-1
-           Debugging print statements to show the difference the n-1 makes.
-        http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
+     **Note:** Standard deviation is using 1 degree of freedom.  Debugging print 
+     statements to show the difference the n-1 makes. http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
     '''
     # TODO:  Add in try block to ensure the shapes match
     
@@ -428,20 +400,21 @@ def calc_anom_cor(t1, t2):
 def calc_nash_sutcliff(dataset_1, dataset_2):
     '''
     Routine to calculate the Nash-Sutcliff coefficient of efficiency (E)
-
-      Assumption(s):  Both dataset_1 and dataset_2 are the same shape.
-                      lat, lon must match up
-                      time steps must align (i.e. months vs. months)
     
-      Input:
-        dataset_1 - 3d (time, lat, lon) array of data
+    Assumption(s)::  
+    	Both dataset_1 and dataset_2 are the same shape.
+        * lat, lon must match up
+        * time steps must align (i.e. months vs. months)
+    
+    Input::
+    	dataset_1 - 3d (time, lat, lon) array of data
         dataset_2 - 3d (time, lat, lon) array of data
     
-     Output:
-           nashcor - 1d array aligned along the time dimension of the input
-           datasets. Time Series of Nash-Sutcliff Coefficient of efficiency
-     Kim Whitehall June 2012 
-    '''
+    Output:
+        nashcor - 1d array aligned along the time dimension of the input
+        datasets. Time Series of Nash-Sutcliff Coefficient of efficiency
+     
+     '''
 
     nt = dataset_1.shape[0]
     nashcor = []
@@ -462,35 +435,38 @@ def calc_nash_sutcliff(dataset_1, dataset_2):
 # Probability Distribution Function
 
 def calc_pdf(dataset_1, dataset_2):
-             
     '''
-    Routine to calculate a normalised Probability Distribution Function with 
+    Routine to calculate a normalized Probability Distribution Function with 
     bins set according to data range.
     Equation from Perkins et al. 2007
-        PS=sum(min(Z_O_i, Z_M_i)) where Z is the distribution (histogram of the data for either 
-                   set)
-    called in do_rcmes_processing_sub.py 
-    Inputs:2 arrays of data
-           t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
-                is the number of time values eg for time period 199001010000 - 199201010000 
-                 if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
-             if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)
+    
+        PS=sum(min(Z_O_i, Z_M_i)) where Z is the distribution (histogram of the data for either set)
+        called in do_rcmes_processing_sub.py
+         
+    Inputs::
+    	2 arrays of data
+        t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
+        is the number of time values eg for time period 199001010000 - 199201010000 
+        
+        if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
+        
+        if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)
+        
     User inputs: number of bins to use and edges (min and max)
     Output:
+    
         one float which represents the PDF for the year
    
-      Peter Lean July 2010 
-      Edited: KDW July 2012
-   #################################################################################################
+    TODO:  Clean up this docstring so we have a single purpose statement
+     
     Routine to calculate a normalised PDF with bins set according to data range.
-    Input:
+    
+    Input::
         2 data  arrays, modelData and obsData
-    Output:
+    
+    Output::
         PDF for the year
    
-      Peter Lean July 2010 
-      Edited: KDW July 2012
-      Reason: according to new metrics given.Equation from Perkins et al. 2007
    '''
 
     #import statistics as stats
