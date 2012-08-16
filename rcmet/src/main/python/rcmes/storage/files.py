@@ -26,23 +26,24 @@ def findunique(seq):
     return keys.keys()
 
 def find_time_var_name_from_file(filelist):
-   # Function to find what the time variable is called in a model file.
-   # Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
-   #              One model may call the time "time", another one may call it "t"
-   #              This script looks for the existence of any of a predefined list of synonyms for time. 
-   #
-   #
-   #       Input: 
-   #               filelist -list of filenames
-   #
-   #       Output: 
-   #               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-   #               -name of time variable
-   #               -list of variable names in file
-   #  
-   #
-   #       Peter Lean   February 2011
-
+   """ 
+    Function to find what the time variable is called in a model file.
+    Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
+                 One model may call the time "time", another one may call it "t"
+                 This script looks for the existence of any of a predefined list of synonyms for time. 
+   
+   
+          Input: 
+                  filelist -list of filenames
+   
+          Output: 
+                  -success flag (1 or 0): were both latitude and longitude variable names found in the file?
+                  -name of time variable
+                  -list of variable names in file
+     
+   
+          Peter Lean   February 2011
+   """
    filename = filelist[0]
 
    success = 0
@@ -82,19 +83,20 @@ def find_time_var_name_from_file(filelist):
    return success, timename, var_name_list
 
 def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
-   # Function to return the latitude and longitude ranges of the data in a file,
-   # given the identifying variable names.
-   #
-   #    Input:
-   #            filelist - list of filenames (data is read in from first file only)
-   #            lat_var_name - variable name of the 'latitude' variable
-   #            lon_var_name - variable name of the 'longitude' variable
-   #
-   #    Output:
-   #            latMin, latMax, lonMin, lonMax - self explanatory
-   #
-   #                    Peter Lean      March 2011
-
+   """
+    Function to return the latitude and longitude ranges of the data in a file,
+    given the identifying variable names.
+   
+       Input:
+               filelist - list of filenames (data is read in from first file only)
+               lat_var_name - variable name of the 'latitude' variable
+               lon_var_name - variable name of the 'longitude' variable
+   
+       Output:
+               latMin, latMax, lonMin, lonMax - self explanatory
+   
+                       Peter Lean      March 2011
+   """
    filename = filelist[0]
 
    try:
@@ -118,28 +120,29 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
      return 0,0,0,0
 
 def find_latlon_var_from_file(filelist):
-   # Function to find what the latitude and longitude variables are called in a model file.
-   # Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
-   #              One model may call the latitude "lat", another one may call it "Latitudes"
-   #              This script looks for the existence of any of a predefined list of synonyms for lat and long.
-   #
-   #
-   #       Input: 
-   #               -filename 
-   #
-   #       Output: 
-   #               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-   #               -name of latitude variable
-   #               -name of longitude variable
-   #               -latMin -descriptions of lat/lon ranges in data files
-   #               -latMax
-   #               -lonMin
-   #               -lonMax
-   #               -list of variable names in file 
-   #                    NB. if unsuccessful then all variables will be empty except the final list of variable names.
-   #
-   #       Peter Lean   February 2011
-
+   """ 
+    Function to find what the latitude and longitude variables are called in a model file.
+    Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
+                 One model may call the latitude "lat", another one may call it "Latitudes"
+                 This script looks for the existence of any of a predefined list of synonyms for lat and long.
+   
+   
+          Input: 
+                  -filename 
+   
+          Output: 
+                  -success flag (1 or 0): were both latitude and longitude variable names found in the file?
+                  -name of latitude variable
+                  -name of longitude variable
+                  -latMin -descriptions of lat/lon ranges in data files
+                  -latMax
+                  -lonMin
+                  -lonMax
+                  -list of variable names in file 
+                       NB. if unsuccessful then all variables will be empty except the final list of variable names.
+   
+          Peter Lean   February 2011
+   """
    filename = filelist[0]
 
    success = 0
@@ -208,22 +211,20 @@ def find_latlon_var_from_file(filelist):
 
 def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarName):
    '''
-   ##################################################################################
-   # Read in data from a list of model files into a single data structure
-   #
-   # Input:
-   #    filelist - list of filenames (including path)
-   #    myvar    - string containing name of variable to load in (as it appears in file)
-   # Output:
-   #    lat, lon - 2D array of latitude and longitude values
-   #    timestore    - list of times
-   #    t2store  - numpy array containing data from all files    
-   #
-   #  NB. originally written specific for WRF netCDF output files
-   #      modified to make more general (Feb 2011)
-   #
-   #   Peter Lean July 2010 
-   ##################################################################################
+    Read in data from a list of model files into a single data structure
+   
+    Input:
+       filelist - list of filenames (including path)
+       myvar    - string containing name of variable to load in (as it appears in file)
+    Output:
+       lat, lon - 2D array of latitude and longitude values
+       timestore    - list of times
+       t2store  - numpy array containing data from all files    
+   
+     NB. originally written specific for WRF netCDF output files
+         modified to make more general (Feb 2011)
+   
+      Peter Lean July 2010 
    '''
 
    filelist.sort()
@@ -320,16 +321,16 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
 
 def select_var_from_file(myfile,fmt='not set'):
    '''
-   # Routine to act as user interface to allow users to select variable of interest from a file.
-   # 
-   #  Input:
-   #     myfile - filename
-   #     fmt - (optional) specify fileformat for PyNIO if filename suffix is non-standard
-   #
-   #  Output:
-   #     myvar - variable name in file
-   #
-   #    Peter Lean  September 2010
+    Routine to act as user interface to allow users to select variable of interest from a file.
+    
+     Input:
+        myfile - filename
+        fmt - (optional) specify fileformat for PyNIO if filename suffix is non-standard
+   
+     Output:
+        myvar - variable name in file
+   
+       Peter Lean  September 2010
    '''
 
    print fmt
@@ -355,15 +356,15 @@ def select_var_from_file(myfile,fmt='not set'):
 
 def select_var_from_wrf_file(myfile):
    '''
-   # Routine to act as user interface to allow users to select variable of interest from a wrf netCDF file.
-   # 
-   #  Input:
-   #     myfile - filename
-   #
-   #  Output:
-   #     mywrfvar - variable name in wrf file
-   #
-   #    Peter Lean  September 2010
+    Routine to act as user interface to allow users to select variable of interest from a wrf netCDF file.
+    
+     Input:
+        myfile - filename
+   
+     Output:
+        mywrfvar - variable name in wrf file
+   
+       Peter Lean  September 2010
    '''
 
    f = Nio.open_file(myfile,format='nc')
