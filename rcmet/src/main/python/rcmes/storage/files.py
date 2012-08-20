@@ -18,7 +18,7 @@ import os
 
 # Appending rcmes via relative path
 sys.path.append(os.path.abspath('../.'))
-import rcmes.toolkit.process
+import rcmes.toolkit.process as process
 
 def findunique(seq):
     keys = {}
@@ -306,7 +306,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
      print 'WARNING: Possible duplicated times'
 
    # Decode model times into python datetime objects
-   timestore = rcmes.process.decode_model_times(filelist, timeVarName)
+   timestore = process.decode_model_times(filelist, timeVarName)
 
    data_dict = {}
    data_dict['lats'] = lat
