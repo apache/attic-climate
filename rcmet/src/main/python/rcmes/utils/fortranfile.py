@@ -1,5 +1,5 @@
 # Copyright 2008, 2009 Neil Martinsen-Burrell
-#
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -18,7 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-"""Defines a file-derived class to read/write Fortran unformatted files.
+
+"""
+Defines a file-derived class to read/write Fortran unformatted files.
 
 The assumption is that a Fortran unformatted file is being written by
 the Fortran runtime as a sequence of records.  Each record consists of
@@ -30,18 +32,23 @@ Examples
 --------
 
 To use the default endian and size settings, one can just do::
+
     >>> f = FortranFile('filename')
     >>> x = f.readReals()
 
 One can read arrays with varying precisions::
+
     >>> f = FortranFile('filename')
     >>> x = f.readInts('h')
     >>> y = f.readInts('q')
     >>> z = f.readReals('f')
+
 Where the format codes are those used by Python's struct module.
 
 One can change the default endian-ness and header precision::
+
     >>> f = FortranFile('filename', endian='>', header_prec='l')
+    
 for a file with little-endian data whose record headers are long
 integers.
 """
@@ -60,9 +67,10 @@ class FortranFile(file):
     _header_length = property(fget=_get_header_length)
 
     def _set_endian(self,c):
-        """Set endian to big (c='>') or little (c='<') or native (c='@')
+        """
+        Set endian to big (c='>') or little (c='<') or native (c='@')
 
-        :Parameters:
+        Parameters:
           `c` : string
             The endian-ness to use when reading from this file.
         """
@@ -147,8 +155,8 @@ class FortranFile(file):
         """Write a record with the given bytes.
 
         Parameters
-        ----------
-        s : the string to write
+        
+            s : the string to write
 
         """
         length_bytes = len(s)
@@ -164,8 +172,8 @@ class FortranFile(file):
         """Write a string
 
         Parameters
-        ----------
-        s : the string to write
+        
+            s : the string to write
         
         """
         self.writeRecord(s)
@@ -173,11 +181,13 @@ class FortranFile(file):
     _real_precisions = 'df'
 
     def readReals(self, prec='f'):
-        """Read in an array of real numbers.
+        """
+        Read in an array of real numbers.
         
         Parameters
-        ----------
-        prec : character, optional
+        
+            prec : character, optional
+            
             Specify the precision of the array using character codes from
             Python's struct module.  Possible values are 'd' and 'f'.
             
@@ -196,14 +206,16 @@ class FortranFile(file):
         return numpy.array(numbers, dtype=_numpy_precisions[prec])
 
     def writeReals(self, reals, prec='f'):
-        """Write an array of floats in given precision
+        """
+        Write an array of floats in given precision
 
         Parameters
-        ----------
+        
         reals : array
             Data to write
         prec` : string
             Character code for the precision to use in writing
+        
         """
         if prec not in self._real_precisions:
             raise ValueError('Not an appropriate precision')
@@ -220,14 +232,15 @@ class FortranFile(file):
     _int_precisions = 'hilq'
 
     def readInts(self, prec='i'):
-        """Read an array of integers.
+        """
+        Read an array of integers.
         
         Parameters
-        ----------
-        prec : character, optional
-            Specify the precision of the data to be read using 
-            character codes from Python's struct module.  Possible
-            values are 'h', 'i', 'l' and 'q'
+        
+            prec : character, optional
+                Specify the precision of the data to be read using 
+                character codes from Python's struct module.  Possible
+                values are 'h', 'i', 'l' and 'q'
             
         """
         if prec not in self._int_precisions:
@@ -238,14 +251,15 @@ class FortranFile(file):
         return numpy.array(struct.unpack(self.ENDIAN+str(num)+prec,data_str))
 
     def writeInts(self, ints, prec='i'):
-        """Write an array of integers in given precision
+        """
+        Write an array of integers in given precision
 
         Parameters
-        ----------
-        reals : array
-            Data to write
-        prec : string
-            Character code for the precision to use in writing
+        
+            reals : array
+                Data to write
+            prec : string
+                Character code for the precision to use in writing
         """
         if prec not in self._int_precisions:
             raise ValueError('Not an appropriate precision')

@@ -139,27 +139,32 @@ def decode_eraint_surf_times(xtimes):
 
 def read_total_precip_from_filelist(myfilelist):
    '''
-     WRF outputs precipitation data under several variables:
-      RAINC=  convective total precip
-      RAINNC= large scale total precip  ("no convective")
-      SNOWC=  convective snow
-      SNOWNC= large scale snow  ("no convective")
-   
-     Therefore, real rain = (rainc+rainnc)-(snowc+snownc)
-                total precip = rainc+rainnc+snowc+snownc
-     Input:
-            myfilelist - a list of filename (including full path)
-           
-     Output:
-            precip - a numpy array of total precip values
-            lat, lon - 2D array of latitude and longitude values
-            times    - list of times
-   
-     Peter Lean August 2010
-   
-     NB. THIS ROUTINE IS NO LONGER NEEDED... I HAD MISUNDERSTOOD HOW PRECIP DATA WAS STORED IN WRF
-         TOTAL PRECIP  = RAINNC
-     -A SIMILAR ROUTINE MAY BE REQUIRED TO FIND THE INDIVIDUAL COMPONENTS THOUGH..
+    WRF outputs precipitation data under several variables:
+    
+        **RAINC** =  convective total precip
+        
+        **RAINNC** = large scale total precip  ("no convective")
+        
+        **SNOWC** =  convective snow
+        
+        **SNOWNC** = large scale snow  ("no convective")
+    
+    Therefore: 
+        real rain = (rainc+rainnc)-(snowc+snownc)
+        total precip = rainc+rainnc+snowc+snownc
+        
+    Input:
+        myfilelist - a list of filename (including full path)
+          
+    Output:
+        precip - a numpy array of total precip values
+        lat, lon - 2D array of latitude and longitude values
+        times    - list of times
+    
+    NB. THIS ROUTINE IS NO LONGER NEEDED... I HAD MISUNDERSTOOD HOW PRECIP DATA WAS STORED IN WRF
+    TOTAL PRECIP  = RAINNC
+    **A SIMILAR ROUTINE MAY BE REQUIRED TO FIND THE INDIVIDUAL COMPONENTS THOUGH..**
+
    '''
 
    myfilelist.sort()
