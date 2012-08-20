@@ -1,11 +1,11 @@
 #!/usr/local/bin/python
 """Module used to launch the RESTful API"""
 import sys
-sys.path.append('../lib')
+sys.path.append('../../.')
 from bottle import route, request
 #import Nio
 import json
-import do_rcmes_processing_sub as awesome
+import rcmes.cli.do_rcmes_processing_sub as awesome
 import time
 import datetime
 time_format_new = '%Y-%m-%d %H:%M:%S'

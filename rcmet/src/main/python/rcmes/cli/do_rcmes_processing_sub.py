@@ -24,66 +24,63 @@ def do_rcmes(settings, params, model, mask, options):
     '''
     Routine to perform full end-to-end RCMET processing.
 
-        i)    retrieve observations from the database
-        ii)   load in model data
-        iii)  temporal regridding
-        iv)   spatial regridding
-        v)    area-averaging
-        vi)   seasonal cycle compositing
-        vii)  metric calculation
-        viii) plot production
+    i)    retrieve observations from the database
+    ii)   load in model data
+    iii)  temporal regridding
+    iv)   spatial regridding
+    v)    area-averaging
+    vi)   seasonal cycle compositing
+    vii)  metric calculation
+    viii) plot production
 
-        Input: 5 dictionaries which contain a huge argument list with all of the user options 
+    Input:
+        5 dictionaries which contain a huge argument list with all of the user options 
         (which can be collected from the GUI)
 
-            settings - dictionary of rcmes run settings
-                settings = {"cache_dir": string describing directory path,
-                            "work_dir": string describing directory path,
-                            "file_list": string describing model file name + path }
+    settings - dictionary of rcmes run settings::
+    
+        settings = {"cache_dir": string describing directory path,
+                    "work_dir": string describing directory path,
+                    "file_list": string describing model file name + path }
 
-            params - dictionary of rcmes run parameters
-                params = {"obs_dataset_id": int( db dataset id ),
-                          "obs_param_id": int( db parameter id ),
-                          "start_time": datetime object (needs to change to string + decode),
-                          "end_time": datetime object (needs to change to string + decode),
-                          "lat_min": float,
-                          "lat_max": float,
-                          "lon_min": float,
-                          "lon_max": float }
+    params - dictionary of rcmes run parameters::
+    
+        params = {"obs_dataset_id": int( db dataset id ),
+                  "obs_param_id": int( db parameter id ),
+                  "start_time": datetime object (needs to change to string + decode),
+                  "end_time": datetime object (needs to change to string + decode),
+                  "lat_min": float,
+                  "lat_max": float,
+                  "lon_min": float,
+                  "lon_max": float }
 
-            model - dictionary of model parameters
-                model = {"var_name": string describing name of variable to evaluate 
-                                     (as written in model file),
-                         "time_variable": string describing name of time variable 
-                                     (as written in model file), 	
-                         "lat_variable": string describing name of latitude variable 
-                                     (as written in model file), 
-                         "lon_variable": string describing name of longitude variable 
-                                     (as written in model file) } 
-            
-            mask - dictionary of mask specific options (only used if options['mask']=True)
-                mask = {"lat_min": float,
-                        "lat_max": float,
-                        "lon_min": float,
-                        "lon_max": float}
-            
-            options - dictionary full of different user supplied options
-                options = {"regrid": str( 'obs' | 'model' | 'regular' ),
-                           "time_regrid": str( 'full' | 'annual' | 'monthly' | 'daily' ),
-                           "seasonal_cycle": Boolean,
-                           "metric": str('bias'|'mae'|'acc'|'pdf'|'patcor'|'rms'|'diff'),
-                           "plot_title": string describing title to use in plot graphic,
-                           "plot_filename": basename of file to use for plot graphic 
-                                             i.e. {plot_filename}.png,
-                           "mask": Boolean,
-                           "precip": Boolean }
+    model - dictionary of model parameters::
+        
+        model = {"var_name": string describing name of variable to evaluate (as written in model file),
+                 "time_variable": string describing name of time variable (as written in model file), 	
+                 "lat_variable": string describing name of latitude variable (as written in model file), 
+                 "lon_variable": string describing name of longitude variable (as written in model file) } 
+        
+    mask - dictionary of mask specific options (only used if options['mask']=True)::
+        
+        mask = {"lat_min": float,
+                "lat_max": float,
+                "lon_min": float,
+                "lon_max": float}
+        
+    options - dictionary full of different user supplied options::
+        
+        options = {"regrid": str( 'obs' | 'model' | 'regular' ),
+                   "time_regrid": str( 'full' | 'annual' | 'monthly' | 'daily' ),
+                   "seasonal_cycle": Boolean,
+                   "metric": str('bias'|'mae'|'acc'|'pdf'|'patcor'|'rms'|'diff'),
+                   "plot_title": string describing title to use in plot graphic,
+                   "plot_filename": basename of file to use for plot graphic i.e. {plot_filename}.png,
+                   "mask": Boolean,
+                   "precip": Boolean }
 
-
-        Output: image files of plots + possibly data
-
-        Peter Lean      February 2011
-        Cameron Goodale August 2012
-
+    Output: image files of plots + possibly data
+    
     '''
 
 
@@ -723,14 +720,14 @@ def create_time_title( options, time_slice, rcmed_data, model_data ):
     
     Return:  string time_title properly formatted based on the 'time_regrid' and 'seasonal_cycle' options value.
     
-    #######################
+    Time title labels need their format adjusting depending on the temporal regridding used
     
-    Time title labels need their format adjusting depending on the temporal regridding used,
-        e.g. if data are averaged to monthly,
-                   then want to write 'Jan 2002', 'Feb 2002', etc instead of 'Jan 1st, 2002', 'Feb 1st, 2002'
+    e.g. if data are averaged to monthly, then want to write 'Jan 2002', 
+    'Feb 2002', etc instead of 'Jan 1st, 2002', 'Feb 1st, 2002'
 
-    Also, if doing seasonal cycle compositing then want to write 'Jan','Feb','Mar' instead of 'Jan 2002',
-     'Feb 2002','Mar 2002' etc as data are representative of all Jans, all Febs etc. 
+    Also, if doing seasonal cycle compositing then want to write 'Jan','Feb',
+    'Mar' instead of 'Jan 2002', 'Feb 2002','Mar 2002' etc as data are 
+    representative of all Jans, all Febs etc. 
     """
     if(options['time_regrid'] == 'daily'):
         time_title = time_slice.strftime("%b %d, %Y")

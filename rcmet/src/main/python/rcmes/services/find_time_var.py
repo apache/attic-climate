@@ -1,27 +1,29 @@
 #!/usr/local/bin/python
 """
- Small command line utility to find what the time variable is called in a model file.
- Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
-              One model may call the time "time", another one may call it "t"
-              This script looks for the existence of any of a predefined list of synonyms for time.
-
-  This script should be run from the command line (i.e. not called from within python)
-
-       Input: 
-               -filename
-
-       Output: 
-               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-            if successful:
-               -name of time variable
-               -(TODO) modelStartTime -descriptions of time ranges in data files
-               -(TODO) modelEndTime
-            if unsuccessful:
-               -list of variable names in file
-
-       (NB. all printed to standar output)
-
-       Peter Lean   February 2011
+    Small command line utility to find what the time variable is called in a model file.
+    
+    Background::  
+        Model output files tend not to follow any defined standard in terms of 
+        variable naming conventions.  One model may call the time "time", 
+        another one may call it "t".  This script looks for the existence of 
+        any of a predefined list of synonyms for time.
+    
+    This script should be run from the command line (i.e. not called from within python)
+    
+    Input::
+        -filename
+    
+    Output::
+        -success flag (1 or 0): were both latitude and longitude variable names found in the file?
+        
+        if successful:
+            -name of time variable
+            -(TODO) modelStartTime -descriptions of time ranges in data files
+            -(TODO) modelEndTime
+        if unsuccessful:
+            -list of variable names in file
+    
+    (NB. all printed to standar output)
 """
 
 import sys

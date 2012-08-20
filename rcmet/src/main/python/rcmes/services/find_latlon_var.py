@@ -1,30 +1,35 @@
 #!/usr/local/bin/python
 """
- Small command line utility to find what the latitude and longitude variables are called in a model file.
- Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
-              One model may call the latitude "lat", another one may call it "Latitudes"
-              This script looks for the existence of any of a predefined list of synonyms for lat and long.
+    Small command line utility to find what the latitude and longitude variables are called in a model file.
 
-  This script should be run from the command line (i.e. not called from within python)
+    Background::  
+        Model output files tend not to follow any defined standard in terms of 
+        variable naming conventions.  One model may call the latitude "lat", 
+        another one may call it "Latitudes".  This script looks for the 
+        existence of any of a predefined list of synonyms for lat and long.
 
-       Input: 
-               -filename
+    This script should be run from the command line (i.e. not called from 
+    within python)
 
-       Output: 
-               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-            if successful:
-               -name of latitude variable
-               -name of longitude variable
-               -latMin -descriptions of lat/lon ranges in data files
-               -latMax
-               -lonMin
-               -lonMax
-            if unsuccessful:
-               -list of variable names in file
-
-       (NB. all printed to standar output)
-
-       Peter Lean   February 2011
+    Input::
+        -filename
+    
+    Output::
+        -success flag (1 or 0): were both latitude and longitude variable names found in the file?
+    
+    if successful::
+        -name of latitude variable
+        -name of longitude variable
+        -latMin -descriptions of lat/lon ranges in data files
+        -latMax
+        -lonMin
+        -lonMax
+    
+    if unsuccessful:
+        -list of variable names in file
+    
+    (NB. all printed to standar output)
+    
 """
 
 import sys

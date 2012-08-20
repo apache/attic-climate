@@ -456,7 +456,6 @@ def rcmetUI():
 
 
 # Actually call the UI function.
-
-
-rcmetUI()
+if __name__ == "__main__":
+    rcmetUI()
 
