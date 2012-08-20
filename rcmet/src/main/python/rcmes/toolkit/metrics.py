@@ -4,7 +4,7 @@ Module storing functions to calculate statistical metrics from numpy arrays
 
 import numpy as np
 import numpy.ma as ma
-import rcmes.toolkit.process
+import rcmes.toolkit.process as process
 
 def calc_annual_cycle_means(data, time):
     '''
@@ -121,8 +121,8 @@ def calc_bias(t1, t2):
     print 'Calculating bias'
     
     
-    t1Mask = rcmes.process.create_mask_using_threshold(t1, threshold=0.75)
-    t2Mask = rcmes.process.create_mask_using_threshold(t2, threshold=0.75)
+    t1Mask = process.create_mask_using_threshold(t1, threshold=0.75)
+    t2Mask = process.create_mask_using_threshold(t2, threshold=0.75)
     
     diff = t1 - t2
     
@@ -171,8 +171,8 @@ def calc_mae(t1, t2):
     print 'Calculating mean absolute error'
 
     
-    t1Mask = rcmes.process.create_mask_using_threshold(t1, threshold=0.75)
-    t2Mask = rcmes.process.create_mask_using_threshold(t2, threshold=0.75)
+    t1Mask = process.create_mask_using_threshold(t1, threshold=0.75)
+    t2Mask = process.create_mask_using_threshold(t2, threshold=0.75)
     
     diff = t1 - t2
     adiff = abs(diff)
