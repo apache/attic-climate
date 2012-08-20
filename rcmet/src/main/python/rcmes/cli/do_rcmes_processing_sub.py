@@ -10,10 +10,10 @@ import numpy
 import numpy.ma as ma 
 import rcmes.toolkit.plots
 
-import rcmes.storage.db
-import rcmes.storage.files
-import rcmes.toolkit.process
-import rcmes.toolkit.metrics
+import rcmes.storage.db as db
+import rcmes.storage.files as files
+import rcmes.toolkit.process as process
+import rcmes.toolkit.metrics as metrics
 
 # NOT USED?
 # global mmt1
@@ -39,43 +39,43 @@ def do_rcmes(settings, params, model, mask, options):
 
     settings - dictionary of rcmes run settings::
     
-        settings = {"cache_dir": string describing directory path,
-                    "work_dir": string describing directory path,
-                    "file_list": string describing model file name + path }
+        settings = {"cacheDir": string describing directory path,
+                    "workDir": string describing directory path,
+                    "fileList": string describing model file name + path }
 
     params - dictionary of rcmes run parameters::
     
-        params = {"obs_dataset_id": int( db dataset id ),
-                  "obs_param_id": int( db parameter id ),
-                  "start_time": datetime object (needs to change to string + decode),
-                  "end_time": datetime object (needs to change to string + decode),
-                  "lat_min": float,
-                  "lat_max": float,
-                  "lon_min": float,
-                  "lon_max": float }
+        params = {"obsDatasetId": int( db dataset id ),
+                  "obsParamId": int( db parameter id ),
+                  "startTime": datetime object (needs to change to string + decode),
+                  "endTime": datetime object (needs to change to string + decode),
+                  "latMin": float,
+                  "latMax": float,
+                  "lonMin": float,
+                  "lonMax": float }
 
     model - dictionary of model parameters::
         
-        model = {"var_name": string describing name of variable to evaluate (as written in model file),
-                 "time_variable": string describing name of time variable (as written in model file), 	
-                 "lat_variable": string describing name of latitude variable (as written in model file), 
-                 "lon_variable": string describing name of longitude variable (as written in model file) } 
+        model = {"varName": string describing name of variable to evaluate (as written in model file),
+                 "timeVariable": string describing name of time variable (as written in model file), 	
+                 "latVariable": string describing name of latitude variable (as written in model file), 
+                 "lonVariable": string describing name of longitude variable (as written in model file) } 
         
     mask - dictionary of mask specific options (only used if options['mask']=True)::
         
-        mask = {"lat_min": float,
-                "lat_max": float,
-                "lon_min": float,
-                "lon_max": float}
+        mask = {"latMin": float,
+                "latMax": float,
+                "lonMin": float,
+                "lonMax": float}
         
     options - dictionary full of different user supplied options::
         
         options = {"regrid": str( 'obs' | 'model' | 'regular' ),
-                   "time_regrid": str( 'full' | 'annual' | 'monthly' | 'daily' ),
-                   "seasonal_cycle": Boolean,
+                   "timeRegrid": str( 'full' | 'annual' | 'monthly' | 'daily' ),
+                   "seasonalCycle": Boolean,
                    "metric": str('bias'|'mae'|'acc'|'pdf'|'patcor'|'rms'|'diff'),
-                   "plot_title": string describing title to use in plot graphic,
-                   "plot_filename": basename of file to use for plot graphic i.e. {plot_filename}.png,
+                   "plotTitle": string describing title to use in plot graphic,
+                   "plotFilename": basename of file to use for plot graphic i.e. {plotFilename}.png,
                    "mask": Boolean,
                    "precip": Boolean }
 
@@ -85,29 +85,29 @@ def do_rcmes(settings, params, model, mask, options):
 
 
 
-    print "%s is type of params['start_time']" % type(params['start_time'])
+    print "%s is type of params['startTime']" % type(params['startTime'])
 
 
     # check the number of model data files
-    if len(settings['file_list']) < 1:         # no input data file
+    if len(settings['fileList']) < 1:         # no input data file
         print 'No input model data file. EXIT'
         sys.exit()
     # assign parameters that must be preserved throughout the process
     if options['mask'] == True: 
-        options['seasonal_cycle'] = True
+        options['seasonalCycle'] = True
 
-    print 'start & end eval period = %s to %s' % ( params['start_time'].strftime("%Y%m"),
-                                                   params['end_time'].strftime("%Y%m") )
+    print 'start & end eval period = %s to %s' % ( params['startTime'].strftime("%Y%m"),
+                                                   params['endTime'].strftime("%Y%m") )
     
-    print(params['obs_dataset_id'], params['obs_param_id'], params['lat_min'],
-          params['lat_max'], params['lon_min'], params['lon_max'], params['start_time'],
-          params['end_time'], settings['cache_dir'])
+    print(params['obsDatasetId'], params['obsParamId'], params['latMin'],
+          params['latMax'], params['lonMin'], params['lonMax'], params['startTime'],
+          params['endTime'], settings['cacheDir'])
 
     ###########################################################################
     # Part 1: retrieve observation data from the database
     #         NB. automatically uses local cache if already retrieved.
     ###########################################################################
-    rcmed_data = get_data_from_rcmed( params, settings )
+    rcmedData = getDataFromRCMED( params, settings )
 
 
     #extract climo data
@@ -115,7 +115,7 @@ def do_rcmes(settings, params, model, mask, options):
     ###########################################################################
     # Part 2: load in model data from file(s)
     ###########################################################################
-    model_data = get_data_from_model( model, settings )
+    modelData = getDataFromModel( model, settings )
 
     ###########################################################################
     # Deal with some precipitation specific options
@@ -123,11 +123,11 @@ def do_rcmes(settings, params, model, mask, options):
     ###########################################################################
     colorbar = 'rainbow'
     if options['precip'] == True:
-        model_data['data'] = model_data['data']*86400.  # convert from kgm-2s-1 into mm/day
+        modelData['data'] = modelData['data']*86400.  # convert from kgm-2s-1 into mm/day
         colorbar = 'precip2_17lev'
 
     # set color bar suitable for MODIS cloud data
-    if params['obs_param_id'] == 31:
+    if params['obsParamId'] == 31:
         colorbar = 'gsdtol'
 
     ##################################################################################################################
@@ -136,15 +136,15 @@ def do_rcmes(settings, params, model, mask, options):
     #        but the user may have selected to only analyse data between 2003 and 2004.  
     ##################################################################################################################
 
-    # make list of indices where model_data['times'] are between params['start_time'] and params['end_time']
-    model_time_overlap = numpy.logical_and((numpy.array(model_data['times'])>=params['start_time']), 
-                                           (numpy.array(model_data['times'])<=params['end_time'])) 
+    # make list of indices where modelData['times'] are between params['startTime'] and params['endTime']
+    modelTimeOverlap = numpy.logical_and((numpy.array(modelData['times'])>=params['startTime']), 
+                                           (numpy.array(modelData['times'])<=params['endTime'])) 
 
-    # make subset of model_data['times'] using full list of times and indices calculated above
-    model_data['times'] = list(numpy.array(model_data['times'])[model_time_overlap])
+    # make subset of modelData['times'] using full list of times and indices calculated above
+    modelData['times'] = list(numpy.array(modelData['times'])[modelTimeOverlap])
 
-    # make subset of model_data['data'] using full model data and indices calculated above 
-    model_data['data'] = model_data['data'][model_time_overlap, :, :]
+    # make subset of modelData['data'] using full model data and indices calculated above 
+    modelData['data'] = modelData['data'][modelTimeOverlap, :, :]
 
     ##################################################################################################################
     # Part 3: Temporal regridding
@@ -156,21 +156,21 @@ def do_rcmes(settings, params, model, mask, options):
     ##################################################################################################################
     print 'Temporal Regridding Started'
 
-    if(options['time_regrid']):
+    if(options['timeRegrid']):
         # Run both obs and model data through temporal regridding routine.
         #  NB. if regridding not required (e.g. monthly time units selected and model data is already monthly),
         #      then subroutine detects this and returns data untouched.
-        rcmed_data['data'], new_obs_times = rcmes.process.calc_average_on_new_time_unit(rcmed_data['data'], 
-                                                                                        rcmed_data['times'],
-                                                                                        unit=options['time_regrid'])
+        rcmedData['data'], newObsTimes = process.calc_average_on_new_time_unit(rcmedData['data'], 
+                                                                                        rcmedData['times'],
+                                                                                        unit=options['timeRegrid'])
         
-        model_data['data'], new_model_times = rcmes.process.calc_average_on_new_time_unit(model_data['data'],
-                                                                                          model_data['times'],
-                                                                                          unit=options['time_regrid'])
+        modelData['data'], newModelTimes = process.calc_average_on_new_time_unit(modelData['data'],
+                                                                                          modelData['times'],
+                                                                                          unit=options['timeRegrid'])
 
     # Set a new 'times' list which describes the common times used for both model and obs after the regrid.
-    if new_obs_times == new_model_times:
-        times = new_obs_times
+    if newObsTimes == newModelTimes:
+        times = newObsTimes
 
     ###########################################################################
     # Catch situations where after temporal regridding the times in model and obs don't match.
@@ -186,33 +186,33 @@ def do_rcmes(settings, params, model, mask, options):
     #              This section of code deals with this situation by only looking at data
     #              from the common times between model and obs after temporal regridding.           
     ###########################################################################
-    if new_obs_times != new_model_times:
+    if newObsTimes != newModelTimes:
         print 'Warning: after temporal regridding, times from observations and model do not match'
         print 'Check if this is unexpected.'
         print 'Proceeding with data from times common in both model and obs.'
 
         # Create empty lists ready to store data
         times = []
-        temp_model_data = []
-        temp_obs_data = []
+        tempModelData = []
+        tempObsData = []
 
         # Loop through each time that is common in both model and obs
-        for common_time in numpy.intersect1d(new_obs_times, new_model_times):
+        for commonTime in numpy.intersect1d(newObsTimes, newModelTimes):
             # build up lists of times, and model and obs data for each common time
             #  NB. use lists for data for convenience (then convert to masked arrays at the end)
-            times.append(new_obs_times[numpy.where(numpy.array(new_obs_times) == common_time)[0][0]])
-            temp_model_data.append(model_data['data'][numpy.where(numpy.array(new_model_times) == common_time)[0][0], :, :])
-            temp_obs_data.append(rcmed_data['data'][numpy.where(numpy.array(new_obs_times) == common_time)[0][0], :, :])
+            times.append(newObsTimes[numpy.where(numpy.array(newObsTimes) == commonTime)[0][0]])
+            tempModelData.append(modelData['data'][numpy.where(numpy.array(newModelTimes) == commonTime)[0][0], :, :])
+            tempObsData.append(rcmedData['data'][numpy.where(numpy.array(newObsTimes) == commonTime)[0][0], :, :])
 
         # Convert data arrays from list back into full 3d arrays.
-        model_data['data'] = ma.array(temp_model_data)
-        rcmed_data['data'] = ma.array(temp_obs_data)
+        modelData['data'] = ma.array(tempModelData)
+        rcmedData['data'] = ma.array(tempObsData)
 
         # Reset all time lists so representative of the data actually used.
-        new_obs_times = times
-        new_model_times = times
-        rcmed_data['times'] = times
-        model_data['times'] = times
+        newObsTimes = times
+        newModelTimes = times
+        rcmedData['times'] = times
+        modelData['times'] = times
 
     ##################################################################################################################
     # Part 4: spatial regridding
@@ -223,7 +223,7 @@ def do_rcmes(settings, params, model, mask, options):
     #          by parameters that they enter.
     #
     #         NB. from this point on in the code, the 'lats' and 'lons' arrays are common to 
-    #             both rcmed_data['data'] and model_data['data'].
+    #             both rcmedData['data'] and modelData['data'].
     ##################################################################################################################
 
     ##################################################################################################################
@@ -231,12 +231,12 @@ def do_rcmes(settings, params, model, mask, options):
     ##################################################################################################################
     if options['regrid'] == 'model':
         # User chose to regrid observations to the model grid
-        model_data['data'], rcmed_data['data'], lats, lons = rcmes.process.regrid_wrapper('0', rcmed_data['data'], 
-                                                                                  rcmed_data['lats'],
-                                                                                  rcmed_data['lons'], 
-                                                                                  model_data['data'],
-                                                                                  model_data['lats'],
-                                                                                  model_data['lons'])
+        modelData['data'], rcmedData['data'], lats, lons = process.regrid_wrapper('0', rcmedData['data'], 
+                                                                                  rcmedData['lats'],
+                                                                                  rcmedData['lons'], 
+                                                                                  modelData['data'],
+                                                                                  modelData['lats'],
+                                                                                  modelData['lons'])
 
     ##################################################################################################################
     # or    ii) Regrid model data to obs grid.
@@ -244,12 +244,12 @@ def do_rcmes(settings, params, model, mask, options):
     if options['regrid'] == 'obs':
         # User chose to regrid model data to the observation grid
 
-        model_data['data'], rcmed_data['data'], lats, lons = rcmes.process.regrid_wrapper('1', rcmed_data['data'], 
-                                                                                  rcmed_data['lats'], 
-                                                                                  rcmed_data['lons'], 
-                                                                                  model_data['data'],
-                                                                                  model_data['lats'], 
-                                                                                  model_data['lons'])
+        modelData['data'], rcmedData['data'], lats, lons = process.regrid_wrapper('1', rcmedData['data'], 
+                                                                                  rcmedData['lats'], 
+                                                                                  rcmedData['lons'], 
+                                                                                  modelData['data'],
+                                                                                  modelData['lats'], 
+                                                                                  modelData['lons'])
 
     ##################################################################################################################
     # or    iii) Regrid both model data and obs data to new regular lat/lon grid.
@@ -269,33 +269,33 @@ def do_rcmes(settings, params, model, mask, options):
         # Regrid model data for every time
         #  NB. store new data in a list and convert back to an array at the end.
         ###########################################################################################################
-        tmp_model_data = []
+        tmpModelData = []
 
-        time_count = model_data['data'].shape[0]
-        for t in numpy.arange(time_count):
-            tmp_model_data.append(rcmes.process.do_regrid(model_data['data'][t, :, :],
-                                                          model_data['lats'][:, :],
-                                                          model_data['lons'][:, :],
-                                                          rcmed_data['lats'][:, :],
-                                                          rcmed_data['lons'][:, :]))
+        timeCount = modelData['data'].shape[0]
+        for t in numpy.arange(timeCount):
+            tmpModelData.append(process.do_regrid(modelData['data'][t, :, :],
+                                                          modelData['lats'][:, :],
+                                                          modelData['lons'][:, :],
+                                                          rcmedData['lats'][:, :],
+                                                          rcmedData['lons'][:, :]))
 
         # Convert list back into a masked array 
-        model_data['data'] = ma.array(tmp_model_data)
+        modelData['data'] = ma.array(tmpModelData)
 
         ###########################################################################################################
         # Regrid obs data for every time
         #  NB. store new data in a list and convert back to an array at the end.
         ###########################################################################################################
-        temp_obs_data = []
-        time_count = rcmed_data['data'].shape[0]
-        for t in numpy.arange(time_count):
-            temp_obs_data.append(rcmes.process.do_regrid(rcmed_data['data'][t, :, :], 
-                                                         rcmed_data['lats'][:, :], 
-                                                         rcmed_data['lons'][:, :], 
-                                                         model_data['lats'][:, :], model_data['lons'][:, :]))
+        tempObsData = []
+        timeCount = rcmedData['data'].shape[0]
+        for t in numpy.arange(timeCount):
+            tempObsData.append(process.do_regrid(rcmedData['data'][t, :, :], 
+                                                         rcmedData['lats'][:, :], 
+                                                         rcmedData['lons'][:, :], 
+                                                         modelData['lats'][:, :], modelData['lons'][:, :]))
 
         # Convert list back into a masked array 
-        rcmed_data['data'] = ma.array(temp_obs_data)
+        rcmedData['data'] = ma.array(tempObsData)
 
     ##################################################################################################################
     # (Optional) Part 5: area-averaging
@@ -321,33 +321,33 @@ def do_rcmes(settings, params, model, mask, options):
     ###############################################################################################################
     # Define mask using regular lat/lon box specified by users (i.e. ignore regions where mask = True)
     ###############################################################################################################
-    mask = numpy.logical_or(numpy.logical_or(lats<=mask['lat_min'], lats>=mask['lat_max']), 
-                            numpy.logical_or(lons<=mask['lon_min'], lons>=mask['lon_max']))
+    mask = numpy.logical_or(numpy.logical_or(lats<=mask['latMin'], lats>=mask['latMax']), 
+                            numpy.logical_or(lons<=mask['lonMin'], lons>=mask['lonMax']))
 
     ###############################################################################################################
     # Calculate area-weighted averages within this region and store in new lists
     ###############################################################################################################
-    model_store = []
-    time_count = model_data['data'].shape[0]
-    for t in numpy.arange(time_count):
-        model_store.append(rcmes.process.calc_area_mean(model_data['data'][t, :, :], lats, lons, mymask=mask))
+    modelStore = []
+    timeCount = modelData['data'].shape[0]
+    for t in numpy.arange(timeCount):
+        modelStore.append(process.calc_area_mean(modelData['data'][t, :, :], lats, lons, mymask=mask))
 
-    obs_store = []
-    time_count = rcmed_data['data'].shape[0]
-    for t in numpy.arange(time_count):
-        obs_store.append(rcmes.process.calc_area_mean(rcmed_data['data'][t, :, :], lats, lons, mymask=mask))
+    obsStore = []
+    timeCount = rcmedData['data'].shape[0]
+    for t in numpy.arange(timeCount):
+        obsStore.append(process.calc_area_mean(rcmedData['data'][t, :, :], lats, lons, mymask=mask))
   
     ###############################################################################################################
     # Now overwrite data arrays with the area-averaged values
     ###############################################################################################################
-    model_data['data'] = ma.array(model_store)
-    rcmed_data['data'] = ma.array(obs_store)
+    modelData['data'] = ma.array(modelStore)
+    rcmedData['data'] = ma.array(obsStore)
 
     ###############################################################################################################
     # Free-up some memory by overwriting big variables
     ###############################################################################################################
-    obs_store = 0
-    model_store = 0
+    obsStore = 0
+    modelStore = 0
 
     ##############################################################################################################
     # NB. if area-averaging has been performed then the dimensions of the data arrays will have changed from 3D to 1D
@@ -379,19 +379,19 @@ def do_rcmes(settings, params, model, mask, options):
     #                each one showing the average values for a month. (all Jans, all Febs etc).
     #
     ##################################################################################################################
-    if options['seasonal_cycle'] == True:
+    if options['seasonalCycle'] == True:
 
         print 'Compositing data to calculate seasonal cycle'
 
-        model_data['data'] = rcmes.metrics.calc_annual_cycle_means(model_data['data'], model_data['times'])
-        rcmed_data['data'] = rcmes.metrics.calc_annual_cycle_means(rcmed_data['data'], model_data['times'])
+        modelData['data'] = metrics.calc_annual_cycle_means(modelData['data'], modelData['times'])
+        rcmedData['data'] = metrics.calc_annual_cycle_means(rcmedData['data'], modelData['times'])
 
     ##################################################################################################################
     # Part 7: metric calculation
-    #              Calculate performance metrics comparing rcmed_data['data'] and model_data['data'].
-    #              All output is stored in metric_data regardless of what metric was calculated.
+    #              Calculate performance metrics comparing rcmedData['data'] and modelData['data'].
+    #              All output is stored in metricData regardless of what metric was calculated.
     #          
-    #      NB. the dimensions of metric_data will vary depending on the dimensions of the incoming data
+    #      NB. the dimensions of metricData will vary depending on the dimensions of the incoming data
     #          *and* on the type of metric being calculated.
     #
     #      e.g.    bias between incoming 1D model and 1D obs data (after area-averaging) will be a single number. 
@@ -401,45 +401,45 @@ def do_rcmes(settings, params, model, mask, options):
     ##################################################################################################################
 
     if options['metric'] == 'bias':
-        metric_data = rcmes.metrics.calc_bias(model_data['data'], rcmed_data['data'])
-        metric_title = 'Bias'
+        metricData = metrics.calc_bias(modelData['data'], rcmedData['data'])
+        metricTitle = 'Bias'
 
     if options['metric'] == 'mae':
-        metric_data = rcmes.metrics.calc_mae(model_data['data'], rcmed_data['data'])
-        metric_title = 'Mean Absolute Error'
+        metricData = metrics.calc_mae(modelData['data'], rcmedData['data'])
+        metricTitle = 'Mean Absolute Error'
 
     if options['metric'] == 'rms':
-        metric_data = rcmes.metrics.calc_rms(model_data['data'], rcmed_data['data'])
-        metric_title = 'RMS error'
+        metricData = metrics.calc_rms(modelData['data'], rcmedData['data'])
+        metricTitle = 'RMS error'
  
     if options['metric'] == 'difference':
-        metric_data = rcmes.metrics.calc_difference(model_data['data'], rcmed_data['data'])
-        metric_title = 'Difference'
+        metricData = metrics.calc_difference(modelData['data'], rcmedData['data'])
+        metricTitle = 'Difference'
 
     if options['metric'] == 'patcor':
-        metric_data = rcmes.metrics.calc_pat_cor(model_data['data'], rcmed_data['data'])
-        metric_title = 'Pattern Correlation'
+        metricData = metrics.calc_pat_cor(modelData['data'], rcmedData['data'])
+        metricTitle = 'Pattern Correlation'
 
     if options['metric'] == 'acc':
-        metric_data = rcmes.metrics.calc_anom_cor(model_data['data'], rcmed_data['data'])
-        metric_title = 'Anomaly Correlation'
+        metricData = metrics.calc_anom_cor(modelData['data'], rcmedData['data'])
+        metricTitle = 'Anomaly Correlation'
 
     if options['metric'] == 'nacc':
-        metric_data = rcmes.metrics.calc_anom_corn(model_data['data'], rcmed_data['data'])
-        metric_title = 'Anomaly Correlation'
+        metricData = metrics.calc_anom_corn(modelData['data'], rcmedData['data'])
+        metricTitle = 'Anomaly Correlation'
 
     if options['metric'] == 'pdf':
-        metric_data = rcmes.metrics.calc_pdf(model_data['data'], rcmed_data['data'])
-        metric_title = 'Probability Distribution Function'
+        metricData = metrics.calc_pdf(modelData['data'], rcmedData['data'])
+        metricTitle = 'Probability Distribution Function'
 
     if options['metric'] == 'coe':
-        metric_data = rcmes.metrics.calc_nash_sutcliff(model_data['data'], rcmed_data['data'])
-        metric_title = 'Coefficient of Efficiency'
+        metricData = metrics.calc_nash_sutcliff(modelData['data'], rcmedData['data'])
+        metricTitle = 'Coefficient of Efficiency'
 
     if options['metric'] == 'stddev':
-        metric_data = rcmes.metrics.calc_stdev(model_data['data'])
-        data2 = rcmes.metrics.calc_stdev(rcmed_data['data'])
-        metric_title = 'Standard Deviation'
+        metricData = metrics.calc_stdev(modelData['data'])
+        data2 = metrics.calc_stdev(rcmedData['data'])
+        metricTitle = 'Standard Deviation'
     ##################################################################################################################
     # Part 8: Plot production
     #
@@ -454,17 +454,17 @@ def do_rcmes(settings, params, model, mask, options):
     ##################################################################################################################
     # 1 dimensional data, e.g. Time series plots
     ##################################################################################################################
-    if metric_data.ndim == 1:
+    if metricData.ndim == 1:
         print 'Producing time series plots ****'
-        print metric_data
-        year_labels = True
+        print metricData
+        yearLabels = True
         #   mytitle = 'Area-average model v obs'
 
     ################################################################################################################
     # If producing seasonal cycle plots, don't want to put year labels on the time series plots.
     ################################################################################################################
-    if options['seasonal_cycle'] == True:
-        year_labels = False
+    if options['seasonalCycle'] == True:
+        yearLabels = False
         mytitle = 'Annual cycle: area-average  model v obs'
         # Create a list of datetimes to represent the annual cycle, one per month.
         times = []
@@ -481,7 +481,7 @@ def do_rcmes(settings, params, model, mask, options):
     if (options['metric'] != 'patcor')&(options['metric'] != 'acc')&(options['metric'] != 'nacc')&(options['metric'] != 'coe')&(options['metric'] != 'pdf'):
         # for anomaly and pattern correlation,
         # can't plot time series of model, obs as these are 3d fields
-        # ^^ This is the reason model_data['data'] has been swapped for metric_data in
+        # ^^ This is the reason modelData['data'] has been swapped for metricData in
         # the following function
         # TODO: think of a cleaner way of dealing with this.
 
@@ -489,43 +489,43 @@ def do_rcmes(settings, params, model, mask, options):
         # Produce the time series plots with two lines: obs and model
         ###########################################################################################
         print 'two line timeseries'
-        #     mytitle = options['plot_title']
+        #     mytitle = options['plotTitle']
         mytitle = 'Area-average model v obs'
-        if options['plot_title'] == 'default':
-            mytitle = metric_title+' model & obs'
-        #rcmes.plots.draw_time_series_plot(model_data['data'],times,options['plot_filename']+'both',
-        #                                           settings['work_dir'],data2=rcmed_data['data'],mytitle=mytitle,
+        if options['plotTitle'] == 'default':
+            mytitle = metricTitle+' model & obs'
+        #plots.draw_time_series_plot(modelData['data'],times,options['plotFilename']+'both',
+        #                                           settings['workDir'],data2=rcmedData['data'],mytitle=mytitle,
         #                                           ytitle='Y',xtitle='time',
-        #                                           year_labels=year_labels)
+        #                                           year_labels=yearLabels)
         
-        rcmes.plots.draw_time_series_plot(metric_data, times, options['plot_filename']+'both',
-                                                   settings['work_dir'], data2, mytitle=mytitle, 
+        plots.draw_time_series_plot(metricData, times, options['plotFilename']+'both',
+                                                   settings['workDir'], data2, mytitle=mytitle, 
                                                    ytitle='Y', xtitle='time',
-                                                   year_labels=year_labels)
+                                                   year_labels=yearLabels)
 
     else: 
     ###############################################################################################
     # Produce the metric time series plot (one line only)
     ###############################################################################################
-        mytitle = options['plot_title']
-        if options['plot_title'] == 'default':
-            mytitle = metric_title+' model v obs'
+        mytitle = options['plotTitle']
+        if options['plotTitle'] == 'default':
+            mytitle = metricTitle+' model v obs'
         print 'one line timeseries'
-        rcmes.plots.draw_time_series_plot(metric_data, times, options['plot_filename'], 
-                                                   settings['work_dir'], mytitle=mytitle, ytitle='Y', xtitle='time',
-                                                   year_labels=year_labels)
+        plots.draw_time_series_plot(metricData, times, options['plotFilename'], 
+                                                   settings['workDir'], mytitle=mytitle, ytitle='Y', xtitle='time',
+                                                   year_labels=yearLabels)
 
     ###############################################################################################
     # 2 dimensional data, e.g. Maps
     ###############################################################################################
-    if metric_data.ndim == 2:
+    if metricData.ndim == 2:
 
         ###########################################################################################
         # Calculate color bar ranges for data such that same range is used in obs and model plots
         # for like-with-like comparison.
         ###########################################################################################
-        mymax = max(rcmed_data['data'].mean(axis=0).max(), model_data['data'].mean(axis=0).max())
-        mymin = min(rcmed_data['data'].mean(axis=0).min(), model_data['data'].mean(axis=0).min())
+        mymax = max(rcmedData['data'].mean(axis=0).max(), modelData['data'].mean(axis=0).max())
+        mymin = min(rcmedData['data'].mean(axis=0).min(), modelData['data'].mean(axis=0).min())
 
         ###########################################################################################
         # Time title labels need their format adjusting depending on the temporal regridding used,
@@ -536,14 +536,14 @@ def do_rcmes(settings, params, model, mask, options):
         #  then want to write 'Jan','Feb','Mar' instead of 'Jan 2002','Feb 2002','Mar 2002' etc 
         #  as data are representative of all Jans, all Febs etc. 
         ###########################################################################################
-        if(options['time_regrid'] == 'daily'):
-            time_format = "%b %d, %Y"
-        if(options['time_regrid'] == 'monthly'):
-            time_format = "%b %Y"
-        if(options['time_regrid'] == 'annual'):
-            time_format = "%Y"
-        if(options['time_regrid'] == 'full'):
-            time_format = "%b %d, %Y"
+        if(options['timeRegrid'] == 'daily'):
+            timeFormat = "%b %d, %Y"
+        if(options['timeRegrid'] == 'monthly'):
+            timeFormat = "%b %Y"
+        if(options['timeRegrid'] == 'annual'):
+            timeFormat = "%Y"
+        if(options['timeRegrid'] == 'full'):
+            timeFormat = "%b %d, %Y"
 
         ###########################################################################################
         # Special case: when plotting bias data, we also like to plot the mean obs and mean model data.
@@ -559,141 +559,141 @@ def do_rcmes(settings, params, model, mask, options):
         ###########################################################################################
         # Calculate time means of model and obs data
         ###########################################################################################
-        model_data_mean = model_data['data'].mean(axis=0)
-        obs_data_mean = rcmed_data['data'].mean(axis=0)
+        modelDataMean = modelData['data'].mean(axis=0)
+        obsDataMean = rcmedData['data'].mean(axis=0)
 
         ###########################################################################################
         # Calculate missing data masks using tolerance threshold of missing data going into calculations
         ###########################################################################################
-        obs_data_mask = rcmes.process.create_mask_using_threshold(rcmed_data['data'], threshold=0.75)
-        model_data_mask = rcmes.process.create_mask_using_threshold(model_data['data'], threshold=0.75)
+        obsDataMask = process.create_mask_using_threshold(rcmedData['data'], threshold=0.75)
+        modelDataMask = process.create_mask_using_threshold(modelData['data'], threshold=0.75)
 
         ###########################################################################################
         # Combine data and masks into masked arrays suitable for plotting.
         ###########################################################################################
-        model_data_mean = ma.masked_array(model_data_mean, model_data_mask)
-        obs_data_mean = ma.masked_array(obs_data_mean, obs_data_mask)
+        modelDataMean = ma.masked_array(modelDataMean, modelDataMask)
+        obsDataMean = ma.masked_array(obsDataMean, obsDataMask)
 
         ###########################################################################################
         # Plot model data
         ###########################################################################################
-        mytitle = 'Model data: mean between %s and %s' % ( model_data['times'][0].strftime(time_format), 
-                                                           model_data['times'][-1].strftime(time_format) )
-        rcmes.plots.draw_map_color_filled(model_data_mean, lats, lons, options['plot_filename']+'model',
-                                                   settings['work_dir'], mytitle=mytitle, rangeMax=mymax,
+        mytitle = 'Model data: mean between %s and %s' % ( modelData['times'][0].strftime(timeFormat), 
+                                                           modelData['times'][-1].strftime(timeFormat) )
+        plots.draw_map_color_filled(modelDataMean, lats, lons, options['plotFilename']+'model',
+                                                   settings['workDir'], mytitle=mytitle, rangeMax=mymax,
                                                    rangeMin=mymin, colorTable=colorbar, niceValues=True)
 
         ###########################################################################################
         # Plot obs data
         ###########################################################################################
-        mytitle = 'Obs data: mean between %s and %s' % ( rcmed_data['times'][0].strftime(time_format), 
-                                                        rcmed_data['times'][-1].strftime(time_format) )
-        rcmes.plots.draw_map_color_filled(obs_data_mean, lats, lons, options['plot_filename']+'obs',
-                                                   settings['work_dir'], mytitle=mytitle, rangeMax=mymax, 
+        mytitle = 'Obs data: mean between %s and %s' % ( rcmedData['times'][0].strftime(timeFormat), 
+                                                        rcmedData['times'][-1].strftime(timeFormat) )
+        plots.draw_map_color_filled(obsDataMean, lats, lons, options['plotFilename']+'obs',
+                                                   settings['workDir'], mytitle=mytitle, rangeMax=mymax, 
                                                    rangeMin=mymin, colorTable=colorbar, niceValues=True)
 
         ###########################################################################################
         # Plot metric
         ###########################################################################################
-        mymax = metric_data.max()
-        mymin = metric_data.min()
+        mymax = metricData.max()
+        mymin = metricData.min()
 
-        mytitle = options['plot_title']
+        mytitle = options['plotTitle']
 
-        if options['plot_title'] == 'default':
-            mytitle = metric_title+' model v obs %s to %s' % ( rcmed_data['times'][0].strftime(time_format),
-                                                                rcmed_data['times'][-1].strftime(time_format) )
+        if options['plotTitle'] == 'default':
+            mytitle = metricTitle+' model v obs %s to %s' % ( rcmedData['times'][0].strftime(timeFormat),
+                                                                rcmedData['times'][-1].strftime(timeFormat) )
 
-        rcmes.plots.draw_map_color_filled(metric_data, lats, lons, options['plot_filename'],
-                                                   settings['work_dir'], mytitle=mytitle, 
+        plots.draw_map_color_filled(metricData, lats, lons, options['plotFilename'],
+                                                   settings['workDir'], mytitle=mytitle, 
                                                    rangeMax=mymax, rangeMin=mymin, diff=True, 
                                                    niceValues=True, nsteps=24)
 
     ###############################################################################################
     # 3 dimensional data, e.g. sequence of maps
     ###############################################################################################
-    if metric_data.ndim == 3:
+    if metricData.ndim == 3:
         print 'Generating series of map plots, each for a different time.'
-        for t in numpy.arange(rcmed_data['data'].shape[0]):
+        for t in numpy.arange(rcmedData['data'].shape[0]):
 
             #######################################################################################
             # Calculate color bar ranges for data such that same range is used in obs and model plots
             # for like-with-like comparison.
             #######################################################################################
-            color_range_max = max(rcmed_data['data'][t, :, :].max(), model_data['data'][t, :, :].max())
-            color_range_min = min(rcmed_data['data'][t, :, :].min(), model_data['data'][t, :, :].min())
+            colorRangeMax = max(rcmedData['data'][t, :, :].max(), modelData['data'][t, :, :].max())
+            colorRangeMin = min(rcmedData['data'][t, :, :].min(), modelData['data'][t, :, :].min())
 
-            # Setup the time_title
-            time_slice = times[t]
-            time_title = create_time_title( options, time_slice, rcmed_data, model_data )
+            # Setup the timeTitle
+            timeSlice = times[t]
+            timeTitle = createTimeTitle( options, timeSlice, rcmedData, modelData )
 
             #######################################################################################
             # Plot model data
             #######################################################################################
-            mytitle = 'Model data: mean '+time_title
-            rcmes.plots.draw_map_color_filled(model_data['data'][t, :, :], lats, lons, 
-                                                       options['plot_filename']+'model'+str(t),
-                                                       settings['work_dir'], mytitle=mytitle, 
-                                                       rangeMax=color_range_max, rangeMin=color_range_min,
+            mytitle = 'Model data: mean '+timeTitle
+            plots.draw_map_color_filled(modelData['data'][t, :, :], lats, lons, 
+                                                       options['plotFilename']+'model'+str(t),
+                                                       settings['workDir'], mytitle=mytitle, 
+                                                       rangeMax=colorRangeMax, rangeMin=colorRangeMin,
                                                        colorTable=colorbar, niceValues=True)
 
             #######################################################################################
             # Plot obs data
             #######################################################################################
-            mytitle = 'Obs data: mean '+time_title
-            rcmes.plots.draw_map_color_filled(rcmed_data['data'][t, :, :], lats, lons, 
-                                                       options['plot_filename']+'obs'+str(t),
-                                                       settings['work_dir'], mytitle=mytitle, 
-                                                       rangeMax=color_range_max, rangeMin=color_range_min,
+            mytitle = 'Obs data: mean '+timeTitle
+            plots.draw_map_color_filled(rcmedData['data'][t, :, :], lats, lons, 
+                                                       options['plotFilename']+'obs'+str(t),
+                                                       settings['workDir'], mytitle=mytitle, 
+                                                       rangeMax=colorRangeMax, rangeMin=colorRangeMin,
                                                        colorTable=colorbar, niceValues=True)
 
             #######################################################################################
             # Plot metric
             #######################################################################################
-            mytitle = options['plot_title']
+            mytitle = options['plotTitle']
 
-            if options['plot_title'] == 'default':
-                mytitle = metric_title +' model v obs : '+time_title
+            if options['plotTitle'] == 'default':
+                mytitle = metricTitle +' model v obs : '+timeTitle
 
-            color_range_max = metric_data.max()
-            color_range_min = metric_data.min()
+            colorRangeMax = metricData.max()
+            colorRangeMin = metricData.min()
 
-            rcmes.plots.draw_map_color_filled(metric_data[t, :, :], lats, lons, 
-                                                       options['plot_filename']+str(t), settings['work_dir'], 
-                                                       mytitle=mytitle, rangeMax=color_range_max, rangeMin=color_range_min, diff=True,
+            plots.draw_map_color_filled(metricData[t, :, :], lats, lons, 
+                                                       options['plotFilename']+str(t), settings['workDir'], 
+                                                       mytitle=mytitle, rangeMax=colorRangeMax, rangeMin=colorRangeMin, diff=True,
                                                        niceValues=True, nsteps=24)
 
 
-def get_data_from_rcmed( params, settings ):
+def getDataFromRCMED( params, settings ):
     """
-    This function takes in the params and settings dictionaries and will return an rcmed_data dictionary.
+    This function takes in the params and settings dictionaries and will return an rcmedData dictionary.
     
     return:
-        rcmed_data = {"lats": 1-d numpy array of latitudes,
+        rcmedData = {"lats": 1-d numpy array of latitudes,
                       "lons": 1-d numpy array of longitudes,
                       "levels": 1-d numpy array of height/pressure levels (surface based data will have length == 1),
                       "times": list of python datetime objects,
                       "data": masked numpy arrays of data values}
     """
-    rcmed_data = {}
-    obs_lats, obs_lons, obs_levs, obs_times, obs_data =  rcmes.db.extract_data_from_db(params['obs_dataset_id'],
-                                                                                       params['obs_param_id'],
-                                                                                       params['lat_min'],
-                                                                                       params['lat_max'],
-                                                                                       params['lon_min'],
-                                                                                       params['lon_max'],
-                                                                                       params['start_time'],
-                                                                                       params['end_time'],
-                                                                                       settings['cache_dir'])
-    rcmed_data['lats'] = obs_lats
-    rcmed_data['lons'] = obs_lons
-    rcmed_data['levels'] = obs_levs
-    rcmed_data['times'] = obs_times
-    rcmed_data['data'] = obs_data
+    rcmedData = {}
+    obsLats, obsLons, obsLevs, obsTimes, obsData =  db.extract_data_from_db(params['obsDatasetId'],
+                                                                                 params['obsParamId'],
+                                                                                 params['latMin'],
+                                                                                 params['latMax'],
+                                                                                 params['lonMin'],
+                                                                                 params['lonMax'],
+                                                                                 params['startTime'],
+                                                                                 params['endTime'],
+                                                                                 settings['cacheDir'])
+    rcmedData['lats'] = obsLats
+    rcmedData['lons'] = obsLons
+    rcmedData['levels'] = obsLevs
+    rcmedData['times'] = obsTimes
+    rcmedData['data'] = obsData
     
-    return rcmed_data
+    return rcmedData
 
-def get_data_from_model( model, settings ):
+def getDataFromModel( model, settings ):
     """
     This function takes in the model and settings dictionaries and will return a model data dictionary.
     
@@ -703,22 +703,22 @@ def get_data_from_model( model, settings ):
                  "times": list of python datetime objects,
                  "data": numpy array containing data from all files}
     """
-    model = rcmes.files.read_data_from_file_list(settings['file_list'],
-                                                 model['var_name'],
-                                                 model['time_variable'],
-                                                 model['lat_variable'],
-                                                 model['lon_variable'])
+    model = files.read_data_from_file_list(settings['fileList'],
+                                                 model['varName'],
+                                                 model['timeVariable'],
+                                                 model['latVariable'],
+                                                 model['lonVariable'])
     return model
 
 ##################################################################################################################
 # Processing complete
 ##################################################################################################################
 
-def create_time_title( options, time_slice, rcmed_data, model_data ):
+def createTimeTitle( options, timeSlice, rcmedData, modelData ):
     """
-    Function that takes in the options dictionary and a specific time_slice.
+    Function that takes in the options dictionary and a specific timeSlice.
     
-    Return:  string time_title properly formatted based on the 'time_regrid' and 'seasonal_cycle' options value.
+    Return:  string timeTitle properly formatted based on the 'timeRegrid' and 'seasonalCycle' options value.
     
     Time title labels need their format adjusting depending on the temporal regridding used
     
@@ -729,25 +729,25 @@ def create_time_title( options, time_slice, rcmed_data, model_data ):
     'Mar' instead of 'Jan 2002', 'Feb 2002','Mar 2002' etc as data are 
     representative of all Jans, all Febs etc. 
     """
-    if(options['time_regrid'] == 'daily'):
-        time_title = time_slice.strftime("%b %d, %Y")
-        if options['seasonal_cycle'] == True:
-            time_title = time_slice.strftime("%b %d (all years)")
+    if(options['timeRegrid'] == 'daily'):
+        timeTitle = timeSlice.strftime("%b %d, %Y")
+        if options['seasonalCycle'] == True:
+            timeTitle = timeSlice.strftime("%b %d (all years)")
 
-    if(options['time_regrid'] == 'monthly'):
-        time_title = time_slice.strftime("%b %Y")
-        if options['seasonal_cycle'] == True:
-            time_title = time_slice.strftime("%b (all years)")
+    if(options['timeRegrid'] == 'monthly'):
+        timeTitle = timeSlice.strftime("%b %Y")
+        if options['seasonalCycle'] == True:
+            timeTitle = timeSlice.strftime("%b (all years)")
 
-    if(options['time_regrid'] == 'annual'):
-        time_title = time_slice.strftime("%Y")
+    if(options['timeRegrid'] == 'annual'):
+        timeTitle = timeSlice.strftime("%Y")
     
-    if(options['time_regrid'] == 'full'):
-        min_time = min(min(rcmed_data['times']), min(model_data['times']))
-        max_time = max(max(rcmed_data['times']), max(model_data['times']))
-        time_title = min_time.strftime("%b %d, %Y")+' to '+max_time.strftime("%b %d, %Y")
+    if(options['timeRegrid'] == 'full'):
+        minTime = min(min(rcmedData['times']), min(modelData['times']))
+        maxTime = max(max(rcmedData['times']), max(modelData['times']))
+        timeTitle = minTime.strftime("%b %d, %Y")+' to '+maxTime.strftime("%b %d, %Y")
     
-    return time_title
+    return timeTitle
 
 
 print 'RCMES processing completed.'
