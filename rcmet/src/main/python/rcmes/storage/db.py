@@ -33,18 +33,18 @@ def findUnique(seq, idfun=None):
 def extract_data_from_db(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir):
    """
    Main function to extract data from DB into numpy masked arrays
-   Input:
-       datasetID, paramID  : 		required identifiers of data in database
-       latMin, latMax, lonMin, lonMax:  	location range to extract data for
-       startTime, endTime:  		python datetime objects describing required time range to extract
-       cachedir:                            directory path used to store temporary cache files
+   
+   Input::
+       datasetID, paramID: required identifiers of data in database
+       latMin, latMax, lonMin, lonMax: location range to extract data for
+       startTime, endTime: python datetime objects describing required time range to extract
+       cachedir: directory path used to store temporary cache files
    Output:
-    lats_unique,lons_unique:		1d-numpy array of latitude and longitude grid values
-       levs_unique:				1d-numpy array of vertical level values
-       times_unique:			list of python datetime objects describing times of returned data
-       mdata:				masked numpy arrays of data values
+       lats_unique,lons_unique: 1d-numpy array of latitude and longitude grid values
+       levs_unique:	1d-numpy array of vertical level values
+       times_unique: list of python datetime objects describing times of returned data
+       mdata: masked numpy arrays of data values
 
-       Peter Lean August 2010
    """
 
 

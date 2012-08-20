@@ -1,8 +1,9 @@
-"""Module for handling data input files.  Requires PyNIO and Numpy be 
+"""
+Module for handling data input files.  Requires PyNIO and Numpy be 
 installed.
 
 This module can easily open NetCDF, HDF and Grib files.  Search the PyNIO
-documentation for a complete list
+documentation for a complete list of supported formats.
 """
 
 try:
@@ -17,7 +18,7 @@ import os
 
 # Appending rcmes via relative path
 sys.path.append(os.path.abspath('../.'))
-import toolkit.process
+import rcmes.toolkit.process
 
 def findunique(seq):
     keys = {}
@@ -28,22 +29,20 @@ def findunique(seq):
 def find_time_var_name_from_file(filelist):
    """ 
     Function to find what the time variable is called in a model file.
-    Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
-                 One model may call the time "time", another one may call it "t"
-                 This script looks for the existence of any of a predefined list of synonyms for time. 
+    
+    Background:  model output files tend not to follow any defined standard in
+    terms of variable naming conventions.  One model may call the time "time",
+    another one may call it "t" and this script looks for the existence of 
+    any of a predefined list of synonyms for time. 
+       
+    Input:: 
+        filelist -list of filenames
    
-   
-          Input: 
-                  filelist -list of filenames
-   
-          Output: 
-                  -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-                  -name of time variable
-                  -list of variable names in file
-     
-   
-          Peter Lean   February 2011
-   """
+    Output:: 
+        success - flag (1 or 0): were both latitude and longitude variable names found in the file?
+        timename - name of time variable
+        var_name_list - list of variable names in file
+    """
    filename = filelist[0]
 
    success = 0
@@ -121,38 +120,36 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
 
 def find_latlon_var_from_file(filelist):
    """ 
-    Function to find what the latitude and longitude variables are called in a model file.
-    Background:  model output files tend not to follow any defined standard in terms of variable naming conventions.
-                 One model may call the latitude "lat", another one may call it "Latitudes"
-                 This script looks for the existence of any of a predefined list of synonyms for lat and long.
+   Function to find what the latitude and longitude variables are called in a model file.
+    
+   Background:
+    
+       Model output files tend not to follow any defined standard in terms of 
+       variable naming conventions. One model may call the latitude "lat", 
+       another one may call it "Latitudes" and this script looks for the 
+       existence of any of a predefined list of synonyms for lat and long.
    
+   Input:: 
+       filename 
    
-          Input: 
-                  -filename 
-   
-          Output: 
-                  -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-                  -name of latitude variable
-                  -name of longitude variable
-                  -latMin -descriptions of lat/lon ranges in data files
-                  -latMax
-                  -lonMin
-                  -lonMax
-                  -list of variable names in file 
-                       NB. if unsuccessful then all variables will be empty except the final list of variable names.
-   
-          Peter Lean   February 2011
+   Output::
+       success - success flag (1 or 0): were both latitude and longitude variable names found in the file?
+       latname - name of latitude variable
+       lonname - name of longitude variable
+       latMin -descriptions of lat/lon ranges in data files
+       latMax
+       lonMin
+       lonMax
+       var_name_list - list of variable names in file 
+               
+   **NB.** if unsuccessful then all variables will be empty except the final list of variable names.
    """
    filename = filelist[0]
-
    success = 0
-
    f = Nio.open_file(filename)
    var_name_list = f.variables.keys()
-
    # convert all variable names into lower case
    var_name_list_lower = [x.lower() for x in var_name_list]
-
    # create a "set" from this list of names
    varset = set(var_name_list_lower)
 
