@@ -76,13 +76,17 @@ $task->showPreviousNextLinks();
 				.text('Comparison Plot'))
 	}
 </script>
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Task Summary</h2>
+<div class="box">
+<div class="box-content">
 <div id="preview">
-<h2>Job Summary</h2>
-The toolkit is almost ready to generate plots based upon your input. Please take one last look at 
-the settings below: 
-<fieldset id="modelFileSelector">
-<legend>Preview your Job Settings:</legend>
-<table class="preview">
+<fieldset>
+<legend>
+Please review the settings below before submitting your job: </legend>
+<table class="table">
 <tr><th>Model File:</th>             <td><?php echo $task->modelFilePaths[0]?></td></tr>
 <tr><th>Latitude Range (var): </th>  <td><strong>FROM:</strong> <?php echo $task->modelBounds['lat']['min'] . ', <strong>TO:</strong> ' . $task->modelBounds['lat']['max'].", <strong>USING:</strong> \"".$task->modelVars['lat']."\""?></td></tr>
 <tr><th>Longitude Range (var):</th>  <td><strong>FROM:</strong> <?php echo $task->modelBounds['lon']['min'] . ', <strong>TO:</strong> ' . $task->modelBounds['lon']['max'].", <strong>USING:</strong> \"".$task->modelVars['lon']."\""?></td></tr>
@@ -99,7 +103,8 @@ the settings below:
 <hr class="space"/>
 <div style="text-align:right;">
 <p>If the information above is correct, please click: 
-<input type="button" id="btnBegin" value="Generate Plots"/>
+<input type="button" id="btnBegin" value="Generate Plots" class="btn btn-primary"/>
+<a href="../init" class="btn">Start Over</a>
 </p>
 </div>
 
@@ -112,4 +117,9 @@ the settings below:
 	<hr/>
 </div>
 </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>

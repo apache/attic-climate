@@ -21,9 +21,14 @@ if (isset($_POST['save'])) {
 
 $task->showPreviousNextLinks('selectTimeVars');
 ?>
-
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Temporal Boundaries</h2>
+<div class="box">
+<div class="box-content">
 <fieldset class="">
-	<legend>Confirm Time Variable Selection</legend>
+	<legend>Confirm Temporal Variable Selection</legend>
 	<form method="POST">
 		The following information has been auto-detected for time:<hr/>
 		<h5>Time</h5>
@@ -32,11 +37,16 @@ $task->showPreviousNextLinks('selectTimeVars');
 			<tr><th>Min:</th><td id="timeMinValue"><input type="text" name="timeMin"  value="<?php echo $data->start_time?>"/></td><td class="note">The earliest Time value detected in the model file</td></tr>
 			<tr><th>Max:</th><td id="timeMaxValue"><input type="text" name="timeMax"  value="<?php echo $data->end_time?>"/></td><td class="note">The most recent Time value detected in the model file</td></tr>
 		</table>
-		<hr class="space"/>
-		<div style="text-align:right;">
+		<div>
+		<br/>
 		<p>If the information above is correct, please click: 
-		<input type="submit" name="save" value="Continue"/>
+		<input type="submit" name="save" value="Continue" class="btn btn-primary"/>
 		</p>
 		</div>
 	</form>
 </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>

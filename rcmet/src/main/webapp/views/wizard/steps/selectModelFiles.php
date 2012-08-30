@@ -53,13 +53,23 @@ function updateAutocomplete() {
 	});
 }
 </script>
-<fieldset id="modelFileSelector" class="span-22 prepend-1 last"	>
-<form method="post">
-	<legend>To begin, select a model file to work with</legend>
-	<input type="text" id="txtModelFilePath" name="txtModelFilePath" value=""/>
-	<input id="btnLoadModelFile" type="submit" name="save" value="Load"/>
-	<br/>
-	<ul id="pathAutocomplete"></ul>
-</form>
-</fieldset>
-<hr/>
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Select a Model File</h2>
+<div class="box">
+<div class="box-content">
+    <fieldset id="modelFileSelector">
+    <form method="post">
+	    <legend>Please select the file that contains your model data:</legend>
+	    <input type="file" id="txtModelFilePath" name="txtModelFilePath" value=""/>
+	    <input id="btnLoadModelFile" type="submit" name="save" value="Load" class="btn btn-primary"/>
+	    <br/>
+	    <p class="hint">Acceptable formats are <strong>NetCDF</strong> (*.nc)</p>
+    </form>
+    </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>

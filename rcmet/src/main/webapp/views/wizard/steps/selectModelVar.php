@@ -21,11 +21,16 @@ if (isset($_POST['save'])) {
 
 $task->showPreviousNextLinks('selectModelVar');
 ?>
-
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Model Parameter</h2>
+<div class="box">
+<div class="box-content">
 <fieldset class="">
 	<legend>Select a Model Parameter to Evaluate</legend>
 	<form method="POST">
-		The following parameter information has been auto-detected from the model input:<hr/>
+		The following parameter information has been auto-detected from the model input file:<hr/>
 		<h5>Available Parameters</h5>
 		<select name="modelParameter">
 			<?php foreach ($data->variables as $var):?>
@@ -33,11 +38,16 @@ $task->showPreviousNextLinks('selectModelVar');
 			<?php endforeach ?>
 		</select>
 		<span class="note">The variable in the model file that will be used in calculations</span>
-		<hr class="space"/>
-		<div style="text-align:right;">
+        <br/><br/>
+		<div>
 		<p>If the information above is correct, please click: 
-		<input type="submit" name="save" value="Continue"/>
+		<input type="submit" name="save" value="Continue" class="btn btn-primary"/>
 		</p>
 		</div>
 	</form>
 </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>

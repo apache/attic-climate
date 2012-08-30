@@ -11,13 +11,19 @@ if (isset($_POST['save'])) {
 }
 $task->showPreviousNextLinks();
 ?>
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Regridding Properties</h2>
+<div class="box">
+<div class="box-content">
 <fieldset id="variableAssignmentSelector" class="">
-	<legend>Specify Spatial and Temporal Regridding</legend>
+	<legend>Specify parameters for spatial and temporal regridding:</legend>
 <form method="POST">
 	Provide details about the methods to use for regridding the observational and 
 	model data in both space and time:<hr/>
 	
-	<h3>Spatial Regridding Options</h3>
+	<h4>Spatial Regridding Options</h3>
 	<select name="spatialRegridOption">
 		<option value="-1">Please select an option...</option>
 		<option value="obs">Use Observational Data Grid</option>
@@ -26,7 +32,7 @@ $task->showPreviousNextLinks();
 	</select>
 	<span class="note">Specify the spatial grid to use as a reference when calculating </span>
 	
-	<h3>Temporal Regridding Options</h3>
+	<h4>Temporal Regridding Options</h3>
 	<select name="temporalRegridOption">
 		<option value="-1">Please select an option...</option>
 		<option value="full">Calculate time mean for full period</option>
@@ -37,11 +43,16 @@ $task->showPreviousNextLinks();
 	<span class="note">Specify the temporal gridding options to use when calculating </span>
 	
 
-	<hr class="space"/>
-	<div style="text-align:right;">
+	<br/><br/>
+	<div>
 	<p>If the information above is correct, please click: 
-	<input type="submit" name="save" value="Continue"/>
+	<input type="submit" name="save" value="Continue" class="btn btn-primary"/>
 	</p>
 	</div>	
 </form>
 </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>

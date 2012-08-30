@@ -51,11 +51,17 @@ $(document).ready(function() {
 
 });
 </script>
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Observational Data</h2>
+<div class="box">
+<div class="box-content">
 <fieldset id="modelFileSelector">
-	<legend>Select an Observational Dataset from RCMED</legend>
-	<p>The following information is pulled automatically from the Regional Climate Model Evaluation Database:
+	<legend>Select an observational dataset and parameter for comparison:</legend>
+	<p>The following information is retrieved automatically from the Regional Climate Model Evaluation Database:
 	<form method="post">
-		<h3>Available Datasets</h3>
+		<h4>Available Datasets</h4>
 		<input type="hidden" id="obsDatasetId" name="observationalDatasetId" value=""/>
 		<input type="hidden" id="obsParamId"   name="observationalParameterId" value=""/>
 		<select id="observationalDataset" name="observationalDataset">
@@ -65,11 +71,16 @@ $(document).ready(function() {
 			<?php endforeach ?>
 		</select>
 		<span id="parameterList"></span>
-		<hr class="space"/>
-		<div style="text-align:right;">
+		<br/><br/>
+		<div style="">
 		<p>If the information above is correct, please click: 
-		<input type="submit" name="save" value="Continue"/>
+		<input type="submit" name="save" value="Continue" class="btn btn-primary"/>
 		</p>
 		</div>
 	</form>
 </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>

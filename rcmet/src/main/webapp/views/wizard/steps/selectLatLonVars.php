@@ -20,16 +20,19 @@ if (isset($_POST['save'])) {
 	$srvcPath = 'http://localhost:8082/list/latlon/"' . $path . '"';
 	$data = json_decode(file_get_contents($srvcPath));
 }
-
-$task->showPreviousNextLinks();
 ?>
-
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Spatial Boundaries</h2>
+<div class="box">
+<div class="box-content">
 <fieldset id="variableAssignmentSelector" class="">
 	<legend>Confirm Latitude and Longitude Selection</legend>
 <form method="POST">
 	The following information has been auto-detected for latitude and longitude by examining 
 	the file specified in the previous step:<hr/>
-	<div class="span-7">
+	<div>
 	<h5>Latitude</h5>
 	<table>
 		<tr><th>Var:</th><td id="latVariable"><input type="text" name="latname" value="<?php echo $data->latname?>"/></td><td class="note">The variable in the model file that will be used to represent Latitude</td> </tr>
@@ -37,7 +40,7 @@ $task->showPreviousNextLinks();
 		<tr><th>Max:</th><td id="latMaxValue"><input type="text" name="latmax"  value="<?php echo $data->latMax?>"/></td><td class="note">The maximum Latitude value detected in the model file</td></tr>
 	</table>
 	</div>
-	<div class="span-4">
+	<div>
 	<h5>Longitude</h5>
 	<table>
 		<tr><th>Var:</th><td id="lonVariable"><input type="text" name="lonname" value="<?php echo $data->lonname?>"/></td><td class="note">The variable in the model file that will be used to represent Longitude</td></tr>
@@ -45,11 +48,16 @@ $task->showPreviousNextLinks();
 		<tr><th>Max:</th><td id="lonMaxValue"><input type="text" name="lonmax"  value="<?php echo $data->lonMax?>"/></td><td class="note">The maximum Longitude value detected in the model file</td></tr>
 	</table>
 	</div>
-	<hr class="space"/>
-	<div style="text-align:right;">
+	<br/>
+	<div>
 	<p>If the information above is correct, please click: 
-	<input type="submit" name="save" value="Continue"/>
+	<input type="submit" name="save" value="Continue" class="btn btn-primary"/>
 	</p>
 	</div>
 </form>
 </fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>
