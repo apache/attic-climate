@@ -10,12 +10,23 @@ if (isset($_POST['init'])) {
 }
 
 ?>
-<h1>Begin a New Evaluation Task</h1>
-<p>The toolkit will ask you a series of questions to determine what type of plot to generate:
-<div class="notice">
+<div class="section">
+<div class="row">
+<div class="span12">
+<h2 class="title">Begin a New Evaluation Task</h2>
+<div class="box">
+<div class="box-content">
+<fieldset>
+<legend>You will be asked a series of questions to determine what type of plot to generate:</legend>
+<div class="alert alert-info">
 <strong>Note:</strong> By continuing, any previous task information will be discarded.
 </div>
-<hr class="space"/>
 <form method="post">
-	<input type="submit" name="init" value="OK, Begin"/>
+	<input type="submit" name="init" value="Start" class="btn btn-primary"/>
 </form>
+</fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>
