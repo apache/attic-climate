@@ -23,22 +23,13 @@
 
 </head>
 <body>
-<div id="container" class="rounded-br">
 <header>
-<p>&nbsp;</p>
-<div id="badge-bg" class="rounded-br">
-	<div id="badge-bg-inner" class="rounded-br">
-		<a href="<?php echo SITE_ROOT?>/">
-		<img src="<?php echo SITE_ROOT?>/static/img/wrm-badge.png"/>
-		</a>
-		<br/><br/>
-		<h1>Regional Climate Model Evaluation System</h1>
-	</div>
-</div>
-
+    <p>&nbsp;</p>
 </header>
-<div id="content" role="main">
-<h1 class="bigger">Regional Climate Model Evaluation Toolkit (RCMET)
-	<span style="font-size:0.62em;color:#686;">beta</span></h1>
-<hr/>
-<?php echo App::Get()->GetMessages(); ?>
+<div class="container">
+    <div id="content" role="main">
+        <h1>Regional Climate Model Evaluation Toolkit (RCMET)
+	        <span style="font-size:0.50em;color:#686;">beta</span>
+	    </h1>
+	    <div class="page">
+            <?php echo App::Get()->GetMessages(); ?>
