@@ -9,7 +9,7 @@
 <link rel="stylesheet" type="text/css" href="<?php echo SITE_ROOT?>/static/css/style.css"/>
 
 <!-- Base Javascript -->
-<script type="text/javascript" type="text/javascript" src="<?php echo SITE_ROOT?>/static/js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" type="text/javascript" src="<?php echo SITE_ROOT?>/static/js/jquery-1.8.0.min.js"></script>
 
 <!-- Dynamically Added Stylesheets -->
 <!-- STYLESHEETS -->
