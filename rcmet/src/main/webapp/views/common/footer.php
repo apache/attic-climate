@@ -10,5 +10,6 @@ Regional Climate Model Evaluation Toolkit
 <!-- html closing statements -->
 </footer>
 </div> <!-- end #container -->
+<script type="text/javascript" src="<?php echo SITE_ROOT?>/static/bootstrap/js/bootstrap-min.js"/>
 </body>
 </html>

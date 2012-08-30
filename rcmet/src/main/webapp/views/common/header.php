@@ -6,6 +6,7 @@
 <title>RCMES Client Toolkit</title>
 
 <!-- Base stylesheets -->
+<link rel="stylesheet" type="text/css" href="<?php echo SITE_ROOT?>/static/bootstrap/css/bootstrap.min.css"/>
 <link rel="stylesheet" type="text/css" href="<?php echo SITE_ROOT?>/static/css/style.css"/>
 
 <!-- Base Javascript -->
