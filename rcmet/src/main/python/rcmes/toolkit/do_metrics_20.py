@@ -49,12 +49,12 @@ def metrics_plots(numOBS,numMDL,nT,ngrdY,ngrdX,Times,obsData,mdlData,obsRgn,mdlR
  import numpy as np
  import numpy.ma as ma
  import Nio
- import rcmes.plots
- import rcmes.fortranfile
- import rcmes.db_v12
- import rcmes.files_20
- import rcmes.process_v12
- import rcmes.metrics_v12
+ import plots
+ import utils.fortranfile
+ import storage.db_v12
+ import storage.files_20
+ import process_v12
+ import metrics_v12
 
   #####################################################################################################
   # Select the model for calculating seasonal cycles (opt) and metrics for plotting

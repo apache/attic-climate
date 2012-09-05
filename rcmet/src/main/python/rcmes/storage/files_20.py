@@ -1,3 +1,10 @@
+import Nio 
+import numpy as np
+import numpy.ma as ma
+import toolkit.process as process
+import toolkit.process_v12 as process_v12
+
+
 def findunique(seq):
     keys = {}
     for e in seq:
@@ -127,7 +134,11 @@ def read_lolaT_from_file(ifile,latVarName,lonVarName,timeVarName,file_type):
    ##################################################################################
    # Read in the long & lat of model grid
    ##################################################################################
-   import Nio; import numpy as np; import numpy.ma as ma; import rcmes.process; import rcmes.process_v12
+   import Nio 
+   import numpy as np
+   import numpy.ma as ma
+   import toolkit.process as process
+   import toolkit.process_v12 as process_v12
    tmp=Nio.open_file(ifile,format=file_type)
    lonsraw = tmp.variables[lonVarName][:]
    latsraw = tmp.variables[latVarName][:]
@@ -136,7 +147,7 @@ def read_lolaT_from_file(ifile,latVarName,lonVarName,timeVarName,file_type):
      lon,lat = np.meshgrid(lonsraw,latsraw)
    if(latsraw.ndim == 2):
      lon = lonsraw; lat = latsraw
-   timestore = rcmes.process_v12.decode_model_timesK(ifile,timeVarName,file_type)
+   timestore = process_v12.decode_model_timesK(ifile,timeVarName,file_type)
    print '  read_lolaT_from_file: Lats, lons and times read in for the model domain'
    return lat,lon,timestore
 
@@ -155,7 +166,6 @@ def read_data_from_one_file(ifile,myvar,timeVarName,lat,file_type):
    # 2. Because one of the model data exceeds 240 mos (243 mos), the model data must be
    #    truncated to the 240 mons using the ntimes determined from the first file.
    ##################################################################################
-   import Nio; import numpy as np; import numpy.ma as ma; import rcmes.process; import rcmes.process_v12
    tmp=Nio.open_file(ifile,format=file_type)
    timesraw = tmp.variables[timeVarName]
    ntimes=len(timesraw); nygrd=len(lat[:,0]); nxgrd=len(lat[0,:])
@@ -173,7 +183,7 @@ def read_data_from_one_file(ifile,myvar,timeVarName,lat,file_type):
    t2store=t2tmp
    f.close()
    print '  read_data_from_one_file: Data read in successfully with dimensions: ',t2store.shape
-   timestore = rcmes.process_v12.decode_model_timesK(ifile,timeVarName,file_type)
+   timestore = process_v12.decode_model_timesK(ifile,timeVarName,file_type)
    return timestore, t2store
 
 def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,file_type):
@@ -191,8 +201,6 @@ def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,
    # 2. Because one of the model data exceeds 240 mos (243 mos), the model data must be
    #    truncated to the 240 mons using the ntimes determined from the first file.
    ##################################################################################
-   import Nio; import numpy as np; import numpy.ma as ma; import rcmes.process; import rcmes.process_v1
-
    filelist.sort()
    nfiles=len(filelist)
     # Crash nicely if 'filelist' is zero length
@@ -256,7 +264,7 @@ def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,
 
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
    ifile=filelist[0]
-   timestore = rcmes.process_v12.decode_model_timesK(ifile,timeVarName,file_type)
+   timestore = process_v12.decode_model_timesK(ifile,timeVarName,file_type)
 
    return lat, lon, timestore, t2store
 

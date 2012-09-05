@@ -308,7 +308,7 @@ def prep_data(cachedir, workdir, \
                 obsStore = []
                 
                 for t in np.arange(nT):
-                    obsStore.append(rcmes.process.calc_area_mean(obsData[k, t, :, :], lats, lons, mymask=mask))
+                    obsStore.append(process.calc_area_mean(obsData[k, t, :, :], lats, lons, mymask=mask))
                     
                 obsRgnAvg[k, n, :] = ma.array(obsStore[:])
                 
@@ -316,7 +316,7 @@ def prep_data(cachedir, workdir, \
                 mdlStore = []
                 
                 for t in np.arange(nT):
-                    mdlStore.append(rcmes.process.calc_area_mean(modelData[k, t, :, :], lats, lons, mymask=mask))
+                    mdlStore.append(process.calc_area_mean(modelData[k, t, :, :], lats, lons, mymask=mask))
                     
                 mdlRgnAvg[k, n, :] = ma.array(mdlStore)
 

@@ -2,22 +2,31 @@
 
 # 0. Keep both Peter's original and modified libraries
 
+# Python Standard Lib Imports
 import sys
 import os
-# Appending rcmes via relative path
-sys.path.append(os.path.abspath('../.'))
-
 import glob
 import datetime
+
+# 3rd Party Modules
 import numpy as np
 import numpy.ma as ma
+
+# RCMES Imports
+# Appending rcmes via relative path
+sys.path.append(os.path.abspath('../.'))
+import storage.files_v12
+import storage.rcmed as db
 import toolkit.do_data_prep_20
 import toolkit.do_metrics_20
-import storage.files_v12
 import toolkit.process_v12
 
-
-
+# Empty dictionaries to collect all of the user's inputs 
+OPTIONS = {}
+MASK = {}
+MODEL = {}
+PARAMS = {}
+SETTINGS = {}
 
 def rcmet_cordexAF():
     """
@@ -71,7 +80,7 @@ def rcmet_cordexAF():
         modelLatVarName = 'lat'
         modelLonVarName = 'lon'
         modelTimeVarName = 'time' # mdl var names for lat, long, & time coords
-        workdir = '../cases/cordex-af/wrk1'
+        workdir = '../cases/cordex-af/wrk2'
         cachedir = '../cases/cordex-af/cache'
         mdlDataDir = '/nas/share4-cf/jinwonki/data/cordex-af'
     if modelVarName == 'pr':
@@ -80,6 +89,13 @@ def rcmet_cordexAF():
         precipFlag = False
 
     # 2.   Metadata for the RCMED database
+    try:
+        parameters = db.getParams()
+    except Exception:
+        sys.exit()
+    
+    datasets = [parameter['longName'] for parameter in parameters]
+    
     #   NOTE: the list must be updated whenever a new dataset is added to RCMED (current as of 11/22/2011)
     db_datasets = ['TRMM', 'ERA-Interim', 'AIRS', 'MODIS', 'URD', 'CRU3.0', 'CRU3.1']
     db_dataset_ids = [3, 1, 2, 5, 4, 6, 10]
