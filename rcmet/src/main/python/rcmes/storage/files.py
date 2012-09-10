@@ -9,16 +9,20 @@ documentation for a complete list of supported formats.
 try:
     import Nio
 except ImportError:
-    import nio
+    import nio as Nio
 
 import numpy as np
 import numpy.ma as ma
 import sys
-import os
 
-# Appending rcmes via relative path
-sys.path.append(os.path.abspath('../.'))
-import rcmes.toolkit.process as process
+import toolkit.process as process
+
+
+VARIABLE_NAMES = {'time': ['time', 'times', 'date', 'dates', 'julian'],
+                  'latitude': ['latitude', 'lat', 'lats', 'latitudes'],
+                  'longitude': ['longitude', 'lon', 'lons', 'longitudes']
+                  }
+
 
 def findunique(seq):
     keys = {}
@@ -26,60 +30,39 @@ def findunique(seq):
         keys[e] = 1
     return keys.keys()
 
-def find_time_var_name_from_file(filelist):
-   """ 
-    Function to find what the time variable is called in a model file.
-    
-    Background:  model output files tend not to follow any defined standard in
-    terms of variable naming conventions.  One model may call the time "time",
-    another one may call it "t" and this script looks for the existence of 
-    any of a predefined list of synonyms for time. 
-       
-    Input:: 
-        filelist -list of filenames
-   
-    Output:: 
-        success - flag (1 or 0): were both latitude and longitude variable names found in the file?
-        timename - name of time variable
-        var_name_list - list of variable names in file
+def getVariableByType(filename, variableType):
     """
-   filename = filelist[0]
+    Function that will try to return the variable from a file based on a provided
+    parameter type.
+    
+    Input::
+        filename - the file to inspect
+        variableType - time | latitude | longitude
+    
+    Output::
+        variable name OR list of all variables in the file if a single variable
+        name match cannot be found.
+    """
+    try:
+        f = Nio.open_file(filename)
+    except:
+        #print 'PyNio had an issue opening the filename (%s) you provided' % filename
+        print "NIOError:", sys.exc_info()[0]
+        raise
+    
+    variableKeys = f.variables.keys()
+    f.close()
+    variableKeys = [variable.lower() for variable in variableKeys]
+    variableMatch = VARIABLE_NAMES[variableType]
 
-   success = 0
+    commonVariables = list(set(variableKeys).intersection(variableMatch)) 
 
-   f = Nio.open_file(filename)
-   var_name_list = f.variables.keys()
+    if len(commonVariables) == 1:
+        return str(commonVariables[0])
+    
+    else:
+        return variableKeys
 
-   # convert all variable names into lower case
-   var_name_list_lower = [x.lower() for x in var_name_list]
-
-   # create a "set" from this list of names
-   varset = set(var_name_list_lower)
-
-   # Use "set" types for finding common variable name from in the file and from the list of possibilities
-   time_possible_names = set(['time','times','date','dates','julian'])
-
-
-   # Search for common latitude name variants:
-   # Find the intersection of two sets, i.e. find what latitude is called in this file.
-   try:
-     time_var_name = list(varset & time_possible_names)[0]
-     success = 1
-     index = 0
-     for i in var_name_list_lower:
-      if i==time_var_name:
-           wh = index
-      index += 1
-     timename = var_name_list[wh]
-  
-   except:
-     timename = 'not_found'
-     success = 0
-
-   if success==0:
-      timename = ''
-
-   return success, timename, var_name_list
 
 def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
    """
@@ -106,7 +89,7 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
      latMax = lats.max()
 
      lons = f.variables[lon_var_name][:]
-     lons[lons>180]=lons[lons>180]-360.
+     lons[lons > 180] = lons[lons > 180] - 360.
      lonMin = lons.min()
      lonMax = lons.max()
 
@@ -116,95 +99,7 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
      print 'Error: there was a problem with finding the latitude and longitude ranges in the file'
      print '       Please check that you specified the filename, and variable names correctly.'
  
-     return 0,0,0,0
-
-def find_latlon_var_from_file(filelist):
-   """ 
-   Function to find what the latitude and longitude variables are called in a model file.
-    
-   Background:
-    
-       Model output files tend not to follow any defined standard in terms of 
-       variable naming conventions. One model may call the latitude "lat", 
-       another one may call it "Latitudes" and this script looks for the 
-       existence of any of a predefined list of synonyms for lat and long.
-   
-   Input:: 
-       filename 
-   
-   Output::
-       success - success flag (1 or 0): were both latitude and longitude variable names found in the file?
-       latname - name of latitude variable
-       lonname - name of longitude variable
-       latMin -descriptions of lat/lon ranges in data files
-       latMax
-       lonMin
-       lonMax
-       var_name_list - list of variable names in file 
-               
-   **NB.** if unsuccessful then all variables will be empty except the final list of variable names.
-   """
-   filename = filelist[0]
-   success = 0
-   f = Nio.open_file(filename)
-   var_name_list = f.variables.keys()
-   # convert all variable names into lower case
-   var_name_list_lower = [x.lower() for x in var_name_list]
-   # create a "set" from this list of names
-   varset = set(var_name_list_lower)
-
-   # Use "set" types for finding common variable name from in the file and from the list of possibilities
-   lat_possible_names = set(['latitude','lat','lats','latitudes'])
-   lon_possible_names = set(['longitude','lon','lons','longitudes'])
-
-   # Search for common latitude name variants:
-   # Find the intersection of two sets, i.e. find what latitude is called in this file.
-   try:
-     lat_var_name = list(varset & lat_possible_names)[0]
-     successlat = 1
-     index = 0
-     for i in var_name_list_lower:
-      if i==lat_var_name:
-           whlat = index
-      index += 1
-     latname = var_name_list[whlat]
-
-     lats = f.variables[latname][:]
-     latMin = lats.min()
-     latMax = lats.max()
-
-   except:
-     latname = 'not_found'
-     successlat = 0
-
-   # Search for common longitude name variants:
-   # Find the intersection of two sets, i.e. find what longitude is called in this file.
-   try:
-     lon_var_name = list(varset & lon_possible_names)[0]
-     successlon = 1
-     index = 0
-     for i in var_name_list_lower:
-      if i==lon_var_name:
-           whlon = index
-      index += 1
-     lonname = var_name_list[whlon]
-
-     lons = f.variables[lonname][:]
-     lons[lons>180]=lons[lons>180]-360.
-     lonMin = lons.min()
-     lonMax = lons.max()
-
-   except:
-     lonname = 'not_found'
-     successlon = 0
-
-   if(successlat & successlon): 
-      success = 1
-
-   if success==0:
-      latname = lonname = latMin = lonMin = latMax = lonMax = ''
-
-   return success, latname, lonname, latMin, latMax, lonMin, lonMax, var_name_list
+     return 0, 0, 0, 0
 
 def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarName):
    '''
@@ -228,54 +123,54 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
 
    # Crash nicely if 'filelist' is zero length
    """TODO:  Throw Error instead via try Except"""
-   if len(filelist)==0:
+   if len(filelist) == 0:
       print 'Error: no files have been passed to read_data_from_file_list()'
-      return -1,-1,-1,-1
+      return -1, -1, -1, -1
 
    # Open the first file in the list to:
    #    i) read in lats, lons
    #    ii) find out how many timesteps in the file 
    #        (assume same ntimes in each file in list)
    #     -allows you to create an empty array to store variable data for all times
-   tmp=Nio.open_file(filelist[0], format='nc')
+   tmp = Nio.open_file(filelist[0], format='nc')
    latsraw = tmp.variables[latVarName][:]
    lonsraw = tmp.variables[lonVarName][:]
-   lonsraw[lonsraw>180] = lonsraw[lonsraw>180]-360.  # convert to -180,180 if necessary
+   lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
 
    """TODO:  Guard against case where latsraw and lonsraw are not the same dim?"""
    
    if(latsraw.ndim == 1):
-     lon,lat = np.meshgrid(lonsraw,latsraw)
+     lon, lat = np.meshgrid(lonsraw, latsraw)
    if(latsraw.ndim == 2):
      lon = lonsraw
      lat = latsraw
 
    timesraw = tmp.variables[timeVarName]
-   ntimes=len(timesraw)
+   ntimes = len(timesraw)
 
    print 'Lats and lons read in for first file in filelist'
 
    # Create a single empty masked array to store model data from all files
-   t2store = ma.zeros((ntimes*len(filelist),len(lat[:,0]),len(lon[0,:])))
-   timestore=np.empty((ntimes*len(filelist))) 
+   t2store = ma.zeros((ntimes * len(filelist), len(lat[:, 0]), len(lon[0, :])))
+   timestore = np.empty((ntimes * len(filelist))) 
   
 
    # Now load in the data for real
    #  NB. no need to reload in the latitudes and longitudes -assume invariant
-   i=0
-   timesaccu=0 # a counter for number of times stored so far in t2store 
+   i = 0
+   timesaccu = 0 # a counter for number of times stored so far in t2store 
                #  NB. this method allows for missing times in data files 
                #      as no assumption made that same number of times in each file...
 
 
    for ifile in filelist:
-     print 'Loading data from file: ',filelist[i]
-     f=Nio.open_file(ifile)
+     print 'Loading data from file: ', filelist[i]
+     f = Nio.open_file(ifile)
      t2raw = f.variables[myvar][:]
 
      timesraw = f.variables[timeVarName]
-     time=timesraw[:]
-     ntimes=len(time)
+     time = timesraw[:]
+     ntimes = len(time)
 
      # Flatten dimensions which needn't exist, i.e. level 
      #   e.g. if for single level then often data have 4 dimensions, when 3 dimensions will do.
@@ -287,22 +182,22 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
      t2tmp = t2raw.squeeze()
      # Nb. if this happens to be data for a single time only, then we just flattened it by accident
      #     lets put it back... 
-     if t2tmp.ndim==2:
-        t2tmp = np.expand_dims(t2tmp,0)
+     if t2tmp.ndim == 2:
+        t2tmp = np.expand_dims(t2tmp, 0)
 
-     t2store[timesaccu+np.arange(ntimes),:,:]=t2tmp[:,:,:]
-     timestore[timesaccu+np.arange(ntimes)]=time
-     timesaccu=timesaccu+ntimes
+     t2store[timesaccu + np.arange(ntimes), :, :] = t2tmp[:, :, :]
+     timestore[timesaccu + np.arange(ntimes)] = time
+     timesaccu = timesaccu + ntimes
      f.close()
      i += 1 
      
 
-   print 'Data read in successfully with dimensions: ',t2store.shape
+   print 'Data read in successfully with dimensions: ', t2store.shape
 
    # TODO: search for duplicated entries (same time) and remove duplicates.
    # Check to see if number of unique times == number of times, if so then no problem
 
-   if(len(np.unique(timestore))!=len(np.where(timestore!=0)[0].view())):
+   if(len(np.unique(timestore)) != len(np.where(timestore != 0)[0].view())):
      print 'WARNING: Possible duplicated times'
 
    # Decode model times into python datetime objects
@@ -316,7 +211,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
    #return lat, lon, timestore, t2store
    return data_dict
 
-def select_var_from_file(myfile,fmt='not set'):
+def select_var_from_file(myfile, fmt='not set'):
    '''
     Routine to act as user interface to allow users to select variable of interest from a file.
     
@@ -332,20 +227,20 @@ def select_var_from_file(myfile,fmt='not set'):
 
    print fmt
 
-   if fmt=='not set':
+   if fmt == 'not set':
        f = Nio.open_file(myfile)
 
-   if fmt!='not set':
-       f = Nio.open_file(myfile,format=fmt)
+   if fmt != 'not set':
+       f = Nio.open_file(myfile, format=fmt)
 
    keylist = f.variables.keys()
 
    i = 0
    for v in keylist:
-       print '[',i,'] ',f.variables[v].long_name,' (',v,')'
+       print '[', i, '] ', f.variables[v].long_name, ' (', v, ')'
        i += 1
 
-   user_selection = raw_input('Please select variable : [0 -'+str(i-1)+']  ')
+   user_selection = raw_input('Please select variable : [0 -' + str(i - 1) + ']  ')
 
    myvar = keylist[int(user_selection)]
 
@@ -364,20 +259,20 @@ def select_var_from_wrf_file(myfile):
        Peter Lean  September 2010
    '''
 
-   f = Nio.open_file(myfile,format='nc')
+   f = Nio.open_file(myfile, format='nc')
 
    keylist = f.variables.keys()
 
    i = 0
    for v in keylist:
        try:
-         print '[',i,'] ',f.variables[v].description,' (',v,')'
+         print '[', i, '] ', f.variables[v].description, ' (', v, ')'
        except:
          print ''
 
        i += 1
 
-   user_selection = raw_input('Please select WRF variable : [0 -'+str(i-1)+']  ')
+   user_selection = raw_input('Please select WRF variable : [0 -' + str(i - 1) + ']  ')
 
    mywrfvar = keylist[int(user_selection)]
 
