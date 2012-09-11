@@ -237,10 +237,10 @@ def create_mask_using_threshold(masked_array, threshold=0.5):
         #   e.g. if the threshold is 75%, and there are 10 times,
         #        then a pixel will be masked if more than 5 times are masked.
         mymask = nMasked > (nT*threshold)
-   except:
+    except:
         mymask = numpy.zeros_like(masked_array.data[0,:,:])
 
-   return mymask
+    return mymask
 
 
 def calc_average_on_new_time_unit_K(data, dateList, unit):
@@ -614,7 +614,7 @@ def calc_running_accum_from_period_accum(data):
         if len(data.shape)>1:
             running_acc[i+1,:] = running_acc[i,:] + data[i+1,:]
 
-   return running_acc
+    return running_acc
 
 
 def ignore_boundaries(data, rim=10):
@@ -737,7 +737,7 @@ def decode_model_times(filelist, timeVarName):
          
         times.append(new_time)
 
-   return times
+    return times
 
 def decode_model_timesK(ifile, timeVarName, file_type):
     '''
@@ -814,7 +814,7 @@ def decode_model_timesK(ifile, timeVarName, file_type):
             dt = datetime.timedelta(years=xtime)
             new_time = base_time + dt
         times.append(new_time)
-   return times
+    return times
 
 def decodeTimeFromString(time_string):
     '''
@@ -951,26 +951,26 @@ def regrid_space(oLats,oLons,iLats,iLons,iData):
     '''
 
     # Regrid obs data onto model grid
-   if regrid_choice == '0':
-      ndims = len(obsdata.shape)
-      if ndims == 3:
-         newshape = [obsdata.shape[0],mdldata.shape[1],mdldata.shape[2]]
-         nT = obsdata.shape[0]
-      if ndims == 2:
-         newshape = [mdldata.shape[0],mdldata.shape[1]]
-         nT = 0
-      rdata = mdldata
-      lats,lons = mdllats,mdllons
-       # Create a new masked array with the required dimensions
-      tmp = numpy.zeros(newshape)
-      rdata2 = numpy.ma.MaskedArray(tmp,mask=(tmp==0))
-      tmp = 0            # free up some memory
-      rdata2[:] = 0.0
-      if nT > 0:
-       for t in numpy.arange(nT):
-         rdata2[t,:,:] = do_regrid(obsdata[t,:,:],obslats[:,:],obslons[:,:],mdllats[:,:],mdllons[:,:])
-      if nT == 0:
-         rdata2[:,:] = do_regrid(obsdata[:,:],obslats[:,:],obslons[:,:],mdllats[:,:],mdllons[:,:])
+    if regrid_choice == '0':
+        ndims = len(obsdata.shape)
+        if ndims == 3:
+            newshape = [obsdata.shape[0],mdldata.shape[1],mdldata.shape[2]]
+            nT = obsdata.shape[0]
+        if ndims == 2:
+            newshape = [mdldata.shape[0],mdldata.shape[1]]
+            nT = 0
+        rdata = mdldata
+        lats,lons = mdllats,mdllons
+        # Create a new masked array with the required dimensions
+        tmp = numpy.zeros(newshape)
+        rdata2 = numpy.ma.MaskedArray(tmp,mask=(tmp==0))
+        tmp = 0            # free up some memory
+        rdata2[:] = 0.0
+        if nT > 0:
+            for t in numpy.arange(nT):
+                rdata2[t,:,:] = do_regrid(obsdata[t,:,:],obslats[:,:],obslons[:,:],mdllats[:,:],mdllons[:,:])
+        if nT == 0:
+                rdata2[:,:] = do_regrid(obsdata[:,:],obslats[:,:],obslons[:,:],mdllats[:,:],mdllons[:,:])
 
     # Regrid model data onto obs grid
     if regrid_choice == '1':
