@@ -567,13 +567,13 @@ def getModelTimes(modelFile,timeVarName):
         if units=='minutes':
             dt = datetime.timedelta(minutes=xtime)
             new_time = base_time + dt
-        if units=='hours':
+        elif units=='hours':
             dt = datetime.timedelta(hours=xtime)
             new_time = base_time + dt
-        if units=='days':
+        elif units=='days':
             dt = datetime.timedelta(days=xtime)
             new_time = base_time + dt
-        if units=='months':
+        elif units=='months':
             # NB. adding months in python is complicated as month length varies and hence ambiguous.
             # Perform date arithmatic manually
             #  Assumption: the base_date will usually be the first of the month
@@ -582,9 +582,10 @@ def getModelTimes(modelFile,timeVarName):
             new_month = int(base_time.month + xtime % 12)
             new_year = int(math.floor(base_time.year + xtime / 12.))
             new_time = datetime.datetime(new_year,new_month,base_time.day,base_time.hour,base_time.second,0)
-        if units=='years':
+        elif units=='years':
             dt = datetime.timedelta(years=xtime)
             new_time = base_time + dt
+
         times.append(new_time)
     return times
 
