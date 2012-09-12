@@ -548,12 +548,14 @@ def getModelTimes(modelFile,timeVarName):
     except AttributeError:
         print 'Error decoding model times: time variable attributes do not contain "since"'
         raise
-
+    
+    units = None
     TIME_UNITS = ['minutes', 'hours','days','months','years']
     # search for 'seconds','minutes','hours', 'days', 'months', 'years' so know units
     for unit in TIME_UNITS:
         if re.search(unit, timeFormat):
             units = unit
+            break
 
     # cut out base time (the bit following 'since')
     base_time_string = string.lstrip(timeFormat[sinceLoc:])
