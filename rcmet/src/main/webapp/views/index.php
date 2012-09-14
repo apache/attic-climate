@@ -2,7 +2,7 @@
     <div class="row">
 	    <div class="box span6">
 	        <div class="box-content">
-		        <h3><a href="http://rcmed.jpl.nasa.gov/">Browse the Database</a></h3>
+		        <h3><a href="http://rcmes.jpl.nasa.gov/rcmed/datasets/">Browse the Database</a></h3>
 		        The Regional Climate Model Evaluation Database contains
 		        decades of observational datasets from NASA and other
 		        organizations.
