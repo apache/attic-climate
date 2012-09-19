@@ -12,13 +12,13 @@ import sys
 import os
 
 # Appending rcmes via relative path
-sys.path.append(os.path.abspath('../../.'))
+sys.path.append(os.path.abspath('../.'))
 
 # RCMES Imports
-import rcmes.storage.files as files
-import rcmes.storage.rcmed as db
-import rcmes.toolkit.process as process
-import rcmes.cli.do_rcmes_processing_sub as doProcess
+import storage.files as files
+import storage.rcmed as db
+import toolkit.process as process
+import cli.do_rcmes_processing_sub as doProcess
 
 
 # Empty dictionaries to collect all of the user's inputs 
