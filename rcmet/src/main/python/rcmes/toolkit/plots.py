@@ -264,9 +264,14 @@ def draw_time_series_plot(data,times,myfilename,myworkdir, data2='',mytitle='',y
     # Make plot, specifying marker style ('x'), linestyle ('-'), linewidth and line color
     line1 = ax.plot_date(times,data,'bo-',markersize=6,linewidth=2,color='#AAAAFF')
     # Make second line, if data2 has been passed in.
+    # TODO:  Handle the optional second dataset better.  Maybe set the Default to None instead 
+    # of an empty string
     if type(data2)!=str:
       line2 = ax.plot_date(times,data2,'rx-',markersize=6,linewidth=2,color='#FFAAAA')
-      fig.legend([line1,line2],['model','obs'],'upper right')
+      lines = []
+      lines.extend(line1)
+      lines.extend(line2)
+      fig.legend((lines),('model','obs'),loc='upper right')
 
     fig.savefig(myworkdir+'/'+myfilename+'.png')
 
