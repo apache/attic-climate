@@ -1,3 +1,25 @@
+"""
+Module for handling data input files.  Requires PyNIO and Numpy be 
+installed.
+
+This module can easily open NetCDF, HDF and Grib files.  Search the PyNIO
+documentation for a complete list of supported formats.
+"""
+
+try:
+    import Nio
+except ImportError:
+    import nio
+
+import numpy as np
+import numpy.ma as ma
+import sys
+import os
+
+# Appending rcmes via relative path
+sys.path.append(os.path.abspath('../.'))
+import toolkit.process as process
+
 def findunique(seq):
     keys = {}
     for e in seq:
@@ -14,12 +36,17 @@ def find_time_var_name_from_file(filename,timename,file_type):
    import Nio
    f = Nio.open_file(filename)
    var_name_list = f.variables.keys()
+
    # convert all variable names into lower case
    var_name_list_lower = [x.lower() for x in var_name_list]
+
    # create a "set" from this list of names
    varset = set(var_name_list_lower)
+
    # Use "set" types for finding common variable name from in the file and from the list of possibilities
    time_possible_names = set(['time','times','date','dates','julian'])
+
+
    # Search for common latitude name variants:
    # Find the intersection of two sets, i.e. find what latitude is called in this file.
    try:
@@ -31,50 +58,16 @@ def find_time_var_name_from_file(filename,timename,file_type):
            wh = index
       index += 1
      timename = var_name_list[wh]
+  
    except:
      timename = 'not_found'
      success = 0
+
    if success==0:
       timename = ''
+
    return success, timename, var_name_list
 
-def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
-   # Function to return the latitude and longitude ranges of the data in a file,
-   # given the identifying variable names.
-   #
-   #    Input:
-   #            filelist - list of filenames (data is read in from first file only)
-   #            lat_var_name - variable name of the 'latitude' variable
-   #            lon_var_name - variable name of the 'longitude' variable
-   #
-   #    Output:
-   #            latMin, latMax, lonMin, lonMax - self explanatory
-   #
-   #                    Peter Lean      March 2011
-
-   import Nio
-
-   filename = filelist[0]
-
-   try:
-     f = Nio.open_file(filename)
-
-     lats = f.variables[lat_var_name][:]
-     latMin = lats.min()
-     latMax = lats.max()
-
-     lons = f.variables[lon_var_name][:]
-     lons[lons>180]=lons[lons>180]-360.
-     lonMin = lons.min()
-     lonMax = lons.max()
-
-     return latMin, latMax, lonMin, lonMax
-
-   except:
-     print 'Error: there was a problem with finding the latitude and longitude ranges in the file'
-     print '       Please check that you specified the filename, and variable names correctly.'
- 
-     return 0,0,0,0
 
 def find_latlon_var_from_file(filename,file_type,latname,lonname):
    # Function to find what the latitude and longitude variables are called in a model file.
@@ -90,26 +83,36 @@ def find_latlon_var_from_file(filename,file_type,latname,lonname):
    import Nio
    f = Nio.open_file(filename,mode='r',options=None,format=file_type)
    var_name_list = f.variables.keys()
-    # convert all variable names into lower case
+   # convert all variable names into lower case
    var_name_list_lower = [x.lower() for x in var_name_list]
    # create a "set" from this list of names
    varset = set(var_name_list_lower)
+
    # Use "set" types for finding common variable name from in the file and from the list of possibilities
    lat_possible_names = set(['latitude','lat','lats','latitudes'])
    lon_possible_names = set(['longitude','lon','lons','longitudes'])
-   # read latitudes
+
+   # Search for common latitude name variants:
+   # Find the intersection of two sets, i.e. find what latitude is called in this file.
    try:
      lats = f.variables[latname][:]
      successlat = 1
-     latMin = lats.min(); latMax = lats.max()
+     latMin = lats.min()
+     latMax = lats.max()
+
    except:
+     latname = 'not_found'
      successlat = 0
-   # read longitudes
+
+   # Search for common longitude name variants:
+   # Find the intersection of two sets, i.e. find what longitude is called in this file.
    try:
      lons = f.variables[lonname][:]
      successlon = 1
      lons[lons>180]=lons[lons>180]-360.
-     lonMin = lons.min(); lonMax = lons.max()
+     lonMin = lons.min()
+     lonMax = lons.max()
+
    except:
      successlon = 0
     # check if both longs and lats are successfully read from the data file (send message only if unsuccessful).
