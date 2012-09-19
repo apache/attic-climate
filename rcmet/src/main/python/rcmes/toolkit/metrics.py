@@ -4,7 +4,7 @@ Module storing functions to calculate statistical metrics from numpy arrays
 
 import numpy as np
 import numpy.ma as ma
-import rcmes.toolkit.process as process
+import toolkit.process as process
 
 def calc_annual_cycle_means(data, time):
     '''
