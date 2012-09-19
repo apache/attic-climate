@@ -3,6 +3,7 @@ import numpy as np
 import numpy.ma as ma
 import toolkit.process as process
 import toolkit.process_v12 as process_v12
+import math
 
 
 def findunique(seq):
@@ -11,134 +12,12 @@ def findunique(seq):
         keys[e] = 1
     return keys.keys()
 
-def find_time_var_name_from_file(filename,timename,file_type):
-   # Function to find what the time variable is called in a model file.
-   #       Input: 
-   #               filelist -list of filenames
-   #       Output: 
-   #               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-   #       Peter Lean   February 2011
-   import Nio
-   f = Nio.open_file(filename)
-   var_name_list = f.variables.keys()
-   # convert all variable names into lower case
-   var_name_list_lower = [x.lower() for x in var_name_list]
-   # create a "set" from this list of names
-   varset = set(var_name_list_lower)
-   # Use "set" types for finding common variable name from in the file and from the list of possibilities
-   time_possible_names = set(['time','times','date','dates','julian'])
-   # Search for common latitude name variants:
-   # Find the intersection of two sets, i.e. find what latitude is called in this file.
-   try:
-     time_var_name = list(varset & time_possible_names)[0]
-     success = 1
-     index = 0
-     for i in var_name_list_lower:
-      if i==time_var_name:
-           wh = index
-      index += 1
-     timename = var_name_list[wh]
-   except:
-     timename = 'not_found'
-     success = 0
-   if success==0:
-      timename = ''
-   return success, timename, var_name_list
-
-def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
-   # Function to return the latitude and longitude ranges of the data in a file,
-   # given the identifying variable names.
-   #
-   #    Input:
-   #            filelist - list of filenames (data is read in from first file only)
-   #            lat_var_name - variable name of the 'latitude' variable
-   #            lon_var_name - variable name of the 'longitude' variable
-   #
-   #    Output:
-   #            latMin, latMax, lonMin, lonMax - self explanatory
-   #
-   #                    Peter Lean      March 2011
-
-   import Nio
-
-   filename = filelist[0]
-
-   try:
-     f = Nio.open_file(filename)
-
-     lats = f.variables[lat_var_name][:]
-     latMin = lats.min()
-     latMax = lats.max()
-
-     lons = f.variables[lon_var_name][:]
-     lons[lons>180]=lons[lons>180]-360.
-     lonMin = lons.min()
-     lonMax = lons.max()
-
-     return latMin, latMax, lonMin, lonMax
-
-   except:
-     print 'Error: there was a problem with finding the latitude and longitude ranges in the file'
-     print '       Please check that you specified the filename, and variable names correctly.'
- 
-     return 0,0,0,0
-
-def find_latlon_var_from_file(filename,file_type,latname,lonname):
-   # Function to find what the latitude and longitude variables are called in a model file.
-   #       Input: 
-   #               -filename 
-   #       Output: 
-   #               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-   #               -latMin -descriptions of lat/lon ranges in data files
-   #               -latMax
-   #               -lonMin
-   #               -lonMax
-   #       Peter Lean   February 2011
-   import Nio
-   f = Nio.open_file(filename,mode='r',options=None,format=file_type)
-   var_name_list = f.variables.keys()
-    # convert all variable names into lower case
-   var_name_list_lower = [x.lower() for x in var_name_list]
-   # create a "set" from this list of names
-   varset = set(var_name_list_lower)
-   # Use "set" types for finding common variable name from in the file and from the list of possibilities
-   lat_possible_names = set(['latitude','lat','lats','latitudes'])
-   lon_possible_names = set(['longitude','lon','lons','longitudes'])
-   # read latitudes
-   try:
-     lats = f.variables[latname][:]
-     successlat = 1
-     latMin = lats.min(); latMax = lats.max()
-   except:
-     successlat = 0
-   # read longitudes
-   try:
-     lons = f.variables[lonname][:]
-     successlon = 1
-     lons[lons>180]=lons[lons>180]-360.
-     lonMin = lons.min(); lonMax = lons.max()
-   except:
-     successlon = 0
-    # check if both longs and lats are successfully read from the data file (send message only if unsuccessful).
-   success = 0
-   if(successlat == successlon == 1): success = 1
-   #if success==1: print 'in rcmes_v12.find_latlon_var_from_file: both long/lat found'
-   if success==0:
-      latname = lonname = latMin = lonMin = latMax = lonMax = ''
-      print 'rcmes_v12.find_latlon_var_from_file: either/both long or/& lat corresponding'
-      print '  to the provided var names are not found. Check your var names or data files: Exit'
-      return -1,-1,-1,-1
-   return success,latMin,latMax,lonMin,lonMax
 
 def read_lolaT_from_file(ifile,latVarName,lonVarName,timeVarName,file_type):
    ##################################################################################
    # Read in the long & lat of model grid
    ##################################################################################
-   import Nio 
-   import numpy as np
-   import numpy.ma as ma
-   import toolkit.process as process
-   import toolkit.process_v12 as process_v12
+
    tmp=Nio.open_file(ifile,format=file_type)
    lonsraw = tmp.variables[lonVarName][:]
    latsraw = tmp.variables[latVarName][:]
@@ -147,7 +26,7 @@ def read_lolaT_from_file(ifile,latVarName,lonVarName,timeVarName,file_type):
      lon,lat = np.meshgrid(lonsraw,latsraw)
    if(latsraw.ndim == 2):
      lon = lonsraw; lat = latsraw
-   timestore = process_v12.decode_model_timesK(ifile,timeVarName,file_type)
+   timestore = process.getModelTimes(ifile,timeVarName)
    print '  read_lolaT_from_file: Lats, lons and times read in for the model domain'
    return lat,lon,timestore
 
@@ -183,7 +62,7 @@ def read_data_from_one_file(ifile,myvar,timeVarName,lat,file_type):
    t2store=t2tmp
    f.close()
    print '  read_data_from_one_file: Data read in successfully with dimensions: ',t2store.shape
-   timestore = process_v12.decode_model_timesK(ifile,timeVarName,file_type)
+   timestore = process.getModelTimes(ifile,timeVarName)
    return timestore, t2store
 
 def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,file_type):
@@ -264,7 +143,7 @@ def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,
 
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
    ifile=filelist[0]
-   timestore = process_v12.decode_model_timesK(ifile,timeVarName,file_type)
+   timestore = process.getModelTimes(ifile,timeVarName)
 
    return lat, lon, timestore, t2store
 
@@ -287,10 +166,6 @@ def read_data_from_file_list(filelist,myvar,timeVarName,latVarName,lonVarName,fi
    #   Peter Lean July 2010 
    ##################################################################################
    '''
-   import Nio
-   import numpy as np
-   import numpy.ma as ma
-   import rcmes.process
 
    #filelist.sort()
 
@@ -387,8 +262,6 @@ def select_var_from_file(myfile,fmt='not set'):
    #
    #    Peter Lean  September 2010
    '''
-
-   import Nio
    print fmt
 
    if fmt=='not set':
@@ -423,7 +296,6 @@ def select_var_from_wrf_file(myfile):
    #    Peter Lean  September 2010
    '''
 
-   import Nio
 
    f = Nio.open_file(myfile,format='nc')
 
@@ -446,7 +318,8 @@ def select_var_from_wrf_file(myfile):
 
 def writeBN_lola(fileName,lons,lats):
   # write a binary data file that include longitude (1-d) and latitude (1-d) values
- import rcmes.fortranfile; import numpy as np; import numpy.ma as ma
+ import rcmes.fortranfile
+
  F=rcmes.fortranfile.FortranFile(fileName,mode='w')
  ngrdY=lons.shape[0]; ngrdX=lons.shape[1]
  tmpDat=ma.zeros(ngrdX); tmpDat[:]=lons[0,:]; F.writeReals(tmpDat)
@@ -457,7 +330,8 @@ def writeBN_lola(fileName,lons,lats):
 
 def writeBNdata       \
    (fileName,maskOption,numOBSs,numMDLs,nT,ngrdX,ngrdY,numSubRgn,obsData,mdlData,obsRgnAvg,mdlRgnAvg):
- import rcmes.fortranfile; import math; import numpy; import numpy as np; import numpy.ma as ma
+ import rcmes.fortranfile
+
   # write spatially- and regionally regridded data into a binary data file
  missing=-1.e26
  F=rcmes.fortranfile.FortranFile(fileName,mode='w')
@@ -488,7 +362,7 @@ def writeBNdata       \
        F.writeReals(tmpDat)
  data=0     # release the array allocated for data
   # write data in subregions
- if(maskOption==1):
+ if maskOption:
    print 'Also included are the time series of the means over ',numSubRgn,' areas from obs and model data'
    tmpDat=ma.zeros(nT); print numSubRgn
    for m in np.arange(numOBSs):
@@ -511,9 +385,13 @@ def writeNCfile(fileName,lons,lats,obsData,mdlData,obsRgnAvg,mdlRgnAvg):
   # mdlData[numMDLs,nT,ngrdY,ngrdX]: the mdltime series of the entire model domain
   # obsRgnAvg[numSubRgn,nT]: the obs time series for the all subregions
   # mdlRgnAvg[numMDLs,numSubRgn,nT]: the mdl time series for the all subregions
- import Nio; import numpy as np; import numpy.ma as ma
- dimO=obsData.shape[0]; dimM=mdlData.shape[0]
- dimT=mdlData.shape[1]; dimY=mdlData.shape[2]; dimX=mdlData.shape[3]; dimR=obsRgnAvg.shape[1]
+
+ dimO=obsData.shape[0]
+ dimM=mdlData.shape[0]
+ dimT=mdlData.shape[1]
+ dimY=mdlData.shape[2]
+ dimX=mdlData.shape[3]
+ dimR=obsRgnAvg.shape[1]
  f = Nio.open_file(fileName,mode='w',format='nc')
  print mdlRgnAvg.shape,dimM,dimR,dimT
   #create global attributes
