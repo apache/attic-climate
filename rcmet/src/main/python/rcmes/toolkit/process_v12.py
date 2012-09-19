@@ -317,37 +317,37 @@ def calc_average_on_new_time_unit_K(data, dateList, unit):
         # Create array to store the resulting data
         meanstore = numpy.zeros(len(numpy.unique(timeunits)))
   
-    # Calculate the means across each unique time unit
-    i=0
-    for myunit in numpy.unique(timeunits):
-        if processing_required:
-            datam=ma.masked_array(data,timeunits!=myunit)
-            meanstore[i] = ma.average(datam)
-        
-        # construct new times list
-        smyunit = str(myunit)
-        if len(smyunit)==4:  # YYYY
-            yyyy = int(myunit[0:4])
-            mm = 1
-            dd = 1
-        if len(smyunit)==6:  # YYYYMM
-            yyyy = int(smyunit[0:4])
-            mm = int(smyunit[4:6])
-            dd = 1
-        if len(smyunit)==8:  # YYYYMMDD
-            yyyy = int(smyunit[0:4])
-            mm = int(smyunit[4:6])
-            dd = int(smyunit[6:8])
-        if len(smyunit)==3:  # Full time range
-            # Need to set an appropriate time representing the mid-point of the entire time span
-            dt = dateList[-1]-dateList[0]
-            halfway = dateList[0]+(dt/2)
-            yyyy = int(halfway.year)
-            mm = int(halfway.month)
-            dd = int(halfway.day)
+        # Calculate the means across each unique time unit
+        i=0
+        for myunit in numpy.unique(timeunits):
+            if processing_required:
+                datam=ma.masked_array(data,timeunits!=myunit)
+                meanstore[i] = ma.average(datam)
+            
+            # construct new times list
+            smyunit = str(myunit)
+            if len(smyunit)==4:  # YYYY
+                yyyy = int(myunit[0:4])
+                mm = 1
+                dd = 1
+            if len(smyunit)==6:  # YYYYMM
+                yyyy = int(smyunit[0:4])
+                mm = int(smyunit[4:6])
+                dd = 1
+            if len(smyunit)==8:  # YYYYMMDD
+                yyyy = int(smyunit[0:4])
+                mm = int(smyunit[4:6])
+                dd = int(smyunit[6:8])
+            if len(smyunit)==3:  # Full time range
+                # Need to set an appropriate time representing the mid-point of the entire time span
+                dt = dateList[-1]-dateList[0]
+                halfway = dateList[0]+(dt/2)
+                yyyy = int(halfway.year)
+                mm = int(halfway.month)
+                dd = int(halfway.day)
 
-        newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
-        i = i+1
+            newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
+            i = i+1
 
     # 3D data arrays
     if data.ndim==3:
