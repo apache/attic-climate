@@ -28,12 +28,13 @@ import pickle
 import numpy as np
 import numpy.ma as ma
 import Nio
-import rcmes.plots
-import rcmes.fortranfile
-import rcmes.db_v12
-import rcmes.files_20
-import rcmes.process_v12
-import rcmes.metrics_v12
+import toolkit.plots
+import utils.fortranfile
+import storage.db_v12
+import storage.files_20
+import toolkit.process_v12
+import toolkit.metrics_v12
+import toolkit.metrics
 
 def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, \
                   workdir, mdlSelect, obsSelect, numSubRgn, subRgnName, rgnSelect, obsParameterId, precipFlag, \
@@ -64,7 +65,8 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
             obsParameterId   - int, db parameter id. ** this is non-essential once the correct metadata use is implemented
             precipFlag       - to be removed once the correct metadata use is implemented
             timeRegridOption - string: 'full'|'annual'|'monthly'|'daily'
-            seasonalCycleOption - int (=1 if set) (probably should be bool longterm) 
+            maskOption       - Boolean
+            seasonalCycleOption - Boolean 
             metricOption - string: 'bias'|'mae'|'acc'|'pdf'|'patcor'|'rms'|'diff'
             titleOption - string describing title to use in plot graphic
             plotFileNameOption - string describing filename stub to use for plot graphic i.e. {stub}.png
@@ -86,7 +88,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
     obsList = obsList[obsSelect]
     print 'selected model= ', mdlList
 
-    if(maskOption==1):         # overwrite data arrays with the area-averaged values
+    if maskOption:         # overwrite data arrays with the area-averaged values
         mdlData = ma.zeros(nT)
         obsData = ma.zeros(nT)
         mdlData[:] = mdlRgn[mdlSelect,rgnSelect,:]
@@ -114,18 +116,18 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
     #  The obs/model data for each case are prepared in the matching shapes in the processings up to this point.
     #   --> If not, there is a problem.
 
-    if seasonalCycleOption==1:
+    if seasonalCycleOption:
         print 'Calculate the monthly and seasonal climatology: mdlData.shape, obsData.shape ', mdlData.shape, \
             obsData.shape
-    if maskOption != 1:           # 2-D climatology at the entire model grid
+    if not maskOption:           # 2-D climatology at the entire model grid
         print 'For 2-d model domain'
-        monCLobs = rcmes.metrics_v12.calc_clim_month(obsData, Times)                    # compute the seasonal means
+        monCLobs = toolkit.metrics_v12.calc_clim_month(obsData, Times)                    # compute the seasonal means
         seaCLobs = ma.zeros((4, ngrdY, ngrdX))
         seaCLobs[0,:,:] = (monCLobs[0,:,:] + monCLobs[1,:,:] + monCLobs[11,:,:])/3.       # winter (DJF)
         seaCLobs[1,:,:] = (monCLobs[2,:,:] + monCLobs[3,:,:] + monCLobs[4,:,:])/3.        # spring (MAM)
         seaCLobs[2,:,:] = (monCLobs[5,:,:] + monCLobs[6,:,:] + monCLobs[7,:,:])/3.        # Summer (JJA)
         seaCLobs[3,:,:] = (monCLobs[8,:,:] + monCLobs[9,:,:] + monCLobs[10,:,:])/3.       # Fall   (SON)
-        monCLmdl = rcmes.metrics_v12.calc_clim_month(mdlData, Times)
+        monCLmdl = toolkit.metrics_v12.calc_clim_month(mdlData, Times)
         seaCLmdl = ma.zeros((4, ngrdY, ngrdX))
         seaCLmdl[0,:,:] = (monCLmdl[0,:,:] + monCLmdl[1,:,:] + monCLmdl[11,:,:])/3.       # winter (DJF)
         seaCLmdl[1,:,:] = (monCLmdl[2,:,:] + monCLmdl[3,:,:] + monCLmdl[4,:,:])/3.        # spring (MAM)
@@ -139,13 +141,13 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
         monCLmdl = ma.zeros(12)
         seaCLmd = ma.zeros(4)
         tmpDat[:] = obsData[:]
-        monCLobs[:] = rcmes.metrics_v12.calc_clim_month(tmpDat, Times)
+        monCLobs[:] = toolkit.metrics_v12.calc_clim_month(tmpDat, Times)
         seaCLobs[0] = (monCLobs[0] + monCLobs[1] + monCLobs[11])/3.       # winter (DJF)
         seaCLobs[1] = (monCLobs[2] + monCLobs[3] + monCLobs[4])/3.        # spring (MAM)
         seaCLobs[2] = (monCLobs[5] + monCLobs[6] + monCLobs[7])/3.        # Summer (JJA)
         seaCLobs[3] = (monCLobs[8] + monCLobs[9] + monCLobs[10])/3.       # Fall   (SON)
         tmpDat[:] = mdlData[:]
-        monCLmdl[:] = rcmes.metrics_v12.calc_clim_month(tmpDat, Times)
+        monCLmdl[:] = toolkit.metrics_v12.calc_clim_month(tmpDat, Times)
         seaCLmdl[0] = (monCLmdl[0] + monCLmdl[1] + monCLmdl[11])/3.       # winter (DJF)
         seaCLmdl[1] = (monCLmdl[2] + monCLmdl[3] + monCLmdl[4])/3.        # spring (MAM)
         seaCLmdl[2] = (monCLmdl[5] + monCLmdl[6] + monCLmdl[7])/3.        # Summer (JJA)
@@ -169,7 +171,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
     print '(Part 7): metric option= ',metricOption
     # create a temporary array to store model data according to the:
     # record lenth (nT), the number of models (numMDL) option(mdlSelect) and area-averaging option (maskOption)
-    if(maskOption!=1):    
+    if not maskOption:    
         # metrics at every grid points within the full domain --> results in 2-D contour plots
         tmpMDL = ma.zeros((nT, ngrdY, ngrdX))
         metricData = ma.zeros((ngrdY, ngrdX))
@@ -181,65 +183,65 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
     if metricOption == 'bias':
         metricTitle = 'Bias'
         optn = 'mean'
-        if(maskOption != 1):
+        if not maskOption:
             # Metrics at each grid point over the entire domain
-            metricData = rcmes.metrics_v12.calc_bias_annual(mdlData, obsData, optn)
+            metricData = toolkit.metrics_v12.calc_bias_annual(mdlData, obsData, optn)
         else:
             metricData = monCLmdl - monCLobs
 
     if metricOption == 'mae':
         metricTitle = 'Mean Absolute Error'
         optn = 'abs'
-        if maskOption != 1:
+        if not maskOption:
             # Metrics at each grid point over the entire domain
             if mdlSelect >= 0 :
-                metricData = rcmes.metrics_v12.calc_bias_annual(mdlData, obsData, optn)
+                metricData = toolkit.metrics_v12.calc_bias_annual(mdlData, obsData, optn)
             else:
                 n = 0
                 while n < numMDL:
                     tmpMDL = mdlData[n,:,:,:]
-                    metricData[n,:,:] = rcmes.metrics_v12.calc_bias_annual(tmpMDL, obsData, optn)
+                    metricData[n,:,:] = toolkit.metrics_v12.calc_bias_annual(tmpMDL, obsData, optn)
                     n += 1
-        if maskOption == 1:     # TODO: TBW
+        if maskOption:     # TODO: TBW
             pass
 
     if metricOption == 'rms':
         metricTitle = 'RMS Error'
-        if maskOption != 1:                            
+        if not maskOption:                            
             # Metrics at each grid point over the entire domain
             if mdlSelect >= 0:
-                metricData = rcmes.metrics_v12.calc_rms_annual(mdlData, obsData)
+                metricData = toolkit.metrics_v12.calc_rms_annual(mdlData, obsData)
             else:
                 n = 0
                 while n < numMDL:
                     tmpMDL = mdlData[n,:,:,:]
-                    metricData[n,:,:] = rcmes.metrics_v12.calc_rms_annual(tmpMDL, obsData)
+                    metricData[n,:,:] = toolkit.metrics_v12.calc_rms_annual(tmpMDL, obsData)
                     n += 1 
-        if maskOption == 1:     # TODO: TBW
+        if maskOption:     # TODO: TBW
             pass
 
     if metricOption == 'difference':
-        metricData = rcmes.metrics.calc_difference(mdlData, obsData)
+        metricData = toolkit.metrics.calc_difference(mdlData, obsData)
         metricTitle = 'Difference'
 
     if metricOption == 'patcor':
         metricTitle = 'Pattern Correlation'
-        if maskOption != 1:
+        if not maskOption:
             # Metrics at each grid point over the entire domain
             if mdlSelect >= 0:
-                metricData = rcmes.metrics.calc_pat_cor2D(mdlData, obsData, nT)
+                metricData = toolkit.metrics.calc_pat_cor2D(mdlData, obsData, nT)
             else:
                 n=0
                 while n < numMDL:
                     tmpMDL = mdlData[n,:,:,:]
-                    metricData = rcmes.metrics.calc_pat_cor2D(tmpMDL, obsData, nT)
+                    metricData = toolkit.metrics.calc_pat_cor2D(tmpMDL, obsData, nT)
                     n += 1
-        if maskOption==1:     # TODO: TBW
+        if maskOption:     # TODO: TBW
             pass
 
     if metricOption=='acc':
         metricTitle = 'Anomaly Correlation'
-        metricData = rcmes.metrics.calc_anom_cor(mdlData,obsData)
+        metricData = toolkit.metrics.calc_anom_cor(mdlData,obsData)
 
     # Part 8: Plot production
     #      Produce plots of metrics and obs,model data.
@@ -272,7 +274,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
         year_labels = True
         mytitle = 'Area-mean '
         # If producing seasonal cycle plots, don't want to put year labels on the time series plots.
-        if seasonalCycleOption == 1:
+        if seasonalCycleOption:
             year_labels = False
             mytitle = 'Annual cycle over the ' + subRgnName[rgnSelect] + 'region'
             print 'mytitle = ', mytitle
@@ -286,13 +288,13 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
             # for anomaly and pattern correlation, can't plot time series of model, obs as these are 3d fields
             # TODO: think of a cleaner way of dealing with this. Produce the time series plots with two lines: 
             # obs and model
-            status = rcmes.plots.draw_time_series_plot(monCLmdl, times, plotFileNameOption + 'both', workdir, 
+            status = toolkit.plots.draw_time_series_plot(monCLmdl, times, plotFileNameOption + 'both', workdir, 
                 data2=monCLobs, mytitle=mytitle, ytitle='Y', xtitle='time', year_labels=year_labels)
         # Produce the metric time series plot (one line only)
         mytitle = titleOption
         if titleOption=='default':
             mytitle = metricTitle+' model v obs'
-        status = rcmes.plots.draw_time_series_plot(metricData, times, plotFileNameOption,workdir, mytitle=mytitle,
+        status = toolkit.plots.draw_time_series_plot(metricData, times, plotFileNameOption,workdir, mytitle=mytitle,
             ytitle='Y', xtitle='time', year_labels=year_labels)
 
     # 2. dimensional data, e.g. Maps
@@ -337,11 +339,11 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
         # Plot model data
         mytitle = 'Model data: mean between ' + Times[0].strftime(timeFormat) + ' and ' + \
             Times[-1].strftime(timeFormat)
-        status = rcmes.plots.draw_map_color_filled(mdlDataMean, lats, lons, plotFileNameOption + 'model', \
+        status = toolkit.plots.draw_map_color_filled(mdlDataMean, lats, lons, plotFileNameOption + 'model', \
             workdir, mytitle=mytitle, rangeMax=mymax, rangeMin=mymin, colorTable=colorbar, niceValues=True)
         # Plot obs data
         mytitle = 'Obs data: mean between ' + Times[0].strftime(timeFormat) + ' and ' + Times[-1].strftime(timeFormat)
-        status = rcmes.plots.draw_map_color_filled(obsDataMean, lats, lons, plotFileNameOption + 'obs', workdir, \
+        status = toolkit.plots.draw_map_color_filled(obsDataMean, lats, lons, plotFileNameOption + 'obs', workdir, \
             mytitle=mytitle, rangeMax=mymax, rangeMin=mymin, colorTable=colorbar, niceValues=True)
         # Plot metric
         mymax = metricData.max()
@@ -350,7 +352,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
         if titleOption == 'default':
             mytitle = metricTitle + ' model v obs ' + Times[0].strftime(timeFormat) + ' to ' + \
                 Times[-1].strftime(timeFormat)
-        status = rcmes.plots.draw_map_color_filled(metricData, lats, lons, plotFileNameOption, workdir, \
+        status = toolkit.plots.draw_map_color_filled(metricData, lats, lons, plotFileNameOption, workdir, \
             mytitle=mytitle, rangeMax=mymax, rangeMin=mymin, diff=True, niceValues=True, nsteps=24)
 
     # 3. dimensional data, e.g. sequence of maps
@@ -369,11 +371,11 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
             #  as data are representative of all Jans, all Febs etc. 
             if timeRegridOption=='daily':
                 timeTitle = Times[t].strftime("%b %d, %Y")
-            if seasonalCycleOption==1:
+            if seasonalCycleOption:
                 timeTitle = Times[t].strftime("%b %d (all years)")
             if timeRegridOption=='monthly':
                 timeTitle = Times[t].strftime("%b %Y")
-            if seasonalCycleOption==1:
+            if seasonalCycleOption:
                 timeTitle = Times[t].strftime("%b (all years)")
             if timeRegridOption=='annual':
                 timeTitle = Times[t].strftime("%Y")
@@ -383,11 +385,11 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
                 timeTitle = time1.strftime("%b %d, %Y")+' to '+time2.strftime("%b %d, %Y")
             # Plot model data
             mytitle = 'Model data: mean '+timeTitle
-            status = rcmes.plots.draw_map_color_filled(mdlData[t,:,:], lats, lons, plotFileNameOption + 'model' + \
+            status = toolkit.plots.draw_map_color_filled(mdlData[t,:,:], lats, lons, plotFileNameOption + 'model' + \
                 str(t), workdir, mytitle=mytitle, rangeMax=mymax, rangeMin=mymin, colorTable=colorbar, niceValues=True)
             # Plot obs data
             mytitle = 'Obs data: mean ' + timeTitle
-            status = rcmes.plots.draw_map_color_filled(obsData[t,:,:], lats, lons, plotFileNameOption + 'obs' + str(t), \
+            status = toolkit.plots.draw_map_color_filled(obsData[t,:,:], lats, lons, plotFileNameOption + 'obs' + str(t), \
                 workdir, mytitle=mytitle, rangeMax=mymax, rangeMin=mymin, colorTable=colorbar, niceValues=True)
             # Plot metric
             mytitle = titleOption
@@ -395,7 +397,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
                 mytitle = metricTitle + ' model v obs : ' + timeTitle
             mymax = metricData.max()
             mymin = metricData.min()
-            status = rcmes.plots.draw_map_color_filled(metricData[t,:,:], lats, lons, plotFileNameOption + str(t), \
+            status = toolkit.plots.draw_map_color_filled(metricData[t,:,:], lats, lons, plotFileNameOption + str(t), \
                 workdir, mytitle=mytitle, rangeMax=mymax, rangeMin=mymin, diff=True, niceValues=True, nsteps=24)
 
     # Processing complete
