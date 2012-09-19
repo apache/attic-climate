@@ -189,7 +189,7 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi=-999999999):
     # Preserve MDI mask, by only changing data part of masked array object.
     for shift in (-1,1):
         for axis in (0,1):        
-            q_shifted = np.roll(q, shift=shift, axis=axis)
+            q_shifted = numpy.roll(q, shift=shift, axis=axis)
             idx=~q_shifted.mask * q.mask
             q.data[idx] = q_shifted[idx]
     # Now we actually interpolate
@@ -198,17 +198,17 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi=-999999999):
     q2 = map_coordinates(q, [lati, loni], order=order)
     q2 = q2.reshape([nlat2, nlon2])
     # Set values to missing data outside of original domain
-    q2 = ma.masked_array(q2, mask=np.logical_or(np.logical_or(lat2>=lat.max(), lat2<=lat.min()), \
-        np.logical_or(lon2<=lon.min(),lon2>=lon.max())))
+    q2 = ma.masked_array(q2, mask=numpy.logical_or(numpy.logical_or(lat2>=lat.max(), lat2<=lat.min()), \
+        numpy.logical_or(lon2<=lon.min(),lon2>=lon.max())))
     # Make second map using nearest neighbour interpolation -use this to determine locations with MDI and mask these
-    qmdi = np.zeros_like(q)
+    qmdi = numpy.zeros_like(q)
     qmdi[q.mask==True] = 1.
     qmdi[q.mask==False] = 0.
     qmdi_r = map_coordinates(qmdi, [lati, loni], order=order)
     qmdi_r = qmdi_r.reshape([nlat2, nlon2])
     mdimask = (qmdi_r != 0.0)
     # Combine missing data mask, with outside domain mask define above.
-    q2.mask = np.logical_or(mdimask,q2.mask)
+    q2.mask = numpy.logical_or(mdimask,q2.mask)
     return q2
 
 def create_mask_using_threshold(masked_array, threshold=0.5):
