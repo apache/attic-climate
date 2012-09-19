@@ -63,43 +63,28 @@ def getVariableByType(filename, variableType):
     else:
         return variableKeys
 
-
-def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
-   """
-    Function to return the latitude and longitude ranges of the data in a file,
-    given the identifying variable names.
+def getVariableRange(filename, variableName):
+    """
+    Function to return the min and max values of the given variable in
+    the supplied filename.
    
-       Input:
-               filelist - list of filenames (data is read in from first file only)
-               lat_var_name - variable name of the 'latitude' variable
-               lon_var_name - variable name of the 'longitude' variable
-   
-       Output:
-               latMin, latMax, lonMin, lonMax - self explanatory
-   
-                       Peter Lean      March 2011
-   """
-   filename = filelist[0]
+    Input::
+        filename - absolute path to a file
+        variableName - variable whose min and max values should be returned
 
-   try:
-     f = Nio.open_file(filename)
+    Output::
+        variableRange - tuple of order (variableMin, variableMax)
+    """
+    try:
+        f = Nio.open_file(filename)
+    except:
+        #print 'PyNio had an issue opening the filename (%s) you provided' % filename
+        print "NIOError:", sys.exc_info()[0]
+        raise
+    
+    varArray = f.variables[variableName][:]
+    return (varArray.min(), varArray.max())
 
-     lats = f.variables[lat_var_name][:]
-     latMin = lats.min()
-     latMax = lats.max()
-
-     lons = f.variables[lon_var_name][:]
-     lons[lons > 180] = lons[lons > 180] - 360.
-     lonMin = lons.min()
-     lonMax = lons.max()
-
-     return latMin, latMax, lonMin, lonMax
-
-   except:
-     print 'Error: there was a problem with finding the latitude and longitude ranges in the file'
-     print '       Please check that you specified the filename, and variable names correctly.'
- 
-     return 0, 0, 0, 0
 
 def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarName):
    '''
