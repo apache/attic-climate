@@ -82,7 +82,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
     #       the next processing as well.
     # NOTE: (7/8/2012) metrics calculation currently utilizes only the first obs data. need to expand later.
 
-    print 'Start calculating metrics for a single selected model/signle selected region hereafter'
+    print 'Start calculating metrics for a single selected model/single selected region hereafter'
     mdlList = mdlList[mdlSelect]
     print 'selected model= ', mdlList
     obsList = obsList[obsSelect]
@@ -139,7 +139,7 @@ def metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obs
         monCLobs = ma.zeros(12)
         seaCLobs = ma.zeros(4)
         monCLmdl = ma.zeros(12)
-        seaCLmd = ma.zeros(4)
+        seaCLmdl = ma.zeros(4)
         tmpDat[:] = obsData[:]
         monCLobs[:] = toolkit.metrics_v12.calc_clim_month(tmpDat, Times)
         seaCLobs[0] = (monCLobs[0] + monCLobs[1] + monCLobs[11])/3.       # winter (DJF)
