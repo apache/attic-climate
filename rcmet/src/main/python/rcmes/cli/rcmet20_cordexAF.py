@@ -3,10 +3,13 @@
 # 0. Keep both Peter's original and modified libraries
 
 # Python Standard Lib Imports
-import sys
-import os
-import glob
+import argparse
+import ConfigParser
 import datetime
+import glob
+import os
+import sys
+import json
 
 # 3rd Party Modules
 import numpy as np
@@ -14,19 +17,62 @@ import numpy.ma as ma
 
 # RCMES Imports
 # Appending rcmes via relative path
-sys.path.append(os.path.abspath('../.'))
+#sys.path.append(os.path.abspath('../.'))
 import storage.files_v12
 import storage.rcmed as db
 import toolkit.do_data_prep_20
 import toolkit.do_metrics_20
-import toolkit.process_v12
+import toolkit.process as process
+from classes import Settings, Model, BoundingBox, SubRegion, GridBox
 
-# Empty dictionaries to collect all of the user's inputs 
-OPTIONS = {}
-MASK = {}
-MODEL = {}
-PARAMS = {}
-SETTINGS = {}
+parser = argparse.ArgumentParser(description='Regional Climate Model Evaluation Toolkit.  Use -h for help and options')
+parser.add_argument('-c', '--config', dest='CONFIG', help='Path to an evaluation configuration file')
+args = parser.parse_args()
+
+
+def getSettings(settings):
+    """
+    This function will collect 2 parameters from the user about the RCMET run they have started.
+    
+    Input::
+        settings - Empty Python Dictionary they will be used to store the user supplied inputs
+        
+    Output::
+        None - The user inputs will be added to the supplied dictionary.
+    """
+    settings['workDir'] = os.path.abspath(raw_input('Please enter workDir:\n> '))
+    if os.path.isdir(settings['workDir']):
+        pass
+    else:
+        makeDirectory(settings['workDir'])
+    
+    settings['cacheDir'] = os.path.abspath(raw_input('Please enter cacheDir:\n> '))
+    if os.path.isdir(settings['cacheDir']):
+        pass
+    else:
+        makeDirectory(settings['cacheDir'])    
+
+def setSettings(settings, config):
+    """
+    This function is used to set the values within the 'SETTINGS' dictionary when a user provides an external
+    configuration file.
+    
+    Input::
+        settings - Python Dictionary object that will collect the key : value pairs
+        config - A configparse object that contains the external config values
+    
+    Output::
+        None - The settings dictionary will be updated in place.
+    """
+    pass
+
+def makeDirectory(directory):
+    print "%s doesn't exist.  Trying to create it now." % directory
+    try:
+        os.mkdir(directory)
+    except OSError:
+        print "This program cannot create dir: %s due to permission issues." % directory
+        sys.exit()
 
 def rcmet_cordexAF():
     """
@@ -52,6 +98,8 @@ def rcmet_cordexAF():
     """
     print 'Start RCMET'
 
+
+    """  COMMENTED OUT UN-USED CODE
     # Specify GUI or nonGUI version [True/False]
     GUI = False
     user_input = int(raw_input('Enter interactive/specified run: [0/1]: \n> '))
@@ -59,12 +107,11 @@ def rcmet_cordexAF():
         GUI = True
 
     # 1.   Prescribe the directories and variable names for processing
-    dir_rcmet = '/nas/share3-wf/jinwonki/rcmet'   # The path to the python script to process the cordex-AF data
+    #dir_rcmet = '/nas/share3-wf/jinwonki/rcmet'   # The path to the python script to process the cordex-AF data
     if GUI: 
-        workdir = raw_input('Please enter workdir:\n> ')                                             # Store images
-        cachedir = raw_input('Please enter cachedir:\n> ')                                           # Store database cache
-        mdlDataDir = raw_input('Enter the model data directory (e.g., /nas/share4-cf/jinwonki/data/cordex-af):\n> ')      # The model data directory
-        print 'Model variable names: pr tas tasmax tasmin clt ua850 va850'
+        workdir = os.path.abspath(raw_input('Please enter workdir:\n> '))
+        cachedir = os.path.abspath(raw_input('Please enter cachedir:\n> '))
+        mdlDataDir = os.path.abspath(raw_input('Enter the model data directory (e.g., ~/data/cordex-af):\n> '))
         modelVarName = raw_input('Enter the model variable name from above:\n> ')     # Input model variable name
         modelLatVarName = raw_input('Enter the Latitude variable name:\n> ')     # Input model variable name
         modelLonVarName = raw_input('Enter the Longitude variable name:\n> ')     # Input model variable name
@@ -87,8 +134,11 @@ def rcmet_cordexAF():
         precipFlag = True
     else:
         precipFlag = False
-
+    """
     # 2.   Metadata for the RCMED database
+    
+    # TODO:  WORK OUT THE RCMED PARAMETERS API USAGE - Prolly need to move this into a PARAMETERS Object
+    """  COMMENTED OUT HARDCODED VALUES
     try:
         parameters = db.getParams()
     except Exception:
@@ -147,8 +197,15 @@ def rcmet_cordexAF():
         #idObsDat=6; idObsDatPara=3; obsTimeStep='monthly'                 # CRU3.1 - t2min
         #idObsDat=6; idObsDatPara=4; obsTimeStep='monthly'                 # CRU3.1 - cloud fraction
         ##### Data table to be replace with the use of metadata #################################
-     # assign observed data info: all variables are 'list'
-    obsDataset = []; data_type = []; obsDatasetId = []; obsParameterId = []; obsStartTime = []; obsEndTime = []; obsList = []
+    # assign observed data info: all variables are 'list'
+    obsDataset = []
+    data_type = []
+    obsDatasetId = []
+    obsParameterId = []
+    obsStartTime = []
+    obsEndTime = []
+    obsList = []
+
     for m in np.arange(numOBSs):
         obsDataset.append(db_datasets[idObsDat[m]])# obsDataset=db_datasets[idObsDat[m]]
         data_type.append(db_parameters[idObsDat[m]][idObsDatPara[m]])# data_type = db_parameters[idObsDat[m]][idObsDatPara[m]]
@@ -157,10 +214,13 @@ def rcmet_cordexAF():
         obsStartTime.append(db_dataset_startTimes[idObsDat[m]])# obsStartTime = db_dataset_startTimes[idObsDat[m]]
         obsEndTime.append(db_dataset_endTimes[idObsDat[m]])# obsEndTime = db_dataset_endTimes[idObsDat[m]]
         obsList.append(db_datasets[idObsDat[m]] + '_' + db_parameters[idObsDat[m]][idObsDatPara[m]])
+                        TRMM_pr_mon
+                        CRU3.1_pr
         
     print'obsDatasetId,obsParameterId,obsList,obsStartTime,obsEndTime= ', obsDatasetId, obsParameterId, obsStartTime, obsEndTime# return -1
-    obsStartTmax = max(obsStartTime); obsEndTmin = min(obsEndTime)# print 'obsStartTmax, obsEndTmin = ',obsStartTmax, obsEndTmin
-
+    obsStartTmax = max(obsStartTime)
+    obsEndTmin = min(obsEndTime)
+    
     ###################################################################
     # 3.   Load model data and assign model-related processing info
     ###################################################################
@@ -191,12 +251,22 @@ def rcmet_cordexAF():
         print 'Min/Max Lon & Lat: ', n, lonMin[n], lonMax[n], latMin[n], latMax[n]
     if GUI:
         instruction = raw_input('Do the long/lat ranges all model files match? (y/n)\n> ')
+
     else:
         instruction = 'y'
     print instruction
     if instruction != 'y':
         print 'Long & lat ranges of model data files do not match: EXIT'; return -1
-    latMin = latMin[0]; latMax = latMax[0]; lonMin = lonMin[0]; lonMax = lonMax[0]; print 'Min/Max Lon & Lat:', lonMin, lonMax, latMin, latMax; print ''
+    latMin = latMin[0]
+    latMax = latMax[0]
+    lonMin = lonMin[0]
+    lonMax = lonMax[0]
+    print 'Min/Max Lon & Lat:', lonMin, lonMax, latMin, latMax
+    print ''
+
+
+
+    # TODO:  Work out how to handle when model files have different ranges for Latitude, Longitude or Time
 
     # 3c: Decode model times into a python datetime object (removed in rcmes.process_v12.decode_model_times; var name is hardwired in 1.)
     #     Check the length of model data period. Retain only the files that contain the entire 20yr records
@@ -214,29 +284,54 @@ def rcmet_cordexAF():
 
     for n in np.arange(n_infiles):
         # extract model names for identification
-        ifile = FileList[n]; name = ifile[46:60]; ii = 3
+        ifile = FileList[n]
+        name = ifile[46:60]
+        ii = 3
+        
         for i in np.arange(ii):
-            if name[i] == '-': ii = i
+            if name[i] == '-': 
+                ii = i
         mdlName.append(name[0:ii])# print'model name= ',name
         # extract the temporal coverage of each model data file and the related time parameters
-        modelTimes = toolkit.process_v12.decode_model_timesK(ifile, timeName, file_type)
+        
+        modelTimes = process.getModelTimes(ifile, timeName)
+        
+        # NOW WE HAVE MODEL TIMES...WHAT ARE THEY USED FOR???
+        
+        # THIS APPEARS TO BE A MONTHLY SPECIFIC IMPLEMENTATAION DETAIL
         n_mos[n] = len(modelTimes)
-        y0 = min(modelTimes).strftime("%Y"); m0 = min(modelTimes).strftime("%m")
-        y1 = max(modelTimes).strftime("%Y"); m1 = max(modelTimes).strftime("%m")
+        
+        # PARSE OUT THE Min(YEAR and MONTH) and Max(YEAR and MONTH)
+        # Could this merely be a MinTime and MaxTime so essentially a TimeRange?
+        
+        
+        y0 = min(modelTimes).strftime("%Y")
+        m0 = min(modelTimes).strftime("%m")
+        y1 = max(modelTimes).strftime("%Y")
+        m1 = max(modelTimes).strftime("%m")
+        
+        
+        
         if mdlTimeStep == 'monthly':
-            d0 = 1; d1 = 1
+            d0 = 1
+            d1 = 1
         else:
-            d0 = mix(modelTimes).strftime("%d"); d1 = max(modelTimes).strftime("%d")
+            d0 = min(modelTimes).strftime("%d")
+            d1 = max(modelTimes).strftime("%d")
+            
         minMdlT = datetime.datetime(int(y0), int(m0), int(d0), 0, 0, 0, 0)
         maxMdlT = datetime.datetime(int(y1), int(m1), int(d1), 0, 0, 0, 0)
-        mdlStartT.append(minMdlT); mdlEndT.append(maxMdlT)
+        
+        # AFTER all the Datetime to string to int and back to datetime, we are left with the ModelTimeStart and ModelTimeEnd
+        mdlStartT.append(minMdlT)
+        mdlEndT.append(maxMdlT)
 
     print 'Mdl Times decoded: n= ', n, ' Name: ', mdlName[n], ' length= ', len(modelTimes), \
           ' 1st mdl time: ', mdlStartT[n].strftime("%Y/%m"), ' Lst mdl time: ', mdlEndT[n].strftime("%Y/%m")
 
     #print 'mdlStartT'; print mdlStartT; print 'mdlEndT'; print mdlEndT
     #print max(mdlStartT),min(mdlEndT)
-
+    
     # get the list of models to be evaluated and the period of evaluation
     # July 25, 2011: the selection of model and evaluation period are modified:
     #   1. Default: If otherwise specified, select the longest overlapping period and exclude the model outputs that do not cover the default period
@@ -249,7 +344,9 @@ def rcmet_cordexAF():
     endTime = []
     
     for n in np.arange(n_infiles):
-        startTime.append(max(mdlStartT[n], obsStartTmax)); endTime.append(min(mdlEndT[n], obsEndTmin))
+        startTime.append(max(mdlStartT[n], obsStartTmax))
+        endTime.append(min(mdlEndT[n], obsEndTmin))
+        
         #print n,mdlStartT[n],mdlEndT[n],startTime[n],endTime[n]
         yy = int(startTime[n].strftime("%Y"))
         mm = int(startTime[n].strftime("%m"))
@@ -269,7 +366,10 @@ def rcmet_cordexAF():
         endTime[n] = datetime.datetime(int(yy), int(mm), 1, 0, 0, 0, 0)
         print mdlName[n], ' common start/end time: ', startTime[n], endTime[n]
 
-    maxAnlT0 = min(startTime); maxAnlT1 = max(endTime); minAnlT0 = max(startTime); minAnlT1 = min(endTime)
+    maxAnlT0 = min(startTime)
+    maxAnlT1 = max(endTime)
+    minAnlT0 = max(startTime)
+    minAnlT1 = min(endTime)
     #print startTime; print endTime
     print 'max common period: ', maxAnlT0, '-', maxAnlT1; print 'min common period: ', minAnlT0, '-', minAnlT1
     
@@ -307,6 +407,7 @@ def rcmet_cordexAF():
         
     print 'Final: startTime/endTime: ', startTime, '/', endTime
 
+
     # select model data for analysis and analysis period
     k = 0
     newFileList = []
@@ -316,6 +417,9 @@ def rcmet_cordexAF():
         ifile = FileList[n]
         nMos = n_mos[n]
         print mdlName[n], n_mos[n], mdlStartT[n], startTime, mdlEndT[n], endTime
+        
+        # LOOP OVER THE MODEL START TIMES AND DETERMINE WHICH TO KEEP based on user entered Start/End Years
+        
         if mdlStartT[n] <= startTime and mdlEndT[n] >= endTime:
             newFileList.append(ifile)
             name.append(mdlName[n])
@@ -331,6 +435,7 @@ def rcmet_cordexAF():
         print n, mdlName[n], FileList[n]
     
     # 6:   Select spatial regridding options
+    # PULLED DOWN INTO THE MAIN Loop
     regridOption = 2      # for multi-model cases, this option can be selected only when all model data are on the same grid system.
     naLons = 1
     naLats = 1
@@ -361,7 +466,8 @@ def rcmet_cordexAF():
         lonMax = 60.28
         latMin = -45.76
         latMax = 42.24
-        naLons = int((lonMax - lonMin + 1.e-5 * dLon) / dLon) + 1; naLats = int((latMax - latMin + 1.e-5 * dLat) / dLat) + 1
+        naLons = int((lonMax - lonMin + 1.e-5 * dLon) / dLon) + 1
+        naLats = int((latMax - latMin + 1.e-5 * dLat) / dLat) + 1
 
     if GUI:
         if regridOption == 2:
@@ -376,6 +482,7 @@ def rcmet_cordexAF():
             nLats = int((latMax - latMin + 1.e-5 * dLat) / dLat) + 1
             
     print 'Spatial re-grid data on the ', regridOption, ' grid'
+
 
     # 7:   Temporal regridding: Bring the model and obs data to the same temporal grid for comparison
     #      (e.g., daily vs. daily; monthly vs. monthly)
@@ -405,6 +512,7 @@ def rcmet_cordexAF():
         timeRegridOption = 'daily'
         
     print 'timeRegridOption= ', timeRegridOption
+    
 
     #******************************************************************************************************************
     # 8:   Select whether to perform Area-Averaging over masked region
@@ -431,6 +539,7 @@ def rcmet_cordexAF():
     rgnSelect = 0
     
     choice = 'y'
+
     if GUI:
         choice = raw_input('Do you want to calculate area averages over a masked region of interest? [y/n]\n> ').lower()
         if choice == 'y':
@@ -449,8 +558,11 @@ def rcmet_cordexAF():
             #  maskLatMin = float(raw_input('Please enter the latitude at the lower edge of the mask region:\n> '))
             #  maskLatMax = float(raw_input('Please enter the latitude at the upper edge of the mask region:\n> '))
     ## maskInputChoice = 0/1: Load spatial mask from file/specifify with long,lat range'
+
+    
     if choice == 'y':
-        maskOption = 1; maskInputChoice = 1
+        maskOption = 1
+        maskInputChoice = 1
         if maskInputChoice == 1:
             for n in np.arange(numSubRgn):
                 print 'Subregion [', n, '] ', subRgnName[n], subRgnLon0[n], 'E - ', subRgnLon1[n], ' E: ', subRgnLat0[n], 'N - ', subRgnLat1[n], 'N'
@@ -464,6 +576,7 @@ def rcmet_cordexAF():
     
     # 9.   Select properties to evaluate/analyze
     # old Section 8: Select: calculate seasonal cycle composites
+    
     seasonalCycleOption = 'y'
     if GUI:
         seasonalCycleOption = raw_input('Composite the data to show seasonal cycles? [y/n]\n> ').lower()
@@ -471,6 +584,7 @@ def rcmet_cordexAF():
         seasonalCycleOption = 1
     else:
         seasonalCycleOption = 0
+
       
     # Section 9: Select Peformance Metric
     choice = 0
@@ -506,6 +620,7 @@ def rcmet_cordexAF():
     if choice == 6:
         metricOption = 'rms'
 
+
     #  Select output option
     FoutOption = 0
     if GUI:
@@ -520,6 +635,8 @@ def rcmet_cordexAF():
     ###################################################################################################
     # Section 11: Select Plot Options
     ###################################################################################################
+
+
     modifyPlotOptions = 'no'
     plotTitle = modelVarName + '_'
     plotFilenameStub = modelVarName + '_'
@@ -531,34 +648,56 @@ def rcmet_cordexAF():
         plotTitle = raw_input('Enter the plot title:\n> ')
         plotFilenameStub = raw_input('Enter the filename stub to use, without suffix e.g. files will be named <YOUR CHOICE>.png\n> ')
 
-    ###################################################################################################
-    # Section 13: Run RCMET, passing in all of the user options
-    ###################################################################################################
-    print'------------------------------'; print'End of preprocessor: Run RCMET'; print'------------------------------'
 
-    # ToDo4CAM: Add an option to write a file that includes all options selected before this step to help repeating the same analysis.
+
+    print'------------------------------'
+    print'End of preprocessor: Run RCMET'
+    print'------------------------------'
+
+    """
+
+
+    # Section 13: Run RCMET, passing in all of the user options
+
+    # TODO: **Cameron** Add an option to write a file that includes all options selected before this step to help repeating the same analysis.
     # read-in and regrid both obs and model data onto a common grid system (temporally & spatially).
     # the data are passed to compute metrics and plotting
     # numOBSs & numMDLs will be increased by +1 for multiple obs & mdls, respectively, to accomodate obs and model ensembles
     # nT: the number of time steps in the data
-    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20.prep_data(\
-         cachedir, workdir, \
-         obsList, obsDatasetId, obsParameterId, \
-         startTime, endTime, \
-         latMin, latMax, lonMin, lonMax, dLat, dLon, naLats, naLons, \
-         FileList, \
-         numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName, \
-         modelVarName, precipFlag, modelTimeVarName, modelLatVarName, modelLonVarName, \
-         regridOption, timeRegridOption, maskOption, FoutOption)
+    
+    
+#    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20.prep_data(\
+#         cachedir, workdir, \
+#         obsList, obsDatasetId, obsParameterId, \
+#         startTime, endTime, \
+#         latMin, latMax, lonMin, lonMax, dLat, dLon, naLats, naLons, \
+#         FileList, \
+#         numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName, \
+#         modelVarName, precipFlag, modelTimeVarName, modelLatVarName, modelLonVarName, \
+#         regridOption, timeRegridOption, maskOption, FoutOption)
 
+    """
+    Parameter to Object Mapping
+    cachedir = settings.cacheDir
+    workdir = settings.cacheDir
+    obsList = obsDatasetList.each['longName']
+    """
+
+    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20(\
+          settings, obsDatasetList, gridBox, models, subRegionTuple)
+    
+    """
     print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
     # Input and regridding of both obs and model data are completed. now move to metrics calculations
 
     print '-----------------------------------------------'
     print 'mdlID  numMOs  mdlStartTime mdlEndTime fileName'
     print '-----------------------------------------------'
-  
+    
+    """
     mdlSelect = numMDL - 1                      # numMDL-1 corresponds to the model ensemble
+
+    """
     if GUI:
         n = 0
         while n < len(mdlList):
@@ -568,16 +707,19 @@ def rcmet_cordexAF():
         mdlSelect = int(raw_input(ask))
 
     print '----------------------------------------------------------------------------------------------------------'
+
     
     if maskOption == 1:
         seasonalCycleOption = 1
-        
+    
+    # TODO:  This seems like we can just use numOBS to compute obsSelect (obsSelect = numbOBS -1)
     if numOBS == 1:
         obsSelect = 1
     else:
         #obsSelect = 1          #  1st obs (TRMM)
         #obsSelect = 2          # 2nd obs (CRU3.1)
         obsSelect = numOBS      # obs ensemble
+
     obsSelect = obsSelect - 1   # convert to fit the indexing that starts from 0
 
     toolkit.do_metrics_20.metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, \
@@ -586,9 +728,254 @@ def rcmet_cordexAF():
                               numSubRgn, subRgnName, rgnSelect, \
                               obsParameterId, precipFlag, timeRegridOption, maskOption, seasonalCycleOption, metricOption, \
                                                                                            plotTitle, plotFilenameStub)
+    """
 
+def generateModels(modelConfig):
+    """
+    This function will return a list of Model objects that can easily be used for 
+    metric computation and other processing tasks.
+    
+    Input::  
+        modelConfig - list of ('key', 'value') tuples.  Below is a list of valid keys
+            filenamepattern - string i.e. '/nas/run/model/output/MOD*precip*.nc'
+            latvariable - string i.e. 'latitude'
+            lonvariable - string i.e. 'longitude'
+            timevariable - string i.e. 't'
+            timestep - string 'monthly' | 'daily' | 'annual'
+            varname - string i.e. 'pr'
 
+    Output::
+        modelList - List of Model objects
+    """
+    # Setup the config Data Dictionary to make parsing easier later
+    configData = {}
+    for entry in modelConfig:
+        configData[entry[0]] = entry[1]
 
+    modelFileList = None
+    for keyValTuple in modelConfig:
+        if keyValTuple[0] == 'filenamePattern':
+            modelFileList = glob.glob(keyValTuple[1])
+    
+    # Remove the filenamePattern from the dict since it is no longer used
+    configData.pop('filenamePattern')
+    
+    models = []
+    for modelFile in modelFileList:
+        configData['filename'] = modelFile
+        model = Model(**configData)
+        models.append(model)
+    
+    return models
+
+def generateSettings(settingsConfig):
+    """
+    Helper function to decouple the argument parsing from the Settings object creation
+    
+    Input::  
+        settingsConfig - list of ('key', 'value') tuples.
+            workdir - string i.e. '/nas/run/rcmet/work/'
+            cachedir - string i.e. '/tmp/rcmet/cache/'
+    Output::
+        settings - Settings Object
+    """
+    # Setup the config Data Dictionary to make parsing easier later
+    configData = {}
+    for entry in settingsConfig:
+        configData[entry[0]] = entry[1]
+        
+    return Settings(**configData)
+
+def generateDatasets(rcmedConfig):
+    """
+    Helper function to decouple the argument parsing from the RCMEDDataset object creation
+
+    Input::  
+        rcmedConfig - list of ('key', 'value') tuples.
+            obsDatasetId=3,10
+            obsParamId=36,32
+            obsTimeStep=monthly,monthly
+
+    Output::
+        datasets - list of RCMEDDataset Objects
+    # Setup the config Data Dictionary to make parsing easier later
+    """
+    delimiter = ','
+    configData = {}
+    for entry in rcmedConfig:
+        if delimiter in entry[1]:
+            # print 'delim found - %s' % entry[1]
+            valueList = entry[1].split(delimiter)
+            configData[entry[0]] = valueList
+        else:
+            configData[entry[0]] = entry[1]
+
+    return configData
+
+def tempGetYears():
+    startYear = int(raw_input('Enter start year YYYY \n'))
+    endYear = int(raw_input('Enter end year YYYY \n'))
+    # CGOODALE - Updating the Static endTime to be 31-DEC
+    startTime = datetime.datetime(startYear, 1, 1, 0, 0)
+    endTime = datetime.datetime(endYear, 12, 31, 0, 0)
+    return (startTime, endTime)
 
 if __name__ == "__main__":
-    rcmet_cordexAF()
+    
+    if args.CONFIG:
+        print 'Running using config file: %s' % args.CONFIG
+        # Parse the Config file
+        userConfig = ConfigParser.SafeConfigParser()
+        userConfig.optionxform = str # This is so the case is preserved on the items in the config file
+        userConfig.read(args.CONFIG)
+        settings = generateSettings(userConfig.items('SETTINGS'))
+        models = generateModels(userConfig.items('MODEL'))
+        datasets = generateDatasets(userConfig.items('RCMED'))
+        
+        # Go get the parameter listing from the database
+        try:
+            params = db.getParams()
+        except Exception:
+            sys.exit()
+        
+        obsDatasetList = []
+        for param_id in datasets['obsParamId']:
+            for param in params:
+                if param['parameter_id'] == int(param_id):
+                    obsDatasetList.append(param)
+                else:
+                    pass
+
+        # TODO:  Find a home for the regrid parameters in the CONFIG file
+        # Setup the Regridding Options
+        regridOption = 'regular'
+        # dLon = 0.44 - Provided in the SETTINGS config section
+        # dLat = 0.44
+        lonMin = -24.64
+        lonMax = 60.28
+        latMin = -45.76
+        latMax = 42.24
+        # Create a Grid Box Object that extends the bounding box Object
+        gridBox = GridBox(latMin, lonMin, latMax, lonMax, settings.gridLonStep, settings.gridLatStep)
+       
+        """ These can now be accessed from the gridBox object using gridBox.latCount and gridBox.lonCount attributes
+        naLons = int((gridBox.lonMax - gridBox.lonMin + 1.e-5 * settings.gridLonStep) / settings.gridLonStep) + 1
+        print naLons
+        print int((gridBox.lonMax - gridBox.lonMin) / gridBox.lonStep) + 1 
+        naLats = int((gridBox.latMax - gridBox.latMin + 1.e-5 * settings.gridLatStep) / settings.gridLatStep) + 1
+        """
+        timeRegridOption = settings.temporalGrid
+        
+        # TODO:  How do we support n subregions as Jinwon has below?
+        
+        numSubRgn = 21
+#        subRgnLon0 = ma.zeros(numSubRgn)
+#        subRgnLon1 = ma.zeros(numSubRgn)
+#        subRgnLat0 = ma.zeros(numSubRgn)
+#        subRgnLat1 = ma.zeros(numSubRgn)
+        # 21 rgns: SMHI11 + W+C+E. Mediterrenean (JK) + 3 in UCT (Western Sahara, Somalia, Madagascar) + 4 in Mideast
+        subRgnLon0 = [-10.0, 0.0, 10.0, 20.0, -19.3, 15.0, -10.0, -10.0, 33.9, 44.2, 10.0, 10.0, 30.0, 13.6, 13.6, 20.0, 43.2, 33.0, 45.0, 43.0, 50.0]   # HYB 21 rgns
+        subRgnLon1 = [  0.0, 10.0, 20.0, 33.0, -10.2, 30.0, 10.0, 10.0, 40.0, 51.8, 25.0, 25.0, 40.0, 20.0, 20.0, 35.7, 50.3, 40.0, 50.0, 50.0, 58.0]   # HYB 21 rgns
+        subRgnLat0 = [ 29.0, 29.0, 25.0, 25.0, 12.0, 15.0, 7.3, 5.0, 6.9, 2.2, 0.0, -10.0, -15.0, -27.9, -35.0, -35.0, -25.8, 25.0, 28.0, 13.0, 20.0]   # HYB 21 rgns
+        subRgnLat1 = [ 36.5, 37.5, 32.5, 32.5, 20.0, 25.0, 15.0, 7.3, 15.0, 11.8, 10.0, 0.0, 0.0, -21.4, -27.9, -21.4, -11.7, 35.0, 35.0, 20.0, 27.5]   # HYB 21 rgns
+        subRgnName = ['R01', 'R02', 'R03', 'R04', 'R05', 'R06', 'R07', 'R08', 'R09', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15', 'R16', 'R17', 'R18', 'R19', 'R20', 'R21']   # HYB 21 rgns
+        print subRgnName
+        
+        subRegionTuple = (numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName)
+        
+        
+        rgnSelect = 3
+        maskOption = settings.maskOption
+        
+        bbox = BoundingBox(subRgnLat0[rgnSelect], 
+                           subRgnLon0[rgnSelect], 
+                           subRgnLat1[rgnSelect], 
+                           subRgnLon1[rgnSelect])
+        
+        regionMask = SubRegion(subRgnName[rgnSelect], bbox)
+        
+        # Using a 'mask' instance of the BoundingBox object
+#        maskLonMin = 0
+#        maskLonMax = 0
+#        maskLatMin = 0
+#        maskLatMax = 0
+        
+        choice = 'y'
+        
+        #  THIS JUST MEANS A USER DEFINED MASK IS BEING USED (basically from the hardcoded values listed above (line 819 ish)
+        maskInputChoice = 1
+
+        if maskInputChoice == 1:
+            for n in np.arange(numSubRgn):
+                print 'Subregion [', n, '] ', subRgnName[n], subRgnLon0[n], 'E - ', subRgnLon1[n], ' E: ', subRgnLat0[n], 'N - ', subRgnLat1[n], 'N'
+            rgnSelect = 3
+        
+        # Section 9: Select Peformance Metric
+        metricOption = 'bias'
+        FoutOption = 0
+        
+        # Section 11: Select Plot Options
+        # TODO: Using first model in models since Var name is the same across all
+        modifyPlotOptions = 'no'
+        plotTitle = models[0].varName + '_'
+        plotFilenameStub = models[0].varName + '_'
+        
+        print'------------------------------'
+        print'End of preprocessor: Run RCMET'
+        print'------------------------------'
+        
+        numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20.prep_data(settings, obsDatasetList, gridBox, models, subRegionTuple)
+        
+        
+        print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
+        
+        """FROM THE UPPER SECTION OF CODE"""
+
+        mdlSelect = numMDL - 1                      # numMDL-1 corresponds to the model ensemble
+    
+        """ Disregard GUI block for now
+        if GUI:
+            n = 0
+            while n < len(mdlList):
+                print n, n_mos[n], mdlStartT[n], mdlEndT[n], FileList[n][35:]
+                n += 1
+            ask = 'Enter the model ID to be evaluated from above:  ', len(FileList), ' for the model-ensemble: \n'
+            mdlSelect = int(raw_input(ask))
+    
+        print '----------------------------------------------------------------------------------------------------------'
+        """
+        
+        if maskOption:
+            seasonalCycleOption = True
+        
+        # TODO:  This seems like we can just use numOBS to compute obsSelect (obsSelect = numbOBS -1)
+        if numOBS == 1:
+            obsSelect = 1
+        else:
+            #obsSelect = 1          #  1st obs (TRMM)
+            #obsSelect = 2          # 2nd obs (CRU3.1)
+            obsSelect = numOBS      # obs ensemble
+    
+        obsSelect = obsSelect - 1   # convert to fit the indexing that starts from 0
+    
+    
+    
+        # TODO:  Undo the following code when refactoring later
+        obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
+        precipFlag = models[0].precipFlag
+    
+        toolkit.do_metrics_20.metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, \
+                                  settings.workDir, \
+                                  mdlSelect, obsSelect, \
+                                  numSubRgn, subRgnName, rgnSelect, \
+                                  obsParameterId, precipFlag, timeRegridOption, maskOption, seasonalCycleOption, metricOption, \
+                                                                                               plotTitle, plotFilenameStub)
+        
+
+        
+    else:
+        print 'Interactive mode has been enabled'
+        #getSettings(SETTINGS)
+        print "But isn't implemented.  Try using the -c option instead"
+
+    #rcmet_cordexAF()

@@ -12,14 +12,55 @@ import storage.db_v12 as db
 import storage.files_20 as files
 import process_v12 as process
 
-def prep_data(cachedir, workdir, \
-              obsList, obsDatasetId, obsParameterId, \
-              startTime, endTime, \
-              latMin, latMax, lonMin, lonMax, dLat, dLon, naLats, naLons, \
-              mdlList, \
-              numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName, \
-              modelVarName, precipFlag, modelTimeVarName, modelLatVarName, modelLonVarName, \
-              regridOption, timeRegridOption, maskOption, FoutOption):
+def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
+    
+    
+    # TODO:  Stop the object Deserialization and work on refactoring the core code here
+    cachedir = settings.cacheDir
+    workdir = settings.cacheDir
+    startTime = settings.startDate
+    endTime = settings.endDate
+
+    # Use list comprehensions to deconstruct obsDatasetList
+    #  ['TRMM_pr_mon', 'CRU3.1_pr']    Basically a list of Dataset NAME +'_' + parameter name - THE 'CRU*' one triggers unit conversion issues later
+    # the plan here is to use the obsDatasetList which contains a longName key we can use.
+    obsList = [str(x['longName']) for x in obsDatasetList]
+    # Also using the obsDatasetList with a key of ['dataset_id']
+    obsDatasetId = [str(x['dataset_id']) for x in obsDatasetList]
+    # obsDatasetList ['paramter_id'] list
+    obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
+    # Ising the GridBox Object
+    latMin = gridBox.latMin
+    latMax = gridBox.latMax
+    lonMin = gridBox.lonMin
+    lonMax = gridBox.lonMax
+    naLats = gridBox.latCount
+    naLons = gridBox.lonCount
+    dLat = gridBox.latStep
+    dLon = gridBox.lonStep
+    mdlList = [model.filename for model in modelList]
+    # Deconstruct this tuple subRegionTuple = (numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName)
+    numSubRgn = subRegionTuple[0]
+    subRgnLon0 = subRegionTuple[1]
+    subRgnLon1 = subRegionTuple[2]
+    subRgnLat0 = subRegionTuple[3]
+    subRgnLat1 = subRegionTuple[4]
+    subRgnName = subRegionTuple[5]
+    
+    # Since all of the model objects in the modelList have the same Varnames and Precip Flag, I am going to merely 
+    # pull this from modelList[0] for now
+    modelVarName = modelList[0].varName
+    precipFlag = modelList[0].precipFlag
+    modelTimeVarName = modelList[0].timeVariable
+    modelLatVarName = modelList[0].latVariable
+    modelLonVarName = modelList[0].lonVariable
+    regridOption = settings.spatialGrid
+    timeRegridOption = settings.temporalGrid
+    
+    maskOption = settings.maskOption
+    FoutOption = settings.writeOutFile
+
+
 
     """
      Routine to read-in and re-grid both obs and mdl datasets.
@@ -54,7 +95,12 @@ def prep_data(cachedir, workdir, \
                    modelLonVarName  - string describing name of longitude variable in model file 
                    regridOption 	 - string: 'obs'|'model'|'regular'
                    timeRegridOption -string: 'full'|'annual'|'monthly'|'daily'
-                   maskOption - int (=1 if set)
+                   maskOption - Boolean
+                   
+                   # TODO:  This isn't true in the current codebase.
+                   Instead the SubRegion's are being used.  You can see that these values are not
+                   being used in the code, at least they are not being passed in from the function
+                   
                    maskLatMin - float (only used if maskOption=1)
                    maskLatMax - float (only used if maskOption=1)
     	         maskLonMin - float (only used if maskOption=1)
@@ -85,9 +131,8 @@ def prep_data(cachedir, workdir, \
     if regridOption == 'model':
         ifile = mdlList[0]
         typeF = 'nc'
-        modelLats, modelLons, mTimes = files.read_lolaT_from_file(ifile, modelLatVarName, modelLonVarName, modelTimeVarName, typeF)
-        lats = modelLats
-        lons = modelLons
+        lats, lons, mTimes = files.read_lolaT_from_file(ifile, modelLatVarName, modelLonVarName, modelTimeVarName, typeF)
+        
     elif regridOption == 'regular':
         lat = np.arange(naLats) * dLat + latMin
         lon = np.arange(naLons) * dLon + lonMin
@@ -102,6 +147,7 @@ def prep_data(cachedir, workdir, \
     ngrdX = lats.shape[1]
 
     regObsData = []
+    
     for n in np.arange(numOBSs):
         # spatial regridding
         oLats, oLons, oLevs, oTimes, oData = db.extract_data_from_db(obsDatasetId[n],
@@ -117,8 +163,11 @@ def prep_data(cachedir, workdir, \
         nstOBSs = oData.shape[0]         # note that the length of obs data can vary for different obs intervals (e.g., daily vs. monthly)
         
         print 'Regrid OBS dataset onto the ', regridOption, ' grid system: ngrdY, ngrdX, nstOBSs= ', ngrdY, ngrdX, nstOBSs
+        print 'For dataset: %s' % obsList[n]
         
         tmpOBS = ma.zeros((nstOBSs, ngrdY, ngrdX))
+        
+        print 'tmpOBS shape = ', tmpOBS.shape
         
         for t in np.arange(nstOBSs):
             tmpOBS[t, :, :] = process.do_regrid(oData[t, :, :], oLats, oLons, lats, lons)
@@ -131,6 +180,9 @@ def prep_data(cachedir, workdir, \
         
         # temporally regrid the spatially regridded obs data
         oData, newObsTimes = process.calc_average_on_new_time_unit_K(tmpOBS, oTimes, unit=timeRegridOption)
+        
+        print n,' time through loop, newObsTImes length is: ',len(newObsTimes)
+        
         tmpOBS = 0.
         
         # check the consistency of temporally regridded obs data
@@ -139,6 +191,9 @@ def prep_data(cachedir, workdir, \
         else:
             if oldObsTimes != newObsTimes:
                 print 'temporally regridded obs data time levels do not match at ', n - 1, n
+                print '%s Time through Loop' % (n+1)
+                print 'oldObsTimes Count: %s' % len(oldObsTimes)
+                print 'newObsTimes Count: %s' % len(newObsTimes)
                 # TODO:  We need to handle these cases using Try Except Blocks or insert a sys.exit if appropriate
                 return -1, -1, -1, -1
             else:
@@ -147,17 +202,23 @@ def prep_data(cachedir, workdir, \
         regObsData.append(oData)
 
     # all obs datasets have been read-in and regridded. convert the regridded obs data from 'list' to 'array'
-    # also finalize 'obsTimes', the time cooridnate values of the regridded obs data.
+# also finalize 'obsTimes', the time cooridnate values of the regridded obs data.
     # NOTE: using 'list_to_array' assigns values to the missing points; this has become a problem in handling the CRU data.
     #       this problem disappears by using 'ma.array'.
-    obsData = ma.array(regObsData); obsTimes = newObsTimes; regObsData = 0; oldObsTimes = 0
+    obsData = ma.array(regObsData)
+    obsTimes = newObsTimes
+    regObsData = 0
+    oldObsTimes = 0
     nT = len(obsTimes)
 
     # TODO:  Refactor this into a function within the toolkit module
     # compute the simple multi-obs ensemble if multiple obs are used
     if numOBSs > 1:
+        print 'numOBSs = ', numOBSs
         oData = obsData
+        print 'oData shape = ', oData.shape
         obsData = ma.zeros((numOBSs + 1, nT, ngrdY, ngrdX))
+        print 'obsData shape = ', obsData.shape
         avg = ma.zeros((nT, ngrdY, ngrdX))
         
         for i in np.arange(numOBSs):
@@ -288,9 +349,10 @@ def prep_data(cachedir, workdir, \
     #             or ii) Create the mask using latlonbox  
     #           then iii) Do the area-averaging
     
-    obsRgnAvg = ma.zeros((numOBSs, numSubRgn, nT)); mdlRgnAvg = ma.zeros((numMDLs, numSubRgn, nT))
+    obsRgnAvg = ma.zeros((numOBSs, numSubRgn, nT))
+    mdlRgnAvg = ma.zeros((numMDLs, numSubRgn, nT))
     
-    if maskOption == 1:  # i.e. define regular lat/lon box for area-averaging
+    if maskOption:  # i.e. define regular lat/lon box for area-averaging
         print 'Enter area-averaging: modelData.shape, obsData.shape ', modelData.shape, obsData.shape
         print 'Using Latitude/Longitude Mask for Area Averaging'
         for n in np.arange(numSubRgn):
@@ -329,10 +391,10 @@ def prep_data(cachedir, workdir, \
         mdlRgnAvg = 0.0
     
     # Output according to the output method options
-    # Create a binary file of raw obs & model data and exit. If maskOption==1, also write area-averaged time series
+    # Create a binary file of raw obs & model data and exit. If maskOption == True, also write area-averaged time series
     #   in the same data file.
 
-    if FoutOption == 1:
+    if FoutOption == 'binary':
         # write 1-d long and lat values
         fileName = workdir + '/lonlat' + '.bn'
         # clean up old file
@@ -351,7 +413,7 @@ def prep_data(cachedir, workdir, \
 
         files.writeBNdata(fileName, maskOption, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSubRgn, obsData, modelData, obsRgnAvg, mdlRgnAvg)
 
-    if FoutOption == 2:                    # print a netCDF file
+    if FoutOption == 'netcdf':                    # print a netCDF file
         foName = workdir + '/Tseries'
         tempName = foName + '.' + 'nc'
 

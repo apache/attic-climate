@@ -10,7 +10,7 @@ class BoundingBox(object):
         self.latMin = latMin
         self.lonMin = lonMin
         self.latMax = latMax
-        self.lonMin = lonMax
+        self.lonMax = lonMax
         
         
 class SubRegion(object):
@@ -18,17 +18,40 @@ class SubRegion(object):
     def __init__(self, name, bbox):
         self.name = name
         self.bbox = bbox
+        
+class GridBox(BoundingBox):
+    
+    def __init__(self, latMin, lonMin, latMax, lonMax, lonStep, latStep):
+        BoundingBox.__init__(self, latMin, lonMin, latMax, lonMax)
+        self.lonStep = lonStep
+        self.latStep = latStep
+        self.lonCount = int((self.lonMax - self.lonMin) / self.lonStep) + 1
+        self.latCount = int((self.latMax - self.latMin) / self.latStep) + 1
 
 class Settings(object):
     
-    def __init__(self, workDir, cacheDir, startDate, endDate, spatialGrid, gridLonStep, gridLatStep):
+    def __init__(self, workDir, cacheDir, startDate, endDate, spatialGrid, temporalGrid, gridLonStep, gridLatStep, mask, outputFile):
         self.workDir = os.path.abspath(workDir)
         self.cacheDir = os.path.abspath(cacheDir)
         self.startDate = datetime.strptime(startDate, '%Y%m%d')
         self.endDate = datetime.strptime(endDate, '%Y%m%d')
         self.spatialGrid = spatialGrid
+        self.temporalGrid = temporalGrid
         self.gridLonStep = float(gridLonStep)
         self.gridLatStep = float(gridLatStep)
+        if mask.lower() =='true':
+            self.maskOption = True
+        else:
+            self.maskOption = False
+
+        if outputFile.lower() == 'false':
+            self.writeOutFile = False
+        elif outputFile.lower() == 'binary':
+            self.writeOutFile = 'binary'
+        elif outputFile.lower() == 'netcdf':
+            self.writeOutFile = 'netcdf'
+        else:
+            self.writeOutFile = False
         """
         TODO:  These will be split apart into Object Attributes
         self.latMin=config['latmin']
@@ -80,6 +103,7 @@ class Model(object):
     
     def setLongitudeRange(self):
         self.lonMin, self.lonMax = files.getVariableRange(self.filename, self.lonVariable)
+        
 
 
 class Parameter(object):
