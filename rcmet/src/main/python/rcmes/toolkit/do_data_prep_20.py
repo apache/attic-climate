@@ -2,22 +2,22 @@
 
 import sys
 import os
-# Appending rcmes via relative path
-sys.path.append(os.path.abspath('../.'))
+
 import subprocess
 import numpy as np
 import numpy.ma as ma
 import Nio
-import storage.db_v12 as db
+import storage.db as db
 import storage.files_20 as files
 import process_v12 as process
 
-def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
+# TODO:  swap gridBox for Domain
+def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions=None):
     
     
     # TODO:  Stop the object Deserialization and work on refactoring the core code here
     cachedir = settings.cacheDir
-    workdir = settings.cacheDir
+    workdir = settings.workDir
     startTime = settings.startDate
     endTime = settings.endDate
 
@@ -39,13 +39,12 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
     dLat = gridBox.latStep
     dLon = gridBox.lonStep
     mdlList = [model.filename for model in modelList]
-    # Deconstruct this tuple subRegionTuple = (numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName)
-    numSubRgn = subRegionTuple[0]
-    subRgnLon0 = subRegionTuple[1]
-    subRgnLon1 = subRegionTuple[2]
-    subRgnLat0 = subRegionTuple[3]
-    subRgnLat1 = subRegionTuple[4]
-    subRgnName = subRegionTuple[5]
+    
+    numSubRgn = len(subRegions)
+    subRgnLon0 = [ x.lonMin for x in subRegions ]
+    subRgnLon1 = [ x.lonMax for x in subRegions ]
+    subRgnLat0 = [ x.latMin for x in subRegions ]
+    subRgnLat1 = [ x.latMax for x in subRegions ]
     
     # Since all of the model objects in the modelList have the same Varnames and Precip Flag, I am going to merely 
     # pull this from modelList[0] for now
@@ -57,7 +56,8 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
     regridOption = settings.spatialGrid
     timeRegridOption = settings.temporalGrid
     
-    maskOption = settings.maskOption
+    #TODO: Un hardcode this later
+    maskOption = True
     FoutOption = settings.writeOutFile
 
 
@@ -93,7 +93,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
                    modelTimeVarName - string describing name of time variable in model file 	
                    modelLatVarName  - string describing name of latitude variable in model file 
                    modelLonVarName  - string describing name of longitude variable in model file 
-                   regridOption 	 - string: 'obs'|'model'|'regular'
+                   regridOption 	 - string: 'obs'|'model'|'user'
                    timeRegridOption -string: 'full'|'annual'|'monthly'|'daily'
                    maskOption - Boolean
                    
@@ -133,7 +133,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
         typeF = 'nc'
         lats, lons, mTimes = files.read_lolaT_from_file(ifile, modelLatVarName, modelLonVarName, modelTimeVarName, typeF)
         
-    elif regridOption == 'regular':
+    elif regridOption == 'user':
         lat = np.arange(naLats) * dLat + latMin
         lon = np.arange(naLons) * dLon + lonMin
         lons, lats = np.meshgrid(lon, lat)
@@ -362,8 +362,11 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegionTuple):
             maskLatMin = subRgnLat0[n]
             maskLatMax = subRgnLat1[n]
             
-            mask = np.logical_or(np.logical_or(lats <= maskLatMin, lats >= maskLatMax), np.logical_or(lons <= maskLonMin, lons >= maskLonMax))
-            
+            print "N: %s S: %s E: %s, W: %s" % (maskLatMax, maskLatMin, maskLonMax, maskLonMin)
+
+            mask = np.logical_or(np.logical_or(lats <= maskLatMin, lats >= maskLatMax), 
+                                 np.logical_or(lons <= maskLonMin, lons >= maskLonMax))
+
             # TODO:  The next two for loops can be refactored into a function that operates on model and obs data
             # Calculate area-weighted averages within this region and store in new lists: first average obs data (single time series)
             for k in np.arange(numOBSs):

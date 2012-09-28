@@ -13,11 +13,11 @@ class BoundingBox(object):
         self.lonMax = lonMax
         
         
-class SubRegion(object):
+class SubRegion(BoundingBox):
     
-    def __init__(self, name, bbox):
+    def __init__(self, name, latMin, lonMin, latMax, lonMax):
+        BoundingBox.__init__(self, latMin, lonMin, latMax, lonMax)
         self.name = name
-        self.bbox = bbox
         
 class GridBox(BoundingBox):
     
@@ -28,9 +28,9 @@ class GridBox(BoundingBox):
         self.lonCount = int((self.lonMax - self.lonMin) / self.lonStep) + 1
         self.latCount = int((self.latMax - self.latMin) / self.latStep) + 1
 
-class Settings(object):
+class JobProperties(object):
     
-    def __init__(self, workDir, cacheDir, startDate, endDate, spatialGrid, temporalGrid, gridLonStep, gridLatStep, mask, outputFile):
+    def __init__(self, workDir, cacheDir, startDate, endDate, spatialGrid, temporalGrid, gridLonStep, gridLatStep, outputFile, latMin=None, latMax=None, lonMin=None, lonMax=None):
         self.workDir = os.path.abspath(workDir)
         self.cacheDir = os.path.abspath(cacheDir)
         self.startDate = datetime.strptime(startDate, '%Y%m%d')
@@ -39,10 +39,6 @@ class Settings(object):
         self.temporalGrid = temporalGrid
         self.gridLonStep = float(gridLonStep)
         self.gridLatStep = float(gridLatStep)
-        if mask.lower() =='true':
-            self.maskOption = True
-        else:
-            self.maskOption = False
 
         if outputFile.lower() == 'false':
             self.writeOutFile = False
@@ -52,25 +48,12 @@ class Settings(object):
             self.writeOutFile = 'netcdf'
         else:
             self.writeOutFile = False
-        """
-        TODO:  These will be split apart into Object Attributes
-        self.latMin=config['latmin']
-        self.latMax=config['latmax']
-        self.lonMin=config['lonmin']
-        self.lonMax=config['lonmax']
-        self.obsDatasetId=config['obsdatasetid']
-        self.obsParamId=config['obsparamid']
-        self.obsTimeStep=config['obstimestep']
-        self.startTime=config['starttime']
-        self.endTime=config['endtime']
-        self.mask=config['mask']
-
-        if self.mask == 'True':
-            self.maskLonMin=config['masklonmin']
-            self.maskLonMax=config['masklonmax']
-            self.maskLatMin=config['masklatmin']
-            self.maskLatMax=config['masklatmax']
-        """
+        
+        if self.spatialGrid.lower() == 'user':
+            self.latMin = float(latMin)
+            self.latMax = float(latMax)
+            self.lonMin = float(lonMin)
+            self.lonMax = float(lonMax)
 
     def obsDatasetCount(self):
         self.parameterList = self.obsParamId.split(',')
@@ -104,8 +87,6 @@ class Model(object):
     def setLongitudeRange(self):
         self.lonMin, self.lonMax = files.getVariableRange(self.filename, self.lonVariable)
         
-
-
 class Parameter(object):
     def __init__(self, param_id, shortName=None, description=None, endDate=None ):
         pass
