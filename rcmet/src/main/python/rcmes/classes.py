@@ -1,5 +1,7 @@
 import os
 from datetime import datetime as datetime
+import urllib
+import urllib2
 
 import storage.files as files
 import toolkit.process as process
@@ -97,8 +99,25 @@ class RCMED(object):
     
     def retriveData(self, parameter, dataBounds, timeStep=None):
         # Returns the data
-
         pass
+    
+    @classmethod
+    def isoDateString(self, pythonDate):
+        isoDate = pythonDate.strftime("%Y%m%dT%H%MZ")
+        return isoDate
+    
+    @classmethod
+    def jplUrl(self, datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir):
+        """ This will create a valid RCMED Query URL used to contact the JPL RCMED Instance"""
+        JPL_RCMED_URL = 'http://rcmes.jpl.nasa.gov/query-api/query.php?'
+        timeStart = self.isoDateString(startTime)
+        timeEnd = self.isoDateString(endTime)
+        query = [('datasetId',datasetID), ('parameterId',paramID), ('latMin',latMin), ('latMax',latMax),
+                 ('lonMin', lonMin), ('lonMax',lonMax), ('timeStart', timeStart), ('timeEnd', timeEnd)]
+        queryURL = urllib.urlencode(query)
+        urlRequest = JPL_RCMED_URL+queryURL
+        
+        return urlRequest
 
 class RCMEDDataset(object):
     
