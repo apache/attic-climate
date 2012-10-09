@@ -550,7 +550,7 @@ def getModelTimes(modelFile,timeVarName):
         raise
     
     units = None
-    TIME_UNITS = ['minutes', 'hours','days','months','years']
+    TIME_UNITS = ('minutes', 'hours','days','months','years')
     # search for 'seconds','minutes','hours', 'days', 'months', 'years' so know units
     for unit in TIME_UNITS:
         if re.search(unit, timeFormat):
@@ -564,6 +564,10 @@ def getModelTimes(modelFile,timeVarName):
     times=[]
 
     for xtime in xtimes[:]:
+        
+        # Cast time as an int
+        xtime = int(xtime)
+
         if units=='minutes':
             dt = datetime.timedelta(minutes=xtime)
             new_time = base_time + dt
@@ -600,6 +604,12 @@ def decodeTimeFromString(time_string):
        
        **Output:** mytime - a python datetime object
     '''
+
+    # This will deal with times that use decimal seconds
+    if '.' in time_string:
+        time_string = time_string.split('.')[0]+'0'
+    else:
+        pass
 
     try:
         mytime = time.strptime(time_string, '%Y-%m-%d %H:%M:%S')
