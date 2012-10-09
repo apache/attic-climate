@@ -150,12 +150,13 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions=None):
     
     for n in np.arange(numOBSs):
         # spatial regridding
-        oLats, oLons, oLevs, oTimes, oData = db.extract_data_from_db(obsDatasetId[n],
+        oLats, oLons, oLevs, oTimes, oData = db.extractData(obsDatasetId[n],
                                                                                obsParameterId[n],
                                                                                latMin, latMax,
                                                                                lonMin, lonMax,
                                                                                startTime, endTime,
                                                                                cachedir)
+        
         # TODO: modify this if block with new metadata usage.
         if precipFlag == True and obsList[n][0:3] == 'CRU':
             oData = 86400.0 * oData
