@@ -75,9 +75,15 @@ Vagrant::Config.run do |config|
   # some recipes and/or roles.
   #
   config.vm.provision :chef_solo do |chef|
-    chef.recipe_url = "http://people.apache.org/~ahart/other/chef/example/cookbooks.tar.gz"
+    chef.cookbooks_path = "../src/cookbooks"
     chef.add_recipe("vagrant_main")
   end
+
+  # Change the following to "true" to auto-check that the version of Guest Additions
+  # matches the version of your VirtualBox install. For production this is a GOOD
+  # idea, but it increases the build time considerably, so for development it is 
+  # turned off.
+  config.vbguest.auto_update = false;
 
   # Enable provisioning with chef server, specifying the chef server URL,
   # and the path to the validation key (relative to this Vagrantfile).
