@@ -457,71 +457,71 @@ def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
    return meanstorem,newTimesList
 
 def calc_running_accum_from_period_accum(data):
-   '''
-    Routine to calculate running total accumulations from individual period accumulations.
-    ::
-
-        e.g.  0,0,1,0,0,2,2,1,0,0
-           -> 0,0,1,1,1,3,5,6,6,6
-   
-    Input::
-         data: numpy array with time in the first axis
-   
-    Output::
-         running_acc: running accumulations
-   
-   '''
-   
-
-   running_acc = numpy.zeros_like(data)
-
-   if(len(data.shape)==1):
-     running_acc[0] = data[0]
-
-   if(len(data.shape)>1):
-     running_acc[0,:] = data[0,:]
-
-   for i in numpy.arange(data.shape[0]-1):
-       if(len(data.shape)==1):
-           running_acc[i+1] = running_acc[i] + data[i+1]
-
-       if(len(data.shape)>1):
-           running_acc[i+1,:] = running_acc[i,:] + data[i+1,:]
-
-   return running_acc
+    '''
+     Routine to calculate running total accumulations from individual period accumulations.
+     ::
+    
+         e.g.  0,0,1,0,0,2,2,1,0,0
+            -> 0,0,1,1,1,3,5,6,6,6
+    
+     Input::
+          data: numpy array with time in the first axis
+    
+     Output::
+          running_acc: running accumulations
+    
+    '''
+    
+    
+    running_acc = numpy.zeros_like(data)
+    
+    if(len(data.shape)==1):
+        running_acc[0] = data[0]
+    
+    if(len(data.shape)>1):
+        running_acc[0,:] = data[0,:]
+    
+    for i in numpy.arange(data.shape[0]-1):
+        if(len(data.shape)==1):
+            running_acc[i+1] = running_acc[i] + data[i+1]
+    
+        if(len(data.shape)>1):
+            running_acc[i+1,:] = running_acc[i,:] + data[i+1,:]
+    
+    return running_acc
 
 def ignore_boundaries(data,rim=10):
-   '''
-    Routine to mask the lateral boundary regions of model data to ignore them from calculations.
+    '''
+     Routine to mask the lateral boundary regions of model data to ignore them from calculations.
+     
+     Input::
+         data - a masked array of model data
+         rim - (optional) number of grid points to ignore
     
-    Input::
-        data - a masked array of model data
-        rim - (optional) number of grid points to ignore
-   
-    Output::
-        data - data array with boundary region masked
-
-   '''
-   
-   nx = data.shape[1]
-   ny = data.shape[0]
-
-   rimmask = numpy.zeros_like(data)
-   for j in numpy.arange(rim):
-      rimmask[j,0:nx-1] = 1.0
-
-   for j in ny-1-numpy.arange(rim):
-      rimmask[j,0:nx-1] = 1.0
-
-   for i in numpy.arange(rim):
-      rimmask[0:ny-1,i] = 1.0
-
-   for i in nx-1-numpy.arange(rim):
-      rimmask[0:ny-1,i] = 1.0
-
-   data = ma.masked_array(data,mask=rimmask)
-
-   return data
+     Output::
+         data - data array with boundary region masked
+    
+    '''
+    
+    nx = data.shape[1]
+    ny = data.shape[0]
+    
+    rimmask = numpy.zeros_like(data)
+    for j in numpy.arange(rim):
+        rimmask[j,0:nx-1] = 1.0
+    
+    for j in ny-1-numpy.arange(rim):
+        rimmask[j,0:nx-1] = 1.0
+    
+    for i in numpy.arange(rim):
+        rimmask[0:ny-1,i] = 1.0
+    
+    for i in nx-1-numpy.arange(rim):
+        rimmask[0:ny-1,i] = 1.0
+    
+    data = ma.masked_array(data,mask=rimmask)
+    
+    return data
 
 def getModelTimes(modelFile,timeVarName):
     '''
@@ -530,11 +530,12 @@ def getModelTimes(modelFile,timeVarName):
     into a python datetime structure
 
     Input::
-        filelist - list of model files
-        timeVarName - name of the time variable in the model files
+        modelFile - path to the model tile you want to extract the times list and modelTimeStep from
+        timeVarName - name of the time variable in the model file
 
     Output::
         times  - list of python datetime objects describing model data times
+        modelTimeStep - 'hourly','daily','monthly','annual'
     '''
 
     f = Nio.open_file(modelFile)
@@ -591,12 +592,77 @@ def getModelTimes(modelFile,timeVarName):
             new_time = base_time + dt
 
         times.append(new_time)
-    return times
+    
+    try:
+        timeStepLength = int(xtimes[1] - xtimes[0])
+        modelTimeStep = getModelTimeStep(units, timeStepLength)
+    except:
+        raise
+    
+    return times, modelTimeStep
+
+def getModelTimeStep(units, stepSize):
+    # Time units are now determined. Determine the time intervals of input data (mdlTimeStep)
+
+    if units == 'minutes':
+        if stepSize == 60:
+            modelTimeStep = 'hourly'
+        elif stepSize == 1440:
+            modelTimeStep = 'daily'
+        # 28 days through 31 days
+        elif 40320 <= stepSize <= 44640:
+            modelTimeStep = 'monthly'
+        # 365 days through 366 days 
+        elif 525600 <= stepSize <= 527040:
+            modelTimeStep = 'annual' 
+        else:
+            raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
+
+    elif units == 'hours':
+        if stepSize == 1:
+            modelTimeStep = 'hourly'
+        elif stepSize == 24:
+            modelTimeStep = 'daily'
+        elif 672 <= stepSize <= 744:
+            modelTimeStep = 'monthly' 
+        elif 8760 <= stepSize <= 8784:
+            modelTimeStep = 'annual' 
+        else:
+            raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
+
+    elif units == 'days':
+        if stepSize == 1:
+            modelTimeStep = 'daily'
+        elif 28 <= stepSize <=31:
+            modelTimeStep = 'monthly'
+        elif 365 <= stepSize <=366:
+            modelTimeStep = 'annual'
+        else:
+            raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
+
+    elif units == 'months':
+        if stepSize == 1:
+            modelTimeStep = 'monthly'
+        elif stepSize == 12:
+            modelTimeStep = 'annual'
+        else:
+            raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
+
+    elif units == 'years':
+        if stepSize == 1:
+            modelTimeStep = 'annual'
+        else:
+            raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
+
+    else:
+        errorMessage = 'the time unit ',units,' is not currently handled in this version.'
+        raise Exception(errorMessage)
+
+    return modelTimeStep
 
 def decodeTimeFromString(time_string):
     '''
      Decodes string into a python datetime object
-     
      *Method:* tries a bunch of different time format possibilities and hopefully one of them will hit.
      ::
 

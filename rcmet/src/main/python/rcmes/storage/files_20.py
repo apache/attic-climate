@@ -13,22 +13,34 @@ def findunique(seq):
     return keys.keys()
 
 
-def read_lolaT_from_file(ifile,latVarName,lonVarName,timeVarName,file_type):
-   ##################################################################################
-   # Read in the long & lat of model grid
-   ##################################################################################
+def read_lolaT_from_file(filename,latVarName,lonVarName,timeVarName,file_type):
+    """
+    Function that will return lat, lon, and time arrays
+    
+    Input::
+        filename - the file to inspect
+        latVarName - name of the Latitude Variable
+        lonVarName - name of the Longitude Variable
+        timeVarName - name of the Time Variable
+        fileType = type of file we are trying to parse
+    
+    Output::
+        lat - Array of Latitude values 
+        lon - Array of Longitude values
+        timestore - Python list of Datetime objects
+    """
 
-   tmp=Nio.open_file(ifile,format=file_type)
-   lonsraw = tmp.variables[lonVarName][:]
-   latsraw = tmp.variables[latVarName][:]
-   lonsraw[lonsraw>180] = lonsraw[lonsraw>180]-360.  # convert to -180,180 if necessary
-   if(latsraw.ndim == 1):
-     lon,lat = np.meshgrid(lonsraw,latsraw)
-   if(latsraw.ndim == 2):
-     lon = lonsraw; lat = latsraw
-   timestore = process.getModelTimes(ifile,timeVarName)
-   print '  read_lolaT_from_file: Lats, lons and times read in for the model domain'
-   return lat,lon,timestore
+    tmp=Nio.open_file(filename,format=file_type)
+    lonsraw = tmp.variables[lonVarName][:]
+    latsraw = tmp.variables[latVarName][:]
+    lonsraw[lonsraw>180] = lonsraw[lonsraw>180]-360.  # convert to -180,180 if necessary
+    if(latsraw.ndim == 1):
+        lon,lat = np.meshgrid(lonsraw,latsraw)
+    if(latsraw.ndim == 2):
+        lon = lonsraw; lat = latsraw
+    timestore, _ = process.getModelTimes(filename,timeVarName)
+    print '  read_lolaT_from_file: Lats, lons and times read in for the model domain'
+    return lat,lon,timestore
 
 def read_data_from_one_file(ifile,myvar,timeVarName,lat,file_type):
    ##################################################################################
@@ -62,7 +74,7 @@ def read_data_from_one_file(ifile,myvar,timeVarName,lat,file_type):
    t2store=t2tmp
    f.close()
    print '  read_data_from_one_file: Data read in successfully with dimensions: ',t2store.shape
-   timestore = process.getModelTimes(ifile,timeVarName)
+   timestore, _ = process.getModelTimes(ifile,timeVarName)
    return timestore, t2store
 
 def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,file_type):
@@ -143,7 +155,7 @@ def read_data_from_file_list_K(filelist,myvar,timeVarName,latVarName,lonVarName,
 
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
    ifile=filelist[0]
-   timestore = process.getModelTimes(ifile,timeVarName)
+   timestore, _ = process.getModelTimes(ifile,timeVarName)
 
    return lat, lon, timestore, t2store
 

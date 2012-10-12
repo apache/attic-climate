@@ -13,6 +13,7 @@ import json
 import storage.rcmed as db
 import toolkit.do_data_prep_20
 import toolkit.do_metrics_20
+import toolkit.process as process
 
 from classes import JobProperties, Model, GridBox, SubRegion
 
@@ -97,6 +98,8 @@ def generateModels(modelConfig):
     
     models = []
     for modelFile in modelFileList:
+        # use getModelTimes(modelFile,timeVarName) to generate the modelTimeStep and time list
+        _ , configData['timeStep'] = process.getModelTimes(modelFile, configData['timeVariable'])
         configData['filename'] = modelFile
         model = Model(**configData)
         models.append(model)
