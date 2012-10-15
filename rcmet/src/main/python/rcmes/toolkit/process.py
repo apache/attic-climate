@@ -594,7 +594,7 @@ def getModelTimes(modelFile,timeVarName):
         times.append(new_time)
     
     try:
-        timeStepLength = int(xtimes[1] - xtimes[0])
+        timeStepLength = int(xtimes[1] - xtimes[0] + 1.e-12)
         modelTimeStep = getModelTimeStep(units, timeStepLength)
     except:
         raise
