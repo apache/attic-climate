@@ -319,16 +319,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions=None):
     print 'Reading and regridding model data are completed'; print 'numMDLs, modelData.shape= ', numMDLs, modelData.shape
     # compute the simple multi-model ensemble if multiple modles are evaluated
     if numMDLs > 1:
-        mdlData = modelData
-        modelData = ma.zeros((numMDLs + 1, nT, ngrdY, ngrdX))
-        avg = ma.zeros((nT, ngrdY, ngrdX))
-        for i in np.arange(numMDLs):
-            modelData[i, :, :, :] = mdlData[i, :, :, :]
-            avg[:, :, :] = avg[:, :, :] + mdlData[i, :, :, :]
-        avg = avg / float(numMDLs)
-        modelData[numMDLs, :, :, :] = avg[:, :, :]     # store the model-ensemble data
-        i0mdl = 0
-        i1mdl = numMDLs
+        modelData=np.vstack([modelData,ma.average(modelData, axis=0).reshape(1,nT,ngrdY,ngrdX)])
         numMDLs = numMDLs + 1 
         mdlName.append('ENS')
         print 'Eval mdl-mean timeseries for the obs periods: modelData.shape= ', modelData.shape

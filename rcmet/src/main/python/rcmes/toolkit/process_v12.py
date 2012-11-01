@@ -64,13 +64,14 @@ def extract_subregion_from_data_array(data, lats, lons, latmin, latmax, lonmin, 
     imin = numpy.where(wh == True)[1].min()
 
     # Cut out the sub-region from the data array
-    data2 = ma.zeros((data.shape[0], jmax-jmin, imax-imin))
-    data2 = data[:,jmin:jmax,imin:imax]
+    jmax=max(jmax,data.shape[1]-1)
+    imax=max(imax,data.shape[2]-1)
+    data2 = ma.zeros((data.shape[0], jmax-jmin+1, imax-imin+1))    
+    data2 = data[:,jmin:jmax+1,imin:imax+1]                        
 
     # Cut out sub-region from lats,lons arrays
-    lats2 = lats[jmin:jmax,imin:imax]
-    lons2 = lons[jmin:jmax,imin:imax]
-
+    lats2 = lats[jmin:jmax+1,imin:imax+1]                          
+    lons2 = lons[jmin:jmax+1,imin:imax+1]                         
     return data2, lats2, lons2
 
 
@@ -932,17 +933,6 @@ def extract_sub_time_selection(allTimes,subTimes,data):
     Output:
         subdata     - subselection of data array
     '''
-
-    # Create new array to store the subselection
-    subdata = numpy.zeros([len(subTimes),data.shape[1],data.shape[2]])
-
-    # Loop over all Times and when it is a member of the required subselection, copy the data across
-    i=0     # counter for allTimes
-    subi=0  # counter for subTimes
-    for t in allTimes:
-        if numpy.setmember1d(allTimes,subTimes):
-            subdata[subi,:,:] = data[i,:,:]
-            subi += 1
-        i += 1
-
+    temp_index = numpy.intersect1d(allTimes,subTimes)
+    subdata = data[temp_index,:,:]
     return subdata
