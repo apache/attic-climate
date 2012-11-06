@@ -284,14 +284,13 @@ def rcmet_cordexAF():
 
     for n in np.arange(n_infiles):
         # extract model names for identification
+        # Provided that model results are named as 
+        # mdlDataDir/projectName_mdlName_(some other information)_variableName.nc
         ifile = FileList[n]
-        name = ifile[46:60]
-        ii = 3
+        name = ifile[len(mdlDataDir)+1:len(mdlDataDir)+20]  # +1 excludes '/'
+        name_wo_project = name[name.find('_')+1:]   # file name without its project name
         
-        for i in np.arange(ii):
-            if name[i] == '-': 
-                ii = i
-        mdlName.append(name[0:ii])# print'model name= ',name
+        mdlName.append(name_wo_project[0:name_wo_project.find('_')]) # print'model name= ',name[0:name.find('_')]
         # extract the temporal coverage of each model data file and the related time parameters
         
         modelTimes = process.getModelTimes(ifile, timeName)

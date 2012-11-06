@@ -750,6 +750,10 @@ def decodeTimeFromString(time_string):
     Output: 
         mytime - a python datetime object
     '''
+    if '.' in time_string:
+        time_string = time_string.split('.')[0]+'0'
+    else:
+        pass
 
     try:
         mytime = time.strptime(time_string, '%Y-%m-%d %H:%M:%S')
@@ -799,8 +803,16 @@ def decodeTimeFromString(time_string):
     except ValueError:
         pass
 
+    try:
+        mytime = time.strptime(time_string, '%Y-%m-%d')
+        mytime = datetime.datetime(*mytime[0:6])
+        return mytime
 
-    print 'Error decoding time string: string does not match a predefined time format'
+    except ValueError:
+        pass
+
+    print 'Error decoding time string:',time_string,' does not match a predefined time format'
+    print '[Y-m-d H:M:S, Y/m/d H:M:S, Ymd H:M:S, Y:m:d H:M:S, YmdHMS, Y-m-d H:M, Y-m-d]'
     return 0
 
 def regrid_wrapper(regrid_choice, obsdata, obslats, obslons, mdldata, mdllats, mdllons):
