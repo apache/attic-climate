@@ -26,11 +26,11 @@ CREATE TABLE `dataPoint` (
   `granule_id` int(10) unsigned NOT NULL,
   `dataset_id` int(10) unsigned NOT NULL,
   `parameter_id` int(10) unsigned NOT NULL,
-  `time` datetime DEFAULT NOT NULL,
-  `latitude` double DEFAULT NOT NULL,
-  `longitude` double DEFAULT NOT NULL,
-  `vertical` double DEFAULT NOT NULL,
-  `value` double DEFAULT NOT NULL,
+  `time` datetime NOT NULL,
+  `latitude` double NOT NULL,
+  `longitude` double NOT NULL,
+  `vertical` double DEFAULT  NULL,
+  `value` double NOT NULL,
   PRIMARY KEY (`datapoint_id`),
   INDEX ( `time` , `latitude` , `longitude` )
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
