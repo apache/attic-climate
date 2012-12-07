@@ -24,23 +24,8 @@ directory "/usr/local/rcmet" do
   mode "0777"
 end
 
-# Apache Web Server Configuration -----------------------------------
-# Install the Apache2 HTTPD Web Server, and configure a virtual host
-# for the RCMET web application. 
-#
-include_recipe "apache2"
 
-execute "disable-default-site" do
-  command "sudo a2dissite default"
-  notifies :reload, resources(:service => "apache2"), :delayed
-end
-
-web_app "rcmet" do
-  template "rcmet.conf.erb"
-  notifies :reload, resources(:service => "apache2"), :delayed
-end
-
-# Python Environment ------------------------------------------------
+# Python Environment Setup ------------------------------------------
 # Install Python and package management tools 'pip' and 'virtualenv'.
 # Then create a virtual environment in  the 'rcmet' user's home 
 # directory, into which all RCMET python code and dependencies can be 
@@ -54,3 +39,18 @@ python_virtualenv "/usr/local/rcmet/python-env" do
   action :create
 end
 
+# Apache Web Server Configuration -----------------------------------
+# Install the Apache2 HTTPD Web Server, and configure a virtual host
+# for the RCMET web application.
+#
+include_recipe "apache2"
+
+execute "disable-default-site" do
+  command "sudo a2dissite default"
+  notifies :reload, resources(:service => "apache2"), :delayed
+end
+
+web_app "rcmet" do
+  template "rcmet.conf.erb"
+  notifies :reload, resources(:service => "apache2"), :delayed
+end
