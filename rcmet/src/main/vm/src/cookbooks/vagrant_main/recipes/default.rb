@@ -48,7 +48,7 @@ end
 #
 include_recipe "python"
 
-python_virtualenv "/usr/local/rcmet/env" do
+python_virtualenv "/usr/local/rcmet/python-env" do
   owner "rcmet"
   group "rcmet"
   action :create
