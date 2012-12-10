@@ -22,6 +22,50 @@ parser = argparse.ArgumentParser(description='Regional Climate Model Evaluation 
 parser.add_argument('-c', '--config', dest='CONFIG', help='Path to an evaluation configuration file')
 args = parser.parse_args()
 
+def checkConfigSettings(config):
+    """ This function will check the SETTINGS block of the user supplied config file.
+    This will only check if the working and cache dirs are writable from this program.
+    Additional configuration parameters can be checked here later on.
+    
+    Input::
+        config - ConfigParser configuration object
+    
+    Output::
+        none - An exception will be raised if something goes wrong
+    """
+    settings = config.items('SETTINGS')
+    for key_val in settings:
+        
+        if key_val[0] == 'workDir':
+            workDir = os.path.abspath(key_val[1])
+            
+            if os.path.exists(workDir):
+                workDirIsValid = os.access(workDir, os.W_OK | os.X_OK)
+                if workDirIsValid:
+                    pass
+                else:
+                    errorMessage =  "Unable to access the workDir: %s.  Check that you have the proper permissions to read and write to that directory." % workDir
+                    raise IOError(errorMessage)
+            else:
+                errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % workDir
+                raise IOError(errorMessage)
+        
+        if key_val[0] == 'cacheDir':
+            cacheDir = os.path.abspath(key_val[1])
+            
+            if os.path.exists(workDir):
+                cacheDirIsValid = os.access(cacheDir, os.W_OK | os.X_OK)
+                if cacheDirIsValid:
+                    pass
+                else:
+                    errorMessage =  "Unable to access the cacheDir: %s.  Check that you have the proper permissions to read and write to that directory." % cacheDir
+                    raise IOError(errorMessage)
+            else:
+                errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % workDir
+                raise IOError(errorMessage)
+        
+        else:
+            pass
 
 def getSettings(settings):
     """
@@ -211,6 +255,12 @@ if __name__ == "__main__":
         userConfig = ConfigParser.SafeConfigParser()
         userConfig.optionxform = str # This is so the case is preserved on the items in the config file
         userConfig.read(args.CONFIG)
+        
+        try:
+            checkConfigSettings(userConfig)
+        except:
+            raise
+        
         jobProperties = generateSettings(userConfig.items('SETTINGS'))
         models = generateModels(userConfig.items('MODEL'))
         datasetDict = makeDatasetsDictionary(userConfig.items('RCMED'))
