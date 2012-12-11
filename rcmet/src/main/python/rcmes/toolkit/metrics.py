@@ -1,3 +1,20 @@
+#
+#  Licensed to the Apache Software Foundation (ASF) under one or more
+#  contributor license agreements.  See the NOTICE file distributed with
+#  this work for additional information regarding copyright ownership.
+#  The ASF licenses this file to You under the Apache License, Version 2.0
+#  (the "License"); you may not use this file except in compliance with
+#  the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
 '''
 Module storing functions to calculate statistical metrics from numpy arrays
 '''
@@ -339,7 +356,6 @@ def calc_anom_corn(dataset_1, dataset_2, climatology=None):
         else:
             base_dataset = dataset_2
     
-    #---------------------------------------------------------------------
 
     for t in xrange(nt):
         mean_base = base_dataset[t, :, :].mean()
@@ -357,7 +373,6 @@ def calc_anom_corn(dataset_1, dataset_2, climatology=None):
     
     return anomcor
 
-###########################################################################
 # Anomaly Correlation
 
 def calc_anom_cor(t1, t2):
