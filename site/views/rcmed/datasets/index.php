@@ -34,12 +34,14 @@ if (empty ($app->request->segments[0])):
 	$tableWidget->addColumn('Dataset Name');
 	$tableWidget->addColumn('Abbreviation');
 	$tableWidget->addColumn('Description');
+	$tableWidget->addColumn('Dataset ID');
 
 	foreach ($response->data as $row) {
 		$tableWidget->addRow(array(
 			"<a href=\"" . SITE_ROOT . "/rcmed/datasets/{$row['shortName']}\">{$row['longName']}</a>",
 		    	"{$row['shortName']}",
 			"{$row['description']} ",
+			"{$row['dataset_id']} ",
 			));
 	}
 ?><div class="breadcrumbs">
