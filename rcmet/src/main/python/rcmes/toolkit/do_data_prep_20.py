@@ -1,13 +1,14 @@
 """Prepare Datasets both model and observations for analysis using metrics"""
 
-import sys
+
 import numpy as np
 import numpy.ma as ma
+import sys
+
 import Nio
-import storage.db as db
-import storage.files_20 as files
-import process_v12 as process
-import toolkit.regrid as regrid
+
+from storage import db, files
+from toolkit import process, regrid
 
 # TODO:  swap gridBox for Domain
 def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
