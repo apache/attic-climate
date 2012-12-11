@@ -6,16 +6,23 @@ import math
 import datetime
 import re
 import string
+import sys
 import time
+
+# RCMES Imports
+import process_v12
+import storage.db as db
+import storage.files_20 as files
+import toolkit.regrid as regrid
 
 # 3rd Party Imports
 import Nio
-import numpy
+import numpy as np
 import numpy.ma as ma
 from scipy.ndimage import map_coordinates
 
 
-def extract_subregion_from_data_array(data,lats,lons,latmin,latmax,lonmin,lonmax):
+def extract_subregion_from_data_array(data, lats, lons, latmin, latmax, lonmin, lonmax):
     '''
      Extract a sub-region from a data array.
      
@@ -43,27 +50,27 @@ def extract_subregion_from_data_array(data,lats,lons,latmin,latmax,lonmin,lonmax
     
 
     # Mask model data array to find grid points inside the supplied bounding box
-    whlat = (lats>latmin)&(lats<latmax)
-    whlon = (lons>lonmin)&(lons<lonmax)
+    whlat = (lats > latmin) & (lats < latmax)
+    whlon = (lons > lonmin) & (lons < lonmax)
     wh = whlat & whlon
 
     # Find required matrix indices describing the limits of the regular lat/lon bounding box
-    jmax = numpy.where(wh==True)[0].max()
-    jmin = numpy.where(wh==True)[0].min()
-    imax = numpy.where(wh==True)[1].max()
-    imin = numpy.where(wh==True)[1].min()
+    jmax = np.where(wh == True)[0].max()
+    jmin = np.where(wh == True)[0].min()
+    imax = np.where(wh == True)[1].max()
+    imin = np.where(wh == True)[1].min()
 
     # Cut out the sub-region from the data array
-    data2 = ma.zeros((data.shape[0],jmax-jmin,imax-imin))
-    data2 = data[:,jmin:jmax,imin:imax]
+    data2 = ma.zeros((data.shape[0], jmax - jmin, imax - imin))
+    data2 = data[:, jmin:jmax, imin:imax]
 
     # Cut out sub-region from lats,lons arrays
-    lats2 = lats[jmin:jmax,imin:imax]
-    lons2 = lons[jmin:jmax,imin:imax]
+    lats2 = lats[jmin:jmax, imin:imax]
+    lons2 = lons[jmin:jmax, imin:imax]
 
-    return data2,lats2,lons2
+    return data2, lats2, lons2
 
-def calc_area_mean(data,lats,lons,mymask='not set'):
+def calc_area_mean(data, lats, lons, mymask='not set'):
     '''
      Calculate Area Average of data in a masked array
      
@@ -81,43 +88,43 @@ def calc_area_mean(data,lats,lons,mymask='not set'):
     
 
     # If mask not passed in, then set maks to cover whole data domain
-    if(mymask=='not set'):
-       mymask=numpy.empty(data.shape)
-       mymask[:]=False	# NB. mask means (don't show), so False everywhere means use everything.
+    if(mymask == 'not set'):
+       mymask = np.empty(data.shape)
+       mymask[:] = False	# NB. mask means (don't show), so False everywhere means use everything.
    
     # Dimension check on lats, lons
     #  Sometimes these arrays are 3d, sometimes 2d, sometimes 1d
     #  This bit of code just converts to the required 2d array shape
-    if(len(lats.shape)==3):
-       lats=lats[0,:,:]
+    if(len(lats.shape) == 3):
+       lats = lats[0, :, :]
 
-    if(len(lons.shape)==3):
-       lons=lons[0,:,:]
+    if(len(lons.shape) == 3):
+       lons = lons[0, :, :]
 
-    if(numpy.logical_and(len(lats.shape)==1,len(lons.shape)==1)):
-       lons,lats=numpy.meshgrid(lons,lats)
+    if(np.logical_and(len(lats.shape) == 1, len(lons.shape) == 1)):
+       lons, lats = np.meshgrid(lons, lats)
  
     # Calculate grid length (assuming regular lat/lon grid)
-    dlat=lats[1,0]-lats[0,0]
-    dlon=lons[0,1]-lons[0,0]
+    dlat = lats[1, 0] - lats[0, 0]
+    dlon = lons[0, 1] - lons[0, 0]
 
     # Calculates weights for each grid box
-    myweights = calc_area_in_grid_box(lats,dlon,dlat)
+    myweights = calc_area_in_grid_box(lats, dlon, dlat)
 
     # Create a new masked array covering just user selected area (defined in mymask)
     #   NB. this preserves missing data points in the observations data
-    subdata = ma.masked_array(data,mask=mymask)
+    subdata = ma.masked_array(data, mask=mymask)
  
     if(myweights.shape != subdata.shape):
        myweights.resize(subdata.shape)
-       myweights[1:,:]=myweights[0,:]
+       myweights[1:, :] = myweights[0, :]
 
     # Calculate weighted mean using ma.average (which takes weights)
-    area_mean = ma.average(subdata,weights=myweights)
+    area_mean = ma.average(subdata, weights=myweights)
  
     return area_mean
 
-def calc_area_in_grid_box(latitude,dlat,dlon):
+def calc_area_in_grid_box(latitude, dlat, dlon):
     '''
      Calculate area of regular lat-lon grid box
      
@@ -132,105 +139,107 @@ def calc_area_in_grid_box(latitude,dlat,dlon):
       '''
 
     R = 6371000  # radius of Earth in metres
-    C = 2*math.pi*R
+    C = 2 * math.pi * R
 
-    latitude = numpy.radians(latitude)
+    latitude = np.radians(latitude)
 
-    A = (dlon*(C/360.)) * (dlat*(C/360.)*numpy.cos(latitude))
+    A = (dlon * (C / 360.)) * (dlat * (C / 360.) * np.cos(latitude))
 
     return A
 
-def do_regrid(q,lat,lon,lat2,lon2,order=1,mdi=-999999999):
-   '''
-    Perform regridding from one set of lat,lon values onto a new set (lat2,lon2)
-   
-    Input::
-        q          - the variable to be regridded
-        lat,lon    - original co-ordinates corresponding to q values
-        lat2,lon2  - new set of latitudes and longitudes that you want to regrid q onto 
-        order      - (optional) interpolation order 1=bi-linear, 3=cubic spline
-        mdi  	    - (optional) fill value for missing data (used in creation of masked array)
-     
-    Output::
-        q2  - q regridded onto the new set of lat2,lon2 
-   
-   '''
+def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi= -999999999):
+    '''
+     Perform regridding from one set of lat,lon values onto a new set (lat2,lon2)
+    
+     Input::
+         q          - the variable to be regridded
+         lat,lon    - original co-ordinates corresponding to q values
+         lat2,lon2  - new set of latitudes and longitudes that you want to regrid q onto 
+         order      - (optional) interpolation order 1=bi-linear, 3=cubic spline
+         mdi  	    - (optional) fill value for missing data (used in creation of masked array)
+      
+     Output::
+         q2  - q regridded onto the new set of lat2,lon2 
+    
+    '''
 
-   
-   
 
-   print 'Regridding onto new latitudes and longitudes'
+    print 'Regridding onto new latitudes and longitudes'
 
-   nlat = q.shape[0]
-   nlon = q.shape[1]
+    nlat = q.shape[0]
+    nlon = q.shape[1]
 
-   nlat2 = lat2.shape[0]
-   nlon2 = lon2.shape[1]
+    nlat2 = lat2.shape[0]
+    nlon2 = lon2.shape[1]
 
-   # To make our lives easier down the road, let's 
-   # turn these into arrays of x & y coords
-   loni = lon2.ravel()
-   lati = lat2.ravel()
+    # To make our lives easier down the road, let's 
+    # turn these into arrays of x & y coords
+    loni = lon2.ravel()
+    lati = lat2.ravel()
 
-   loni = loni.copy() # NB. it won't run unless you do this...
-   lati = lati.copy()
+    loni = loni.copy() # NB. it won't run unless you do this...
+    lati = lati.copy()
 
-   # Now, we'll set points outside the boundaries to lie along an edge
-   loni[loni > lon.max()] = lon.max()
-   loni[loni < lon.min()] = lon.min()
+    # Now, we'll set points outside the boundaries to lie along an edge
+    loni[loni > lon.max()] = lon.max()
+    loni[loni < lon.min()] = lon.min()
+    
+    # To deal with the "hard" break, we'll have to treat y differently,
+    # so we're just setting the min here...
+    lati[lati > lat.max()] = lat.max()
+    lati[lati < lat.min()] = lat.min()
+    
+    
+    # We need to convert these to (float) indicies
+    #   (xi should range from 0 to (nx - 1), etc)
+    loni = (nlon - 1) * (loni - lon.min()) / (lon.max() - lon.min())
+    
+    # Deal with the "hard" break in the y-direction
+    lati = (nlat - 1) * (lati - lat.min()) / (lat.max() - lat.min())
+    
+    # Notes on dealing with MDI when regridding data.
+    #  Method adopted here:
+    #    Use bilinear interpolation of data by default (but user can specify other order using order=... in call)
+    #    Perform bilinear interpolation of data, and of mask.
+    #    To be conservative, new grid point which contained some missing data on the old grid is set to missing data.
+    #            -this is achieved by looking for any non-zero interpolated mask values.
+    #    To avoid issues with bilinear interpolation producing strong gradients leading into the MDI,
+    #     set values at MDI points to mean data value so little gradient visible = not ideal, but acceptable for now.
+    
+    # Set values in MDI so that similar to surroundings so don't produce large gradients when interpolating
+    # Preserve MDI mask, by only changing data part of masked array object.
+    for shift in (-1, 1):
+        for axis in (0, 1):        
+            q_shifted = np.roll(q, shift=shift, axis=axis)
+            idx = ~q_shifted.mask * q.mask
+            q.data[idx] = q_shifted[idx]
 
-   # To deal with the "hard" break, we'll have to treat y differently, 
-   # so we're just setting the min here...
-   lati[lati > lat.max()] = lat.max()
-   lati[lati < lat.min()] = lat.min()
+    # Now we actually interpolate
+    # map_coordinates does cubic interpolation by default, 
+    # use "order=1" to preform bilinear interpolation instead...
+    q2 = map_coordinates(q, [lati, loni], order=order)
+    q2 = q2.reshape([nlat2, nlon2])
 
-   # We need to convert these to (float) indicies
-   #   (xi should range from 0 to (nx - 1), etc)
-   loni = (nlon - 1) * (loni - lon.min()) / (lon.max() - lon.min())
+    # Set values to missing data outside of original domain
+    q2 = ma.masked_array(q2, mask=np.logical_or(np.logical_or(lat2 >= lat.max(), 
+                                                              lat2 <= lat.min()), 
+                                                np.logical_or(lon2 <= lon.min(), 
+                                                              lon2 >= lon.max())))
+    
+    # Make second map using nearest neighbour interpolation -use this to determine locations with MDI and mask these
+    qmdi = np.zeros_like(q)
+    qmdi[q.mask == True] = 1.
+    qmdi[q.mask == False] = 0.
+    qmdi_r = map_coordinates(qmdi, [lati, loni], order=order)
+    qmdi_r = qmdi_r.reshape([nlat2, nlon2])
+    mdimask = (qmdi_r != 0.0)
+    
+    # Combine missing data mask, with outside domain mask define above.
+    q2.mask = np.logical_or(mdimask, q2.mask)
+    
+    return q2
 
-   # Deal with the "hard" break in the y-direction
-   lati = (nlat - 1) * (lati - lat.min()) / (lat.max() - lat.min())
-
-   # Notes on dealing with MDI when regridding data.
-   #  Method adopted here:
-   #    Use bilinear interpolation of data by default (but user can specify other order using order=... in call)
-   #    Perform bilinear interpolation of data, and of mask.
-   #    To be conservative, new grid point which contained some missing data on the old grid is set to missing data.
-   #            -this is achieved by looking for any non-zero interpolated mask values.
-   #    To avoid issues with bilinear interpolation producing strong gradients leading into the MDI,
-   #     set values at MDI points to mean data value so little gradient visible = not ideal, but acceptable for now.
-
-   # Set values in MDI so that similar to surroundings so don't produce large gradients when interpolating
-   # Preserve MDI mask, by only changing data part of masked array object.
-   for shift in (-1,1):
-     for axis in (0,1):        
-       q_shifted=numpy.roll(q,shift=shift,axis=axis)
-       idx=~q_shifted.mask * q.mask
-       q.data[idx]=q_shifted[idx]
-
-   # Now we actually interpolate
-   # map_coordinates does cubic interpolation by default, 
-   # use "order=1" to preform bilinear interpolation instead...
-   q2 = map_coordinates(q, [lati, loni],order=order)
-   q2 = q2.reshape([nlat2,nlon2])
-
-   # Set values to missing data outside of original domain
-   q2 = ma.masked_array(q2,mask=numpy.logical_or(numpy.logical_or(lat2>=lat.max(),lat2<=lat.min()),numpy.logical_or(lon2<=lon.min(),lon2>=lon.max())))
-
-   # Make second map using nearest neighbour interpolation -use this to determine locations with MDI and mask these
-   qmdi = numpy.zeros_like(q)
-   qmdi[q.mask==True] = 1.
-   qmdi[q.mask==False] = 0.
-   qmdi_r = map_coordinates(qmdi, [lati, loni],order=order)
-   qmdi_r = qmdi_r.reshape([nlat2,nlon2])
-   mdimask = (qmdi_r!=0.0)
-
-   # Combine missing data mask, with outside domain mask define above.
-   q2.mask = numpy.logical_or(mdimask,q2.mask)
-
-   return q2
-
-def create_mask_using_threshold(masked_array,threshold=0.5):
+def create_mask_using_threshold(masked_array, threshold=0.5):
    '''
     Routine to create a mask, depending on the proportion of times with missing data.
     For each pixel, calculate proportion of times that are missing data,
@@ -254,19 +263,19 @@ def create_mask_using_threshold(masked_array,threshold=0.5):
        nT = masked_array.mask.shape[0]
 
        # For each pixel, count how many times are masked.
-       nMasked = masked_array.mask[:,:,:].sum(axis=0)
+       nMasked = masked_array.mask[:, :, :].sum(axis=0)
 
        # Define new mask as when a pixel has over a defined threshold ratio of masked data
        #   e.g. if the threshold is 75%, and there are 10 times,
        #        then a pixel will be masked if more than 5 times are masked.
-       mymask = nMasked > (nT*threshold)
+       mymask = nMasked > (nT * threshold)
 
    except:
-       mymask = numpy.zeros_like(masked_array.data[0,:,:])
+       mymask = np.zeros_like(masked_array.data[0, :, :])
 
    return mymask
 
-def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
+def calc_average_on_new_time_unit(data, dateList, unit='monthly'):
    '''
     Routine to calculate averages on longer time units than the data exists on.
     
@@ -287,7 +296,7 @@ def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
    '''
 
    # First catch unknown values of time unit passed in by user
-   acceptable = (unit=='full')|(unit=='annual')|(unit=='monthly')|(unit=='daily')|(unit=='pentad')
+   acceptable = (unit == 'full') | (unit == 'annual') | (unit == 'monthly') | (unit == 'daily') | (unit == 'pentad')
 
    if not acceptable:
       print 'Error: unknown unit type selected for time averaging'
@@ -300,49 +309,49 @@ def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
    #  -depending on user selected averaging period.
 
    # Year list
-   if unit=='annual':
+   if unit == 'annual':
       print 'Calculating annual mean data'
       timeunits = []
 
-      for i in numpy.arange(len(dateList)):
+      for i in np.arange(len(dateList)):
          timeunits.append(str(dateList[i].year))
 
-      timeunits = numpy.array(timeunits, dtype=int)
+      timeunits = np.array(timeunits, dtype=int)
          
    # YearMonth format list
-   if unit=='monthly':
+   if unit == 'monthly':
       print 'Calculating monthly mean data'
       timeunits = []
 
-      for i in numpy.arange(len(dateList)):
+      for i in np.arange(len(dateList)):
          timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month))
 
-      timeunits = numpy.array(timeunits,dtype=int)
+      timeunits = np.array(timeunits, dtype=int)
 
    # YearMonthDay format list
-   if unit=='daily':
+   if unit == 'daily':
       print 'Calculating daily mean data'
       timeunits = []
  
-      for i in numpy.arange(len(dateList)):
+      for i in np.arange(len(dateList)):
          timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month) + \
                           str("%02d" % dateList[i].day))
 
-      timeunits = numpy.array(timeunits,dtype=int)
+      timeunits = np.array(timeunits, dtype=int)
 
 
    # TODO: add pentad setting using Julian days?
 
 
    # Full list: a special case
-   if unit=='full':
+   if unit == 'full':
       print 'Calculating means data over full time range'
       timeunits = []
 
-      for i in numpy.arange(len(dateList)):
+      for i in np.arange(len(dateList)):
          timeunits.append(999)  # i.e. we just want the same value for all times.
 
-      timeunits = numpy.array(timeunits, dtype=int)
+      timeunits = np.array(timeunits, dtype=int)
 
 
 
@@ -353,96 +362,96 @@ def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
    #   i.e. if data are already on required time unit then just pass data through and 
    #        calculate and return representative datetimes.
    processing_required = True
-   if len(timeunits)==(len(numpy.unique(timeunits))):
+   if len(timeunits) == (len(np.unique(timeunits))):
         processing_required = False
 
    # 1D data arrays, i.e. time series
-   if data.ndim==1:
+   if data.ndim == 1:
      # Create array to store the resulting data
-     meanstore = numpy.zeros(len(numpy.unique(timeunits)))
+     meanstore = np.zeros(len(np.unique(timeunits)))
   
      # Calculate the means across each unique time unit
-     i=0
-     for myunit in numpy.unique(timeunits):
+     i = 0
+     for myunit in np.unique(timeunits):
        if processing_required:
-         datam=ma.masked_array(data,timeunits!=myunit)
+         datam = ma.masked_array(data, timeunits != myunit)
          meanstore[i] = ma.average(datam)
 
        # construct new times list
        smyunit = str(myunit)
-       if len(smyunit)==4:  # YYYY
+       if len(smyunit) == 4:  # YYYY
         yyyy = int(myunit[0:4])
         mm = 1
         dd = 1
-       if len(smyunit)==6:  # YYYYMM
+       if len(smyunit) == 6:  # YYYYMM
         yyyy = int(smyunit[0:4])
         mm = int(smyunit[4:6])
         dd = 1
-       if len(smyunit)==8:  # YYYYMMDD
+       if len(smyunit) == 8:  # YYYYMMDD
         yyyy = int(smyunit[0:4])
         mm = int(smyunit[4:6])
         dd = int(smyunit[6:8])
-       if len(smyunit)==3:  # Full time range
+       if len(smyunit) == 3:  # Full time range
         # Need to set an appropriate time representing the mid-point of the entire time span
-        dt = dateList[-1]-dateList[0]
-        halfway = dateList[0]+(dt/2)
+        dt = dateList[-1] - dateList[0]
+        halfway = dateList[0] + (dt / 2)
         yyyy = int(halfway.year)
         mm = int(halfway.month)
         dd = int(halfway.day)
   
-       newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
-       i = i+1
+       newTimesList.append(datetime.datetime(yyyy, mm, dd, 0, 0, 0, 0))
+       i = i + 1
 
    # 3D data arrays
-   if data.ndim==3:
+   if data.ndim == 3:
 
      #datamask = create_mask_using_threshold(data,threshold=0.75)
 
      # Create array to store the resulting data
-     meanstore = numpy.zeros([len(numpy.unique(timeunits)),data.shape[1],data.shape[2]])
+     meanstore = np.zeros([len(np.unique(timeunits)), data.shape[1], data.shape[2]])
   
      # Calculate the means across each unique time unit
-     i=0
+     i = 0
      datamask_store = []
-     for myunit in numpy.unique(timeunits):
+     for myunit in np.unique(timeunits):
        if processing_required:
 
-         mask = numpy.zeros_like(data)
-         mask[timeunits!=myunit,:,:] = 1.0
+         mask = np.zeros_like(data)
+         mask[timeunits != myunit, :, :] = 1.0
 
          # Calculate missing data mask within each time unit...
-         datamask_at_this_timeunit = numpy.zeros_like(data)
-         datamask_at_this_timeunit[:]= create_mask_using_threshold(data[timeunits==myunit,:,:],threshold=0.75)
+         datamask_at_this_timeunit = np.zeros_like(data)
+         datamask_at_this_timeunit[:] = create_mask_using_threshold(data[timeunits == myunit, :, :], threshold=0.75)
          # Store results for masking later
          datamask_store.append(datamask_at_this_timeunit[0])
 
          # Calculate means for each pixel in this time unit, ignoring missing data (using masked array).
-         datam = ma.masked_array(data,numpy.logical_or(mask,datamask_at_this_timeunit))
-         meanstore[i,:,:] = ma.average(datam,axis=0)
+         datam = ma.masked_array(data, np.logical_or(mask, datamask_at_this_timeunit))
+         meanstore[i, :, :] = ma.average(datam, axis=0)
 
        # construct new times list
        smyunit = str(myunit)
-       if len(smyunit)==4:  # YYYY
+       if len(smyunit) == 4:  # YYYY
         yyyy = int(smyunit[0:4])
         mm = 1
         dd = 1
-       if len(smyunit)==6:  # YYYYMM
+       if len(smyunit) == 6:  # YYYYMM
         yyyy = int(smyunit[0:4])
         mm = int(smyunit[4:6])
         dd = 1
-       if len(smyunit)==8:  # YYYYMMDD
+       if len(smyunit) == 8:  # YYYYMMDD
         yyyy = int(smyunit[0:4])
         mm = int(smyunit[4:6])
         dd = int(smyunit[6:8])
-       if len(smyunit)==3:  # Full time range
+       if len(smyunit) == 3:  # Full time range
         # Need to set an appropriate time representing the mid-point of the entire time span
-        dt = dateList[-1]-dateList[0]
-        halfway = dateList[0]+(dt/2)
+        dt = dateList[-1] - dateList[0]
+        halfway = dateList[0] + (dt / 2)
         yyyy = int(halfway.year)
         mm = int(halfway.month)
         dd = int(halfway.day)
 
-       newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
+       newTimesList.append(datetime.datetime(yyyy, mm, dd, 0, 0, 0, 0))
 
        i += 1
 
@@ -451,10 +460,10 @@ def calc_average_on_new_time_unit(data,dateList,unit='monthly'):
 
      if processing_required:
         # Create masked array (using missing data mask defined above)
-        datamask_store = numpy.array(datamask_store)
+        datamask_store = np.array(datamask_store)
         meanstorem = ma.masked_array(meanstore, datamask_store)
 
-   return meanstorem,newTimesList
+   return meanstorem, newTimesList
 
 def calc_running_accum_from_period_accum(data):
     '''
@@ -473,24 +482,24 @@ def calc_running_accum_from_period_accum(data):
     '''
     
     
-    running_acc = numpy.zeros_like(data)
+    running_acc = np.zeros_like(data)
     
-    if(len(data.shape)==1):
+    if(len(data.shape) == 1):
         running_acc[0] = data[0]
     
-    if(len(data.shape)>1):
-        running_acc[0,:] = data[0,:]
+    if(len(data.shape) > 1):
+        running_acc[0, :] = data[0, :]
     
-    for i in numpy.arange(data.shape[0]-1):
-        if(len(data.shape)==1):
-            running_acc[i+1] = running_acc[i] + data[i+1]
+    for i in np.arange(data.shape[0] - 1):
+        if(len(data.shape) == 1):
+            running_acc[i + 1] = running_acc[i] + data[i + 1]
     
-        if(len(data.shape)>1):
-            running_acc[i+1,:] = running_acc[i,:] + data[i+1,:]
+        if(len(data.shape) > 1):
+            running_acc[i + 1, :] = running_acc[i, :] + data[i + 1, :]
     
     return running_acc
 
-def ignore_boundaries(data,rim=10):
+def ignore_boundaries(data, rim=10):
     '''
      Routine to mask the lateral boundary regions of model data to ignore them from calculations.
      
@@ -506,24 +515,24 @@ def ignore_boundaries(data,rim=10):
     nx = data.shape[1]
     ny = data.shape[0]
     
-    rimmask = numpy.zeros_like(data)
-    for j in numpy.arange(rim):
-        rimmask[j,0:nx-1] = 1.0
+    rimmask = np.zeros_like(data)
+    for j in np.arange(rim):
+        rimmask[j, 0:nx - 1] = 1.0
     
-    for j in ny-1-numpy.arange(rim):
-        rimmask[j,0:nx-1] = 1.0
+    for j in ny - 1 - np.arange(rim):
+        rimmask[j, 0:nx - 1] = 1.0
     
-    for i in numpy.arange(rim):
-        rimmask[0:ny-1,i] = 1.0
+    for i in np.arange(rim):
+        rimmask[0:ny - 1, i] = 1.0
     
-    for i in nx-1-numpy.arange(rim):
-        rimmask[0:ny-1,i] = 1.0
+    for i in nx - 1 - np.arange(rim):
+        rimmask[0:ny - 1, i] = 1.0
     
-    data = ma.masked_array(data,mask=rimmask)
+    data = ma.masked_array(data, mask=rimmask)
     
     return data
 
-def getModelTimes(modelFile,timeVarName):
+def getModelTimes(modelFile, timeVarName):
     '''
     TODO:  Do a better job handling dates here
     Routine to convert from model times ('hours since 1900...', 'days since ...')
@@ -544,14 +553,14 @@ def getModelTimes(modelFile,timeVarName):
 
     # search to check if 'since' appears in units
     try:
-        sinceLoc = re.search('since',timeFormat).end()
+        sinceLoc = re.search('since', timeFormat).end()
 
     except AttributeError:
         print 'Error decoding model times: time variable attributes do not contain "since"'
         raise
     
     units = None
-    TIME_UNITS = ('minutes', 'hours','days','months','years')
+    TIME_UNITS = ('minutes', 'hours', 'days', 'months', 'years')
     # search for 'seconds','minutes','hours', 'days', 'months', 'years' so know units
     for unit in TIME_UNITS:
         if re.search(unit, timeFormat):
@@ -562,23 +571,23 @@ def getModelTimes(modelFile,timeVarName):
     base_time_string = string.lstrip(timeFormat[sinceLoc:])
     # decode base time
     base_time = decodeTimeFromString(base_time_string)
-    times=[]
+    times = []
 
     for xtime in xtimes[:]:
         
         # Cast time as an int
         xtime = int(xtime)
 
-        if units=='minutes':
+        if units == 'minutes':
             dt = datetime.timedelta(minutes=xtime)
             new_time = base_time + dt
-        elif units=='hours':
+        elif units == 'hours':
             dt = datetime.timedelta(hours=xtime)
             new_time = base_time + dt
-        elif units=='days':
+        elif units == 'days':
             dt = datetime.timedelta(days=xtime)
             new_time = base_time + dt
-        elif units=='months':
+        elif units == 'months':
             # NB. adding months in python is complicated as month length varies and hence ambiguous.
             # Perform date arithmatic manually
             #  Assumption: the base_date will usually be the first of the month
@@ -586,8 +595,8 @@ def getModelTimes(modelFile,timeVarName):
             #                      -as can't have, e.g. Feb 31st.
             new_month = int(base_time.month + xtime % 12)
             new_year = int(math.floor(base_time.year + xtime / 12.))
-            new_time = datetime.datetime(new_year,new_month,base_time.day,base_time.hour,base_time.second,0)
-        elif units=='years':
+            new_time = datetime.datetime(new_year, new_month, base_time.day, base_time.hour, base_time.second, 0)
+        elif units == 'years':
             dt = datetime.timedelta(years=xtime)
             new_time = base_time + dt
 
@@ -633,9 +642,9 @@ def getModelTimeStep(units, stepSize):
     elif units == 'days':
         if stepSize == 1:
             modelTimeStep = 'daily'
-        elif 28 <= stepSize <=31:
+        elif 28 <= stepSize <= 31:
             modelTimeStep = 'monthly'
-        elif 365 <= stepSize <=366:
+        elif 365 <= stepSize <= 366:
             modelTimeStep = 'annual'
         else:
             raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
@@ -655,7 +664,7 @@ def getModelTimeStep(units, stepSize):
             raise Exception('model data time step interval exceeds the max time interval (annual)', units, stepSize)
 
     else:
-        errorMessage = 'the time unit ',units,' is not currently handled in this version.'
+        errorMessage = 'the time unit ', units, ' is not currently handled in this version.'
         raise Exception(errorMessage)
 
     return modelTimeStep
@@ -673,7 +682,7 @@ def decodeTimeFromString(time_string):
 
     # This will deal with times that use decimal seconds
     if '.' in time_string:
-        time_string = time_string.split('.')[0]+'0'
+        time_string = time_string.split('.')[0] + '0'
     else:
         pass
 
@@ -729,7 +738,7 @@ def decodeTimeFromString(time_string):
     print 'Error decoding time string: string does not match a predefined time format'
     return 0
 
-def regrid_wrapper(regrid_choice,obsdata,obslats,obslons,wrfdata,wrflats,wrflons):
+def regrid_wrapper(regrid_choice, obsdata, obslats, obslons, wrfdata, wrflats, wrflons):
    '''
     Wrapper routine for regridding.
     
@@ -750,93 +759,253 @@ def regrid_wrapper(regrid_choice,obsdata,obslats,obslons,wrfdata,wrflats,wrflons
    '''
 
    # Regrid obs data onto model grid
-   if(regrid_choice=='0'):
+   if(regrid_choice == '0'):
 
       ndims = len(obsdata.shape)
-      if(ndims==3):
-         newshape = [obsdata.shape[0],wrfdata.shape[1],wrfdata.shape[2]]
+      if(ndims == 3):
+         newshape = [obsdata.shape[0], wrfdata.shape[1], wrfdata.shape[2]]
 	 nT = obsdata.shape[0]
 
-      if(ndims==2):
-         newshape = [wrfdata.shape[0],wrfdata.shape[1]]
+      if(ndims == 2):
+         newshape = [wrfdata.shape[0], wrfdata.shape[1]]
 	 nT = 0
 
       rdata = wrfdata
-      lats,lons = wrflats,wrflons
+      lats, lons = wrflats, wrflons
 
       # Create a new masked array with the required dimensions
-      tmp = numpy.zeros(newshape)
-      rdata2 = ma.MaskedArray(tmp,mask=(tmp==0))
+      tmp = np.zeros(newshape)
+      rdata2 = ma.MaskedArray(tmp, mask=(tmp == 0))
       tmp = 0 # free up some memory
 
       rdata2[:] = 0.0
 
-      if(nT>0):
-       for t in numpy.arange(nT):
-         rdata2[t,:,:] = do_regrid(obsdata[t,:,:],obslats[:,:],obslons[:,:],wrflats[:,:],wrflons[:,:])
+      if(nT > 0):
+       for t in np.arange(nT):
+         rdata2[t, :, :] = do_regrid(obsdata[t, :, :], obslats[:, :], obslons[:, :], wrflats[:, :], wrflons[:, :])
 
-      if(nT==0):
-         rdata2[:,:] = do_regrid(obsdata[:,:],obslats[:,:],obslons[:,:],wrflats[:,:],wrflons[:,:])
+      if(nT == 0):
+         rdata2[:, :] = do_regrid(obsdata[:, :], obslats[:, :], obslons[:, :], wrflats[:, :], wrflons[:, :])
 
 
    # Regrid model data onto obs grid
-   if(regrid_choice=='1'):
+   if(regrid_choice == '1'):
       ndims = len(wrfdata.shape)
-      if(ndims==3):
-         newshape = [wrfdata.shape[0],obsdata.shape[1],obsdata.shape[2]]
+      if(ndims == 3):
+         newshape = [wrfdata.shape[0], obsdata.shape[1], obsdata.shape[2]]
 	 nT = obsdata.shape[0]
 
-      if(ndims==2):
-         newshape = [obsdata.shape[0],obsdata.shape[1]]
+      if(ndims == 2):
+         newshape = [obsdata.shape[0], obsdata.shape[1]]
 	 nT = 0
 
       rdata2 = obsdata
-      lats,lons = obslats,obslons
+      lats, lons = obslats, obslons
 
-      tmp = numpy.zeros(newshape)
-      rdata = ma.MaskedArray(tmp,mask=(tmp==0))
+      tmp = np.zeros(newshape)
+      rdata = ma.MaskedArray(tmp, mask=(tmp == 0))
       tmp = 0 # free up some memory
 
       rdata[:] = 0.0
  
-      if(nT>0):
-        for t in numpy.arange(nT):
-	 rdata[t,:,:] = do_regrid(wrfdata[t,:,:],wrflats[:,:],wrflons[:,:],obslats[:,:],obslons[:,:])
+      if(nT > 0):
+        for t in np.arange(nT):
+	 rdata[t, :, :] = do_regrid(wrfdata[t, :, :], wrflats[:, :], wrflons[:, :], obslats[:, :], obslons[:, :])
 
-      if(nT==0):
-	rdata[:,:] = do_regrid(wrfdata[:,:],wrflats[:,:],wrflons[:,:],obslats[:,:],obslons[:,:])
+      if(nT == 0):
+	rdata[:, :] = do_regrid(wrfdata[:, :], wrflats[:, :], wrflons[:, :], obslats[:, :], obslons[:, :])
 
   
-   return rdata,rdata2,lats,lons
+   return rdata, rdata2, lats, lons
 
-def extract_sub_time_selection(allTimes,subTimes,data):
-   '''
-    Routine to extract a sub-selection of times from a data array.
+def extract_sub_time_selection(allTimes, subTimes, data):
+    '''
+     Routine to extract a sub-selection of times from a data array.
+
+     Example::
+           Suppose a data array has 30 time values for daily data for a whole month, 
+           but you only want the data from the 5th-15th of the month.
     
-    Example::
-          Suppose a data array has 30 time values for daily data for a whole month, 
-          but you only want the data from the 5th-15th of the month.
+     Input::
+           allTimes - list of datetimes describing what times the data in the data array correspond to
+           subTimes - the times you want to extract data from
+           data     - the data array
+    
+     Output::
+           subdata     - subselection of data array
+    
+    '''
+    # Create new array to store the subselection
+    subdata = np.zeros([len(subTimes), data.shape[1], data.shape[2]])
+    
+    # Loop over all Times and when it is a member of the required subselection, copy the data across
+    i = 0     # counter for allTimes
+    subi = 0  # counter for subTimes
+    for t in allTimes:
+        if(np.setmember1d(allTimes, subTimes)):
+            subdata[subi, :, :] = data[i, :, :]
+            subi += 1
+        i += 1
+    
+    return subdata
 
-    Input::
-          allTimes - list of datetimes describing what times the data in the data array correspond to
-          subTimes - the times you want to extract data from
-          data     - the data array
+def calc_average_on_new_time_unit_K(data, dateList, unit):
+    '''
+    Routine to calculate averages on longer time units than the data exists on.
+    e.g. if the data is 6-hourly, calculate daily, or monthly means.
+     
+    Input:
+        data     - data values
+        dateList - list of python datetime structures corresponding to data values
+        unit     - string describing time unit to average onto 
+                      e.g. 'monthly', 'daily', 'pentad','annual','decadal'
+    Output:
+        meanstorem - numpy masked array of data values meaned over required time period
+        newTimesList - a list of python datetime objects representing the data in the new averagin period
+                           NB. currently set to beginning of averaging period, 
+                           i.e. mean Jan 1st - Jan 31st -> represented as Jan 1st, 00Z.
+    '''
 
-    Output::
-          subdata     - subselection of data array
+    # Check if the user-selected temporal grid is valid. If not, EXIT
+    acceptable = (unit=='full')|(unit=='annual')|(unit=='monthly')|(unit=='daily')|(unit=='pentad')
+    if not acceptable:
+        print 'Error: unknown unit type selected for time averaging: EXIT'
+        return -1,-1,-1,-1
 
-   '''
+    # Calculate arrays of: annual timeseries: year (2007,2007),
+    #                      monthly time series: year-month (200701,200702),
+    #                      daily timeseries:  year-month-day (20070101,20070102) 
+    #  depending on user-selected averaging period.
 
-   # Create new array to store the subselection
-   subdata = numpy.zeros([len(subTimes),data.shape[1],data.shape[2]])
+    # Year list
+    if unit=='annual':
+        timeunits = []
+        for i in numpy.arange(len(dateList)):
+            timeunits.append(str(dateList[i].year))
+        timeunits = numpy.array(timeunits, dtype=int)
+         
+    # YearMonth format list
+    if unit=='monthly':
+        timeunits = []
+        for i in numpy.arange(len(dateList)):
+            timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month))
+        timeunits = numpy.array(timeunits,dtype=int)
 
-   # Loop over all Times and when it is a member of the required subselection, copy the data across
-   i=0     # counter for allTimes
-   subi=0  # counter for subTimes
-   for t in allTimes:
-       if(numpy.setmember1d(allTimes,subTimes)):
-           subdata[subi,:,:] = data[i,:,:]
-           subi += 1
-       i += 1
+    # YearMonthDay format list
+    if unit=='daily':
+        timeunits = []
+        for i in numpy.arange(len(dateList)):
+            timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month) + str("%02d" % dateList[i].day))
+        timeunits = numpy.array(timeunits,dtype=int)
 
-   return subdata
+    # TODO: add pentad setting using Julian days?
+
+    # Full list: a special case
+    if unit == 'full':
+        comment='Calculating means data over the entire time range: i.e., annual-mean climatology'
+        timeunits = []
+        for i in numpy.arange(len(dateList)):
+            timeunits.append(999)  # i.e. we just want the same value for all times.
+        timeunits = numpy.array(timeunits, dtype=int)
+
+    # empty list to store new times
+    newTimesList = []
+
+    # Decide whether or not you need to do any time averaging.
+    #   i.e. if data are already on required time unit then just pass data through and 
+    #        calculate and return representative datetimes.
+    processing_required = True
+    if len(timeunits)==(len(numpy.unique(timeunits))):
+        processing_required = False
+
+    # 1D data arrays, i.e. time series
+    if data.ndim==1:
+        # Create array to store the resulting data
+        meanstore = numpy.zeros(len(numpy.unique(timeunits)))
+  
+        # Calculate the means across each unique time unit
+        i=0
+        for myunit in numpy.unique(timeunits):
+            if processing_required:
+                datam=ma.masked_array(data,timeunits!=myunit)
+                meanstore[i] = ma.average(datam)
+            
+            # construct new times list
+            smyunit = str(myunit)
+            if len(smyunit)==4:  # YYYY
+                yyyy = int(myunit[0:4])
+                mm = 1
+                dd = 1
+            if len(smyunit)==6:  # YYYYMM
+                yyyy = int(smyunit[0:4])
+                mm = int(smyunit[4:6])
+                dd = 1
+            if len(smyunit)==8:  # YYYYMMDD
+                yyyy = int(smyunit[0:4])
+                mm = int(smyunit[4:6])
+                dd = int(smyunit[6:8])
+            if len(smyunit)==3:  # Full time range
+                # Need to set an appropriate time representing the mid-point of the entire time span
+                dt = dateList[-1]-dateList[0]
+                halfway = dateList[0]+(dt/2)
+                yyyy = int(halfway.year)
+                mm = int(halfway.month)
+                dd = int(halfway.day)
+
+            newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
+            i = i+1
+
+    # 3D data arrays
+    if data.ndim==3:
+        # datamask = create_mask_using_threshold(data,threshold=0.75)
+        # Create array to store the resulting data
+        meanstore = numpy.zeros([len(numpy.unique(timeunits)),data.shape[1],data.shape[2]])
+  
+        # Calculate the means across each unique time unit
+        i=0
+        datamask_store = []
+        for myunit in numpy.unique(timeunits):
+            if processing_required:
+                mask = numpy.zeros_like(data)
+                mask[timeunits!=myunit,:,:] = 1.0
+                # Calculate missing data mask within each time unit...
+                datamask_at_this_timeunit = numpy.zeros_like(data)
+                datamask_at_this_timeunit[:]= create_mask_using_threshold(data[timeunits==myunit,:,:],threshold=0.75)
+                # Store results for masking later
+                datamask_store.append(datamask_at_this_timeunit[0])
+                # Calculate means for each pixel in this time unit, ignoring missing data (using masked array).
+                datam = ma.masked_array(data,numpy.logical_or(mask,datamask_at_this_timeunit))
+                meanstore[i,:,:] = ma.average(datam,axis=0)
+            # construct new times list
+            smyunit = str(myunit)
+            if len(smyunit)==4:  # YYYY
+                yyyy = int(smyunit[0:4])
+                mm = 1
+                dd = 1
+            if len(smyunit)==6:  # YYYYMM
+                yyyy = int(smyunit[0:4])
+                mm = int(smyunit[4:6])
+                dd = 1
+            if len(smyunit)==8:  # YYYYMMDD
+                yyyy = int(smyunit[0:4])
+                mm = int(smyunit[4:6])
+                dd = int(smyunit[6:8])
+            if len(smyunit)==3:  # Full time range
+                # Need to set an appropriate time representing the mid-point of the entire time span
+                dt = dateList[-1]-dateList[0]
+                halfway = dateList[0]+(dt/2)
+                yyyy = int(halfway.year)
+                mm = int(halfway.month)
+                dd = int(halfway.day)
+            newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
+            i += 1
+
+        if not processing_required:
+            meanstorem = data
+
+        if processing_required:
+            # Create masked array (using missing data mask defined above)
+            datamask_store = numpy.array(datamask_store)
+            meanstorem = ma.masked_array(meanstore, datamask_store)
+
+    return meanstorem,newTimesList
