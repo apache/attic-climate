@@ -1,4 +1,5 @@
 <?php 
+
 // Set the tab
 $activeTab = 'data';
 
@@ -32,12 +33,14 @@ if (empty ($app->request->segments[0])):
 	$tableWidget->addColumn('Parameter Name');
 	$tableWidget->addColumn('Dataset');
 	$tableWidget->addColumn('Id');
+	$tableWidget->addColumn('Unit');
 
 	foreach ($response->data as $row) {
 		$tableWidget->addRow(array(
 			"<a href=\"" . SITE_ROOT . "/rcmed/parameters/{$row['shortName']}\">{$row['longName']}</a>",
 		    "{$row['dsLongName']} ({$row['dsShortName']}) ",
-			$row['parameter_id']));
+			$row['parameter_id'],
+			$row['units']));
 	}
 ?>
 <div class="breadcrumbs">
