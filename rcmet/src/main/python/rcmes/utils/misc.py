@@ -1,5 +1,11 @@
 """Module with a collection of helper functions"""
 
+
+import numpy as np
+import numpy.ma as ma
+import Nio
+
+
 def decode_wrf_times(xtimes, base_time):
    '''
      Routine to convert from WRF time ('minutes since simulation start....') 
@@ -854,35 +860,183 @@ def make_list_of_urd_files(firstTime, lastTime):
    return filenamelist
 
 def make_list_of_era_surf_files(firstTime, lastTime):
-   '''
-    Routine to make list of ERA-Interim surface filenames given time period.
-   
-     Input:
-         firstTime - datetime object specifying start time
-         lastTime  - datetime object specifying end time
-   
-     Output:
-         filelist  - list of standard format WRF filenames
-   
-         Peter Lean
-   '''
+    '''
+     Routine to make list of ERA-Interim surface filenames given time period.
+    
+      Input:
+          firstTime - datetime object specifying start time
+          lastTime  - datetime object specifying end time
+    
+      Output:
+          filelist  - list of standard format WRF filenames
+    
+          Peter Lean
+    '''
 
-   import datetime
- 
-   eraint_repository = '/data/plean/era-int/surf/'
+    import datetime
+    
+    eraint_repository = '/data/plean/era-int/surf/'
+    
+    filenamelist = []
+    dt = datetime.timedelta(days=30)
+    newfirstTime = datetime.datetime(firstTime.year,firstTime.month,15,0,0,0)
+    newlastTime = datetime.datetime(lastTime.year,lastTime.month,15,0,0,0)
+    
+    curTime = newfirstTime
+    while curTime <= newlastTime:
+       curTimeString = curTime.strftime("%b%Y")
+       filenamelist.append(eraint_repository+'sfc.'+curTimeString.lower()+'.nc')
+       if(curTime.month==1):
+          curTime = datetime.datetime(curTime.year,curTime.month,15,00,00,00,00)
+    
+       curTime += dt
+    
+    return filenamelist
 
-   filenamelist = []
-   dt = datetime.timedelta(days=30)
-   newfirstTime = datetime.datetime(firstTime.year,firstTime.month,15,0,0,0)
-   newlastTime = datetime.datetime(lastTime.year,lastTime.month,15,0,0,0)
 
-   curTime = newfirstTime
-   while curTime <= newlastTime:
-      curTimeString = curTime.strftime("%b%Y")
-      filenamelist.append(eraint_repository+'sfc.'+curTimeString.lower()+'.nc')
-      if(curTime.month==1):
-         curTime = datetime.datetime(curTime.year,curTime.month,15,00,00,00,00)
+#
+def assign_subRgns_from_a_text_file(infile):
+  # Read pre-fabricated sugregion information from a text file
+  # Note: python indexing includes the beginning point but excludes the ending point
+  import math; import numpy as np; import numpy.ma as ma
+  f = open(infile,'r')
+  for i in np.arange(8):
+    string = f.readline()
+    print 'Line ',i,': Content ',string
+  string = f.readline()
+  numSubRgn = int(string[20:22])
+  print 'numSubRgn = ',numSubRgn
+  for i in np.arange(3):
+    string = f.readline()
+  # Read input string and extract subRegion info (name, longs, lats) from the string
+  subRgnName = []
+  subRgnLon0 = ma.zeros((numSubRgn))
+  subRgnLon1 = ma.zeros((numSubRgn))
+  subRgnLat0 = ma.zeros((numSubRgn))
+  subRgnLat1 = ma.zeros((numSubRgn))
+  for i in np.arange(numSubRgn):
+    string = f.readline()
+    subRgnName.append(string[0:19])
+    subRgnLon0[i] = float(string[30:37])
+    subRgnLon1[i] = float(string[40:47])
+    subRgnLat0[i] = float(string[50:55])
+    subRgnLat1[i] = float(string[60:65])
+  f.close()
+  print 'subRgnName: ',subRgnName
+  print 'subRgnLon0: ',subRgnLon0
+  print 'subRgnLon1: ',subRgnLon1
+  print 'subRgnLat0: ',subRgnLat0
+  print 'subRgnLat1: ',subRgnLat1
+  return numSubRgn,subRgnName,subRgnLon0,subRgnLon1,subRgnLat0,subRgnLat1
 
-      curTime += dt
-   
-   return filenamelist
+def assign_subRgns_interactively():
+  #---------------------------------------------
+  # Interacrively select subregions for which area-mean time series are to be evaluated
+  # input : GUI, a logical variable used to decide input option
+  #              (interactive screen IO vs. pre-determined processing steps)
+  #------------------------------------------------------------------------------------
+  numSubRgn = int(raw_input('Enter the number of sub-Regions for examining the area-mean timeseries: \n> '))
+  subRgnName = []
+  subRgnLon0=ma.zeros(numSubRgn)
+  subRgnLon1=ma.zeros(numSubRgn)
+  subRgnLat0=ma.zeros(numSubRgn)
+  subRgnLat1=ma.zeros(numSubRgn)
+  if numSubRgn > 0:
+    for n in np.arange(numSubRgn):
+      print 'For the sub-region: ',n+1
+      name = raw_input('Enter the sub-Region name: \n> ')
+      subRgnName.append(name)
+      subRgnLon0[n] = raw_input('Enter the beginning longitude of sub-Region: \n> ')
+      subRgnLon1[n] = raw_input('Enter the ending longitude of sub-Region: \n> ')
+      subRgnLat0[n] = raw_input('Enter the beginning latitude of sub-Region: \n> ')
+      subRgnLat1[n] = raw_input('Enter the ending latitude of sub-Region: \n> ')
+  return numSubRgn,subRgnName,subRgnLon0,subRgnLon1,subRgnLat0,subRgnLat1
+
+def select_subRgn(numSubRgn,subRgnName,subRgnLon0,subRgnLon1,subRgnLat0,subRgnLat1):
+  # interactively select the sub-region ID for area-mean time-series evaluation
+  print '-----------------------------------------------'
+  for n in np.arange(numSubRgn):
+    print n,subRgnName[n],subRgnLon0[n],subRgnLon1[n],subRgnLat0[n],subRgnLat1[n]
+    n+=1
+  print '-----------------------------------------------'
+  ask = 'Enter the sub-region ID to be evaluated. -9 for all sub-regions (-9 is not active yet): \n'
+  rgnSelect = int(raw_input(ask))
+  if rgnSelect >= numSubRgn:
+    print 'sub-region ID out of range. Max = ',numSubRgn-1,' CRASH'
+    return -1
+  return rgnSelect
+
+def select_timOpt():
+  #---------------------------------------------
+  # Interacrively select the time scale to be evaluated
+  # e.g., the means over annual, seasonal, monthly, or a specified period (e.g., JJAS for Indian monsoon)
+  #------------------------------------------------------------------------------------
+  print 'Select the time-mean properties to be evaluated: Enter'
+  timeOption = \
+    int(raw_input('1=annual mean, 2=seasonal mean (define "season", e.g., JJAS for Indian monsoon), 3=monthly \n> '))
+  return timeOption
+
+def select_data(nDat,Times,List,sourceDat):
+  #---------------------------------------------
+  # Interacrively select a model or models for evaluation
+  #----------------------------------------------------------------------------
+  nT = len(Times)
+  print '-----------------------------------------------'
+  if sourceDat == 'mdl':
+    print 'mdlID  mdlName numMOs  mdlStartTime mdlEndTime fileName'
+  elif sourceDat == 'obs':
+    print 'obsID  obsName obsMOs  obsStartTime obsEndTime fileName'
+  else:
+    print 'not valid data source: CRASH and restart'
+    return -1
+  print '-----------------------------------------------'
+  for n in np.arange(nDat):
+    print n,List[n],nT,Times[0],Times[nT-1],List[n]
+    n+=1
+  print '-----------------------------------------------'
+  if sourceDat == 'mdl':
+    ask = 'Enter the model ID to be evaluated. -9 for all models (-9 is not active yet): \n'
+  elif sourceDat == 'obs':
+    ask = 'Enter the obs ID to be evaluated. -9 for all models (-9 is not active yet): \n'
+  datSelect = int(raw_input(ask))
+  if datSelect > nDat-1:
+    print 'Data ID out of range: CRASH'
+    return -1
+  return datSelect
+
+def select_metrics():
+  #---------------------------------------------
+  # Interacrively select an evaluation metric
+  # Input : none
+  # Output: metricOption, the indicator for selecting the metric to be calculated
+  #------------------------------------------------------------------------------
+  print 'Metric options'
+  print '[0] Bias: mean bias across full time range'
+  print '[1] Mean Absolute Error: across full time range'
+  print '[2] Anomaly Correlation> in time: results in 2-d array of temporal anom correln'
+  print '[3] Anomaly Correlation> in space: results in a single correlation coeff'
+  print '[4] Pattern Correlation> in time: results in 2-d array of temporal anom correln'
+  print '[5] Pattern Correlation> in space: results in a single correlation coeff'
+  print '[6] RMSE in time: results in a 2-d array of RMSE over two time series'
+  print '[7] TODO: Probability Distribution Function similarity score'
+  choice = int(raw_input('Please make a selection from the options above\n> '))
+   # assign the evaluation metric to be calculated
+  if choice==0:
+    metricOption = 'BIAS'
+  elif choice==1:
+    metricOption = 'MAE'
+  elif choice==2:
+    metricOption = 'ACCt'
+  elif choice==3:
+    metricOption = 'ACCs'
+  elif choice==4:
+    metricOption = 'PCCt'
+  elif choice==5:
+    metricOption = 'PCCs'
+  elif choice==6:
+    metricOption = 'RMSt'
+  elif choice==7:
+    metricOption = 'pdfSkillScore'
+  print 'in subroutine metricOption = ',metricOption
+  return metricOption
+
