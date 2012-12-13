@@ -12,9 +12,7 @@ import json
 
 # RCMES Imports
 import storage.rcmed as db
-import toolkit.do_data_prep_20
-import toolkit.do_metrics_20
-import toolkit.process as process
+from toolkit import do_data_prep_20, process, metrics
 
 from classes import JobProperties, Model, GridBox, SubRegion
 
@@ -44,7 +42,7 @@ def checkConfigSettings(config):
                 if workDirIsValid:
                     pass
                 else:
-                    errorMessage =  "Unable to access the workDir: %s.  Check that you have the proper permissions to read and write to that directory." % workDir
+                    errorMessage = "Unable to access the workDir: %s.  Check that you have the proper permissions to read and write to that directory." % workDir
                     raise IOError(errorMessage)
             else:
                 errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % workDir
@@ -58,7 +56,7 @@ def checkConfigSettings(config):
                 if cacheDirIsValid:
                     pass
                 else:
-                    errorMessage =  "Unable to access the cacheDir: %s.  Check that you have the proper permissions to read and write to that directory." % cacheDir
+                    errorMessage = "Unable to access the cacheDir: %s.  Check that you have the proper permissions to read and write to that directory." % cacheDir
                     raise IOError(errorMessage)
             else:
                 errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % workDir
@@ -247,116 +245,144 @@ def generateSubRegions(regions):
         subRegions.append(subRegion)
     return subRegions
 
+def parseSubRegions(userConfig):
+    """
+    Input::
+        userConfig - ConfigParser object
+    
+    Output::
+        subRegions - If able to parse the userConfig then return path/to/subRegions/file, else return False.
+    """
+    subRegions = False
+
+    try:
+        subRegionConfig = configToDict(userConfig.items('SUB_REGION'))
+
+        if os.path.exists(subRegionConfig['subRegionFile']):
+            subRegions = readSubRegionsFile(subRegionConfig['subRegionFile'])
+            
+        else:
+            print "SubRegion Filepath: [%s] does not exist.  Check your configuration file, or comment out the SUB_REGION Section." % (subRegionConfig['subRegionFile'],)
+            print "Processing without a subRegion..."
+
+    except ConfigParser.NoSectionError:
+        pass
+    except IOError:
+        print "Unable to open %s.  Running without SubRegions" % (subRegionConfig['subRegionFile'],)
+    except KeyError:
+        print "subRegionFile parameter was not provided.  Processing without SubRegion support"
+
+    return subRegions
+
+def runUsingConfig(argsConfig):
+    """
+    This function is called when a user provides a configuration file to specify an evaluation job.
+
+    Input::
+        argsConfig - Path to a ConfigParser compliant file
+
+    Output::
+        Plots that visualize the evaluation job. These will be output to SETTINGS.workDir from the config file
+    """
+    
+    print 'Running using config file: %s' % argsConfig
+    # Parse the Config file
+    userConfig = ConfigParser.SafeConfigParser()
+    userConfig.optionxform = str # This is so the case is preserved on the items in the config file
+    userConfig.read(argsConfig)
+
+    try:
+        checkConfigSettings(userConfig)
+    except:
+        raise
+
+    jobProperties = generateSettings(userConfig.items('SETTINGS'))
+    gridBox = GridBox(jobProperties.latMin, jobProperties.lonMin, jobProperties.latMax,
+                      jobProperties.lonMax, jobProperties.gridLonStep, jobProperties.gridLatStep)
+    models = generateModels(userConfig.items('MODEL'))
+    
+    datasetDict = makeDatasetsDictionary(userConfig.items('RCMED'))
+    userSuppliedRegions = parseSubRegions(userConfig)
+
+    if userSuppliedRegions:
+        subRegions = generateSubRegions(userSuppliedRegions)
+    else:
+        subRegions = False
+
+    # Go get the parameter listing from the database
+    try:
+        params = db.getParams()
+    except:
+        raise
+    
+    obsDatasetList = []
+    for param_id in datasetDict['obsParamId']:
+        for param in params:
+            if param['parameter_id'] == int(param_id):
+                obsDatasetList.append(param)
+            else:
+                pass
+
+    #TODO: Unhardcode this when we decided where this belongs in the Config File
+    jobProperties.maskOption = True
+#    metricOption = 'bias'
+#    plotTitle = models[0].varName + '_'
+#    plotFilenameStub = models[0].varName + '_'
+
+
+
+    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models, subRegions)
+
+    print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
+
+#    if jobProperties.maskOption:
+#        seasonalCycleOption = True
+#    
+#    # TODO:  This seems like we can just use numOBS to compute obsSelect (obsSelect = numbOBS -1)
+#    if numOBS == 1:
+#        obsSelect = 1
+#    else:
+#        #obsSelect = 1          #  1st obs (TRMM)
+#        #obsSelect = 2          # 2nd obs (CRU3.1)
+#        obsSelect = numOBS      # obs ensemble
+#
+#    obsSelect = numOBS - 1   # convert to fit the indexing that starts from 0
+#
+#
+#
+#    # TODO:  Undo the following code when refactoring later
+#    obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
+#    precipFlag = models[0].precipFlag
+#
+#    mdlSelect = numMDL - 1                      # numMDL-1 corresponds to the model ensemble
+#
+#
+#    # TODO:  Really need to sort out the SubRegion Code  
+#    numSubRgn = len(subRegions)
+#    rgnSelect = 0
+#    subRgnName = [str(region.name) for region in subRegions]
+#    
+#    
+    """ Commented out until Testing is complete with the v2.0 code instead
+    toolkit.do_metrics_20.metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, \
+                              jobProperties.workDir, \
+                              mdlSelect, obsSelect, \
+                              numSubRgn, subRgnName, rgnSelect, \
+                              obsParameterId, precipFlag, jobProperties.temporalGrid, jobProperties.maskOption, seasonalCycleOption, metricOption, \
+                                                                                           plotTitle, plotFilenameStub)
+    """
+    # TODO: New function Call
+    workdir = jobProperties.workDir
+    modelVarName = models[0].varName
+    metrics.metrics_plots(modelVarName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList, workdir)
+
+
 if __name__ == "__main__":
     
     if args.CONFIG:
-        print 'Running using config file: %s' % args.CONFIG
-        # Parse the Config file
-        userConfig = ConfigParser.SafeConfigParser()
-        userConfig.optionxform = str # This is so the case is preserved on the items in the config file
-        userConfig.read(args.CONFIG)
         
-        try:
-            checkConfigSettings(userConfig)
-        except:
-            raise
-        
-        jobProperties = generateSettings(userConfig.items('SETTINGS'))
-        models = generateModels(userConfig.items('MODEL'))
-        datasetDict = makeDatasetsDictionary(userConfig.items('RCMED'))
-        
-        #TODO: Unhardcode this when we decided where this belongs in the Config File
-        jobProperties.maskOption = True
-        
-        regions = {}
-        try:
-            subRegions = configToDict(userConfig.items('SUB_REGION'))
-            
-            if subRegions['subRegionFile'] == '':
-                print 'SubRegion File path is empty.  Check your configuration file, or comment out the SUB_REGION Section'
-            else:
-                regions = readSubRegionsFile(subRegions['subRegionFile'])
-                
-        except ConfigParser.NoSectionError:
-            print "No SUB_REGION configuration found in %s" % args.CONFIG
-        
-        except IOError:
-            print "Unable to open %s.  Running without SubRegions" % (subRegions['subRegionFile'], )
+        runUsingConfig(args.CONFIG)
 
-        subRegions = generateSubRegions(regions)
-
-
-        #sys.exit()
-
-
-        # Go get the parameter listing from the database
-        try:
-            params = db.getParams()
-        except Exception:
-            sys.exit()
-        
-        obsDatasetList = []
-        for param_id in datasetDict['obsParamId']:
-            for param in params:
-                if param['parameter_id'] == int(param_id):
-                    obsDatasetList.append(param)
-                else:
-                    pass
-
-        gridBox = GridBox(jobProperties.latMin, jobProperties.lonMin, jobProperties.latMax, jobProperties.lonMax, jobProperties.gridLonStep, jobProperties.gridLatStep)
-
-
-        #subRegionTuple = (numSubRgn, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1, subRgnName)
-        #rgnSelect = 3
-               
-        #for n in subRegions:
-        #    print 'Subregion: ', n.name, n.lonMin, 'E - ', n.lonMax, ' E: ', n.latMin, 'N - ', n.latMax, 'N'
-
-
-        
-        metricOption = 'bias'
-        plotTitle = models[0].varName + '_'
-        plotFilenameStub = models[0].varName + '_'
-
-        numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models, subRegions)
-
-        print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
-
-        if jobProperties.maskOption:
-            seasonalCycleOption = True
-        
-        # TODO:  This seems like we can just use numOBS to compute obsSelect (obsSelect = numbOBS -1)
-        if numOBS == 1:
-            obsSelect = 1
-        else:
-            #obsSelect = 1          #  1st obs (TRMM)
-            #obsSelect = 2          # 2nd obs (CRU3.1)
-            obsSelect = numOBS      # obs ensemble
-    
-        obsSelect = numOBS - 1   # convert to fit the indexing that starts from 0
-    
-    
-    
-        # TODO:  Undo the following code when refactoring later
-        obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
-        precipFlag = models[0].precipFlag
-
-        mdlSelect = numMDL - 1                      # numMDL-1 corresponds to the model ensemble
-
-
-        # TODO:  Really need to sort out the SubRegion Code  
-        numSubRgn = len(subRegions)
-        rgnSelect = 0
-        subRgnName = [str(region.name) for region in subRegions]
-        toolkit.do_metrics_20.metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, \
-                                  jobProperties.workDir, \
-                                  mdlSelect, obsSelect, \
-                                  numSubRgn, subRgnName, rgnSelect, \
-                                  obsParameterId, precipFlag, jobProperties.temporalGrid, jobProperties.maskOption, seasonalCycleOption, metricOption, \
-                                                                                               plotTitle, plotFilenameStub)
-        
-
-        
     else:
         print 'Interactive mode has been enabled'
         #getSettings(SETTINGS)
