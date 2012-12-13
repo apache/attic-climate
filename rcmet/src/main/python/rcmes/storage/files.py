@@ -106,7 +106,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     '''
 
     filelist.sort()
-
+    filename = filelist[0]
     # Crash nicely if 'filelist' is zero length
     """TODO:  Throw Error instead via try Except"""
     if len(filelist) == 0:
@@ -118,7 +118,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     #    ii) find out how many timesteps in the file 
     #        (assume same ntimes in each file in list)
     #     -allows you to create an empty array to store variable data for all times
-    tmp = Nio.open_file(filelist[0])
+    tmp = Nio.open_file(filename)
     latsraw = tmp.variables[latVarName][:]
     lonsraw = tmp.variables[lonVarName][:]
     lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
@@ -224,7 +224,7 @@ def select_var_from_file(myfile, fmt='not set'):
     for v in keylist:
         print '[', i, '] ', f.variables[v].long_name, ' (', v, ')'
         i += 1
-    
+
     user_selection = raw_input('Please select variable : [0 -' + str(i - 1) + ']  ')
     
     myvar = keylist[int(user_selection)]
@@ -247,7 +247,7 @@ def select_var_from_wrf_file(myfile):
     f = Nio.open_file(myfile, format='nc')
     
     keylist = f.variables.keys()
-    
+
     i = 0
     for v in keylist:
         try:
@@ -342,17 +342,17 @@ def find_time_var_name_from_file(filename, timename, file_type):
     #       Peter Lean   February 2011
     f = Nio.open_file(filename)
     var_name_list = f.variables.keys()
-    
+
     # convert all variable names into lower case
     var_name_list_lower = [x.lower() for x in var_name_list]
-    
+
     # create a "set" from this list of names
     varset = set(var_name_list_lower)
-    
+
     # Use "set" types for finding common variable name from in the file and from the list of possibilities
     time_possible_names = set(['time', 'times', 'date', 'dates', 'julian'])
-    
-    
+
+
     # Search for common latitude name variants:
     # Find the intersection of two sets, i.e. find what latitude is called in this file.
     try:
@@ -364,16 +364,15 @@ def find_time_var_name_from_file(filename, timename, file_type):
                 wh = index
             index += 1
         timename = var_name_list[wh]
-    
+
     except:
         timename = 'not_found'
         success = 0
-    
+
     if success == 0:
         timename = ''
-    
-    return success, timename, var_name_list
 
+    return success, timename, var_name_list
 
 def find_latlon_var_from_file(filename, file_type, latname, lonname):
     # Function to find what the latitude and longitude variables are called in a model file.
@@ -393,7 +392,7 @@ def find_latlon_var_from_file(filename, file_type, latname, lonname):
     var_name_list_lower = [x.lower() for x in var_name_list]
     # create a "set" from this list of names
     varset = set(var_name_list_lower)
-    
+
     # Use "set" types for finding common variable name from in the file and from the list of possibilities
     lat_possible_names = set(['latitude', 'lat', 'lats', 'latitudes'])
     lon_possible_names = set(['longitude', 'lon', 'lons', 'longitudes'])
@@ -418,7 +417,7 @@ def find_latlon_var_from_file(filename, file_type, latname, lonname):
         lons[lons > 180] = lons[lons > 180] - 360.
         lonMin = lons.min()
         lonMax = lons.max()
-    
+
     except:
         successlon = 0
 
@@ -482,8 +481,9 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     ## Now load in the data for real
     ##  NB. no need to reload in the latitudes and longitudes -assume invariant
     #timesaccu=0 # a counter for number of times stored so far in t2store 
-                #  NB. this method allows for missing times in data files 
-                #      as no assumption made that same number of times in each file...
+    #  NB. this method allows for missing times in data files 
+    #      as no assumption made that same number of times in each file...
+
     i = 0
     for ifile in filelist:
         #print 'Loading data from file: ',filelist[i]
@@ -516,6 +516,41 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     
     return lat, lon, timestore, t2store
 
+def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
+    # Function to return the latitude and longitude ranges of the data in a file,
+    # given the identifying variable names.
+    #
+    #    Input:
+    #            filelist - list of filenames (data is read in from first file only)
+    #            lat_var_name - variable name of the 'latitude' variable
+    #            lon_var_name - variable name of the 'longitude' variable
+    #
+    #    Output:
+    #            latMin, latMax, lonMin, lonMax - self explanatory
+    #
+    #                    Peter Lean      March 2011
+    
+    filename = filelist[0]
+    
+    try:
+        f = Nio.open_file(filename)
+        
+        lats = f.variables[lat_var_name][:]
+        latMin = lats.min()
+        latMax = lats.max()
+        
+        lons = f.variables[lon_var_name][:]
+        lons[lons > 180] = lons[lons > 180] - 360.
+        lonMin = lons.min()
+        lonMax = lons.max()
+        
+        return latMin, latMax, lonMin, lonMax
+
+    except:
+        print 'Error: there was a problem with finding the latitude and longitude ranges in the file'
+        print '       Please check that you specified the filename, and variable names correctly.'
+        
+        sys.exit()
 
 def writeBN_lola(fileName, lons, lats):
     # write a binary data file that include longitude (1-d) and latitude (1-d) values
@@ -528,7 +563,8 @@ def writeBN_lola(fileName, lons, lats):
     tmpDat = 0
     F.close()
 
-def writeBNdata(fileName, maskOption, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
+def writeBNdata(fileName, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
+    #(fileName,maskOption,numOBSs,numMDLs,nT,ngrdX,ngrdY,numSubRgn,obsData,mdlData,obsRgnAvg,mdlRgnAvg):
     # write spatially- and regionally regridded data into a binary data file
     missing = -1.e26
     F = fortranfile.FortranFile(fileName, mode='w')
@@ -550,7 +586,8 @@ def writeBNdata(fileName, maskOption, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSub
 
     # write model data (dep. on the number of models).
     for m in np.arange(numMDLs):
-        data[:, :, :] = mdlData[m, :, :, :]; msk = data.mask
+        data[:, :, :] = mdlData[m, :, :, :]
+        msk = data.mask
         for n in np.arange(nT):
             for j in np.arange(ngrdY):
                 for i in np.arange(ngrdX):
@@ -564,7 +601,7 @@ def writeBNdata(fileName, maskOption, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSub
 
     data = 0     # release the array allocated for data
     # write data in subregions
-    if maskOption:
+    if numSubRgn > 0:
         print 'Also included are the time series of the means over ', numSubRgn, ' areas from obs and model data'
         tmpDat = ma.zeros(nT); print numSubRgn
         for m in np.arange(numOBSs):
@@ -578,22 +615,22 @@ def writeBNdata(fileName, maskOption, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSub
     tmpDat = 0     # release the array allocated for tmpDat
     F.close()
 
-def writeNCfile(fileName, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
+def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
     # write an output file of variables up to 3 dimensions
     # fileName: the name of the output data file
+    # numSubRgn  : the number of subregions
     # lons[ngrdX]: longitude
     # lats[ngrdY]: latitudes
     # obsData[nT,ngrdY,ngrdX]: the obs time series of the entire model domain
     # mdlData[numMDLs,nT,ngrdY,ngrdX]: the mdltime series of the entire model domain
     # obsRgnAvg[numSubRgn,nT]: the obs time series for the all subregions
     # mdlRgnAvg[numMDLs,numSubRgn,nT]: the mdl time series for the all subregions
-
-    dimO = obsData.shape[0]
-    dimM = mdlData.shape[0]
-    dimT = mdlData.shape[1]
-    dimY = mdlData.shape[2]
-    dimX = mdlData.shape[3]
-    dimR = obsRgnAvg.shape[1]
+    dimO = obsData.shape[0]      # the number of obs data
+    dimM = mdlData.shape[0]      # the number of mdl data
+    dimT = mdlData.shape[1]      # the number of time levels
+    dimY = mdlData.shape[2]      # y-dimension
+    dimX = mdlData.shape[3]      # x-dimension
+    dimR = obsRgnAvg.shape[1]    # the number of subregions
     f = Nio.open_file(fileName, mode='w', format='nc')
     print mdlRgnAvg.shape, dimM, dimR, dimT
     #create global attributes
@@ -611,7 +648,7 @@ def writeNCfile(fileName, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
     var = f.create_variable('lat', 'd', ('south_north', 'west_east'))
     var = f.create_variable('oDat', 'd', ('obss', 'time', 'south_north', 'west_east'))
     var = f.create_variable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
-    var = f.create_variable('oRgn', 'd', ('regions', 'time'))
+    var = f.create_variable('oRgn', 'd', ('obss', 'regions', 'time'))
     var = f.create_variable('mRgn', 'd', ('models', 'regions', 'time'))
     # create attributes and units for the variable
     f.variables['lon'].varAttName = 'Longitudes'; f.variables['lon'].varUnit = 'degrees East'
