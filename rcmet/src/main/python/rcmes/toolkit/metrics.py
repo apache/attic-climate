@@ -23,6 +23,8 @@ import os
 
 import numpy as np
 import numpy.ma as ma
+
+import plots
 import toolkit.process as process
 from utils import misc
 
@@ -1136,7 +1138,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
          mymin = float(raw_input('Enter the minimum plot scale \n> '))
          mymax = float(raw_input('Enter the maximum plot scale \n> '))
        wksType = 'ps'
-       status = plots20.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
+       status = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
        # if bias, plot also normalzied values and means: first, normalized by mean
        if metricOption == 'BIAS':
          print ''
@@ -1161,7 +1163,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
              cmnd = 'rm -f ' + plotFileName
              subprocess.call(cmnd, shell=True)
            plotTitle = 'Bias (% MEAN)'
-           status = plots20.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
+           status = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
          # normalized by sigma
          makePlot = raw_input('Plot bias in terms of % of interann sigma? [y/n]\n> ').lower()
          if makePlot == 'y':
@@ -1183,7 +1185,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
              cmnd = 'rm -f ' + plotFileName
              subprocess.call(cmnd, shell=True)
            plotTitle = 'Bias (% SIGMA_time)'
-           status = plots20.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
+           status = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
          # obs climatology
          makePlot = raw_input('Plot observation? [y/n]\n> ').lower()
          if makePlot == 'y':
@@ -1204,7 +1206,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
              cmnd = 'rm -f ' + plotFileName
              subprocess.call(cmnd, shell=True)
            plotTitle = 'OBS (mm/day)'
-           status = plots20.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
+           status = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, plotTitle, plotFileName, cMap, wksType)
 
      # Repeat for another metric
      print ''
@@ -1261,7 +1263,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
        times.append(datetime.datetime(2000, m + 1, 1, 0, 0, 0, 0))
      #for i in np.arange(12):
      #  times.append(i+1)
-     status = plots20.draw_time_series_plot  \
+     status = plots.draw_time_series_plot  \
              (mdlAnnCyc, times, plotFileName, workdir, data2=obsAnnCyc, mytitle=mytitle, ytitle='Y', xtitle='MONTH', year_labels=year_labels)
 
      # Repeat for another metric
