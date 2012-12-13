@@ -22,6 +22,7 @@ Module storing functions to calculate statistical metrics from numpy arrays
 import numpy as np
 import numpy.ma as ma
 import toolkit.process as process
+from utils import misc
 
 def calc_annual_cycle_means(data, time):
     '''
@@ -623,7 +624,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
  if ans == 'y':
    ans = raw_input('Input subregion info interactively? y/n: \n> ')
    if ans == 'y':
-     numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = util20.assign_subRgns_interactively()
+     numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
    else:
      print 'Read subregion info from a pre-fabricated text file'
      ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
@@ -632,7 +633,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
      else:
        subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
      print 'subRgnFileName ', subRgnFileName
-     numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = util20.assign_subRgns_from_a_text_file(subRgnFileName)
+     numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
    print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
  else:
    numSubRgn = 0
@@ -746,8 +747,8 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
    #--------------------------------
    # (mp.004) Select the model and data to be used in the evaluation step
    #----------------------------------------------------------------------------------------------------
-   mdlSelect = util20.select_data(numMDL, Times, mdlList, 'mdl')
-   obsSelect = util20.select_data(numOBS, Times, obsList, 'obs')
+   mdlSelect = misc.select_data(numMDL, Times, mdlList, 'mdl')
+   obsSelect = misc.select_data(numOBS, Times, obsList, 'obs')
    mdlName = mdlList[mdlSelect]
    obsName = obsList[obsSelect]
    print 'selected obs and model for evaluation= ', obsName, mdlName
@@ -760,7 +761,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
 
      # first determine the temporal properties to be evaluated
      print ''
-     timeOption = util20.select_timOpt()
+     timeOption = misc.select_timOpt()
      print ''
      if timeOption == 1:
        timeScale = 'Annual'
@@ -828,7 +829,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
      # bias, mae, acct, accs, pcct, pccs, rmst, rmss, pdfSkillScore
      #----------------------------------------------------------------------------------------------------
      print ' '
-     metricOption = util20.select_metrics()
+     metricOption = misc.select_metrics()
      print ' '
 
      # metrics below yields 2-d array, i.e., metricDat = ma.zeros((ngrdY,ngrdX))
@@ -973,7 +974,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
 
      # select the region(s) for evaluation. model and obs have been selected before entering this if block
      print 'There are ', numSubRgn, ' subregions. Select the subregion(s) for evaluation'
-     rgnSelect = util20.select_subRgn(numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1)
+     rgnSelect = misc.select_subRgn(numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1)
      print 'selected region for evaluation= ', rgnSelect
      # Select the model & obs data to be evaluated
      oData = ma.zeros(nT)
@@ -990,7 +991,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, 
      #--------------------------------
      # (mp.008) Select performance metric
      #----------------------------------------------------------------------------------------------------
-     #metricOption = util20.select_metrics()
+     #metricOption = misc.select_metrics()
      # Temporarily, compute the RMSE and pattern correlation for the simulated and observed annual cycle based on monthly means
      tempRMS = metrics20.calc_rms(mdlAnnCyc, obsAnnCyc)
      tempCOR = metrics20.calc_temporal_pat_cor(mdlAnnCyc, obsAnnCyc)
