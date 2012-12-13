@@ -144,8 +144,8 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     #  NB. no need to reload in the latitudes and longitudes -assume invariant
     i = 0
     timesaccu = 0 # a counter for number of times stored so far in t2store 
-                  #  NB. this method allows for missing times in data files 
-                  #      as no assumption made that same number of times in each file...
+    #  NB. this method allows for missing times in data files 
+    #      as no assumption made that same number of times in each file...
 
 
     for ifile in filelist:
@@ -197,39 +197,39 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     return data_dict
 
 def select_var_from_file(myfile, fmt='not set'):
-   '''
-    Routine to act as user interface to allow users to select variable of interest from a file.
+    '''
+     Routine to act as user interface to allow users to select variable of interest from a file.
+     
+      Input:
+         myfile - filename
+         fmt - (optional) specify fileformat for PyNIO if filename suffix is non-standard
     
-     Input:
-        myfile - filename
-        fmt - (optional) specify fileformat for PyNIO if filename suffix is non-standard
-   
-     Output:
-        myvar - variable name in file
-   
-       Peter Lean  September 2010
-   '''
+      Output:
+         myvar - variable name in file
+    
+        Peter Lean  September 2010
+    '''
 
-   print fmt
-
-   if fmt == 'not set':
-       f = Nio.open_file(myfile)
-
-   if fmt != 'not set':
-       f = Nio.open_file(myfile, format=fmt)
-
-   keylist = f.variables.keys()
-
-   i = 0
-   for v in keylist:
-       print '[', i, '] ', f.variables[v].long_name, ' (', v, ')'
-       i += 1
-
-   user_selection = raw_input('Please select variable : [0 -' + str(i - 1) + ']  ')
-
-   myvar = keylist[int(user_selection)]
-
-   return myvar
+    print fmt
+    
+    if fmt == 'not set':
+        f = Nio.open_file(myfile)
+    
+    if fmt != 'not set':
+        f = Nio.open_file(myfile, format=fmt)
+    
+    keylist = f.variables.keys()
+    
+    i = 0
+    for v in keylist:
+        print '[', i, '] ', f.variables[v].long_name, ' (', v, ')'
+        i += 1
+    
+    user_selection = raw_input('Please select variable : [0 -' + str(i - 1) + ']  ')
+    
+    myvar = keylist[int(user_selection)]
+    
+    return myvar
 
 def select_var_from_wrf_file(myfile):
     '''
@@ -330,5 +330,5 @@ def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
     t2store = t2tmp
     f.close()
     print '  success read_data_from_one_file: VarName=', myvar, ' Shape(Full)= ', t2store.shape, ' Unit= ', varUnit
-    timestore = process20.decode_model_timesK(ifile, timeVarName, file_type)
+    timestore = process.decode_model_timesK(ifile, timeVarName, file_type)
     return timestore, t2store, varUnit
