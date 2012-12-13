@@ -16,6 +16,7 @@ import numpy.ma as ma
 import sys
 
 from toolkit import process
+from utils import fortranfile
 
 
 VARIABLE_NAMES = {'time': ['time', 'times', 'date', 'dates', 'julian'],
@@ -148,13 +149,14 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
 
 
     for ifile in filelist:
-    
+
         #print 'Loading data from file: ',filelist[i]
         f = Nio.open_file(ifile)
         t2raw = f.variables[myvar][:]
         timesraw = f.variables[timeVarName]
         time = timesraw[:]
         ntimes = len(time)
+        print 'file= ', i, 'ntimes= ', ntimes, filelist[i]
         
         # Flatten dimensions which needn't exist, i.e. level 
         #   e.g. if for single level then often data have 4 dimensions, when 3 dimensions will do.
@@ -168,7 +170,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
         #     lets put it back... 
         if t2tmp.ndim == 2:
             t2tmp = np.expand_dims(t2tmp, 0)
-        
+
         t2store[timesaccu + np.arange(ntimes), :, :] = t2tmp[:, :, :]
         timestore[timesaccu + np.arange(ntimes)] = time
         timesaccu = timesaccu + ntimes
@@ -184,7 +186,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
         print 'WARNING: Possible duplicated times'
 
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
-    timestore = process.decode_model_times(filelist[0], timeVarName, file_type)
+    timestore, _ = process.getModelTimes(filename, timeVarName)
     
     data_dict = {}
     data_dict['lats'] = lat
@@ -241,7 +243,7 @@ def select_var_from_wrf_file(myfile):
     
         Peter Lean  September 2010
     '''
-    
+
     f = Nio.open_file(myfile, format='nc')
     
     keylist = f.variables.keys()
@@ -252,7 +254,7 @@ def select_var_from_wrf_file(myfile):
             print '[', i, '] ', f.variables[v].description, ' (', v, ')'
         except:
             print ''
-        
+
         i += 1
     
     user_selection = raw_input('Please select WRF variable : [0 -' + str(i - 1) + ']  ')
@@ -447,7 +449,6 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     # 2. Because one of the model data exceeds 240 mos (243 mos), the model data must be
     #    truncated to the 240 mons using the ntimes determined from the first file.
     ##################################################################################
-    
     filelist.sort()
     nfiles = len(filelist)
     # Crash nicely if 'filelist' is zero length
@@ -472,7 +473,7 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     ntimes = len(timesraw); nygrd = len(lat[:, 0]); nxgrd = len(lon[0, :])
     
     print 'Lats and lons read in for first file in filelist'
-    
+
     # Create a single empty masked array to store model data from all files
     #t2store = ma.zeros((ntimes*nfiles,nygrd,nxgrd))
     t2store = ma.zeros((nfiles, ntimes, nygrd, nxgrd))
@@ -506,20 +507,20 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
         #timesaccu=timesaccu+ntimes
         f.close()
         i += 1 
-      
+
     print 'Data read in successfully with dimensions: ', t2store.shape
     
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
     ifile = filelist[0]
-    timestore = rcmes.process_v12.decode_model_timesK(ifile, timeVarName, file_type)
+    timestore, _ = process.getModelTimes(ifile, timeVarName)
     
     return lat, lon, timestore, t2store
 
 
 def writeBN_lola(fileName, lons, lats):
     # write a binary data file that include longitude (1-d) and latitude (1-d) values
-    import rcmes.fortranfile; import numpy as np; import numpy.ma as ma
-    F = rcmes.fortranfile.FortranFile(fileName, mode='w')
+    
+    F = fortranfile.FortranFile(fileName, mode='w')
     ngrdY = lons.shape[0]; ngrdX = lons.shape[1]
     tmpDat = ma.zeros(ngrdX); tmpDat[:] = lons[0, :]; F.writeReals(tmpDat)
     tmpDat = ma.zeros(ngrdY); tmpDat[:] = lats[:, 0]; F.writeReals(tmpDat)
@@ -527,70 +528,53 @@ def writeBN_lola(fileName, lons, lats):
     tmpDat = 0
     F.close()
 
-def writeBNdata(fileName, maskOption, numMDLs, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
+def writeBNdata(fileName, maskOption, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
     # write spatially- and regionally regridded data into a binary data file
     missing = -1.e26
-    F = rcmes.fortranfile.FortranFile(fileName, mode='w')
+    F = fortranfile.FortranFile(fileName, mode='w')
     # construct a data array to replace mask flag with a missing value (missing=-1.e12) for printing
-    data = ma.zeros((nT, ngrdY, ngrdX)); msk = obsData.mask
-    for n in np.arange(nT):
-        for j in np.arange(ngrdY):
-            for i in np.arange(ngrdX):
-                if msk[n, j, i]:
-                    data[n, j, i] = missing
-                else:
-                    data[n, j, i] = obsData[n, j, i]
+    data = ma.zeros((nT, ngrdY, ngrdX))
+    for m in np.arange(numOBSs):
+        data[:, :, :] = obsData[m, :, :, :]; msk = data.mask
+        for n in np.arange(nT):
+            for j in np.arange(ngrdY):
+                for i in np.arange(ngrdX):
+                    if msk[n, j, i]: data[n, j, i] = missing
 
-    # write observed data. allowed to write only one row at a time
-    tmpDat = ma.zeros(ngrdX)
-    for n in np.arange(nT):
-        for j in np.arange(ngrdY):
-            tmpDat[:] = data[n, j, :]
-            F.writeReals(tmpDat)
+        # write observed data. allowed to write only one row at a time
+        tmpDat = ma.zeros(ngrdX)
+        for n in np.arange(nT):
+            for j in np.arange(ngrdY):
+                tmpDat[:] = data[n, j, :]
+                F.writeReals(tmpDat)
 
     # write model data (dep. on the number of models).
-    if numMDLs == 1:
-        msk = mdlData.mask
+    for m in np.arange(numMDLs):
+        data[:, :, :] = mdlData[m, :, :, :]; msk = data.mask
         for n in np.arange(nT):
             for j in np.arange(ngrdY):
                 for i in np.arange(ngrdX):
                     if msk[n, j, i]:
                         data[n, j, i] = missing
-                    else:
-                        data[n, j, i] = mdlData[n, j, i]
 
         for n in np.arange(nT):
             for j in np.arange(ngrdY):
                 tmpDat[:] = data[n, j, :]
                 F.writeReals(tmpDat)
 
-    else:
-        for m in np.arange(numMDLs):
-            data[:, :, :] = mdlData[m, :, :, :]; msk = data.mask
-            for n in np.arange(nT):
-                for j in np.arange(ngrdY):
-                    for i in np.arange(ngrdX):
-                        if msk[n, j, i]: data[n, j, i] = missing
-            for n in np.arange(nT):
-                for j in np.arange(ngrdY):
-                    tmpDat[:] = data[n, j, :]
-                    F.writeReals(tmpDat)
     data = 0     # release the array allocated for data
     # write data in subregions
-    if(maskOption == 1):
+    if maskOption:
         print 'Also included are the time series of the means over ', numSubRgn, ' areas from obs and model data'
         tmpDat = ma.zeros(nT); print numSubRgn
-        for n in np.arange(numSubRgn):
-            tmpDat[:] = obsRgnAvg[n, :]
-            F.writeReals(tmpDat)
-        if numMDLs == 1:
-            tmpDat[:] = mdlRgnAvg[n, :]
-            F.writeReals(tmpDat)
-        else:
-            for m in np.arange(numMDLs):
-                for n in np.arange(numSubRgn):
-                    tmpDat[:] = mdlRgnAvg[m, n, :]
-                    F.writeReals(tmpDat)
+        for m in np.arange(numOBSs):
+            for n in np.arange(numSubRgn):
+                tmpDat[:] = obsRgnAvg[m, n, :]
+                F.writeReals(tmpDat)
+        for m in np.arange(numMDLs):
+            for n in np.arange(numSubRgn):
+                tmpDat[:] = mdlRgnAvg[m, n, :]
+                F.writeReals(tmpDat)
     tmpDat = 0     # release the array allocated for tmpDat
     F.close()
 
@@ -603,7 +587,13 @@ def writeNCfile(fileName, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
     # mdlData[numMDLs,nT,ngrdY,ngrdX]: the mdltime series of the entire model domain
     # obsRgnAvg[numSubRgn,nT]: the obs time series for the all subregions
     # mdlRgnAvg[numMDLs,numSubRgn,nT]: the mdl time series for the all subregions
-    dimM = mdlData.shape[0]; dimT = mdlData.shape[1]; dimY = mdlData.shape[2]; dimX = mdlData.shape[3]; dimR = obsRgnAvg.shape[0]
+
+    dimO = obsData.shape[0]
+    dimM = mdlData.shape[0]
+    dimT = mdlData.shape[1]
+    dimY = mdlData.shape[2]
+    dimX = mdlData.shape[3]
+    dimR = obsRgnAvg.shape[1]
     f = Nio.open_file(fileName, mode='w', format='nc')
     print mdlRgnAvg.shape, dimM, dimR, dimT
     #create global attributes
@@ -613,12 +603,13 @@ def writeNCfile(fileName, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
     f.create_dimension('time', dimT)
     f.create_dimension('west_east', dimX)
     f.create_dimension('south_north', dimY)
+    f.create_dimension('obss', dimO)
     f.create_dimension('models', dimM)
     f.create_dimension('regions', dimR)
     # create the variable (real*4) to be written in the file
     var = f.create_variable('lon', 'd', ('south_north', 'west_east'))
     var = f.create_variable('lat', 'd', ('south_north', 'west_east'))
-    var = f.create_variable('oDat', 'd', ('time', 'south_north', 'west_east'))
+    var = f.create_variable('oDat', 'd', ('obss', 'time', 'south_north', 'west_east'))
     var = f.create_variable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
     var = f.create_variable('oRgn', 'd', ('regions', 'time'))
     var = f.create_variable('mRgn', 'd', ('models', 'regions', 'time'))
@@ -633,9 +624,9 @@ def writeNCfile(fileName, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
     #print 'lons in writeFile'; print lons
     f.variables['lon'][:, :] = lons
     f.variables['lat'][:, :] = lats
-    f.variables['oDat'][:, :, :] = obsData
+    f.variables['oDat'][:, :, :, :] = obsData
     f.variables['mDat'][:, :, :, :] = mdlData
-    f.variables['oRgn'][:, :] = obsRgnAvg
+    f.variables['oRgn'][:, :, :] = obsRgnAvg
     f.variables['mRgn'][:, :, :] = mdlRgnAvg
     #print f
     f.close()
