@@ -3,6 +3,7 @@
 import os
 import urllib2
 import re
+import cPickle
 import csv
 import numpy as np
 import numpy.ma as ma
@@ -77,7 +78,7 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
     if os.path.exists(pickleFilePath):
         print 'Retrieving data from cache (pickle file)'
         f = open(pickleFilePath, 'rb')
-        store = pickle.load(f)
+        store = cPickle.load(f)
         f.close()
         latitudes = store[0]
         longitudes = store[1]
@@ -176,6 +177,6 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         # Save 'pickles' files (=direct memory dump to file) of data variables
         # for faster retrieval than txt cache files.
         f = open(pickleFilePath, 'wb')
-        __ = pickle.dump([latitudes, longitudes, uniqueLevels, timesUnique, mdata], f)
+        pickle.dump([latitudes, longitudes, uniqueLevels, timesUnique, mdata], f)
         f.close()
         return latitudes, longitudes, uniqueLevels, timesUnique, mdata
