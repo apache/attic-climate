@@ -275,9 +275,12 @@ def read_lolaT_from_file(filename, latVarName, lonVarName, timeVarName, file_typ
         fileType = type of file we are trying to parse
     
     Output::
-        lat - Array of Latitude values 
-        lon - Array of Longitude values
+        lat - MESH GRID of Latitude values with shape (nx, ny)
+        lon - MESH GRID of Longitude values with shape (nx, ny)
         timestore - Python list of Datetime objects
+        
+        MESHGRID docs: http://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html
+        
     """
 
     tmp = Nio.open_file(filename, format=file_type)
@@ -287,7 +290,8 @@ def read_lolaT_from_file(filename, latVarName, lonVarName, timeVarName, file_typ
     if(latsraw.ndim == 1):
         lon, lat = np.meshgrid(lonsraw, latsraw)
     if(latsraw.ndim == 2):
-        lon = lonsraw; lat = latsraw
+        lon = lonsraw
+        lat = latsraw
     timestore, _ = process.getModelTimes(filename, timeVarName)
     print '  read_lolaT_from_file: Lats, lons and times read in for the model domain'
     return lat, lon, timestore
@@ -307,31 +311,20 @@ def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
     # 2. Because one of the model data exceeds 240 mos (243 mos), the model data must be
     #    truncated to the 240 mons using the ntimes determined from the first file.
     ##################################################################################
-    tmp = Nio.open_file(ifile, format=file_type)
-    timesraw = tmp.variables[timeVarName]
-    ntimes = len(timesraw)
-    nygrd = len(lat[:, 0])
-    nxgrd = len(lat[0, :])
-    # Create a single empty masked array to store model data from all files
-    t2store = ma.zeros((ntimes, nygrd, nxgrd))
-    # Now load in the data for real
-    #print '  read_data_from_one_file: Loading data from file: ',ifile
     f = Nio.open_file(ifile)
     try:
         varUnit = f.variables[myvar].units.upper()
     except:
         varUnit = raw_input('Enter the model variable unit: \n> ').upper()
     t2raw = f.variables[myvar][:]
-    timesraw = f.variables[timeVarName]
-    time = timesraw[0:ntimes]
     t2tmp = t2raw.squeeze()
     if t2tmp.ndim == 2:
         t2tmp = np.expand_dims(t2tmp, 0)
-    t2store = t2tmp
+    t2tmp = t2tmp
     f.close()
-    print '  success read_data_from_one_file: VarName=', myvar, ' Shape(Full)= ', t2store.shape, ' Unit= ', varUnit
+    print '  success read_data_from_one_file: VarName=', myvar, ' Shape(Full)= ', t2tmp.shape, ' Unit= ', varUnit
     timestore = process.decode_model_timesK(ifile, timeVarName, file_type)
-    return timestore, t2store, varUnit
+    return timestore, t2tmp, varUnit
 
 def find_time_var_name_from_file(filename, timename, file_type):
     # Function to find what the time variable is called in a model file.
