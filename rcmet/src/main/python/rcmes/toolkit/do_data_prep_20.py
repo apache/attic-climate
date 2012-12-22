@@ -8,7 +8,7 @@ import sys
 import Nio
 
 from storage import db, files
-from toolkit import process, regrid
+import process
 
 # TODO:  swap gridBox for Domain
 def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
@@ -45,15 +45,6 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
     obsDatasetId = [str(x['dataset_id']) for x in obsDatasetList]
     # obsDatasetList ['paramter_id'] list
     obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
-    # Ising the GridBox Object
-    latMin = gridBox.latMin
-    latMax = gridBox.latMax
-    lonMin = gridBox.lonMin
-    lonMax = gridBox.lonMax
-    naLats = gridBox.latCount
-    naLons = gridBox.lonCount
-    dLat = gridBox.latStep
-    dLon = gridBox.lonStep
     mdlList = [model.filename for model in modelList]
     
     # TODO - SubRegions seems to be missing in the latest code
@@ -148,17 +139,27 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
     ## Part 1: retrieve observation data from the database and regrid them
     ##       NB. automatically uses local cache if already retrieved.
 
-    print 'the number of observation datasets: ', numOBSs
-    print obsList, obsDatasetId, obsParameterId, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir
-    
     # preparation for spatial re-gridding: define the size of horizontal array of the target interpolation grid system (ngrdX and ngrdY)
     print 'regridOption in prep_data= ', regridOption
     if regridOption == 'model':
         ifile = mdlList[0]
         typeF = 'nc'
         lats, lons, mTimes = files.read_lolaT_from_file(ifile, modelLatVarName, modelLonVarName, modelTimeVarName, typeF)
-        
+        modelObject = modelList[0]
+        latMin = modelObject.latMin
+        latMax = modelObject.latMax
+        lonMin = modelObject.lonMin
+        lonMax = modelObject.lonMax
     elif regridOption == 'user':
+        # Use the GridBox Object
+        latMin = gridBox.latMin
+        latMax = gridBox.latMax
+        lonMin = gridBox.lonMin
+        lonMax = gridBox.lonMax
+        naLats = gridBox.latCount
+        naLons = gridBox.lonCount
+        dLat = gridBox.latStep
+        dLon = gridBox.lonStep
         lat = np.arange(naLats) * dLat + latMin
         lon = np.arange(naLons) * dLon + lonMin
         lons, lats = np.meshgrid(lon, lat)
@@ -300,7 +301,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
             tmpMDL = mData
 
         # temporally regrid the model data
-        mData, newMdlTimes = regrid.regrid_in_time(tmpMDL, modelTimes, unit=timeRegridOption)
+        mData, newMdlTimes = process.regrid_in_time(tmpMDL, modelTimes, unit=timeRegridOption)
         tmpMDL = 0.0
         
         # check data consistency for all models 
