@@ -134,16 +134,16 @@ def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, cMap, wksT
     if wksType == 'pdf':
         wres.wkPaperSize = "A4"
 
-    # assign resolution for png option (defaule = 1024x1024)
-    if wksType == 'png':
-        res.wkWidth = 1000
-        res.wkHeight = 1000
-
     wks = Ngl.open_wks(wksType, pName, wres)
 
     # Set up variable to hold the various plot
     # resources we want to set.
     res = Ngl.Resources()
+    # assign resolution for png option (default = 1024x1024)
+    if wksType == 'png':
+        res.wkWidth = 1000
+        res.wkHeight = 1000
+
     # Set some scalar field resources.
     res.sfXArray = lon
     res.sfYArray = lat
@@ -184,13 +184,16 @@ def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, cMap, wksT
     res.tiMainFontHeightF = 0.02
     # If 1d lat,lon array then assumed to be regular lat,lon grid
     if len(lat.shape) == 1:
+        print 'Assuming the lat,lon grid is regularly spaced'
         res.sfXCStartV = float(lon.min())
         res.sfXCEndV = float(lon.max())
         res.sfYCStartV = float(lat.min())
         res.sfYCEndV = float(lat.max())
 
+    contourMap = Ngl.contour_map(wks,pVar,res)
     # Clean up
     Ngl.destroy(wks)
+    del contourMap
     del res
     del wks
 
