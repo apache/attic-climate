@@ -9,12 +9,6 @@ import string
 import sys
 import time
 
-# RCMES Imports
-import process_v12
-import storage.db as db
-import storage.files_20 as files
-import toolkit.regrid as regrid
-
 # 3rd Party Imports
 import Nio
 import numpy as np
@@ -163,9 +157,6 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi= -999999999):
     
     '''
 
-
-    print 'Regridding onto new latitudes and longitudes'
-
     nlat = q.shape[0]
     nlon = q.shape[1]
 
@@ -209,7 +200,7 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi= -999999999):
     # Set values in MDI so that similar to surroundings so don't produce large gradients when interpolating
     # Preserve MDI mask, by only changing data part of masked array object.
     for shift in (-1, 1):
-        for axis in (0, 1):        
+        for axis in (0, 1):
             q_shifted = np.roll(q, shift=shift, axis=axis)
             idx = ~q_shifted.mask * q.mask
             q.data[idx] = q_shifted[idx]
@@ -236,7 +227,7 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi= -999999999):
     
     # Combine missing data mask, with outside domain mask define above.
     q2.mask = np.logical_or(mdimask, q2.mask)
-    
+
     return q2
 
 def create_mask_using_threshold(masked_array, threshold=0.5):
@@ -880,23 +871,23 @@ def calc_average_on_new_time_unit_K(data, dateList, unit):
     # Year list
     if unit=='annual':
         timeunits = []
-        for i in numpy.arange(len(dateList)):
+        for i in np.arange(len(dateList)):
             timeunits.append(str(dateList[i].year))
-        timeunits = numpy.array(timeunits, dtype=int)
+        timeunits = np.array(timeunits, dtype=int)
          
     # YearMonth format list
     if unit=='monthly':
         timeunits = []
-        for i in numpy.arange(len(dateList)):
+        for i in np.arange(len(dateList)):
             timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month))
-        timeunits = numpy.array(timeunits,dtype=int)
+        timeunits = np.array(timeunits,dtype=int)
 
     # YearMonthDay format list
     if unit=='daily':
         timeunits = []
-        for i in numpy.arange(len(dateList)):
+        for i in np.arange(len(dateList)):
             timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month) + str("%02d" % dateList[i].day))
-        timeunits = numpy.array(timeunits,dtype=int)
+        timeunits = np.array(timeunits,dtype=int)
 
     # TODO: add pentad setting using Julian days?
 
@@ -904,9 +895,9 @@ def calc_average_on_new_time_unit_K(data, dateList, unit):
     if unit == 'full':
         comment='Calculating means data over the entire time range: i.e., annual-mean climatology'
         timeunits = []
-        for i in numpy.arange(len(dateList)):
+        for i in np.arange(len(dateList)):
             timeunits.append(999)  # i.e. we just want the same value for all times.
-        timeunits = numpy.array(timeunits, dtype=int)
+        timeunits = np.array(timeunits, dtype=int)
 
     # empty list to store new times
     newTimesList = []
@@ -915,17 +906,17 @@ def calc_average_on_new_time_unit_K(data, dateList, unit):
     #   i.e. if data are already on required time unit then just pass data through and 
     #        calculate and return representative datetimes.
     processing_required = True
-    if len(timeunits)==(len(numpy.unique(timeunits))):
+    if len(timeunits)==(len(np.unique(timeunits))):
         processing_required = False
 
     # 1D data arrays, i.e. time series
     if data.ndim==1:
         # Create array to store the resulting data
-        meanstore = numpy.zeros(len(numpy.unique(timeunits)))
+        meanstore = np.zeros(len(np.unique(timeunits)))
   
         # Calculate the means across each unique time unit
         i=0
-        for myunit in numpy.unique(timeunits):
+        for myunit in np.unique(timeunits):
             if processing_required:
                 datam=ma.masked_array(data,timeunits!=myunit)
                 meanstore[i] = ma.average(datam)
@@ -959,22 +950,22 @@ def calc_average_on_new_time_unit_K(data, dateList, unit):
     if data.ndim==3:
         # datamask = create_mask_using_threshold(data,threshold=0.75)
         # Create array to store the resulting data
-        meanstore = numpy.zeros([len(numpy.unique(timeunits)),data.shape[1],data.shape[2]])
+        meanstore = np.zeros([len(np.unique(timeunits)),data.shape[1],data.shape[2]])
   
         # Calculate the means across each unique time unit
         i=0
         datamask_store = []
-        for myunit in numpy.unique(timeunits):
+        for myunit in np.unique(timeunits):
             if processing_required:
-                mask = numpy.zeros_like(data)
+                mask = np.zeros_like(data)
                 mask[timeunits!=myunit,:,:] = 1.0
                 # Calculate missing data mask within each time unit...
-                datamask_at_this_timeunit = numpy.zeros_like(data)
+                datamask_at_this_timeunit = np.zeros_like(data)
                 datamask_at_this_timeunit[:]= create_mask_using_threshold(data[timeunits==myunit,:,:],threshold=0.75)
                 # Store results for masking later
                 datamask_store.append(datamask_at_this_timeunit[0])
                 # Calculate means for each pixel in this time unit, ignoring missing data (using masked array).
-                datam = ma.masked_array(data,numpy.logical_or(mask,datamask_at_this_timeunit))
+                datam = ma.masked_array(data,np.logical_or(mask,datamask_at_this_timeunit))
                 meanstore[i,:,:] = ma.average(datam,axis=0)
             # construct new times list
             smyunit = str(myunit)
@@ -1005,7 +996,223 @@ def calc_average_on_new_time_unit_K(data, dateList, unit):
 
         if processing_required:
             # Create masked array (using missing data mask defined above)
-            datamask_store = numpy.array(datamask_store)
+            datamask_store = np.array(datamask_store)
             meanstorem = ma.masked_array(meanstore, datamask_store)
 
     return meanstorem,newTimesList
+
+def decode_model_timesK(ifile,timeVarName,file_type):
+    #################################################################################################
+    #  Convert model times ('hours since 1900...', 'days since ...') into a python datetime structure
+    #  Input:
+    #      filelist - list of model files
+    #      timeVarName - name of the time variable in the model files
+    #  Output:
+    #      times  - list of python datetime objects describing model data times
+    #     Peter Lean February 2011
+    #################################################################################################
+    f = Nio.open_file(ifile,mode='r',options=None,format=file_type)
+    xtimes = f.variables[timeVarName]
+    timeFormat = xtimes.attributes['units']
+    #timeFormat = "days since 1979-01-01 00:00:00"
+    # search to check if 'since' appears in units
+    try:
+        sinceLoc = re.search('since',timeFormat).end()
+    except:
+        print 'Error decoding model times: time var attributes do not contain "since": Exit'
+        sys.exit()
+    # search for 'seconds','minutes','hours', 'days', 'months', 'years' so know units
+    # TODO:  Swap out this section for a set of if...elseif statements
+    units = ''
+    try:
+        _ = re.search('minutes',timeFormat).end()
+        units = 'minutes'
+    except:
+        pass
+    try:
+        _ = re.search('hours',timeFormat).end()
+        units = 'hours'
+    except:
+        pass
+    try:
+        _ = re.search('days',timeFormat).end()
+        units = 'days'
+    except:
+        pass
+    try:
+        _ = re.search('months',timeFormat).end()
+        units = 'months'
+    except:
+        pass
+    try:
+        _ = re.search('years',timeFormat).end()
+        units = 'years'
+    except:
+        pass
+    # cut out base time (the bit following 'since')
+    base_time_string = string.lstrip(timeFormat[sinceLoc:])
+    # decode base time
+    # 9/25/2012: datetime.timedelta has problem with the argument because xtimes is NioVariable.
+    # Soln (J. Kim): use a temp variable ttmp in the for loop, then convert it into an integer xtime.
+    base_time = decodeTimeFromString(base_time_string)
+    times=[]
+    for ttmp in xtimes[:]:
+        xtime = int(ttmp)
+        if(units=='minutes'):  
+            dt = datetime.timedelta(minutes=xtime); new_time = base_time + dt
+        if(units=='hours'):  
+            dt = datetime.timedelta(hours=xtime); new_time = base_time + dt
+        if(units=='days'):  
+            dt = datetime.timedelta(days=xtime); new_time = base_time + dt
+        if(units=='months'):   # NB. adding months in python is complicated as month length varies and hence ambigous.
+            # Perform date arithmatic manually
+            #  Assumption: the base_date will usually be the first of the month
+            #              NB. this method will fail if the base time is on the 29th or higher day of month
+            #                      -as can't have, e.g. Feb 31st.
+            new_month = int(base_time.month + xtime % 12)
+            new_year = int(math.floor(base_time.year + xtime / 12.))
+            #print type(new_year),type(new_month),type(base_time.day),type(base_time.hour),type(base_time.second)
+            new_time = datetime.datetime(new_year,new_month,base_time.day,base_time.hour,base_time.second,0)
+        if(units=='years'):
+            dt = datetime.timedelta(years=xtime); new_time = base_time + dt
+        times.append(new_time)
+    return times
+
+
+def regrid_in_time(data,dateList,unit):
+   #################################################################################################
+   # Routine to calculate averages on longer time units than the data exists on.
+   #  e.g. if the data is 6-hourly, calculate daily, or monthly means.
+   #  Input:
+   #         data     - data values
+   #         dateList - list of python datetime structures corresponding to data values
+   #         unit     - string describing time unit to average onto 
+   #                       e.g. 'monthly', 'daily', 'pentad','annual','decadal'
+   #  Output:
+   #         meanstorem - numpy masked array of data values meaned over required time period
+   #         newTimesList - a list of python datetime objects representing the data in the new averagin period
+   #                            NB. currently set to beginning of averaging period, 
+   #                            i.e. mean Jan 1st - Jan 31st -> represented as Jan 1st, 00Z.
+   # ..............................
+   #   Jinwon Kim, Sept 30, 2012
+   #   Created from calc_average_on_new_time_unit_K, Peter's original, with the modification below:
+   #   Instead of masked array used by Peter, use wh to defined data within the averaging range.
+   #################################################################################################
+
+   print '***  Begin calc_average_on_new_time_unit_KK  ***'
+   # Check if the user-selected temporal grid is valid. If not, EXIT
+   acceptable = (unit=='full')|(unit=='annual')|(unit=='monthly')|(unit=='daily')|(unit=='pentad')
+   if not acceptable:
+     print 'Error: unknown unit type selected for time averaging: EXIT'; return -1,-1,-1,-1
+
+   # Calculate time arrays of: annual (yyyy, [2007]), monthly (yyyymm, [200701,200702]), daily (yyyymmdd, [20070101,20070102]) 
+   # "%02d" is similar to i2.2 in Fortran
+   if unit=='annual':                      # YYYY
+      timeunits = []
+      for i in np.arange(len(dateList)):
+         timeunits.append(str(dateList[i].year))
+   elif unit=='monthly':                   # YYYYMM
+      timeunits = []
+      for i in np.arange(len(dateList)):
+         timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month))
+   elif unit=='daily':                     # YYYYMMDD
+      timeunits = []
+      for i in np.arange(len(dateList)):
+         timeunits.append(str(dateList[i].year) + str("%02d" % dateList[i].month) + str("%02d" % dateList[i].day))
+   elif unit=='full':                      # Full list: a special case
+      comment='Calculating means data over the entire time range: i.e., annual-mean climatology'
+      timeunits = []
+      for i in np.arange(len(dateList)):
+         timeunits.append(999)             # i.e. we just want the same value for all times.
+   timeunits = np.array(timeunits,dtype=int)
+   print 'timeRegridOption= ',unit#'; output timeunits= ',timeunits
+   #print 'timeRegridOption= ',unit,'; output timeunits= ',timeunits
+
+   # empty list to store time levels after temporal regridding
+   newTimesList = []
+
+   # Decide whether or not you need to do any time averaging.
+   #   i.e. if data are already on required time unit then just pass data through and calculate and return representative datetimes.
+   processing_required = True
+   if len(timeunits)==(len(np.unique(timeunits))):
+        processing_required = False
+   print 'processing_required= ',processing_required,': input time steps= ',len(timeunits),': regridded output time steps = ',len(np.unique(timeunits))
+   #print 'np.unique(timeunits): ',np.unique(timeunits)
+   print 'data.ndim= ',data.ndim
+
+   if data.ndim==1:                                           # 1D data arrays, i.e. 1D time series
+      # Create array to store the temporally regridded data
+     meanstore = np.zeros(len(np.unique(timeunits)))
+      # Calculate the means across each unique time unit
+     i=0
+     for myunit in np.unique(timeunits):
+       if processing_required:
+         wh = timeunits==myunit
+         datam = data[wh]
+         meanstore[i] = ma.average(datam)
+        # construct new times list
+       smyunit = str(myunit)
+       if len(smyunit)==4:  # YYYY
+        yyyy = int(myunit[0:4])
+        mm = 1
+        dd = 1
+       if len(smyunit)==6:  # YYYYMM
+        yyyy = int(smyunit[0:4])
+        mm = int(smyunit[4:6])
+        dd = 1
+       if len(smyunit)==8:  # YYYYMMDD
+        yyyy = int(smyunit[0:4])
+        mm = int(smyunit[4:6])
+        dd = int(smyunit[6:8])
+       if len(smyunit)==3:  # Full time range
+        # Need to set an appropriate time representing the mid-point of the entire time span
+        dt = dateList[-1]-dateList[0]
+        halfway = dateList[0]+(dt/2)
+        yyyy = int(halfway.year)
+        mm = int(halfway.month)
+        dd = int(halfway.day)
+       newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
+       i = i+1
+
+   elif data.ndim==3:                                         # 3D data arrays, i.e. 2D time series
+      # Create array to store the resulting data
+     meanstore = np.zeros([len(np.unique(timeunits)),data.shape[1],data.shape[2]])
+     # Calculate the means across each unique time unit
+     i=0
+     datamask_store = []
+     for myunit in np.unique(timeunits):
+       if processing_required:
+         wh = timeunits==myunit
+         datam = data[wh,:,:]
+         meanstore[i,:,:] = ma.average(datam,axis=0)
+        # construct new times list
+       smyunit = str(myunit)
+       if len(smyunit)==4:  # YYYY
+        yyyy = int(smyunit[0:4])
+        mm = 1
+        dd = 1
+       if len(smyunit)==6:  # YYYYMM
+        yyyy = int(smyunit[0:4])
+        mm = int(smyunit[4:6])
+        dd = 1
+       if len(smyunit)==8:  # YYYYMMDD
+        yyyy = int(smyunit[0:4])
+        mm = int(smyunit[4:6])
+        dd = int(smyunit[6:8])
+       if len(smyunit)==3:  # Full time range
+        # Need to set an appropriate time representing the mid-point of the entire time span
+        dt = dateList[-1]-dateList[0]
+        halfway = dateList[0]+(dt/2)
+        yyyy = int(halfway.year)
+        mm = int(halfway.month)
+        dd = int(halfway.day)
+       newTimesList.append(datetime.datetime(yyyy,mm,dd,0,0,0,0))
+       i += 1
+
+     if not processing_required:
+        meanstorem = data
+     elif processing_required:
+        meanstorem = meanstore
+
+   print '***  End calc_average_on_new_time_unit_KK  ***'
+   return meanstorem,newTimesList
