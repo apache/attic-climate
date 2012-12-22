@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-
+""" DOCSTRING"""
 
 # Python Standard Lib Imports
 import argparse
@@ -297,8 +297,12 @@ def runUsingConfig(argsConfig):
         raise
 
     jobProperties = generateSettings(userConfig.items('SETTINGS'))
-    gridBox = GridBox(jobProperties.latMin, jobProperties.lonMin, jobProperties.latMax,
-                      jobProperties.lonMax, jobProperties.gridLonStep, jobProperties.gridLatStep)
+    try:
+        gridBox = GridBox(jobProperties.latMin, jobProperties.lonMin, jobProperties.latMax,
+                          jobProperties.lonMax, jobProperties.gridLonStep, jobProperties.gridLatStep)
+    except:
+        gridBox = None
+
     models = generateModels(userConfig.items('MODEL'))
     
     datasetDict = makeDatasetsDictionary(userConfig.items('RCMED'))
@@ -325,52 +329,12 @@ def runUsingConfig(argsConfig):
 
     #TODO: Unhardcode this when we decided where this belongs in the Config File
     jobProperties.maskOption = True
-#    metricOption = 'bias'
-#    plotTitle = models[0].varName + '_'
-#    plotFilenameStub = models[0].varName + '_'
-
 
 
     numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models, subRegions)
 
     print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
 
-#    if jobProperties.maskOption:
-#        seasonalCycleOption = True
-#    
-#    # TODO:  This seems like we can just use numOBS to compute obsSelect (obsSelect = numbOBS -1)
-#    if numOBS == 1:
-#        obsSelect = 1
-#    else:
-#        #obsSelect = 1          #  1st obs (TRMM)
-#        #obsSelect = 2          # 2nd obs (CRU3.1)
-#        obsSelect = numOBS      # obs ensemble
-#
-#    obsSelect = numOBS - 1   # convert to fit the indexing that starts from 0
-#
-#
-#
-#    # TODO:  Undo the following code when refactoring later
-#    obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
-#    precipFlag = models[0].precipFlag
-#
-#    mdlSelect = numMDL - 1                      # numMDL-1 corresponds to the model ensemble
-#
-#
-#    # TODO:  Really need to sort out the SubRegion Code  
-#    numSubRgn = len(subRegions)
-#    rgnSelect = 0
-#    subRgnName = [str(region.name) for region in subRegions]
-#    
-#    
-    """ Commented out until Testing is complete with the v2.0 code instead
-    toolkit.do_metrics_20.metrics_plots(numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, \
-                              jobProperties.workDir, \
-                              mdlSelect, obsSelect, \
-                              numSubRgn, subRgnName, rgnSelect, \
-                              obsParameterId, precipFlag, jobProperties.temporalGrid, jobProperties.maskOption, seasonalCycleOption, metricOption, \
-                                                                                           plotTitle, plotFilenameStub)
-    """
     # TODO: New function Call
     workdir = jobProperties.workDir
     modelVarName = models[0].varName
