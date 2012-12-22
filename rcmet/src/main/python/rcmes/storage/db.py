@@ -128,9 +128,10 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
             latitudes.append(np.float32(row[0]))
             longitudes.append(np.float32(row[1]))
             levels.append(np.float32(row[2]))
-            values.append(np.float32(row[4]))
             # timestamps are strings so we will leave them alone for now
             timestamps.append(row[3])
+            values.append(np.float32(row[4]))
+            
         
         myfile.close()
         os.remove(cacheFilePath)
@@ -143,10 +144,10 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         # Calculate nx and ny
         uniqueLongitudeCount = len(uniqueLongitudes)
         uniqueLatitudeCount = len(uniqueLatitudes)
-        uniqueLevelCount = len(np.unique(levels))
-        uniqueTimeCount = len(np.unique(timestamps))
+        uniqueLevelCount = len(uniqueLevels)
+        uniqueTimeCount = len(uniqueTimestamps)
 
-        values, latitudes, longitudes = reorderXYT(latitudes, longitudes, timestamps, values)
+        values, latitudes, longitudes = reorderXYT(longitudes, latitudes, timestamps, values)
 
         # Convert each unique time from strings into list of Python datetime objects
         # TODO - LIST COMPS!
@@ -159,21 +160,18 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         longitudes = longitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
         levels = np.array(levels).reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
         values = values.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
-    
+
         # Flatten dimension if only single level
         if uniqueLevelCount == 1:
             values = values[:, :, :, 0]
             latitudes = latitudes[0, :, :, 0]
             longitudes = longitudes[0, :, :, 0]
-    
+
         # Created masked array to deal with missing values
         #  -these make functions like values.mean(), values.max() etc ignore missing values
         mdi = -9999  # TODO: extract this value from the DB retrieval metadata
         mdata = ma.masked_array(values, mask=(values == mdi))
-        #msk = mdata.mask
-        #print 'extract_from_db: after masking ',mdata[0,50,:]
-        #print 'mask values: ',msk[0,50,:]; return -1
-        
+
         # Save 'pickles' files (=direct memory dump to file) of data variables
         # for faster retrieval than txt cache files.
         f = open(pickleFilePath, 'wb')
