@@ -859,7 +859,6 @@ def select_data(nDat, Times, List, sourceDat):
     #---------------------------------------------
     # Interacrively select a model or models for evaluation
     #----------------------------------------------------------------------------
-    nT = len(Times)
     print '-----------------------------------------------'
     if sourceDat == 'mdl':
         print 'mdlID  mdlName numMOs  mdlStartTime mdlEndTime fileName'
@@ -869,8 +868,9 @@ def select_data(nDat, Times, List, sourceDat):
         print 'not valid data source: CRASH and restart'
         sys.exit()
     print '-----------------------------------------------'
-    for n in np.arange(nDat):
-        print n, List[n], nT, Times[0], Times[nT - 1], List[n]
+
+    for n in np.arange(len(List)):
+        print n, List[n], Times[0], Times[-1]
         n += 1
     print '-----------------------------------------------'
     if sourceDat == 'mdl':
