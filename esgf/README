@@ -1,0 +1,17 @@
+PROTOTYPE PYTHON PACKAGE FOR ESGF-RCMES INTEGRATION
+
+Python dependencies:
+    - Python 2.7
+    - PyOpenSSL (sudo easy_install PyOpenSSL==0.10 - NOTE: latest PyOpenSSL 0.13 needs latest SSL installed)
+    - myproxyclient (sudo easy_install MyProxyClient)
+    - esgf-pyclient (sudo easy_install esgf-pyclient)
+    
+Pre-requisites:
+    - user must be registered with ESGF and be assigned an OpenID to logon
+    - user must have been granted membership in group CMIP5 Research to be able to download CMIP5 datasets
+    
+Usage:
+    - install package under some directory: <INSTALL_DIR>
+    - export PYTHONPATH=<INSTALL_DIR>/src
+    - edit <INSTALL_DIR>/src/esgf/rcmes/main.py to configure openid, password, output directory
+    - python <INSTALL_DIR>/src/esgf/rcmes/main.py
