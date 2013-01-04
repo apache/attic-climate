@@ -51,7 +51,7 @@ def checkConfigSettings(config):
         if key_val[0] == 'cacheDir':
             cacheDir = os.path.abspath(key_val[1])
             
-            if os.path.exists(workDir):
+            if os.path.exists(cacheDir):
                 cacheDirIsValid = os.access(cacheDir, os.W_OK | os.X_OK)
                 if cacheDirIsValid:
                     pass
@@ -59,7 +59,7 @@ def checkConfigSettings(config):
                     errorMessage = "Unable to access the cacheDir: %s.  Check that you have the proper permissions to read and write to that directory." % cacheDir
                     raise IOError(errorMessage)
             else:
-                errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % workDir
+                errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % cacheDir
                 raise IOError(errorMessage)
         
         else:
