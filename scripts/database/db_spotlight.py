@@ -13,18 +13,24 @@ import sys
 def db_connect():
     conn = pymysql.connect(host='localhost', port=3306, user='wrm_data', passwd='wrm_data', db='wrm_prod')
     cur = conn.cursor()
-    cur.execute("select d.dataset_id , p.* from dataset d, parameter p where d.dataset_id = p.dataset_id;")
-    #cur.execute("SELECT * FROM parameter")
     return cur, conn
 
-def columns(cur):
+def fetch_all_params(cursor):
+    cursor.execute("select d.dataset_id , p.* from dataset d, parameter p where d.dataset_id = p.dataset_id;")
+    return cursor
+
+def fetch_one_param(cursor, id):
+    cursor.execute("select d.dataset_id , p.* from dataset d, parameter p where d.dataset_id = p.dataset_id and p.parameter_id = %s;" % id)
+    return cursor      
+
+def columns(cursor):
     # Build list of column names
-    column_list = [x[0] for x in cur.description]
+    column_list = [x[0] for x in cursor.description]
     return column_list
 
-def get_th_row(cur):
+def get_th_row(cursor):
     # Build list of column names
-    column_list = columns(cur)
+    column_list = columns(cursor)
     # Define static HTML elements for the THEAD
     thead_start = ['<thead>\n\t<tr>\n']
     thead_end = '\t</tr>\n</thead>'
@@ -37,11 +43,11 @@ def get_th_row(cur):
     # Convert the List into a string and return
     return ''.join(thead_start)
 
-def get_tbody(cur):
+def get_tbody(cursor):
     # Setup the initial tbody HTML
     tbody = ['\t<tbody>\n']
     # Fetch the entire table from the db
-    row_tup = cur.fetchall()
+    row_tup = cursor.fetchall()
     # Loop over the returned results and do some datetime conversion cleanup
     # and append the formal HTML to the tbody list
     for row in row_tup:
@@ -62,12 +68,12 @@ def get_tbody(cur):
     # Join the list into a string and return
     return ''.join(tbody)
 
-def param_html(cur):
+def param_html(cursor):
     # Setup the static Table HTML
     table = ['<table>\n','</table>\n']
     # Grab the HEAD & BODY content
-    head = get_th_row(cur)
-    body = get_tbody(cur)
+    head = get_th_row(cursor)
+    body = get_tbody(cursor)
     # Add the content to the Table List
     table.insert(1, head)
     table.insert(2, body)
@@ -83,44 +89,48 @@ def cleanse_row(row):
             val = val.strftime('%Y-%m-%d')
         row_list.append(val)
     return row_list
-   
 
-
-def param_json(cur):
+def param_json(cursor):
     object_list = {"param":[]}
-    #json_param = {"rows":[]}
-    keys = columns(cur)
-    data_tuple = cur.fetchall()
+    keys = columns(cursor)
+    data_tuple = cursor.fetchall()
     for row in data_tuple:
         row_list = cleanse_row(row)
         print row_list
         object_list['param'].append(dict(zip(keys, row_list)))
 
     print object_list
-
     return object_list
 
-def close_db(cur, conn):
-    cur.close()
+def close_db(cursor, conn):
+    cursor.close()
     conn.close()
-
-
-
 
 
 @route('/rcmed/param.:format')
 @route('/rcmed/param.:format/')
 def get_param(format):
     # Connect to the database
-    cur, conn = db_connect()
+    database_cursor, conn = db_connect()
+    params_cursor = fetch_all_params(database_cursor)
     if format == 'html':
         #response = param_html(cur)
         response = { "Key": 5 }
     elif format == 'json':
-        response = param_json(cur)
+        response = param_json(params_cursor)
     else:
-        response = '<p> Bad request.  You should pass in /rcmed/param/[json] or [html]</p>'
-    close_db(cur, conn)
+        response = '<p> Bad request.  You should pass in /rcmed/param.[json] or [html]</p>'
+    close_db(database_cursor, conn)
+    return response
+
+@route('/rcmed/param/:id')
+@route('/rcmed/param/:id/')
+def get_single_param(id):
+    # Connect to the database
+    database_cursor, conn = db_connect()
+    params_cursor = fetch_one_param(database_cursor, id)
+    response = param_json(params_cursor)
+    close_db(database_cursor, conn)
     return response
 
 
