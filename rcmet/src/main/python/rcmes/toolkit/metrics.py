@@ -25,6 +25,7 @@ import numpy as np
 import numpy.ma as ma
 from toolkit import plots, process
 from utils import misc
+from storage import files 
 
 def calc_ann_mean(t2, time):
     '''
@@ -925,12 +926,12 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             for k in np.arange(numOBS):           # area-average obs data
                 Store = []
                 for t in np.arange(nT):
-                    Store.append(process20.calc_area_mean(obsData[k, t, :, :], lats, lons, mymask = mask))
+                    Store.append(process.calc_area_mean(obsData[k, t, :, :], lats, lons, mymask = mask))
                 obsRgn[k, n, :] = ma.array(Store[:])
             for k in np.arange(numMDL):           # area-average mdl data
                 Store = []
                 for t in np.arange(nT):
-                    Store.append(process20.calc_area_mean(mdlData[k, t, :, :], lats, lons, mymask = mask))
+                    Store.append(process.calc_area_mean(mdlData[k, t, :, :], lats, lons, mymask = mask))
                 mdlRgn[k, n, :] = ma.array(Store[:])
             Store = []                               # release the memory allocated by temporary vars
 
