@@ -219,11 +219,19 @@ def configToDict(config):
     return configDict
 
 def readSubRegionsFile(regionsFile):
+    """
+    Input::
+        regionsFile - Path to a subRegion configuration file
+        
+    Output::
+        Ordered List of SubRegion Objects decoded from regionsFile
+    """
     if os.path.exists(regionsFile):
         regionsConfig = ConfigParser.SafeConfigParser()
         regionsConfig.optionxform = str
         regionsConfig.read(regionsFile)
-        regions = regionsConfig.items('REGIONS')
+        regions = generateSubRegions(regionsConfig.items('REGIONS'))
+
         return regions
         
     else:
