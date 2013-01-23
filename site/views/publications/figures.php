@@ -9,11 +9,19 @@ if ( $publication != null || $publication != '' ) {
 	// Get files from specified publication directory
 	$gallery_url = SITE_ROOT . '/static/resources/papers/'. $publication . '/';
 	$gallery_dir = HOME . '/static/resources/papers/' . $publication . '/';
-	$gallery_files = scandir($gallery_dir);
-	unset($gallery_files[0],$gallery_files[1]);
-	if ($gallery_files[2] === ".svn") {
-		unset($gallery_files[2]);
+	$metadata_file 	= $gallery_dir . 'pubs.met';
+
+	/********************************************************************
+	 * PREPARATION
+	 ********************************************************************/
+	// Read in the contents of the publication metadata file
+	$pubs = unserialize(file_get_contents($metadata_file));
+	$gallery_files = array();
+	foreach ($pubs as $pub) {
+		if (!isset($gallery_files[$pub['file']])) { $gallery_files[$pub['file']] = array(); }
+		$gallery_files[$pub['file']] = $pub;
 	}
+	ksort($gallery_files);
 }
 ?>
 
@@ -58,15 +66,15 @@ if ( $publication != null || $publication != '' ) {
 	<a href="<?php echo SITE_ROOT?>/publications/papers">Papers</a> &nbsp;&rarr;&nbsp;
     <?php echo $publication?>
 </div>
-<?php if ( $gallery_files != null ) : ?>
-<h2><?php echo $publication?>.dfd</h2> <br />
+<?php if ( $metadata_file != null ) : ?>
+<h2><?php echo $publication?></h2> <br />
 <div id="gallery">
 	<ul>
 	<?php 
 		foreach ($gallery_files as $file) {
-			echo '<li>
-	   				<a href="' . $gallery_url . $file . '" >
-	                	<img src="' . $gallery_url . $file . '" width="100" height="85" alt="" />
+					echo '<li>
+	   				<a href="' . $gallery_url . $file['file'] . '"  title="' . $file['title'] . '">
+	                	<img src="' . $gallery_url . $file['file'] . '" width="100" height="85" alt="' . $file['title'] . '" />
 	            	</a>
 	        	</li>';
 		}
