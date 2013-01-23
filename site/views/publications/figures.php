@@ -47,7 +47,7 @@ if ( $publication != null || $publication != '' ) {
 		width: auto;
 	}
 	#gallery ul { list-style: none; }
-	#gallery ul li { display: inline; }
+	#gallery ul li { display: inline-block; }
 	#gallery ul img {
 		border: 5px solid #3e3e3e;
 		border-width: 5px 5px 20px;
@@ -55,6 +55,18 @@ if ( $publication != null || $publication != '' ) {
 	#gallery ul a:hover img {
 		border: 5px solid #000;
 		border-width: 5px 5px 20px;
+	}
+	#gallery ul a { color: #A2A2A2; }
+	#gallery ul img {
+		display: block;
+		height: 110px;
+	    margin-left: auto;
+	    margin-right: auto;
+	    width: 90px;
+	}
+	#gallery div.figure_frame {
+		width: 165px;
+		text-align: center;
 	}
 	</style>
 </head>
@@ -73,9 +85,16 @@ if ( $publication != null || $publication != '' ) {
 	<?php 
 		foreach ($gallery_files as $file) {
 					echo '<li>
-	   				<a href="' . $gallery_url . $file['file'] . '"  title="' . $file['title'] . '">
-	                	<img src="' . $gallery_url . $file['file'] . '" width="100" height="85" alt="' . $file['title'] . '" />
-	            	</a>
+					<div class="figure_frame">
+		   				<a href="' . $gallery_url . $file['file'] . '"  title="' . $file['caption'] . '">
+		                	<img src="' . $gallery_url . $file['file'] . '" alt="' . $file['title'] . '" />
+		            	</a>
+	            		<div>
+		            		<a href="' . $gallery_url . $file['file'] . '"  title="' . $file['caption'] . '">
+			                	<p>' . $file['title'] . '</p>
+			            	</a>
+		            	</div>
+	            	</div>
 	        	</li>';
 		}
 	?>
