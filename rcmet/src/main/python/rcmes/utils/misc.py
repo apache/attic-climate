@@ -1,8 +1,10 @@
 """Module with a collection of helper functions"""
 
 
+import ConfigParser
 import datetime
 import glob
+import json
 import os
 import sys
 
@@ -10,7 +12,90 @@ import numpy as np
 import numpy.ma as ma
 import Nio
 
+from classes import SubRegion
+
 from fortranfile import FortranFile
+
+
+def configToDict(config):
+    """
+    Helper function to parse a configuration input and return a python dictionary
+    
+    Input::  
+        config - list of ('key', 'value') tuples from ConfigParser.
+            key01 - string i.e. 'value01'
+            key-2 - string i.e. 'value02'
+    Output::
+        configDict - Dictionary of Key/Value pairs
+    """
+    configDict = {}
+    for entry in config:
+        configDict[entry[0]] = entry[1]
+
+    return configDict
+
+
+def readSubRegionsFile(regionsFile):
+    """
+    Input::
+        regionsFile - Path to a subRegion configuration file
+        
+    Output::
+        Ordered List of SubRegion Objects decoded from regionsFile
+    """
+    if os.path.exists(regionsFile):
+        regionsConfig = ConfigParser.SafeConfigParser()
+        regionsConfig.optionxform = str
+        regionsConfig.read(regionsFile)
+        regions = generateSubRegions(regionsConfig.items('REGIONS'))
+
+        return regions
+        
+    else:
+        raise IOError
+
+def generateSubRegions(regions):
+    """ Takes in a list of ConfigParser tuples and returns a list of SubRegion objects
+    
+    Input::
+        regions - Config Tuple: [('Region01', '["R01", 36.5, 29, 0.0, -10]'), ('Region02',....]
+
+    Output::
+        subRegions - list of SubRegion objects
+    """
+    subRegions = []
+    for region in regions:
+        name, latMax, latMin, lonMax, lonMin = json.loads(region[1])
+        subRegion = SubRegion(name, latMin, lonMin, latMax, lonMax)
+        subRegions.append(subRegion)
+
+    return subRegions
+
+def parseSubRegions(subRegionConfig):
+    """
+    Input::
+        subRegionConfig - ConfigParser object
+    
+    Output::
+        subRegions - If able to parse the userConfig then return path/to/subRegions/file, else return False.
+    """
+    subRegions = False
+    try:
+        if os.path.exists(subRegionConfig['subRegionFile']):
+            subRegions = readSubRegionsFile(subRegionConfig['subRegionFile'])
+            
+        else:
+            print "SubRegion Filepath: [%s] does not exist.  Check your configuration file, or comment out the SUB_REGION Section." % (subRegionConfig['subRegionFile'],)
+            print "Processing without SubRegion support"
+
+
+    except IOError:
+        print "Unable to open %s.  Running without SubRegions" % (subRegionConfig['subRegionFile'],)
+    except KeyError:
+        print "subRegionFile parameter was not provided.  Processing without SubRegion support"
+
+    return subRegions
+
 
 def decode_wrf_times(xtimes, base_time):
     '''
@@ -831,20 +916,70 @@ def assign_subRgns_interactively():
             subRgnLat1[n] = raw_input('Enter the ending latitude of sub-Region: \n> ')
     return numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
 
-def select_subRgn(numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1):
+def selectSubRegion(subRegions):
     # interactively select the sub-region ID for area-mean time-series evaluation
-    print '-----------------------------------------------'
-    for n in np.arange(numSubRgn):
-        print n, subRgnName[n], subRgnLon0[n], subRgnLon1[n], subRgnLat0[n], subRgnLat1[n]
-        n += 1
-    print '-----------------------------------------------'
+    print '-'*59
+    columnTemplate = "|{0:2}|{1:10}|{2:10}|{3:10}|{4:10}|{5:10}|"
+    print columnTemplate.format("ID", "Name", "LonMin", "LonMax", "LatMin", "LatMax")
+    counter = 0
+    for subRegion in subRegions:
+        print columnTemplate.format(counter, subRegion.name, subRegion.lonMin, subRegion.lonMax, subRegion.latMin, subRegion.latMax)
+        counter += 1
+
+    print '-'*59
     ask = 'Enter the sub-region ID to be evaluated. -9 for all sub-regions (-9 is not active yet): \n'
     rgnSelect = int(raw_input(ask))
-    if rgnSelect >= numSubRgn:
-        print 'sub-region ID out of range. Max = ', numSubRgn - 1, ' CRASH'
+    if rgnSelect >= len(subRegions):
+        print 'sub-region ID out of range. Max = %s' % len(subRegions)
         sys.exit()
     return rgnSelect
+
+
+def userDefinedStartEndTimes(obsList, modelList):
+    """
+    The function will interactively ask the user to select a start and end time based on the start/end times
+    of the supplied observation and model objects
+     
+    Input::
+        obsList - List of Observation Objects
+        modelList - List of Model Objects
     
+    Output::
+        startTime - Python datetime object from User Input
+        endTime - Python datetime object from User Input
+    """
+    startTimes = []
+    endTimes = []
+    print '='*94
+    template = "|{0:60}|{1:15}|{2:15}|"
+    print template.format('Dataset - NAME', 'START DATE', 'END DATE')
+    for observation in obsList:
+        startTimes.append(datetime.datetime.strptime('%Y-%m-%d'))
+        endTimes.append(datetime.datetime.strptime('%Y-%m-%d'))
+        print template.format(observation['longName'], observation['start_date'], observation['end_date'])
+    print '-'*94
+    for model in modelList:
+        startTimes.append(model.minTime)
+        startTimes.append(model.maxTime)
+        print template.format(model.name, model.minTime.strftime('%Y-%m-%d'), model.maxTime.strftime('%Y-%m-%d'))
+    print '='*94
+    
+    # Compute Overlap
+    overLap = (max(startTimes).strftime('%Y-%b-%d'), min(endTimes).strftime('%Y-%b-%d'))
+    # Present default overlap to user as default value
+    print 'Standard Overlap in the selected datasets are %s through %s' % (overLap)
+    # Enter Start Date
+    
+    # Enter End Date
+    
+        
+    sys.exit()
+        
+    
+    
+    #return startTime, endTime
+
+
 def select_timOpt():
     #---------------------------------------------
     # Interacrively select the time scale to be evaluated

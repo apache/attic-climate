@@ -32,15 +32,22 @@ class GridBox(BoundingBox):
 
 class JobProperties(object):
     
-    def __init__(self, workDir, cacheDir, startDate, endDate, spatialGrid, temporalGrid, gridLonStep, gridLatStep, outputFile, latMin=None, latMax=None, lonMin=None, lonMax=None):
+    def __init__(self, workDir, cacheDir, spatialGrid, temporalGrid, gridLonStep, gridLatStep, outputFile, 
+                 latMin=None, latMax=None, lonMin=None, lonMax=None, startDate=None, endDate=None):
         self.workDir = os.path.abspath(workDir)
         self.cacheDir = os.path.abspath(cacheDir)
-        self.startDate = datetime.strptime(startDate, '%Y%m%d')
-        self.endDate = datetime.strptime(endDate, '%Y%m%d')
         self.spatialGrid = spatialGrid
         self.temporalGrid = temporalGrid
         self.gridLonStep = float(gridLonStep)
         self.gridLatStep = float(gridLatStep)
+        
+        # Support for both User provided Dates, and Interactive Date Collection
+        if startDate and endDate:
+            self.startDate = datetime.strptime(startDate, '%Y%m%d')
+            self.endDate = datetime.strptime(endDate, '%Y%m%d')
+        else:
+            self.startDate = None
+            self.endDate = None
 
         if outputFile.lower() == 'false':
             self.writeOutFile = False
@@ -66,12 +73,13 @@ class Model(object):
     
     def __init__(self, filename, latVariable, lonVariable, timeVariable, timeStep, varName, precipFlag):
         self.filename = filename
+        self.name = os.path.basename(self.filename)
         self.latVariable = latVariable
         self.lonVariable = lonVariable
         self.timeVariable = timeVariable
         self.timeStep = timeStep
         self.varName = varName
-        self.times = process.getModelTimes(self.filename, self.timeVariable)
+        self.times, _ = process.getModelTimes(self.filename, self.timeVariable)
         self.minTime = min(self.times)
         self.maxTime = max(self.times)
         self.setLatitudeRange()

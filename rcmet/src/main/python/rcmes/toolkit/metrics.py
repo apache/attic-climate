@@ -19,7 +19,9 @@
 Module storing functions to calculate statistical metrics from numpy arrays
 '''
 
+import datetime
 import subprocess
+import sys
 import os
 import numpy as np
 import numpy.ma as ma
@@ -547,7 +549,7 @@ def calc_pat_cor2D(t1, t2, nT):
         mt2 = t2[t, :, :].mean()
         sigma_t1 = t1[t, :, :].std()
         sigma_t2 = t2[t, :, :].std()
-         # TODO: make means and standard deviations weighted by grid box area.
+        # TODO: make means and standard deviations weighted by grid box area.
         patcor.append((((((t1[t, :, :] - mt1) * (t2[t, :, :] - mt2)).sum()) / 
                      (t1.shape[1] * t1.shape[2]) ) / (sigma_t1 * sigma_t2)))
         print t, mt1.shape, mt2.shape, sigma_t1.shape, sigma_t2.shape, patcor[t]
@@ -830,7 +832,7 @@ def calc_stdev(t1):
 
 
 def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, 
-                  lats, obsData, mdlData, obsList, mdlList, workdir):
+                  lats, obsData, mdlData, obsList, mdlList, workdir, subRegions):
     '''
     Calculate evaluation metrics and generate plots.
     '''
@@ -855,6 +857,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     #        obsList          - string describing the observation data files
     #        mdlList          - string describing model file names
     #        workdir        - string describing the directory path for storing results and plots
+    #        subRegions        - list of SubRegion Objects or False
     #JK2.0:  mdlSelect        - the mdl data to be evaluated: Locally determined in v.2.0
     #JK2.0:  obsSelect        - the obs data to be used as the reference for evaluation: Locally determined in v.2.0
     #JK2.0:  numSubRgn        - the number of subregions: Locally determined in v.2.0
@@ -886,42 +889,49 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     # Enter the location of the subrgns via screen input of data; 
     # modify this to add an option to read-in from data file(s)
     #----------------------------------------------------------------------------------------------------
-
-    print ''
-    ans = raw_input('Calculate area-mean timeseries for subregions? y/n: \n> ')
-    print ''
-    if ans == 'y':
-        ans = raw_input('Input subregion info interactively? y/n: \n> ')
-        if ans == 'y':
-            numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
-        else:
-            print 'Read subregion info from a pre-fabricated text file'
-            ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
-            if ans == 'y':
-                subRgnFileName = workdir + "/sub_regions.txt"
-            else:
-                subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
-            print 'subRgnFileName ', subRgnFileName
-            numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
-        print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
-    else:
-        numSubRgn = 0
-
+    """
+    If subRegions is true then process them
+    """
+#    
+#    
+#    print ''
+#    ans = raw_input('Calculate area-mean timeseries for subregions? y/n: \n> ')
+#    print ''
+#    if ans == 'y':
+#        ans = raw_input('Input subregion info interactively? y/n: \n> ')
+#        if ans == 'y':
+#            numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
+#        else:
+#            print 'Read subregion info from a pre-fabricated text file'
+#            ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
+#            if ans == 'y':
+#                subRgnFileName = workdir + "/sub_regions.txt"
+#            else:
+#                subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
+#            print 'subRgnFileName ', subRgnFileName
+#            numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
+#        print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
+#    else:
+#        numSubRgn = 0
     # compute the area-mean timeseries for all subregions if subregion(s) are defined.
     #   the number of subregions is usually small and memory usage is usually not a concern
-    obsRgn = ma.zeros((numOBS, numSubRgn, nT))
-    mdlRgn = ma.zeros((numMDL, numSubRgn, nT))
-    if numSubRgn > 0:
+    
+    obsRgn = ma.zeros((numOBS, len(subRegions), nT))
+    mdlRgn = ma.zeros((numMDL, len(subRegions), nT))
+            
+    if subRegions:        
+    #if numSubRgn > 0:
         print 'Enter area-averaging: mdlData.shape, obsData.shape ', mdlData.shape, obsData.shape
-        print 'Use Latitude/Longitude Mask for Area Averaging'
-        for n in np.arange(numSubRgn):
+        print 'Using Latitude/Longitude Mask for Area Averaging'  
+        for n in np.arange(len(subRegions)):
             # Define mask using regular lat/lon box specified by users ('mask=True' defines the area to be excluded)
-            maskLonMin = subRgnLon0[n] 
-            maskLonMax = subRgnLon1[n]
-            maskLatMin = subRgnLat0[n]
-            maskLatMax = subRgnLat1[n]
+            maskLonMin = subRegions[n].lonMin 
+            maskLonMax = subRegions[n].lonMax
+            maskLatMin = subRegions[n].latMin
+            maskLatMax = subRegions[n].latMax
             mask = np.logical_or(np.logical_or(lats <= maskLatMin, lats >= maskLatMax), 
                                 np.logical_or(lons <= maskLonMin, lons >= maskLonMax))
+            
             # Calculate area-weighted averages within this region and store in a new list
             for k in np.arange(numOBS):           # area-average obs data
                 Store = []
@@ -959,7 +969,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
         if(os.path.exists(fileName) == True):
             cmnd = 'rm -f ' + fileName
             subprocess.call(cmnd, shell=True)
-        files.writeBNdata(fileName, numOBS, numMDL, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgn, mdlRgn)
+        files.writeBNdata(fileName, numOBS, numMDL, nT, ngrdX, ngrdY, len(subRegions), obsData, mdlData, obsRgn, mdlRgn)
     # write a netCDF file for post-processing if desired
     if FoutOption == 'nc':
         fileName = workdir + '/Tseries' 
@@ -968,7 +978,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             print "removing %s from the local filesystem, so it can be replaced..." % (tempName,)
             cmnd = 'rm -f ' + tempName
             subprocess.call(cmnd, shell=True)
-        files.writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgn, mdlRgn)
+        files.writeNCfile(fileName, len(subRegions), lons, lats, obsData, mdlData, obsRgn, mdlRgn)
     if FoutOption == 'bn':
         print 'The regridded obs and model data are written in the binary file ', fileName
     elif FoutOption == 'nc':
@@ -1011,7 +1021,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
         anlDomain = 'n'
         anlRgn = 'n'
         print ' '
-        analSelect = int(raw_input('Eval over domain (Enter 0) or time series of selected regions (Enter 1) \n> '))
+        analSelect = int(raw_input('Eval over domain (Enter 0) or time series of selected Sub Regions (Enter 1) \n> '))
         print ' '
         if analSelect == 0:
             anlDomain = 'y'
@@ -1267,10 +1277,13 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 print ''
 
         # metrics and plots for regional time series
+        elif anlRgn == 'y' and subRegions == False:
+            print 'No SubRegions have been defined.  Regional Time Series Plots cannot be created'
+
         elif anlRgn == 'y':
             # select the region(s) for evaluation. model and obs have been selected before entering this if block
-            print 'There are ', numSubRgn, ' subregions. Select the subregion(s) for evaluation'
-            rgnSelect = misc.select_subRgn(numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1)
+            print 'There are %s subregions. Select the subregion(s) for evaluation' % len(subRegions)
+            rgnSelect = misc.selectSubRegion(subRegions)
             print 'selected region for evaluation= ', rgnSelect
             # Select the model & obs data to be evaluated
             oData = ma.zeros(nT)
@@ -1290,9 +1303,9 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             #metricOption = misc.select_metrics()
             # Temporarily, compute the RMSE and pattern correlation for the simulated 
             # and observed annual cycle based on monthly means
-            # TODO This aren't used. Missing something here???
-            tempRMS = calc_rms(mdlAnnCyc, obsAnnCyc)
-            tempCOR = calc_temporal_pat_cor(mdlAnnCyc, obsAnnCyc)
+            # TODO tempRMS and tempCOR are not used in the code and throwing errors.
+#            tempRMS = calc_rms(mdlAnnCyc, obsAnnCyc)
+#            tempCOR = calc_temporal_pat_cor(mdlAnnCyc, obsAnnCyc)
 
             #--------------------------------
             # (mp.009) Plot results
@@ -1303,12 +1316,12 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 colorbar = 'precip2_17lev'
 
             # 1-d data, e.g. Time series plots
-            plotFileName = 'anncyc_' + varName + '_' + subRgnName[rgnSelect][0:3]
+            plotFileName = 'anncyc_' + varName + '_' + subRegions[rgnSelect].name
             if(os.path.exists(plotFileName) == True):
                 cmnd = 'rm -f ' + plotFileName
                 subprocess.call(cmnd, shell = True)
             year_labels = False         # for annual cycle plots
-            mytitle = 'Annual Cycle of ' + varName + ' at Sub-Region ' + subRgnName[rgnSelect][0:3]
+            mytitle = 'Annual Cycle of ' + varName + ' at Sub-Region ' + subRegions[rgnSelect].name
             # Create a list of datetimes to represent the annual cycle, one per month.
             times = []
             for m in xrange(12):

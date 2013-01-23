@@ -9,9 +9,10 @@ import Nio
 
 from storage import db, files
 import process
+from utils import misc
 
 # TODO:  swap gridBox for Domain
-def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
+def prep_data(settings, obsDatasetList, gridBox, modelList):
     """
     
     returns numOBSs,numMDLs,nT,ngrdY,ngrdX,Times,lons,lats,obsData,modelData,obsList
@@ -34,8 +35,6 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
     # TODO:  Stop the object Deserialization and work on refactoring the core code here
     cachedir = settings.cacheDir
     workdir = settings.workDir
-    startTime = settings.startDate
-    endTime = settings.endDate
 
     # Use list comprehensions to deconstruct obsDatasetList
     #  ['TRMM_pr_mon', 'CRU3.1_pr']    Basically a list of Dataset NAME +'_' + parameter name - THE 'CRU*' one triggers unit conversion issues later
@@ -47,14 +46,6 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
     obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
     mdlList = [model.filename for model in modelList]
     
-    # TODO - SubRegions seems to be missing in the latest code
-#    if subRegions:
-#        numSubRgn = len(subRegions)
-#        subRgnLon0 = [ x.lonMin for x in subRegions ]
-#        subRgnLon1 = [ x.lonMax for x in subRegions ]
-#        subRgnLat0 = [ x.latMin for x in subRegions ]
-#        subRgnLat1 = [ x.latMax for x in subRegions ]
-    
     # Since all of the model objects in the modelList have the same Varnames and Precip Flag, I am going to merely 
     # pull this from modelList[0] for now
     modelVarName = modelList[0].varName
@@ -65,13 +56,6 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
     regridOption = settings.spatialGrid
     timeRegridOption = settings.temporalGrid
     
-    #TODO: Un hardcode this later
-    # TODO: These 2 variables are no longer used in the latest version.  Might be able to remove
-#    maskOption = True
-#    FoutOption = settings.writeOutFile
-
-
-
     """
      Routine to read-in and re-grid both obs and mdl datasets.
      Processes both single and multiple files of obs and mdl or combinations in a general way.
@@ -86,8 +70,6 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
                    obsList        - string describing the observation data files
                    obsDatasetId 	- int, db dataset id
                    obsParameterId	- int, db parameter id 
-                   startTime	- datetime object, the starting time of evaluation
-                   endTime	- datetime object, the ending time of evaluation
                    latMin, latMax, lonMin, lonMax, dLat, dLon, naLats, naLons: define the evaluation/analysis domain/grid system
     	         latMin		- float
                    latMax		- float
@@ -119,15 +101,24 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
            Jinwon Kim, 7/11/2012
     """
 
-    # assign parameters that must be preserved throughout the process
-    print 'start & end time = ', startTime, endTime
-    yymm0 = startTime.strftime("%Y%m")
-    yymm1 = endTime.strftime("%Y%m")
-    print 'start & end eval period = ', yymm0, yymm1
+
     # check the number of obs & model data files
     numOBSs = len(obsList)
     numMDLs = len(mdlList)
     
+    # assign parameters that must be preserved throughout the process
+    # User must provide startTime and endTime if not defined
+    if settings.startDate == None or settings.endDate == None:
+        settings.startDate, settings.endDate = misc.userDefinedStartEndTimes(obsDatasetList, modelList)
+    
+    
+    print 'start & end time = ', settings.startDate, settings.endDate
+    yymm0 = settings.startDate.strftime("%Y%m")
+    yymm1 = settings.endDate.strftime("%Y%m")
+    print 'start & end eval period = ', yymm0, yymm1
+
+
+
     #TODO: Wrap in try except blocks instead
     if numMDLs < 1: 
         print 'No input model data file. EXIT'
@@ -180,7 +171,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList, subRegions):
                                                         obsParameterId[n],
                                                         latMin, latMax,
                                                         lonMin, lonMax,
-                                                        startTime, endTime,
+                                                        settings.startDate, settings.endDate,
                                                         cachedir)
         
         # TODO: modify this if block with new metadata usage.

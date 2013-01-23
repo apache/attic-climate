@@ -8,13 +8,13 @@ import datetime
 import glob
 import os
 import sys
-import json
+
 
 # RCMES Imports
 import storage.rcmed as db
 from toolkit import do_data_prep_20, process, metrics
-
-from classes import JobProperties, Model, GridBox, SubRegion
+from utils import misc
+from classes import JobProperties, Model, GridBox
 
 parser = argparse.ArgumentParser(description='Regional Climate Model Evaluation Toolkit.  Use -h for help and options')
 parser.add_argument('-c', '--config', dest='CONFIG', help='Path to an evaluation configuration file')
@@ -201,86 +201,6 @@ def tempGetYears():
     endTime = datetime.datetime(endYear, 12, 31, 0, 0)
     return (startTime, endTime)
 
-def configToDict(config):
-    """
-    Helper function to parse a configuration input and return a python dictionary
-    
-    Input::  
-        config - list of ('key', 'value') tuples from ConfigParser.
-            key01 - string i.e. 'value01'
-            key-2 - string i.e. 'value02'
-    Output::
-        configDict - Dictionary of Key/Value pairs
-    """
-    configDict = {}
-    for entry in config:
-        configDict[entry[0]] = entry[1]
-
-    return configDict
-
-def readSubRegionsFile(regionsFile):
-    """
-    Input::
-        regionsFile - Path to a subRegion configuration file
-        
-    Output::
-        Ordered List of SubRegion Objects decoded from regionsFile
-    """
-    if os.path.exists(regionsFile):
-        regionsConfig = ConfigParser.SafeConfigParser()
-        regionsConfig.optionxform = str
-        regionsConfig.read(regionsFile)
-        regions = generateSubRegions(regionsConfig.items('REGIONS'))
-
-        return regions
-        
-    else:
-        raise IOError
-
-def generateSubRegions(regions):
-    """ Takes in a list of ConfigParser tuples and returns a list of SubRegion objects
-    
-    Input::
-        regions - Config Tuple: [('Region01', '["R01", 36.5, 29, 0.0, -10]'), ('Region02',....]
-
-    Output::
-        subRegions - list of SubRegion objects
-    """
-    subRegions = []
-    for region in regions:
-        name, latMax, latMin, lonMax, lonMin = json.loads(region[1]) 
-        subRegion = SubRegion(name, latMin, lonMin, latMax, lonMax)
-        subRegions.append(subRegion)
-    return subRegions
-
-def parseSubRegions(userConfig):
-    """
-    Input::
-        userConfig - ConfigParser object
-    
-    Output::
-        subRegions - If able to parse the userConfig then return path/to/subRegions/file, else return False.
-    """
-    subRegions = False
-
-    try:
-        subRegionConfig = configToDict(userConfig.items('SUB_REGION'))
-
-        if os.path.exists(subRegionConfig['subRegionFile']):
-            subRegions = readSubRegionsFile(subRegionConfig['subRegionFile'])
-            
-        else:
-            print "SubRegion Filepath: [%s] does not exist.  Check your configuration file, or comment out the SUB_REGION Section." % (subRegionConfig['subRegionFile'],)
-            print "Processing without a subRegion..."
-
-    except ConfigParser.NoSectionError:
-        pass
-    except IOError:
-        print "Unable to open %s.  Running without SubRegions" % (subRegionConfig['subRegionFile'],)
-    except KeyError:
-        print "subRegionFile parameter was not provided.  Processing without SubRegion support"
-
-    return subRegions
 
 def runUsingConfig(argsConfig):
     """
@@ -314,12 +234,17 @@ def runUsingConfig(argsConfig):
     models = generateModels(userConfig.items('MODEL'))
     
     datasetDict = makeDatasetsDictionary(userConfig.items('RCMED'))
-    userSuppliedRegions = parseSubRegions(userConfig)
-
-    if userSuppliedRegions:
-        subRegions = generateSubRegions(userSuppliedRegions)
-    else:
+    
+    
+    try:
+        subRegionConfig = misc.configToDict(userConfig.items('SUB_REGION'))
+        subRegions = misc.parseSubRegions(subRegionConfig)
+        
+    except ConfigParser.NoSectionError:
+        print 'SUB_REGION header not defined.  Processing without SubRegion support'
         subRegions = False
+        
+
 
     # Go get the parameter listing from the database
     try:
@@ -338,15 +263,18 @@ def runUsingConfig(argsConfig):
     #TODO: Unhardcode this when we decided where this belongs in the Config File
     jobProperties.maskOption = True
 
+#    global x
+#    x = models
+#    sys.exit()
 
-    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models, subRegions)
+    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models)
 
     print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
 
     # TODO: New function Call
     workdir = jobProperties.workDir
     modelVarName = models[0].varName
-    metrics.metrics_plots(modelVarName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList, workdir)
+    metrics.metrics_plots(modelVarName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList, workdir, subRegions)
 
 
 if __name__ == "__main__":
