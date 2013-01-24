@@ -6,9 +6,7 @@ RCMES module to download a file from ESGF.
 import urllib2, httplib
 from os.path import expanduser, join
 
-# default location of ESGF user credentials
-ESGF_CREDENTIALS = "~/.esg/credentials.pem"
-
+from esgf.rcmes.constants import ESGF_CREDENTIALS
 
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
     '''

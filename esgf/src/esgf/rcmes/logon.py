@@ -5,7 +5,7 @@ RCMES module to logon onto the ESGF.
 from pyesgf.logon import LogonManager
 import os
 
-JPL_MYPROXY_SERVER_DN = "/O=ESGF/OU=esg-datanode.jpl.nasa.gov/CN=host/esg-vm.jpl.nasa.gov"
+from esgf.rcmes.constants import JPL_MYPROXY_SERVER_DN
 
 def logon(openid, password):
     '''

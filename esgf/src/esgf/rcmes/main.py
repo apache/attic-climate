@@ -5,10 +5,11 @@ Example main program for ESGF-RCMES integration.
 
 # constant parameters
 USER_OPENID = "https://esg-datanode.jpl.nasa.gov/esgf-idp/openid/lucacinquini"
-USER_PASSWORD = "********"
+USER_PASSWORD = "*****"
 OUTPUT_DIRECTORY = "/tmp"
 
 from esgf.rcmes.logon import logon
+from esgf.rcmes.logon2 import logon2
 from esgf.rcmes.search import SearchClient
 from esgf.rcmes.download import download
 
@@ -17,8 +18,12 @@ def main():
     
     # step 1: obtain short-term certificate
     print 'Retrieving ESGF certificate...'
-    if logon(USER_OPENID, USER_PASSWORD):
-        print "...done."
+    # logon using client-side MyProxy libraries
+    #if logon(USER_OPENID, USER_PASSWORD):
+    #    print "...done."
+    # logon through server-side MyProxy service
+    if logon2(USER_OPENID, USER_PASSWORD):
+        print "...done"
     
     # step 2: execute faceted search for files
     urls = main_obs4mips()

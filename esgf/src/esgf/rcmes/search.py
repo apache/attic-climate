@@ -5,7 +5,7 @@ RCMES module to execute a faceted search for ESGF files.
 
 from pyesgf.search import SearchConnection
 
-JPL_SEARCH_SERVICE_URL = "http://esg-datanode.jpl.nasa.gov/esg-search/search"
+from esgf.rcmes.constants import JPL_SEARCH_SERVICE_URL
 
 class SearchClient():
     """
