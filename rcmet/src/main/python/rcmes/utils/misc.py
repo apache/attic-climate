@@ -50,7 +50,6 @@ def readSubRegionsFile(regionsFile):
         regions = generateSubRegions(regionsConfig.items('REGIONS'))
 
         return regions
-        
     else:
         raise IOError
 
@@ -954,26 +953,34 @@ def userDefinedStartEndTimes(obsList, modelList):
     template = "|{0:60}|{1:15}|{2:15}|"
     print template.format('Dataset - NAME', 'START DATE', 'END DATE')
     for observation in obsList:
-        startTimes.append(datetime.datetime.strptime('%Y-%m-%d'))
-        endTimes.append(datetime.datetime.strptime('%Y-%m-%d'))
+        startTimes.append(datetime.datetime.strptime(observation['start_date'],'%Y-%m-%d'))
+        endTimes.append(datetime.datetime.strptime(observation['end_date'],'%Y-%m-%d'))
         print template.format(observation['longName'], observation['start_date'], observation['end_date'])
     print '-'*94
     for model in modelList:
         startTimes.append(model.minTime)
-        startTimes.append(model.maxTime)
+        endTimes.append(model.maxTime)
         print template.format(model.name, model.minTime.strftime('%Y-%m-%d'), model.maxTime.strftime('%Y-%m-%d'))
     print '='*94
     
     # Compute Overlap
-    overLap = (max(startTimes).strftime('%Y-%b-%d'), min(endTimes).strftime('%Y-%b-%d'))
+    maxstartTimes=max(startTimes)
+    minendTimes=min(endTimes)
+    if maxstartTimes.month != 1:
+        maxstartTimes = datetime.datetime(maxstartTimes.year+1,1,maxstartTimes.day)
+    if minendTimes.month != 12:
+        minendTimes = datetime.datetime(minendTimes.year-1,12,minendTimes.day)
+    if minendTimes.year < maxstartTimes.year:
+        print 'Not enough data for overlapping years'
+        sys.exit()
+    overLap = (maxstartTimes.strftime('%Y-%b-%d'), minendTimes.strftime('%Y-%b-%d'))
     # Present default overlap to user as default value
     print 'Standard Overlap in the selected datasets are %s through %s' % (overLap)
     # Enter Start Date
     
     # Enter End Date
-    
-        
-    sys.exit()
+    return datetime.datetime.strptime(overLap[0],'%Y-%b-%d'),datetime.datetime.strptime(overLap[1],'%Y-%b-%d')  
+    #sys.exit()
         
     
     
