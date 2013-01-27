@@ -5,7 +5,7 @@ ESGF_CREDENTIALS = "~/.esg/credentials.pem"
 
 # URL for ESGF certificate service
 #CERT_SERVICE_URL = "https://localhost:8443/esgf-idp/idp/getcert.htm"
-CERT_SERVICE_URL = "https://test-datanode.jpl.nasa.gov/esgf-idp/idp/getcert.htm"
+CERT_SERVICE_URL = "https://esg-datanode.jpl.nasa.gov/esgf-idp/idp/getcert.htm"
 
 # Basic authentication realm
 REALM = "ESGF"

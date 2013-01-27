@@ -6,7 +6,7 @@ Example main program for ESGF-RCMES integration.
 # constant parameters
 USER_OPENID = "https://esg-datanode.jpl.nasa.gov/esgf-idp/openid/lucacinquini"
 USER_PASSWORD = "*****"
-OUTPUT_DIRECTORY = "/tmp"
+DATA_DIRECTORY = "/tmp"
 
 from esgf.rcmes.logon import logon
 from esgf.rcmes.logon2 import logon2
@@ -33,7 +33,7 @@ def main():
     for i, url in enumerate(urls):
         if i>=1:
             break
-        download(url, toDirectory=OUTPUT_DIRECTORY)
+        download(url, toDirectory=DATA_DIRECTORY)
 
     
 def main_cmip5():
