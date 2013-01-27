@@ -973,18 +973,26 @@ def userDefinedStartEndTimes(obsList, modelList):
     if minendTimes.year < maxstartTimes.year:
         print 'Not enough data for overlapping years'
         sys.exit()
-    overLap = (maxstartTimes.strftime('%Y-%b-%d'), minendTimes.strftime('%Y-%b-%d'))
+    overLap = (maxstartTimes.strftime('%Y-%m-%d'), minendTimes.strftime('%Y-%m-%d'))
     # Present default overlap to user as default value
     print 'Standard Overlap in the selected datasets are %s through %s' % (overLap)
     # Enter Start Date
+    defaultTime = datetime.datetime.strptime(overLap[0],'%Y-%m-%d')
+    startTime = raw_input("Please Enter a Start Date [%s]: " % defaultTime.strftime('%Y-%m-%d'))
+    if not startTime:
+        startTime = defaultTime
+    else:
+        startTime = datetime.datetime.strptime(startTime, '%Y-%m-%d')
     
     # Enter End Date
-    return datetime.datetime.strptime(overLap[0],'%Y-%b-%d'),datetime.datetime.strptime(overLap[1],'%Y-%b-%d')  
-    #sys.exit()
-        
-    
-    
-    #return startTime, endTime
+    defaultTime = datetime.datetime.strptime(overLap[1],'%Y-%m-%d')
+    endTime = raw_input("Please Enter an End Date [%s]: " % defaultTime.strftime('%Y-%m-%d'))
+    if not endTime:
+        endTime = defaultTime
+    else:
+        endTime = datetime.datetime.strptime(endTime, '%Y-%m-%d')
+
+    return startTime, endTime
 
 
 def select_timOpt():
