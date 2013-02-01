@@ -12,7 +12,7 @@ import sys
 
 # RCMES Imports
 import storage.rcmed as db
-from toolkit import do_data_prep_20, process, metrics
+from toolkit import do_data_prep, process, metrics
 from utils import misc
 from classes import JobProperties, Model, GridBox
 
@@ -266,7 +266,7 @@ def runUsingConfig(argsConfig):
     #TODO: Unhardcode this when we decided where this belongs in the Config File
     jobProperties.maskOption = True
 
-    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models)
+    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep.prep_data(jobProperties, obsDatasetList, gridBox, models)
 
     print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
 

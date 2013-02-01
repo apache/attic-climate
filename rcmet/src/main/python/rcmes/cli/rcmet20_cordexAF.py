@@ -20,7 +20,7 @@ import numpy.ma as ma
 #sys.path.append(os.path.abspath('../.'))
 import storage.files_v12
 import storage.rcmed as db
-import toolkit.do_data_prep_20
+import toolkit.do_data_prep
 import toolkit.do_metrics_20
 import toolkit.process as process
 from classes import Settings, Model, BoundingBox, SubRegion, GridBox
@@ -665,7 +665,7 @@ def rcmet_cordexAF():
     # nT: the number of time steps in the data
     
     
-#    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20.prep_data(\
+#    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep.prep_data(\
 #         cachedir, workdir, \
 #         obsList, obsDatasetId, obsParameterId, \
 #         startTime, endTime, \
@@ -682,7 +682,7 @@ def rcmet_cordexAF():
     obsList = obsDatasetList.each['longName']
     """
 
-    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20(\
+    numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep(\
           settings, obsDatasetList, gridBox, models, subRegionTuple)
     
     """
@@ -923,7 +923,7 @@ if __name__ == "__main__":
         print'End of preprocessor: Run RCMET'
         print'------------------------------'
         
-        numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep_20.prep_data(settings, obsDatasetList, gridBox, models, subRegionTuple)
+        numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep.prep_data(settings, obsDatasetList, gridBox, models, subRegionTuple)
         
         
         print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
