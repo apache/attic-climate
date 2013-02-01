@@ -239,6 +239,9 @@ def runUsingConfig(argsConfig):
     try:
         subRegionConfig = misc.configToDict(userConfig.items('SUB_REGION'))
         subRegions = misc.parseSubRegions(subRegionConfig)
+        # REORDER SUBREGION OBJECTS until we standardize on Python 2.7
+        # TODO Remove once Python 2.7 support is finalized
+        subRegions.sort(key=lambda x:x.name)
         
     except ConfigParser.NoSectionError:
         print 'SUB_REGION header not defined.  Processing without SubRegion support'
@@ -262,10 +265,6 @@ def runUsingConfig(argsConfig):
 
     #TODO: Unhardcode this when we decided where this belongs in the Config File
     jobProperties.maskOption = True
-
-#    global x
-#    x = models
-#    sys.exit()
 
     numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep_20.prep_data(jobProperties, obsDatasetList, gridBox, models)
 
