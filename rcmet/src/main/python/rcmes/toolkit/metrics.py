@@ -1174,7 +1174,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 obsDataMask = np.zeros_like(oClim.data[:, :])
                 metricDat = ma.masked_array(metricDat, obsDataMask)
                 oClim = ma.masked_array(oClim, obsDataMask)
-                oStdv = ma.masked_array(oClim, obsDataMask)
+                oStdv = ma.masked_array(oStdv, obsDataMask)
                 plotDat = metricDat
                 mymax = plotDat.max()
                 mymin = plotDat.min()
