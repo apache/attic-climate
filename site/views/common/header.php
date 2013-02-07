@@ -135,6 +135,7 @@
                             <li><a href="<?php echo SITE_ROOT . '/training/rcmet-overview'?>">RCMET Overview</a></li>
                             <li>RCMET User Guide</li>
                             <!--<li><a href="<?php echo SITE_ROOT . '/training/rcmet-user-guide'?>">RCMET User Guide</a></li>-->
+                            <li><a href="<?php echo SITE_ROOT . '/training/downloads'?>">RCMET Downloads</a></li>
                             <li><a href="<?php echo SITE_ROOT . '/training/rcmed-api-spec'?>">RCMED API Spec</a></li>
                             <li>Videos</li>
                             <!--<li><a href="<?php echo SITE_ROOT . '/training/videos'?>">Videos</a></li>-->
