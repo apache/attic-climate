@@ -2,6 +2,8 @@
 
 ## Peer-reviewed Journal Publications
 
+* Waliser, D.E., J. Kim, C. Mattmann, L. Mearns, C. Goodale, A. Hart, D. Crichton, S. Mcginnis, 2012: Evaluations of the monthly surface air temperatures and precipitation over the conterminous U.S. in the NARCCAP multi-RCM hindcast experiment. in preparation.
+
 * Waliser, D.E., Jinwon Kim, Y. Xue, Y. Chao, A. Eldering, R. Fovell, Q. Li, K. Liou, J. McWilliams, S. Kapnick, R. Vasic, Fs. De Sale, and Y. Yu, 2011: Simulating the Sierra Nevada snowpack: The impact of snow albedo and multi-layer snow physics. Climatic Change, 109, S95-S117, DOI 10.1007/s10584-011-0312-5.
 
 * Hughes, M., A. Hall, and Jinwon Kim, 2011: Human-induced changes in winds, temperature and relative humidity during Santa Ana events. Climatic Change, 109, S119-S132, doi: 10.1007/s10584-011-0300-9.
@@ -12,11 +14,10 @@
 
 * Kim, Jinwon, D.E. Waliser, P.J. Neiman, B. guan, J.-M. Ryoo, and G.A. Wick, 2012: Effects of atmospheric river landfalls on the cold season precipitation in California. Climate Dynamics, in press.
 
-* Kim, J., D.E. Waliser, C. Mattmann, C. Goodale, A. Hart, P. Zimdars, D. Crichton, C. Jones, G. Nikulin, B. Hewitson, C. Jack, C. Lennard and A. Favre, 2012: Evaluation of the surface climatology in the CORDEX-Africa multi-RCM hindcast experiment using the JPL-UCLA Regional Climate Model Evaluation System (RCMES). in preparation.
+* Kim, J., D.E. Waliser, C. Mattmann, C. Goodale, A. Hart, P. Zimdars, D. Crichton, C. Jones, G. Nikulin, B. Hewitson, C. Jack, C. Lennard and A. Favre, 2012: Evaluation of the CORDEX-Africa multi-RCM Hindcast: Systematic Model Errors. Climate Dynamics, under revision.          
+<a href="figures/Kim-Climate_Dynamics-2012">Supplemental figures</a>
 
 ## Conference Papers
-
-* Waliser, D.E., J. Kim, C. Mattmann, L. Mearns, C. Goodale, A. Hart, D. Crichton, S. Mcginnis, 2012: Evaluations of the monthly surface air temperatures and precipitation over the conterminous U.S. in the NARCCAP multi-RCM hindcast experiment. in preparation.
 
 
 * Kim. J., D. Waliser, Q. Li, K. Liou, C. Cai, Y. Chao, A. Eldering, R. Fovell, A. Hall, X. Qu, and Y. Xue, 2007: The JIFRESSE Regional Earth System Model and its application to air quality in California. AGU Fall meeting, GC21A-0137, December 11, 2007, San Francisco, California, American Geophysical Union.
@@ -43,11 +44,11 @@
 
 * Lean, P., Jinwon Kim, D.E. Waliser, C.A. Mattmann, C. Goodale, A. Hart, P. Zimdars, A. Hall, and D. Crichton, 2011: Regional Climate Model Evaluation System based on satellite and other observations. Amer. Meteor. Soc. Annual Meeting, January 2011, Seattle, WA, USA.
 
-* Chung, F., Jinwon Kim, X. Gao, S. Sorooshian, D.E. Waliser, M.Z. Ejeta, and J. Wang, 2010: A projection of the impact of climate change on California’s major watersheds during the mid-21st century period. December 13-17, San Francisco, CA. 2010, Abstract GC12A-02.
+* Chung, F., Jinwon Kim, X. Gao, S. Sorooshian, D.E. Waliser, M.Z. Ejeta, and J. Wang, 2010: A projection of the impact of climate change on CaliforniaÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s major watersheds during the mid-21st century period. December 13-17, San Francisco, CA. 2010, Abstract GC12A-02.
 
 * Kim, Jinwon, D.E. Waliser, B. Guan, N.P. Molotch, J. Ryoo, E. Fetzer, and P.J. Neiman, 2010: The impact of atmospheric rivers on the cold season hydrology in California. December 13-17, San Francisco, CA. 2010 Fall meeting, Suppl., Abstract A51F-03.
 
-* Waliser, D.E., International Conference on the Coordinated Regional Climate Downscaling Experiment - CORDEX” in Trieste, Italy in March of 2011. 
+* Waliser, D.E., International Conference on the Coordinated Regional Climate Downscaling Experiment - CORDEXÃƒÂ¢Ã¢â€šÂ¬Ã‚Â in Trieste, Italy in March of 2011. 
 
 * Cinquini, L., A. Braverman, G. Bell, M. Cayaman, D. Crichton, C. Goodale, R. Ferraro, A. Hart, Jinwon Kim, C. Mattmann, D. Waliser, and D. Williams, 2011: Building the software infrastructure to enable usage of satellite observations for climate change research. C21-T242B, 2011 CLIVAR conference, 24-28 October 2011, Denver, CO. 
 
@@ -73,5 +74,3 @@
 * Kim, J., B. Guan, J. Ryoo, D. Waliser, E. Fetzer, P. Neiman, G. Wick, and N. Molotch, 2012: Impacts of Atmospheric River landfalls on the cold season hydrology in California. 24th Conf. on Climate Variability and Change, 22-26 January 2012, New Orleans, Louisiana.
 
 * Waliser, D.E., Regional Climate Model Evaluation System, CORDEX-Africa Workshop, International Center for Theoretical Physics, Trieste, Italy, March, 2011.
-
-

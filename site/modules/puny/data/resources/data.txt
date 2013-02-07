@@ -3,7 +3,7 @@ The Regional Climate Model Evaluation Database (RCMED) is a scalable data store 
 
 ### How the RCMED is Organized...
 The RCMED is a homogenized collection of billions (and growing) of observational climate measurements taken over several decades. The data are made available via a RESTful HTTP web interface which provides a single point of entry to the entire collection, making it easy to write scripts in any language that can make an HTTP request.
-The RCMED data model uses the notion that every individual observation is a <code>DataPoint</code>, a measurement of a particular physical <code>Parameter</code> (e.g.: surface air temperature) that is anchored in three dimensional space and time. Data points are further linked to the <code>Granule</code> (file) from which they were originally extracted, and the <code>Dataset</code> to which the file belonged. The following diagram provides a visual picture of the RCMED data model:
+The RCMED data model uses the notion that every individual observation is a <code>DataPoint</code>, a measurement of a particular physical <code>Parameter</code> (e.g. surface air temperature) that is anchored in three dimensional space and time. Data points are further linked to the <code>Granule</code> (file) from which they were originally extracted, and the <code>Dataset</code> to which the file belonged. The following diagram provides a visual picture of the RCMED data model:
 
 <img class="figure" src="[SITE_ROOT]/static/img/figures/rcmed-data-model.png"/>
 <p class="caption">RCMED data model diagram</p>

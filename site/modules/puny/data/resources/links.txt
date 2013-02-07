@@ -1,6 +1,6 @@
 # Links
 
-* [COordinated Regional climate Downscaling EXperiment (CORDEX)](http://wcrp.ipsl.jussieu.fr/SF_RCD_CORDEX.html)
+* [COordinated Regional climate Downscaling EXperiment (CORDEX)](http://wcrp-cordex.ipsl.jussieu.fr/)
 * [Coupled Model Intercomparison Project version 5 (CMIP5)](http://cmip-pcmdi.llnl.gov/cmip5/)
 * [Intergovernmental Panel on Climate Change](http://www.ipcc.ch/)
 * [NASA ESGF Portal - Remote Sensing contributions to CMIP5](http://esg-gateway.jpl.nasa.gov)
