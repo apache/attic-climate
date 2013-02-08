@@ -4,8 +4,4 @@
 
 
 
-
-
-
-
 For more information on RCMET, please [contact]([SITE_ROOT]/about/contact) us!

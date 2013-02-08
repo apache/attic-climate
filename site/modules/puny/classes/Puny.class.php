@@ -1,4 +1,20 @@
 <?php
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 require_once( dirname(__FILE__) . '/Puny_Container.class.php');
 require_once( dirname(__FILE__) . '/Puny_Resource.class.php');
@@ -105,16 +121,35 @@ class Puny {
 	  if ( !self::$commonResourcesLoaded ) {
 	    $js = "\r\n"
 	      . "var puny_module_root   = '" . trim(App::Get()->settings['puny_module_root']) . "'\r\n"
-	      . "    puny_module_static = '" . trim(App::Get()->settings['puny_module_static']) ."';\r\n";
-	    App::Get()->response->addJavascript( $js, true ); // raw Javascript
-	    self::$commonResourcesLoaded = true;
+	      . "    puny_module_static = '" . trim(App::Get()->settings['puny_module_static']) ."'\r\n"
+	      . "    puny_current_url = '" . $_SERVER['HTTP_REFERER'] ."';\r\n";
+	      App::Get()->response->addJavascript( $js, true ); // raw Javascript
+	    
+	    // Add puny default styles
+	    $staticPath = trim(App::Get()->settings['puny_module_static']);
+		App::Get()->response->addStylesheet($staticPath . '/css/defaults.css');
+		self::$commonResourcesLoaded = true;
 	  }
 	}
 
 	protected static function injectEditorResources() {
 		// Only inject resources if we are editing and they have not already been loaded...
+		$segments = App::Get()->request->uri;
+		$staticPath = trim(App::Get()->settings['puny_module_static']);
+		if ( self::isEditing() && strstr($segments,'edit') != false) {
+			
+			App::Get()->response->addJavascript($staticPath . '/js/jquery-1.7.2.min.js');
+			App::Get()->response->addJavascript($staticPath . '/js/gollum.js');
+			App::Get()->response->addJavascript($staticPath . '/js/gollum.dialog.js');
+			App::Get()->response->addJavascript($staticPath . '/js/gollum.placeholder.js');
+			App::Get()->response->addJavascript($staticPath . '/js/editor/gollum.editor.js');
+			
+			App::Get()->response->addStylesheet($staticPath . '/css/github.css');
+			App::Get()->response->addStylesheet($staticPath . '/css/editor.css');
+			App::Get()->response->addStylesheet($staticPath . '/css/dialog.css');
+		}
 		if ( self::isEditing() && !self::$editorResourcesLoaded ) {
-			$staticPath = trim(App::Get()->settings['puny_module_static']);
+			
 			App::Get()->response->addJavascript($staticPath . '/js/puny.js');
 			App::Get()->response->addStylesheet($staticPath . '/css/puny.css');
 			self::$editorResourcesLoaded = true;

@@ -10,7 +10,7 @@ Overview
 
 Puny makes it easier to separate content from presentation and separate the 
 role of the site developer and the content manager. As its name implies, it
-provides the bare miminum necessary to accomplish this -- based on the 
+provides the bare minimum necessary to accomplish this -- based on the 
 understanding that excellent, full-fledged Content Management System options
 are readily available and more appropriate for content-heavy sites. Puny simply 
 provides a way for sites that are not generally suited to a CMS to nevertheless
@@ -22,8 +22,8 @@ How it Works
 
 Developers embed 'containers' in their views, and content editors provide the
 content that get displayed in the containers. Puny loads up the most recent 
-version of the content from the data store, renders it using the 
-specified parser, and places the rendered text into the view container. 
+version of the content from the data store, renders it using the specified 
+parser, and places the rendered text into the view container. 
 
 By logging in with the editor credentials, a user can visually see the editable
 'containers' on the application views, and, using a javascript-enabled browser,
@@ -36,10 +36,10 @@ can provide inline, real-time edits, creating a new version of the content.
 Puny has been designed so that it is easy to plug in custom back end data
 stores (MySql, MongoDB, SQLite, etc) and template engines (Markdown, Textile,
 bbcode, etc). If a driver for <insert data store or parser here> doesn't exist, 
-there are two primary extension points: Puny_DataStore (a base class for developing drivers for data stores), and Puny_Parser (a 
-base clss for interfacing with text parsers and template engines). Using the 
-examples in the /classes/data and /classes/parsers, it should be relatively easy
-to develop additional drivers.
+there are two primary extension points: Puny_DataStore (a base class for developing 
+drivers for data stores), and Puny_Parser (a base class for interfacing with text 
+parsers and template engines). Using the examples in the /classes/data and 
+/classes/parsers, it should be relatively easy to develop additional drivers.
 
 
 Installation
@@ -62,10 +62,10 @@ Developer Guide
 
 ### Including Puny in your application
 
-In general, Puny needs to be available on each application view. To avoid having to 
-load the module at the top of each view, it is possible to include the module once,
-in the Balance index.php at the root of your application. Simply add the following 
-lines to the 'index.php' file where it says 'Initialize any global modules':
+In general, Puny needs to be available on each application view. To avoid having to load 
+the module at the top of each view, it is possible to include the module once,in the 
+Balance index.php at the root of your application. Simply add the following lines to the 
+'index.php' file where it says 'Initialize any globally required modules here':
 
 // Puny initialization
 App::Get()->loadModule('puny');
