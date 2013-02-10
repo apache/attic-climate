@@ -831,8 +831,8 @@ def calc_stdev(t1):
     return sigma_t1
 
 
-def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, 
-                  lats, obsData, mdlData, obsList, mdlList, workdir, subRegions):
+def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
+                  lats, obsData, mdlData, obsList, mdlList, workdir, subRegions, fileOutputOption):
     '''
     Calculate evaluation metrics and generate plots.
     '''
@@ -889,41 +889,43 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     # Enter the location of the subrgns via screen input of data; 
     # modify this to add an option to read-in from data file(s)
     #----------------------------------------------------------------------------------------------------
-    """
-    If subRegions is true then process them
-    """
-#    
-#    
-#    print ''
-#    ans = raw_input('Calculate area-mean timeseries for subregions? y/n: \n> ')
-#    print ''
-#    if ans == 'y':
-#        ans = raw_input('Input subregion info interactively? y/n: \n> ')
-#        if ans == 'y':
-#            numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
-#        else:
-#            print 'Read subregion info from a pre-fabricated text file'
-#            ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
-#            if ans == 'y':
-#                subRgnFileName = workdir + "/sub_regions.txt"
-#            else:
-#                subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
-#            print 'subRgnFileName ', subRgnFileName
-#            numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
-#        print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
-#    else:
-#        numSubRgn = 0
+    if subRegions:
+        numSubRgn = len(subRegions)
+        subRgnName = [ x.name   for x in subRegions ]
+        subRgnLon0 = [ x.lonMin for x in subRegions ]
+        subRgnLon1 = [ x.lonMax for x in subRegions ]
+        subRgnLat0 = [ x.latMin for x in subRegions ]
+        subRgnLat1 = [ x.latMax for x in subRegions ]
+    else:
+        print ''
+        ans = raw_input('Calculate area-mean timeseries for subregions? y/n: [n] \n')
+        print ''
+        if ans == 'y':
+            ans = raw_input('Input subregion info interactively? y/n: \n> ')
+            if ans == 'y':
+                numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
+            else:
+                print 'Read subregion info from a pre-fabricated text file'
+                ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
+                if ans == 'y':
+                    subRgnFileName = workdir + "/sub_regions.txt"
+                else:
+                    subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
+                print 'subRgnFileName ', subRgnFileName
+                numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
+            print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
+        else:
+            numSubRgn = 0
     # compute the area-mean timeseries for all subregions if subregion(s) are defined.
     #   the number of subregions is usually small and memory usage is usually not a concern
     
-    obsRgn = ma.zeros((numOBS, len(subRegions), nT))
-    mdlRgn = ma.zeros((numMDL, len(subRegions), nT))
+    obsRgn = ma.zeros((numOBS, numSubRgn, nT))
+    mdlRgn = ma.zeros((numMDL, numSubRgn, nT))
             
     if subRegions:        
-    #if numSubRgn > 0:
         print 'Enter area-averaging: mdlData.shape, obsData.shape ', mdlData.shape, obsData.shape
         print 'Using Latitude/Longitude Mask for Area Averaging'  
-        for n in np.arange(len(subRegions)):
+        for n in np.arange(numSubRgn):
             # Define mask using regular lat/lon box specified by users ('mask=True' defines the area to be excluded)
             maskLonMin = subRegions[n].lonMin 
             maskLonMax = subRegions[n].lonMax
@@ -946,17 +948,19 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             Store = []                               # release the memory allocated by temporary vars
 
     #-------------------------------------------------------------------------
-    # (mp.002) FoutOption: The option to create a binary or netCDF file of processed 
+    # (mp.002) fileOutputOption: The option to create a binary or netCDF file of processed 
     #                      (re-gridded and regionally-averaged) data for user-specific processing. 
     #                      This option is useful for advanced users who need more than
     #                      the metrics and vidualization provided in the basic package.
     #----------------------------------------------------------------------------------------------------
     print ''
-    FoutOption = raw_input('Option for output files of obs/model data: Enter no/bn/nc \
-                            for no, binary, netCDF file \n> ').lower()
+    if not fileOutputOption:
+        while fileOutputOption not in ['no', 'nc']:
+            fileOutputOption = raw_input('Option for output files of obs/model data: Enter no/nc \
+                                for no, netCDF file \n> ').lower()
     print ''
     # write a binary file for post-processing if desired
-    if FoutOption == 'bn':
+    if fileOutputOption == 'bn':
         fileName = workdir + '/lonlat_eval_domain' + '.bn'
         if(os.path.exists(fileName) == True):
             cmnd = 'rm -f ' + fileName
@@ -969,20 +973,20 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
         if(os.path.exists(fileName) == True):
             cmnd = 'rm -f ' + fileName
             subprocess.call(cmnd, shell=True)
-        files.writeBNdata(fileName, numOBS, numMDL, nT, ngrdX, ngrdY, len(subRegions), obsData, mdlData, obsRgn, mdlRgn)
+        files.writeBNdata(fileName, numOBS, numMDL, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgn, mdlRgn)
+        print 'The regridded obs and model data are written in the binary file ', fileName
+
     # write a netCDF file for post-processing if desired
-    if FoutOption == 'nc':
-        fileName = workdir + '/Tseries' 
+    if fileOutputOption == 'nc':
+        fileName = '%s/%s_Tseries' % (workdir, varName)
         tempName = fileName + '.' + 'nc'
         if(os.path.exists(tempName) == True):
             print "removing %s from the local filesystem, so it can be replaced..." % (tempName,)
             cmnd = 'rm -f ' + tempName
             subprocess.call(cmnd, shell=True)
-        files.writeNCfile(fileName, len(subRegions), lons, lats, obsData, mdlData, obsRgn, mdlRgn)
-    if FoutOption == 'bn':
-        print 'The regridded obs and model data are written in the binary file ', fileName
-    elif FoutOption == 'nc':
+        files.writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, subRegions)
         print 'The regridded obs and model data are written in the netCDF file ', fileName
+
 
     #####################################################################################################
     ###################### Metrics calculation and plotting cycle starts from here ######################
@@ -1282,7 +1286,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
 
         elif anlRgn == 'y':
             # select the region(s) for evaluation. model and obs have been selected before entering this if block
-            print 'There are %s subregions. Select the subregion(s) for evaluation' % len(subRegions)
+            print 'There are %s subregions. Select the subregion(s) for evaluation' % numSubRgn
             rgnSelect = misc.selectSubRegion(subRegions)
             print 'selected region for evaluation= ', rgnSelect
             # Select the model & obs data to be evaluated

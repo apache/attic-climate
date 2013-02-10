@@ -6,6 +6,8 @@ This module can easily open NetCDF, HDF and Grib files.  Search the PyNIO
 documentation for a complete list of supported formats.
 """
 
+from os import path
+
 try:
     import Nio
 except ImportError:
@@ -608,7 +610,7 @@ def writeBNdata(fileName, numOBSs, numMDLs, nT, ngrdX, ngrdY, numSubRgn, obsData
     tmpDat = 0     # release the array allocated for tmpDat
     F.close()
 
-def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg):
+def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, mdlRgnAvg, obsList, mdlList, subRegions):
     # write an output file of variables up to 3 dimensions
     # fileName: the name of the output data file
     # numSubRgn  : the number of subregions
@@ -629,34 +631,70 @@ def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, md
     #create global attributes
     f.globalAttName = ''
     # create dimensions
+    print 'Creating Dimensions within the NetCDF Object...'
     f.create_dimension('unity', 1)
     f.create_dimension('time', dimT)
     f.create_dimension('west_east', dimX)
     f.create_dimension('south_north', dimY)
-    f.create_dimension('obss', dimO)
+    f.create_dimension('obs', dimO)
     f.create_dimension('models', dimM)
-    f.create_dimension('regions', dimR)
+        
     # create the variable (real*4) to be written in the file
-    var = f.create_variable('lon', 'd', ('south_north', 'west_east'))
-    var = f.create_variable('lat', 'd', ('south_north', 'west_east'))
-    var = f.create_variable('oDat', 'd', ('obss', 'time', 'south_north', 'west_east'))
-    var = f.create_variable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
-    var = f.create_variable('oRgn', 'd', ('obss', 'regions', 'time'))
-    var = f.create_variable('mRgn', 'd', ('models', 'regions', 'time'))
+    print 'Creating Variables...'
+    f.create_variable('lon', 'd', ('south_north', 'west_east'))
+    f.create_variable('lat', 'd', ('south_north', 'west_east'))
+    f.create_variable('oDat', 'd', ('obss', 'time', 'south_north', 'west_east'))
+    f.create_variable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
+    
+    if subRegions:
+        f.create_dimension('regions', dimR)
+        f.create_variable('oRgn', 'd', ('obss', 'regions', 'time'))
+        f.create_variable('mRgn', 'd', ('models', 'regions', 'time'))
+        f.variables['oRgn'].varAttName = 'Observation time series: Subregions'
+        f.variables['mRgn'].varAttName = 'Model time series: Subregions'
+
+    loadDataIntoNetCDF(f, obsList, obsData, 'Observation')
+    print 'Loaded the Observations into the NetCDF'
+
+    loadDataIntoNetCDF(f, mdlList, mdlData, 'Model')
+
     # create attributes and units for the variable
-    f.variables['lon'].varAttName = 'Longitudes'; f.variables['lon'].varUnit = 'degrees East'
-    f.variables['lat'].varAttName = 'Latitudes'; f.variables['lat'].varUnit = 'degrees North'
-    f.variables['oDat'].varAttName = 'Obseration time series: entire domain'
+    print 'Creating Attributes and Units...'
+    f.variables['lon'].varAttName = 'Longitudes'
+    f.variables['lon'].varUnit = 'degrees East'
+    f.variables['lat'].varAttName = 'Latitudes'
+    f.variables['lat'].varUnit = 'degrees North'
+    f.variables['oDat'].varAttName = 'Observation time series: entire domain'
     f.variables['mDat'].varAttName = 'Model time series: entire domain'
-    f.variables['oRgn'].varAttName = 'Obseration time series: Subregions'
-    f.variables['mRgn'].varAttName = 'Model time series: Subregions'
+
     # assign the values to the variable and write it
-    #print 'lons in writeFile'; print lons
     f.variables['lon'][:, :] = lons
     f.variables['lat'][:, :] = lats
-    f.variables['oDat'][:, :, :, :] = obsData
-    f.variables['mDat'][:, :, :, :] = mdlData
-    f.variables['oRgn'][:, :, :] = obsRgnAvg
-    f.variables['mRgn'][:, :, :] = mdlRgnAvg
-    #print f
+    if subRegions:
+        f.variables['oRgn'][:, :, :] = obsRgnAvg
+        f.variables['mRgn'][:, :, :] = mdlRgnAvg
+
     f.close()
+
+def loadDataIntoNetCDF(fileObject, datasets, dataArray, dataType):
+    """
+    Input::
+        fileObject - PyNIO file object data will be loaded into
+        datasets - List of dataset names
+        dataArray - Multi-dimensional array of data to be loaded into the NetCDF file
+        dataType - String with value of either 'Model' or 'Observation'
+    Output::
+        No return value.  PyNIO file object is updated in place
+    """
+    datasetCount = 0
+    for dataset in datasets:
+        if dataType.lower() == 'observation':
+            datasetName = dataset.replace(' ','')
+        elif dataType.lower() == 'model':
+            datasetName = path.splitext(path.basename(dataset))[0]
+        print "Creating variable %s" % datasetName
+        fileObject.create_variable(datasetName, 'd', ('time', 'south_north', 'west_east'))
+        fileObject.variables[datasetName].varAttName = 'Obseration time series: entire domain'
+        print 'Loading values into %s' % datasetName
+        fileObject.variables[datasetName].assign_value(dataArray[datasetCount,:,:,:])
+        datasetCount += 1

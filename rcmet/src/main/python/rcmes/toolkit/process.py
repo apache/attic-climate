@@ -725,6 +725,14 @@ def decodeTimeFromString(time_string):
     except ValueError:
         pass
 
+    try:
+        mytime = time.strptime(time_string, '%Y-%m-%d')
+        mytime = datetime.datetime(*mytime[0:6])
+        return mytime
+
+    except ValueError:
+        pass
+
 
     print 'Error decoding time string: string does not match a predefined time format'
     return 0

@@ -135,7 +135,8 @@ def generateModels(modelConfig):
     for keyValTuple in modelConfig:
         if keyValTuple[0] == 'filenamePattern':
             modelFileList = glob.glob(keyValTuple[1])
-    
+            modelFileList.sort()
+
     # Remove the filenamePattern from the dict since it is no longer used
     configData.pop('filenamePattern')
     
@@ -189,7 +190,7 @@ def makeDatasetsDictionary(rcmedConfig):
             valueList = entry[1].split(delimiter)
             configData[entry[0]] = valueList
         else:
-            configData[entry[0]] = entry[1]
+            configData[entry[0]] = entry[1:]
 
     return configData
 
@@ -241,7 +242,8 @@ def runUsingConfig(argsConfig):
         subRegions = misc.parseSubRegions(subRegionConfig)
         # REORDER SUBREGION OBJECTS until we standardize on Python 2.7
         # TODO Remove once Python 2.7 support is finalized
-        subRegions.sort(key=lambda x:x.name)
+        if subRegions:
+            subRegions.sort(key=lambda x:x.name)
         
     except ConfigParser.NoSectionError:
         print 'SUB_REGION header not defined.  Processing without SubRegion support'
@@ -254,7 +256,7 @@ def runUsingConfig(argsConfig):
         params = db.getParams()
     except:
         raise
-    
+
     obsDatasetList = []
     for param_id in datasetDict['obsParamId']:
         for param in params:
@@ -266,14 +268,15 @@ def runUsingConfig(argsConfig):
     #TODO: Unhardcode this when we decided where this belongs in the Config File
     jobProperties.maskOption = True
 
-    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList = do_data_prep.prep_data(jobProperties, obsDatasetList, gridBox, models)
+    numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlName = do_data_prep.prep_data(jobProperties, obsDatasetList, gridBox, models)
 
     print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
 
     # TODO: New function Call
     workdir = jobProperties.workDir
+    fileOutputOption = jobProperties.writeOutFile
     modelVarName = models[0].varName
-    metrics.metrics_plots(modelVarName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlList, workdir, subRegions)
+    metrics.metrics_plots(modelVarName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlName, workdir, subRegions, fileOutputOption)
 
 
 if __name__ == "__main__":

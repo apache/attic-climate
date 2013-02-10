@@ -76,9 +76,9 @@ def parseSubRegions(subRegionConfig):
         subRegionConfig - ConfigParser object
     
     Output::
-        subRegions - If able to parse the userConfig then return path/to/subRegions/file, else return False.
+        subRegions - List of SubRegion Objects.  This could return an empty List if unable to parse subRegionConfig
     """
-    subRegions = False
+    subRegions = []
     try:
         if os.path.exists(subRegionConfig['subRegionFile']):
             subRegions = readSubRegionsFile(subRegionConfig['subRegionFile'])
@@ -966,10 +966,11 @@ def userDefinedStartEndTimes(obsList, modelList):
     # Compute Overlap
     maxstartTimes=max(startTimes)
     minendTimes=min(endTimes)
-    if maxstartTimes.month != 1:
-        maxstartTimes = datetime.datetime(maxstartTimes.year+1,1,maxstartTimes.day)
-    if minendTimes.month != 12:
-        minendTimes = datetime.datetime(minendTimes.year-1,12,minendTimes.day)
+    # TODO:  Do we need to start on JAN and end on DEC?  Do we know someone is doing ANNUAL analysis at this point?
+#    if maxstartTimes.month != 1:
+#        maxstartTimes = datetime.datetime(maxstartTimes.year+1,1,maxstartTimes.day)
+#    if minendTimes.month != 12:
+#        minendTimes = datetime.datetime(minendTimes.year-1,12,minendTimes.day)
     if minendTimes.year < maxstartTimes.year:
         print 'Not enough data for overlapping years'
         sys.exit()

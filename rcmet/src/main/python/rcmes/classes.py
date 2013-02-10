@@ -32,7 +32,7 @@ class GridBox(BoundingBox):
 
 class JobProperties(object):
     
-    def __init__(self, workDir, cacheDir, spatialGrid, temporalGrid, gridLonStep, gridLatStep, outputFile, 
+    def __init__(self, workDir, cacheDir, spatialGrid, temporalGrid, gridLonStep, gridLatStep, outputFile='false', 
                  latMin=None, latMax=None, lonMin=None, lonMax=None, startDate=None, endDate=None):
         self.workDir = os.path.abspath(workDir)
         self.cacheDir = os.path.abspath(cacheDir)
@@ -50,14 +50,12 @@ class JobProperties(object):
             self.endDate = None
 
         if outputFile.lower() == 'false':
-            self.writeOutFile = False
-        elif outputFile.lower() == 'binary':
-            self.writeOutFile = 'binary'
+            self.writeOutFile = 'no'
         elif outputFile.lower() == 'netcdf':
-            self.writeOutFile = 'netcdf'
+            self.writeOutFile = 'nc'
         else:
             self.writeOutFile = False
-        
+
         if self.spatialGrid.lower() == 'user':
             self.latMin = float(latMin)
             self.latMax = float(latMax)
