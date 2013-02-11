@@ -643,12 +643,12 @@ def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, md
     print 'Creating Variables...'
     f.create_variable('lon', 'd', ('south_north', 'west_east'))
     f.create_variable('lat', 'd', ('south_north', 'west_east'))
-    f.create_variable('oDat', 'd', ('obss', 'time', 'south_north', 'west_east'))
+    f.create_variable('oDat', 'd', ('obs', 'time', 'south_north', 'west_east'))
     f.create_variable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
     
     if subRegions:
         f.create_dimension('regions', dimR)
-        f.create_variable('oRgn', 'd', ('obss', 'regions', 'time'))
+        f.create_variable('oRgn', 'd', ('obs', 'regions', 'time'))
         f.create_variable('mRgn', 'd', ('models', 'regions', 'time'))
         f.variables['oRgn'].varAttName = 'Observation time series: Subregions'
         f.variables['mRgn'].varAttName = 'Model time series: Subregions'
