@@ -44,6 +44,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
     obsDatasetId = [str(x['dataset_id']) for x in obsDatasetList]
     # obsDatasetList ['paramter_id'] list
     obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
+    obsTimestep = [str(x['timestep']) for x in obsDatasetList]
     mdlList = [model.filename for model in modelList]
     
     # Since all of the model objects in the modelList have the same Varnames and Precip Flag, I am going to merely 
@@ -172,7 +173,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
                                                         latMin, latMax,
                                                         lonMin, lonMax,
                                                         settings.startDate, settings.endDate,
-                                                        cachedir)
+                                                        cachedir, obsTimestep[n])
         
         # TODO: modify this if block with new metadata usage.
         if precipFlag == True and obsList[n][0:3] == 'CRU':

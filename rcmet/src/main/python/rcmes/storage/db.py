@@ -11,6 +11,7 @@ import datetime
 import pickle
 
 from classes import RCMED
+from toolkit import process
 
 def reorderXYT(lons, lats, times, values):
     # Re-order values in values array such that when reshaped everywhere is where it should be
@@ -52,7 +53,7 @@ def findUnique(seq, idfun=None):
         result.append(item)
     return result
 
-def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir):
+def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep):
     """
     Main function to extract data from DB into numpy masked arrays
     
@@ -154,6 +155,7 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         timeFormat = "%Y-%m-%d %H:%M:%S"
         timesUnique = [datetime.datetime.strptime(t, timeFormat) for t in uniqueTimestamps]
         timesUnique.sort()
+        timesUnique = process.normalizeDatetimes(timesUnique, timestep) 
 
         # Reshape arrays
         latitudes = latitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
