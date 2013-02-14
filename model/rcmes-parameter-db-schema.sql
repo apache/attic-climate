@@ -1,19 +1,8 @@
--- Water Resources Management 
--- Climate Model Evaluation Database Schema
--- 
--- 7/28/2010
---
--- Authors: ahart, cgoodale
--- 
--- Database: `wrm_data`
--- Generation Time: Jul 12, 2010 at 10:08 AM
--- Server version: 5.1.44
--- PHP Version: 5.3.2
+-- Regional Climate Model Evaluation System
+-- Parameter Database Schema
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
---
--- Database: `wrm_dev`
 --
 -- --------------------------------------------------------
 
@@ -23,13 +12,10 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE TABLE `dataPoint` (
   `datapoint_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `granule_id` int(10) unsigned NOT NULL,
-  `dataset_id` int(10) unsigned NOT NULL,
-  `parameter_id` int(10) unsigned NOT NULL,
   `time` datetime NOT NULL,
   `latitude` double NOT NULL,
   `longitude` double NOT NULL,
-  `vertical` double DEFAULT  NULL,
+  `vertical` double NOT NULL,
   `value` double NOT NULL,
   PRIMARY KEY (`datapoint_id`),
   INDEX ( `time` , `latitude` , `longitude` )
