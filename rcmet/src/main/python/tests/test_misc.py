@@ -45,7 +45,8 @@ class TestIsDirGood(unittest.TestCase):
         self.assertTrue(misc.isDirGood(self.writeableMissingDir))
 
     def testUnwriteableDir(self):
-        self.assertFalse(misc.isDirGood(self.unwriteableDir))
+        with self.assertRaises(OSError):
+            misc.isDirGood(self.unwriteableDir)
     
     def testUnwritableMissingDir(self):
         with self.assertRaises(OSError):

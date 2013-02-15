@@ -270,18 +270,17 @@ def isDirGood(directory):
     directoryStatus = False
     
     if os.path.exists(directory):
-        directoryIsValid = os.access(directory, os.W_OK | os.X_OK)
-        if directoryIsValid:
-            directoryStatus = True
+        directoryStatus = os.access(directory, os.W_OK | os.X_OK)
+        if directoryStatus:
+            pass
         else:
-            print "Unable to access the directory: %s.  Check that you have the proper permissions to read and write to that directory." % directory
-            directoryStatus = False
+            raise OSError("Unable to access the directory: %s.  Check that you have the proper permissions to read and write to that directory." % directory)
+            #directoryStatus = False
     else:
         try:
             os.mkdir(directory)
             directoryStatus = True
-        except:
-            #errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % directory
+        except OSError:
             raise
 
     return directoryStatus

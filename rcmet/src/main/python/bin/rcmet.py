@@ -33,35 +33,10 @@ def checkConfigSettings(config):
     """
     settings = config.items('SETTINGS')
     for key_val in settings:
-        
-        if key_val[0] == 'workDir':
-            workDir = os.path.abspath(key_val[1])
-            
-            if os.path.exists(workDir):
-                workDirIsValid = os.access(workDir, os.W_OK | os.X_OK)
-                if workDirIsValid:
-                    pass
-                else:
-                    errorMessage = "Unable to access the workDir: %s.  Check that you have the proper permissions to read and write to that directory." % workDir
-                    raise IOError(errorMessage)
-            else:
-                errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % workDir
-                raise IOError(errorMessage)
-        
-        if key_val[0] == 'cacheDir':
-            cacheDir = os.path.abspath(key_val[1])
-            
-            if os.path.exists(cacheDir):
-                cacheDirIsValid = os.access(cacheDir, os.W_OK | os.X_OK)
-                if cacheDirIsValid:
-                    pass
-                else:
-                    errorMessage = "Unable to access the cacheDir: %s.  Check that you have the proper permissions to read and write to that directory." % cacheDir
-                    raise IOError(errorMessage)
-            else:
-                errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % cacheDir
-                raise IOError(errorMessage)
-        
+        # Check the user provided directories are valid
+        if key_val[0] == 'workDir' or key_val[0] == 'cacheDir':
+            _ =  misc.isDirGood(os.path.abspath(key_val[1]))
+
         else:
             pass
 
