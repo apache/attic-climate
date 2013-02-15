@@ -257,6 +257,36 @@ def read_total_precip_from_filelist(myfilelist):
 
     return lat, lon, times, precip
 
+
+def isDirGood(directory):
+    """
+    Purpose::
+        This function will check if a directory exists and is writeable.  If the directory doesn't exist it is created.
+    Input::
+        directory - Path we need to check 
+    Output::
+        directoryStatus - Boolean
+    """
+    directoryStatus = False
+    
+    if os.path.exists(directory):
+        directoryIsValid = os.access(directory, os.W_OK | os.X_OK)
+        if directoryIsValid:
+            directoryStatus = True
+        else:
+            print "Unable to access the directory: %s.  Check that you have the proper permissions to read and write to that directory." % directory
+            directoryStatus = False
+    else:
+        try:
+            os.mkdir(directory)
+            directoryStatus = True
+        except:
+            #errorMessage = "%s doesn't exist.  Please create it, and re-run the program with the current configuration." % directory
+            raise
+
+    return directoryStatus
+    
+
 def read_trmm_3b42_files(filelist, latMin, latMax, lonMin, lonMax):
     '''
      ** Alternate method of getting TRMM data from local repository if DB not available **
