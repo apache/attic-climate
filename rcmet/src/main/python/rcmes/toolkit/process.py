@@ -536,7 +536,7 @@ def normalizeDatetimes(datetimes, timestep):
         Monthly data will be forced to the first of the month at midnight 
     """
     normalDatetimes = []
-    if timestep == 'monthly':
+    if timestep.lower() == 'monthly':
         for inputDatetime in datetimes:
             if inputDatetime.day != 1:
                 # Clean the inputDatetime
@@ -546,7 +546,7 @@ def normalizeDatetimes(datetimes, timestep):
 
             normalDatetimes.append(inputDatetime)
 
-    elif timestep == 'daily':
+    elif timestep.lower() == 'daily':
         for inputDatetime in datetimes:
             if inputDatetime.hour != 0 or inputDatetime.minute != 0 or inputDatetime.second != 0:
                 datetimeString = inputDatetime.strftime('%Y%m%d%H%M%S')
