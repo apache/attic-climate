@@ -44,7 +44,6 @@ HowManyVariables={
 	"calc_rms_dom" : 2,
 	"calc_temporal_pat_cor" : 2,
 	"calc_pat_cor" : 2,
-	"calc_anom_cor" : 2,
 	"calc_nash_sutcliff" : 2,
 	"calc_pdf" : 2,
 	"calc_anom_corn" : 3
@@ -66,7 +65,6 @@ NameOfVariables={
 	"calc_rms_dom" :['t1','t2'],
 	"calc_temporal_pat_cor" :['t1','t2'],
 	"calc_pat_cor" :['t1','t2'],
-	"calc_anom_cor" :['t1','t2'],
 	"calc_nash_sutcliff" :['t1','t2'],
 	"calc_pdf" :['t1','t2'],
 	"calc_anom_corn" :['t1','t2','t4']
@@ -124,13 +122,12 @@ def ShowPossibleMetrics():
 		<a href='/rcmet/metrics/online/calc_rms_dom'>"calc_rms_dom" to return domain root mean square error</a>	
 		<a href='/rcmet/metrics/online/calc_temporal_pat_cor'>"calc_temporal_pat_cor" to return temporal pattern correlation</a>
 		<a href='/rcmet/metrics/online/calc_pat_cor'>"calc_pat_cor" to return pattern correlation</a>
-		<a href='/rcmet/metrics/online/calc_anom_cor'>"calc_anom_cor" to return anomaly correlation</a>
 		<a href='/rcmet/metrics/online/calc_nash_sutcliff'>"calc_nash_sutcliff" to return Nash-Sutcliff coefficient of 
 		efficiency</a>
 		<a href='/rcmet/metrics/online/calc_pdf'>"calc_pdf" to return probability distribution function</a>
 		
 		<p> Metrics with three variables:
-		<a href='/rcmet/metrics/online/calc_anom_corn'>"calc_anom_cor" to return anomaly correlation</a> </p>
+		<a href='/rcmet/metrics/online/calc_anom_corn'>"calc_anom_corn" to return anomaly correlation</a> </p>
 		</body>
 		<html>'''
 

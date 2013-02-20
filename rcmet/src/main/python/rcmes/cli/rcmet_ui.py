@@ -382,13 +382,12 @@ def getMetricFromUserInput():
     print '[0] Bias: mean bias across full time range'
     print '[1] Mean Absolute Error: across full time range'
     print '[2] Difference: calculated at each time unit'
-    print '[3] Anomaly Correlation Timeseries> '
-    print '[4] Pattern Correlation Timeseries> '
-    print '[5] Probability Distribution Function similarity score'
-    print '[6] RMS error'
-    print '[7] Coefficient of Efficiency'
-    print '[8] Standard deviation'  
-    print '[9] new Anomaly Correlation'  
+    print '[3] Pattern Correlation Timeseries> '
+    print '[4] Probability Distribution Function similarity score'
+    print '[5] RMS error'
+    print '[6] Coefficient of Efficiency'
+    print '[7] Standard deviation'  
+    print '[8] new Anomaly Correlation'  
     choice = int(raw_input('Please make a selection from the OPTIONS above\n> '))
     if choice == 0:
          return 'bias'
@@ -397,18 +396,16 @@ def getMetricFromUserInput():
     if choice == 2:
         return 'difference'
     if choice == 3:
-        return 'acc'
-    if choice == 4:
         return 'patcor'
-    if choice == 5:
+    if choice == 4:
         return 'pdf'
-    if choice == 6:
+    if choice == 5:
         return 'rms'
-    if choice == 7:
+    if choice == 6:
         return 'coe'
-    if choice == 8:
+    if choice == 7:
         return 'stddev'
-    if choice == 9:
+    if choice == 8:
         return 'nacc'
 
 
