@@ -34,13 +34,18 @@ if (empty ($app->request->segments[0])):
 	$tableWidget->addColumn('Dataset');
 	$tableWidget->addColumn('Id');
 	$tableWidget->addColumn('Unit');
+	$tableWidget->addColumn('Start date');
+	$tableWidget->addColumn('End date');
 
 	foreach ($response->data as $row) {
 		$tableWidget->addRow(array(
 			"<a href=\"" . SITE_ROOT . "/rcmed/parameters/{$row['shortName']}\">{$row['longName']}</a>",
 		    "{$row['dsLongName']} ({$row['dsShortName']}) ",
 			$row['parameter_id'],
-			$row['units']));
+			$row['units'],
+			$row['start_date'],
+			$row['end_date']
+		));
 	}
 ?>
 <div class="breadcrumbs">
