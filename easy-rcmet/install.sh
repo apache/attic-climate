@@ -13,6 +13,11 @@ Flags:
     -h  Display this help message.
     -e  Install and configure a virtualenv environment before installation.
     -q  Quiet install. User prompts are removed (when possible).
+
+It is recommended that you pass -e when running this script. If you don't, parts
+of this installation will pollute your global Python install. If you're unsure,
+pass -e just to be safe!
+
 ENDHELP
 }
 
@@ -64,14 +69,21 @@ if [ $WITH_INTERACT == 1 ]
 then
 cat << ENDINTRO
 The following packages will be installed:
-    List of stuff
+    zlib                curl
+    szip                jpeg
+    libpng              freetype
+    numpy               scipy
+    matplotlib          hdf5
+    NetCDF              NetCDF4-Python
+    NCL                 PyNIO
+    PyNGL               Bottle
 
 It is highly recommended that you allow this script to install and configure a
-virtualenv environment for you. If you didn't pass the -e flag when running
-this script, you're fine! Otherwise, know what you're doing! Parts of this
+virtualenv environment for you. If you passed the -e flag when running
+this script you're fine! Otherwise, know what you're doing! Parts of this
 script will pollute your global Python install if you don't run within a
 virtualenv environment. If you already have a virtualenv environment into which
-you want installs to go, then make sure you don't pass -e!
+you want installs to go then make sure you don't pass -e!
 
 ENDINTRO
 
@@ -79,9 +91,9 @@ read -p "Press [ENTER] to being installation..."
 fi
 
 ### virtualenv install (if required)
-if [$WITH_VIRTUAL_ENV == 1]
+if [ $WITH_VIRTUAL_ENV == 1 ]
 then
-    if ! command -v pip >/devl/null
+    if ! command -v pip >/dev/null
     then
         subheader "Installing Pip (and distribute just in case)"
         subheader "Distribute"
@@ -101,7 +113,8 @@ then
 
     # Need to setup environment for virtualenv
     export WORKON_HOME=$HOME/.virtualenvs
-    source /usr/local/bin/virtualenvwrapper.sh
+    virtualEnvLoc=`which virtualenv`
+    source "${virtualEnvLoc}wrapper.sh"
 
     # Create a new environment for RCMES work
     mkvirtualenv rcmes
@@ -112,10 +125,6 @@ fi
 header "Begin Buildout"
 python bootstrap.py -d
 ./bin/buildout -vvvvv
-
-### Cleanup
-header "Begin Clean-up"
-rm -rf bin/ develop-eggs/ eggs/ parts/
 
 ### Outro
 header "Easy RCMET installation complete."
@@ -129,7 +138,7 @@ your shell's RC file.
 
 Similarly, the default virtualenv environment that this script creates for you
 to use during RCMES work is called "rcmes". Whenever you want to work on RCMES
-tasks, be sure to run
+tasks be sure to run
 
     workon rcmes
 
@@ -138,7 +147,7 @@ This will activate the RCMES environment. When you're done, run
     deactivate rcmes
 
 If you would like to read more about how to use virtualenv and 
-virtualenvwrapper, please look to the following websites for documentation.
+virtualenvwrapper please look to the following websites for documentation.
 
     http://www.virtualenv.org/en/latest/
     http://virtualenvwrapper.readthedocs.org/en/latest/
