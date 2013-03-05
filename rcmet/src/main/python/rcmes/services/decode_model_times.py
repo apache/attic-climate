@@ -156,7 +156,7 @@ def decode_model_times(filelist,timeVarName):
          #  Assumption: the base_date will usually be the first of the month
          #              NB. this method will fail if the base time is on the 29th or higher day of month
          #                      -as can't have, e.g. Feb 31st.
-         new_month = base_time.month + xtime % 12
+         new_month = int(base_time.month + xtime % 12)
          new_year = int(math.floor(base_time.year + xtime / 12.))
          new_time = datetime.datetime(new_year,new_month,base_time.day,base_time.hour,base_time.second,0)
 
