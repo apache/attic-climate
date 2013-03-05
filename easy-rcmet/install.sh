@@ -121,6 +121,10 @@ then
     workon rcmes
 fi
 
+### Install the latest RCMET code for development!
+header "Grabbing RCMET code"
+svn co http://oodt.jpl.nasa.gov/repo/projects/rcmes/trunk/rcmet/src/main/python/rcmes src/rcmes
+
 ### Build
 header "Begin Buildout"
 python bootstrap.py -d
@@ -151,5 +155,10 @@ virtualenvwrapper please look to the following websites for documentation.
 
     http://www.virtualenv.org/en/latest/
     http://virtualenvwrapper.readthedocs.org/en/latest/
+
+Additonally, you should set your PYTHON_PATH environment variable to point to the
+RCMET code base that was downloaded into ./src/rcmes. For example:
+    
+    export PYTHON_PATH=/path/to/this/script/src/rcmes:$PYTHON_PATH
 
 OUTRO
