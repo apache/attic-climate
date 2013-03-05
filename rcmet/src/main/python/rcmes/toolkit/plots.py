@@ -8,6 +8,7 @@ import matplotlib
 import Ngl 
 import numpy as np
 import pylab
+import os
 
 
 def pow_round(x):
@@ -245,8 +246,7 @@ def draw_map_color_filled(data, lats, lons, filename, workdir, mytitle='', range
     print 'Making map plot with color filled contours'
 
     # Map plot
-    #wks_type = 'png'
-    wks_type = 'ps'
+    wks_type = 'png'
     res = Ngl.Resources()
     res.wkWidth = 1000
     res.wkHeight = 1000
@@ -255,7 +255,8 @@ def draw_map_color_filled(data, lats, lons, filename, workdir, mytitle='', range
     if(diff == True):
         res.wkColorMap = "BlueDarkRed18"
 
-    wks = Ngl.open_wks(wks_type, filename, res)
+    filePath = os.path.join(workdir, filename)
+    wks = Ngl.open_wks(wks_type, filePath, res)
     
     resources = Ngl.Resources()
 
@@ -400,7 +401,7 @@ def draw_time_series_plot_old(data, times, myfilename, myworkdir, mytitle='', yt
          No data returned from function
          Image file produced with name {filename}.png
     '''
-
+    
     wks_type = "png"
     wks = Ngl.open_wks(wks_type, myworkdir + '/' + myfilename)  # Open a workstation.
     t = np.arange(len(times))
