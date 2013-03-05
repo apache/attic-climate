@@ -8,6 +8,7 @@ import json
 import rcmes.cli.do_rcmes_processing_sub as awesome
 import time
 import datetime
+import os
 time_format_new = '%Y-%m-%d %H:%M:%S'
 
 #Static Default params
@@ -15,7 +16,7 @@ cachedir = '/tmp/rcmet/cache/'
 workdir = '/tmp/rcmet/'
 precipFlag =False
 seasonalCycleOption=0
-maskOption=0         # int (=1 if set)
+maskOption=False
 maskLatMin=0         # float (only used if maskOption=1)
 maskLatMax=0         # float (only used if maskOption=1)
 maskLonMin=0         # float (only used if maskOption=1)
@@ -29,72 +30,80 @@ plotFileNameOption = 'default'  #another good option we can use.
 
 @route('/rcmes/run/', method='POST')
 def rcmes_go():
-    #cachedir = request.POST.get('cachedir', '').strip()
-    print 'cachedir '+cachedir
-    #workdir = request.POST.get('workdir', '').strip()
-    print 'workdir '+workdir
+    print "**********\nBEGIN RCMES2.0_RUN\n**********"
+    print 'cachedir', cachedir
+    print 'workdir', workdir
+    
+    try:
+        if not os.path.exists(cachedir):
+            os.makedirs(cachedir)
+    except Error as e:
+        print "I/O error({0}: {1}".format(e.errno, e.strerror)
+        sys.exit(1)
+
     obsDatasetId = int(request.POST.get('obsDatasetId', '').strip())
-    print 'obsDatasetId '+str(obsDatasetId)
+    print 'obsDatasetId', obsDatasetId
     obsParameterId = int(request.POST.get('obsParameterId', '').strip())
-    print 'obsParameterId '+str(obsParameterId)
+    print 'obsParameterId', obsParameterId
+
     #reformat DateTime after pulling it out of the POST
     POSTstartTime = str(request.POST.get('startTime', '').strip())
     startTime = datetime.datetime.fromtimestamp(time.mktime(time.strptime(POSTstartTime, time_format_new)))
-    print 'startTime '+str(startTime)
+    print 'startTime', startTime
     #reformat DateTime after pulling it out of the POST
     POSTendTime = str(request.POST.get('endTime', '').strip())
     endTime = datetime.datetime.fromtimestamp(time.mktime(time.strptime(POSTendTime, time_format_new)))
-    print 'endTime '+str(endTime)
+    print 'endTime', endTime
+
     latMin = float(request.POST.get('latMin', '').strip())
-    print 'latMin '+str(latMin)
+    print 'latMin', latMin
     latMax = float(request.POST.get('latMax', '').strip())
-    print 'latMax '+str(latMax) 
+    print 'latMax', latMax 
     lonMin = float(request.POST.get('lonMin', '').strip())
-    print 'lonMin '+str(lonMin)
+    print 'lonMin', lonMin
     lonMax = float(request.POST.get('lonMax', '').strip())
-    print 'lonMax '+str(lonMax)
+    print 'lonMax', lonMax
+
     filelist = [request.POST.get('filelist', '').strip()]
-    print 'filelist '+filelist[0]
+    print 'filelist', filelist[0]
+
     modelVarName = str(request.POST.get('modelVarName', '').strip())
-    print 'modelVarName'+modelVarName
-    #precipFlag = request.POST.get('precipFlag', '').strip()
-    print 'precipFlag '+str(precipFlag)
+    print 'modelVarName', modelVarName
+    precipFlag = request.POST.get('precipFlag', '').strip()
+    print 'precipFlag', precipFlag
     modelTimeVarName = str(request.POST.get('modelTimeVarName', '').strip())
-    print 'modelTimeVarName '+modelTimeVarName
+    print 'modelTimeVarName', modelTimeVarName
     modelLatVarName = str(request.POST.get('modelLatVarName', '').strip())
-    print 'modelLatVarName '+modelLatVarName
+    print 'modelLatVarName', modelLatVarName
     modelLonVarName = str(request.POST.get('modelLonVarName', '').strip())
-    print 'modelLonVarName '+modelLonVarName
+    print 'modelLonVarName', modelLonVarName
+
     regridOption = str(request.POST.get('regridOption', '').strip())
-    print 'regridOption '+regridOption
+    print 'regridOption', regridOption
     timeRegridOption = str(request.POST.get('timeRegridOption', '').strip())
-    print 'timeRegridOption '+timeRegridOption
-    #seasonalCycleOption = request.POST.get('seasonalCycleOption', '').strip()
-    print 'seasonalCycleOption '+str(seasonalCycleOption)
+    print 'timeRegridOption', timeRegridOption
+    seasonalCycleOption = request.POST.get('seasonalCycleOption', '').strip()
+    print 'seasonalCycleOption', seasonalCycleOption
     metricOption = str(request.POST.get('metricOption', '').strip())
-    print 'metricOption '+str(metricOption)
-    #titleOption = str(request.POST.get('titleOption', '').strip())
+    print 'metricOption', metricOption    
     
-    #plotFileNameOption = str(request.POST.get('plotFileNameOption', '').strip())
+    settings = {"cacheDir": cachedir, "workDir": workdir, "fileList": filelist}
+    params = {"obsDatasetId": obsDatasetId, "obsParamId": obsParameterId, 
+              "startTime": startTime, "endTime": endTime, "latMin": latMin, 
+              "latMax": latMax, "lonMin": lonMin, "lonMax": lonMax}
+    model = {"varName": modelVarName, "timeVariable": modelTimeVarName, 
+             "latVariable": modelLatVarName, "lonVariable": modelLonVarName}
+    mask = {"latMin": latMin, "latMax": latMax, "lonMin": lonMin, "lonMax": lonMax}
+    options = {"regrid": regridOption, "timeRegrid": timeRegridOption, 
+               "seasonalCycle": seasonalCycleOption, "metric": metricOption, 
+               "plotTitle": titleOption, "plotFilename": plotFileNameOption, 
+               "mask": maskOption, "precip": precipFlag}
     
-    #maskOption = request.POST.get('maskOption', '').strip()
+    awesome.do_rcmes(settings, params, model, mask, options)
     
-    #maskLatMin = request.POST.get('maskLatMin', '').strip()
-    
-    #maskLatMax = request.POST.get('maskLatMax', '').strip()
-    
-    #maskLonMin = request.POST.get('maskLonMin', '').strip()
-    
-    #maskLonMax = request.POST.get('maskLonMax', '').strip()
-    
-    
-    
-    
-    awesome.do_rcmes(cachedir, workdir, obsDatasetId, obsParameterId, startTime, endTime, latMin, latMax, lonMin, lonMax, filelist, modelVarName, precipFlag, modelTimeVarName, modelLatVarName, modelLonVarName, regridOption, timeRegridOption,seasonalCycleOption,metricOption,titleOption,plotFileNameOption,maskOption,maskLatMin,maskLatMax,maskLonMin,maskLonMax)
-    
-    model_path = workdir+plotFileNameOption+'model.000001'+'.png'
-    obs_path = workdir+plotFileNameOption+'obs.000001'+'.png'
-    comp_path = workdir+plotFileNameOption+'.000001.png'
+    model_path = os.path.join(workdir, plotFileNameOption + "model.000001.png")
+    obs_path = os.path.join(workdir, plotFileNameOption + "obs.000001.png")
+    comp_path = os.path.join(workdir, plotFileNameOption + ".000001.png")
     
     product_dict = {'modelPath':model_path,
                     'obsPath': obs_path,
