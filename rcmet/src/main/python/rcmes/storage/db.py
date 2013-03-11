@@ -62,6 +62,7 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         latMin, latMax, lonMin, lonMax: location range to extract data for
         startTime, endTime: python datetime objects describing required time range to extract
         cachedir: directory path used to store temporary cache files
+        timestep: "daily" | "monthly" so we can be sure to query the RCMED properly
     Output:
         uniqueLatitudes,uniqueLongitudes: 1d-numpy array of latitude and longitude grid values
         uniqueLevels:	1d-numpy array of vertical level values
@@ -71,7 +72,7 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
     """
     
     # 0. Setup local variables to be used later
-    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir)
+    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep)
     urlRequest = url.split('?')[1]
 
     pickleFilePath = os.path.abspath(cachedir + '/' + urlRequest + '.pic')

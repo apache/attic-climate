@@ -1,7 +1,7 @@
+import calendar
 import os
 from datetime import datetime as datetime
 import urllib
-import urllib2
 
 import storage.files as files
 import toolkit.process as process
@@ -113,9 +113,44 @@ class RCMED(object):
         return isoDate
     
     @classmethod
-    def jplUrl(self, datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir):
+    def jplUrl(self, datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep):
         """ This will create a valid RCMED Query URL used to contact the JPL RCMED Instance"""
         JPL_RCMED_URL = 'http://rcmes.jpl.nasa.gov/query-api/query.php?'
+
+        """This block will expand the Time Range based on the timestep to ensure complete temporal range coverage"""
+        expanded = False
+        if timestep.lower() == 'monthly':
+            if startTime.day != 1:
+                # Clean the startTime
+                startTimeString = startTime.strftime('%Y%m%d')
+                normalInputDatetimeString = startTimeString[:6] + '01'
+                startTime = datetime.strptime(normalInputDatetimeString, '%Y%m%d')
+                expanded = True
+            
+            lastDayOfMonth = calendar.monthrange(endTime.year, endTime.month)[1]
+            if endTime.day != lastDayOfMonth:
+                # Clean the endTime
+                endTimeString = endTime.strftime('%Y%m%d')
+                endTimeString = endTimeString[:6] + str(lastDayOfMonth)
+                endTime = datetime.strptime(endTimeString, '%Y%m%d')
+                expanded = True
+    
+        elif timestep.lower() == 'daily':
+            if startTime.hour != 0 or startTime.minute != 0 or startTime.second != 0:
+                datetimeString = startTime.strftime('%Y%m%d%H%M%S')
+                normalDatetimeString = datetimeString[:8] + '000000'
+                startTime = datetime.strptime(normalDatetimeString, '%Y%m%d%H%M%S')
+                expanded = True
+            
+            endTimeString = endTime.strftime('%Y%m%d%H%M%S')
+            endTimeString = endTimeString[:8] + '235959'
+            endTime = datetime.strptime(endTimeString, '%Y%m%d%H%M%S')
+        
+        if expanded:
+            print "Your date range selection has been expanded to ensure we return the largest number of available readings."
+            print "The new date Range is:  %s  through  %s" % (startTime.strftime('%Y-%m-%d %H:%M:%S'), endTime.strftime('%Y-%m-%d %H:%M:%S'))
+        
+        
         timeStart = self.isoDateString(startTime)
         timeEnd = self.isoDateString(endTime)
         query = [('datasetId',datasetID), ('parameterId',paramID), ('latMin',latMin), ('latMax',latMax),
