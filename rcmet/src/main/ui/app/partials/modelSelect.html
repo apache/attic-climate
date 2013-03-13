@@ -1,0 +1,67 @@
+<div class="container">
+  <div class="row">
+    <div class="span10 offset1 columns">
+      <div class="row">
+        <div class="span10">
+          <center>
+            <form id="modelSelectorForm">
+              <input type="file" name="modelSelector">
+            </form>
+          </center>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span10 offset2">
+          <form class="form-horizontal" id="parameterSelectorForm">
+            <div class="control-group">
+              <label class="control-label" for="paramSelect">Parameter Value</label>
+              <div class="controls">
+                <select id="paramSelect">
+                  <option ng-repeat="param in modelParameters">
+                    {{param.text}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="latSelect">Latitude Variable</label>
+              <div class="controls">
+                <select id="latSelect">
+                  <option ng-repeat="lat in latVariables">
+                    {{lat.text}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="lonSelect">Longitude Variable</label>
+              <div class"controls">
+                <select id="lonSelect">
+                  <option ng-repeat="lon in lonVariables">
+                    {{lon.text}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="dateTimeSelect">Date/Time Variable</label>
+              <div class="controls">
+                <select id="dateTimeSelect">
+                  <option ng-repeat="dateTime in dateTimeVariables">
+                    {{dateTime.text}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <button type="submit" class="btn btn-warn">Cancel</button>
+                <button type="submit" class="btn">Add Model</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
