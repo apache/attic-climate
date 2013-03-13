@@ -33,7 +33,7 @@
         </form>
       </div>
       <div class="span1">
-        <button ng-click="runEvaluation()" ng-disabled="controlsAreActive()" class="btn btn-primary">Evaluate</button>
+        <button ng-click="runEvaluation()" ng-disabled="shouldDisableControls()" class="btn btn-primary">Evaluate</button>
       </div>
       <div class="span2">
         <button ng-click="addDataset()" class="btn btn-success">Select a Dataset</button>
@@ -53,7 +53,7 @@
         </form>
       </div>
       <div class="span1">
-        <button ng-click="updateParameters()" ng-disabled="controlsAreActive()" class="btn btn-info">Update</button>
+        <button ng-click="updateParameters()" ng-disabled="shouldDisableControls()" class="btn btn-info">Update</button>
       </div>
     </div>
     <div class="row">
