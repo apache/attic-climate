@@ -2,6 +2,8 @@
 
 /* jasmine specs for services go here */
 
+/* Example code for service tests
+ *
 describe('service', function() {
   beforeEach(module('myApp.services'));
 
@@ -12,3 +14,4 @@ describe('service', function() {
     }));
   });
 });
+*/

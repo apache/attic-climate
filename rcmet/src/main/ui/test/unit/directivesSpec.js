@@ -2,6 +2,8 @@
 
 /* jasmine specs for directives go here */
 
+/* Example code for directive test
+ *
 describe('directives', function() {
   beforeEach(module('myApp.directives'));
 
@@ -17,3 +19,4 @@ describe('directives', function() {
     });
   });
 });
+*/

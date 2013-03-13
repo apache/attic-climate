@@ -2,6 +2,8 @@
 
 /* jasmine specs for controllers go here */
 
+/* Example code for controller tests
+ *
 describe('MyCtrl1', function(){
   var myCtrl1;
 
@@ -29,3 +31,4 @@ describe('MyCtrl2', function(){
     //spec body
   });
 });
+*/
