@@ -2,33 +2,26 @@
 
 /* jasmine specs for controllers go here */
 
-/* Example code for controller tests
- *
-describe('MyCtrl1', function(){
-  var myCtrl1;
+describe('RCMES Controllers', function() {
 
-  beforeEach(function(){
-    myCtrl1 = new MyCtrl1();
-  });
+	describe('ParameterSelectCtrl', function() {
+		it('should create a ParameterSelectCtrl with 0 datasets', function() {
+			var scope = {},
+				ctrl = new ParameterSelectCtrl(scope);
 
+				expect(scope.numberOfDatasets).toBe(0);
+		});
 
-  it('should ....', function() {
-    //spec body
-  });
+		it('should not activate controls unless there are at least 2 datasets', function() {
+			var scope = {},
+				ctrl = new ParameterSelectCtrl(scope);
+
+				// Test default case of 0 datasets
+				expect(scope.shouldDisableControls()).toBe(true);
+
+				// Push up to the minimum number of datasets and test validity
+				scope.numberOfDatasets = 2;
+				expect(scope.shouldDisableControls()).toBe(false);
+		});
+	});
 });
-
-
-describe('MyCtrl2', function(){
-  var myCtrl2;
-
-
-  beforeEach(function(){
-    myCtrl2 = new MyCtrl2();
-  });
-
-
-  it('should ....', function() {
-    //spec body
-  });
-});
-*/

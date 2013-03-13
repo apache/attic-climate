@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('rcmes').
+angular.module('rcmes', []).
     directive('sap', function() {
     return {
         restrict: 'E',

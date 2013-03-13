@@ -18,7 +18,59 @@
     <sap id="map"></sap>
   </div>
 
-  <div ng-view></div>
+  <div ng-controller="ParameterSelectCtrl">
+    <div class="row">
+      <div class="span1 offset2 text-center">Start Date:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="startDateInput"/>
+        </form>
+      </div>
+      <div class="span1 text-center">End Date:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="endDateInput"/>
+        </form>
+      </div>
+      <div class="span1">
+        <button ng-click="runEvaluation()" ng-disabled="controlsAreActive()" class="btn btn-primary">Evaluate</button>
+      </div>
+      <div class="span2">
+        <button ng-click="addDataset()" class="btn btn-success">Select a Dataset</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span1 offset2 text-center">North:</div>
+      <div class="span2">
+        <form action="">
+          <input type="text" class="span2" ng-model="northInput"/>
+        </form>
+      </div>
+      <div class="span1 text-center">East:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="eastInput"/>
+        </form>
+      </div>
+      <div class="span1">
+        <button ng-click="updateParameters()" ng-disabled="controlsAreActive()" class="btn btn-info">Update</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span1 offset2 text-center">South:</div>
+      <div class="span2">
+        <form action="">
+          <input type="text" class="span2" ng-model="southInput"/>
+        </form>
+      </div>
+      <div class="span1 text-center">West:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="westInput"/>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- In production use:
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
