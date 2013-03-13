@@ -2,21 +2,19 @@
 
 /* jasmine specs for directives go here */
 
-/* Example code for directive test
- *
+// This should be testing the Leaflet map directive...
+/*
 describe('directives', function() {
-  beforeEach(module('myApp.directives'));
+	beforeEach(module('rcmes'));
 
-  describe('app-version', function() {
-    it('should print current version', function() {
-      module(function($provide) {
-        $provide.value('version', 'TEST_VER');
-      });
-      inject(function($compile, $rootScope) {
-        var element = $compile('<span app-version></span>')($rootScope);
-        expect(element.text()).toEqual('TEST_VER');
-      });
-    });
-  });
+	// Testing Leaflet map directive
+	describe('Testing Leaflet map directive', function() {
+		it('should create the leaflet dir for proper injection into the page', function() {
+			inject(function($compile, $rootScope) {
+				var element = $compile('<sap id="map"></sap>')($rootScope);
+				expect(element.className).toBe('leaflet-container leaflet-fade-anim');
+			})
+		});
+	});
 });
 */
