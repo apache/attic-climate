@@ -24,4 +24,21 @@ describe('RCMES Controllers', function() {
 				expect(scope.shouldDisableControls()).toBe(false);
 		});
 	});
+
+	describe('ObservationSelectCtrl', function() {
+		it('should initialize observation variable parameters correctly', function() {
+			var scope = {},
+				ctrl = new ObservationSelectCtrl(scope);
+
+				expect(scope.params.length).toBe(1);
+				expect(scope.lats.length).toBe(1);
+				expect(scope.lons.length).toBe(1);
+				expect(scope.times.length).toBe(1);
+
+				expect(scope.params[0]).toBe("Please select a file above");
+				expect(scope.lats[0]).toBe("Please select a file above");
+				expect(scope.lons[0]).toBe("Please select a file above");
+				expect(scope.times[0]).toBe("Please select a file above");
+		});
+	});
 });
