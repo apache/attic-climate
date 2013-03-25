@@ -92,4 +92,21 @@ directive('bootstrapModal', function($defer) {
 		template: '<div id="{{modalId}}" class="modal hide"><div ng-transclude></div></div>',
 		transclude: true
 	};
+}).
+// This directive process bootstrapModalOpen attributes. This lets the user bind the opening of a specific modal
+// as well as specifying how that modal should open.
+directive('bootstrapModalOpen', function() {
+	return {
+		restrict: 'A',
+		link: function(scope, elem, attrs) {
+			// Default to showing the background if the user didn't specify a value for this.
+			var hasBackground = attrs.background === undefined ? true : attrs.background;
+			// Default to allowing an exit on escape if the user didn't provide a value for this.
+			var hasEscapeExit == attrs.escapeExit === undefined ? true : attrs.escapeExit;
+
+			$(elem).bind('click', function() {
+				$('#' + attrs.bootstrapModalOpen).trigger('modalOpen', [hasBackground, hasEscapeExit]);
+			});
+		}
+	};
 });
