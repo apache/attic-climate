@@ -19,7 +19,7 @@ describe('directives', function() {
 	});
 
 	//*/
-	describe('Testing bootstrap-modal directive', function() {
+	describe('bootstrap-modal directive', function() {
 		it('should create a div element of the correct form', function() {
 			inject(function($compile, $rootScope) {
 				var element = $compile('<bootstrap-modal modal-id="testmodal"></bootstrap-modal>')($rootScope);
@@ -29,7 +29,7 @@ describe('directives', function() {
 			});
 		});
 
-		it ('should properly wrap the interior html content' , function() {
+		it('should properly wrap the interior html content' , function() {
 			inject(function($compile, $rootScope) {
 				var element = $compile('<bootstrap-modal modal-id="testmodal"><h3>Hello</h3></bootstrap-modal>')($rootScope);
 				expect(element.html()).toEqual("<div ng-transclude=\"\"><h3 class=\"ng-scope\">Hello</h3></div>");
