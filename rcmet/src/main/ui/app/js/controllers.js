@@ -21,3 +21,7 @@ function ParameterSelectCtrl($scope) {
 	$scope.updateParameters = function() {
 	}
 }
+
+// Controller for observation selection in modal
+function ObservationSelectCtrl($scope) {
+}

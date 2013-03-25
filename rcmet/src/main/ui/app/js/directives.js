@@ -1,7 +1,7 @@
 'use strict';
 
 // Directive for dealing with the Leaflet map
-angular.module('rcmes', []).
+angular.module('rcmes').
 directive('sap', function() {
 	return {
 		restrict: 'E',
