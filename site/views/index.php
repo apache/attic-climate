@@ -1,11 +1,9 @@
 <?php
 $activeTab='home';
 
-//App::Get()->response->addJavascript('static/js/slides.jquery.js');
-App::Get()->response->addJavascript('https://raw.github.com/twitter/bootstrap/master/js/bootstrap-transition.js');
-App::Get()->response->addJavascript('https://raw.github.com/twitter/bootstrap/master/js/bootstrap-carousel.js');
-App::Get()->response->addStylesheet('http://twitter.github.com/bootstrap/assets/css/bootstrap.css');
-
+// add bootstrap library for carousel 
+App::Get()->response->addJavascript(SITE_ROOT. '/static/libs/bootstrap/js/bootstrap.js');
+App::Get()->response->addStylesheet(SITE_ROOT. '/static/libs/bootstrap/css/bootstrap.css');
 ?>
 
 <script type="text/javascript">	
