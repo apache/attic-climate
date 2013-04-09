@@ -1,17 +1,19 @@
-"""Collection of functions used to interface with the database
+"""
+Collection of functions used to interface with the database and to create netCDF
 """
 import os
 import urllib2
 import re
-import cPickle
 import csv
 import numpy as np
 import numpy.ma as ma
-import datetime
-import pickle
-
+from datetime import timedelta ,datetime
+from netCDF4 import Dataset
 from classes import RCMED
+import json
 from toolkit import process
+
+
 
 def reorderXYT(lons, lats, times, values):
     # Re-order values in values array such that when reshaped everywhere is where it should be
@@ -53,7 +55,7 @@ def findUnique(seq, idfun=None):
         result.append(item)
     return result
 
-def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep):
+def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir):
     """
     Main function to extract data from DB into numpy masked arrays
     
@@ -62,7 +64,6 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         latMin, latMax, lonMin, lonMax: location range to extract data for
         startTime, endTime: python datetime objects describing required time range to extract
         cachedir: directory path used to store temporary cache files
-        timestep: "daily" | "monthly" so we can be sure to query the RCMED properly
     Output:
         uniqueLatitudes,uniqueLongitudes: 1d-numpy array of latitude and longitude grid values
         uniqueLevels:	1d-numpy array of vertical level values
@@ -70,46 +71,88 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         mdata: masked numpy arrays of data values
     
     """
+    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir)
+
+    database,timestep,realm,instrument,start_date,end_date,unit=get_param_info(url)
     
-    # 0. Setup local variables to be used later
-    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep)
-    urlRequest = url.split('?')[1]
-
-    pickleFilePath = os.path.abspath(cachedir + '/' + urlRequest + '.pic')
-
-    if os.path.exists(pickleFilePath):
-        print 'Retrieving data from cache (pickle file)'
-        f = open(pickleFilePath, 'rb')
-        store = cPickle.load(f)
-        f.close()
-        latitudes = store[0]
-        longitudes = store[1]
-        uniqueLevels = store[2]
-        timesUnique = store[3]
-        mdata = store[4]
-
-        return latitudes, longitudes, uniqueLevels, timesUnique, mdata
-
+    name=[]
+    #create a directory inside the cachedir
+    activity="obs4cmip5"
+    name.append(activity)
+    product="observations"
+    name.append(product)
+    realm=realm
+    name.append(realm)
+    variable=database
+    name.append(variable)
+    frequency=timestep
+    name.append(frequency)
+    data_structure="grid"
+    name.append(data_structure)
+    institution="NASA"
+    name.append(institution)
+    project="RCMES"
+    name.append(project)
+    instrument=instrument
+    name.append(instrument)
+    version="v1"
+    name.append(version)
+    
+    os.chdir(cachedir)
+    path=os.getcwd()
+    for n in name:
+        if os.path.exists(path+"/"+n):
+            os.chdir(path+"/"+n)
+            path=os.getcwd()
+        else:
+            os.mkdir(n)
+            os.chdir(path+"/"+n)
+            path=os.getcwd()
+    
+    #Satellite datasets filename
+    processing_level='L3'
+    processing_version="processing_version"
+    start_date=str(startTime)[0:4]+str(startTime)[5:7]+str(startTime)[8:10]
+    end_date=str(endTime)[0:4]+str(endTime)[5:7]+str(endTime)[8:10]
+    netCD_fileName=variable + '_' + project + '_' + processing_level + '_' + processing_version + '_' + start_date + '_' + end_date + '.nc'
+    
+    if os.path.exists(path+"/"+netCD_fileName):
+        latitudes, longitudes, uniqueLevels, timesUnique, mdata=read_netcdf(path+"/"+netCD_fileName,timestep)
     else:
-        # 1. fetch the data from the database using url query api
+        latitudes, longitudes, uniqueLevels, timesUnique, mdata=create_netCDF(url,cachedir,datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, unit, path+"/"+netCD_fileName,timestep)
+
+    return latitudes, longitudes, uniqueLevels, timesUnique, mdata
+
+
+def get_param_info(url):
+
+    url=url + "&info=yes"
+    result = urllib2.urlopen(url)
+    datastring = result.read()
+    datastring=json.loads(datastring)
+    database=datastring["database"]
+    timestep=datastring["timestep"]
+    realm=datastring["realm"]
+    instrument=datastring["instrument"]
+    start_date=datastring["start_date"]
+    end_date=datastring["end_date"]
+    unit=datastring["units"]
+    return database,timestep,realm,instrument,start_date,end_date,unit
+
+    
+
+def create_netCDF(url,cachedir,datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, unit,netCD_fileName,timestep):
+
+        urlRequest = url.split('?')[1]
+        urlRequest=urlRequest.replace('&','_')
+
         print 'Starting retrieval from DB (this may take several minutes)'
-        
-        '''TODO: - THIS IS WHERE WE NEED TO WORK ON SUPPORTING THE DOWNLOAD AND UNZIPPING
-        OF THE DATABASE RETRIEVALS and converting them into pickle files for faster 
-        read access'''
         cacheFilePath = os.path.abspath(cachedir + '/' + urlRequest + ".txt")
         result = urllib2.urlopen(url)
         datastring = result.read()
-        #print datastring[-200:]
-        # 2. Strip out data from returned string
-        # Separate data and metadata sections from string returned by API
-        # m = re.search('meta:', datastring)
         d = re.search('data: \r\n', datastring)
-        #header = datastring[m.end():d.start()]
         datacsv = datastring[d.end():len(datastring)]
-        # Strip out unnecessary '\r' from delimiters
         datacsv = re.sub('\r', '', datacsv)
-        # Write data to temporary file ready to be read in by csv module (since problems with multi-line strings)
         myfile = open(cacheFilePath, "w")
         myfile.write(datacsv)
         myfile.close()
@@ -133,15 +176,79 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
             # timestamps are strings so we will leave them alone for now
             timestamps.append(row[3])
             values.append(np.float32(row[4]))
-            
         
         myfile.close()
+            
+        lats=latitudes
+        lons=longitudes
+        lev=levels
+        tim=timestamps
+        val=values        
+        hours=[]
+        timeFormat = "%Y-%m-%d %H:%M:%S"
+        base_time=datetime.strptime(tim[0], timeFormat)
+        #Convert the date to hours 
+        for t in tim:
+            date=datetime.strptime(t, timeFormat)
+            dif=date-base_time
+            hours.append(dif.days*24)        
         os.remove(cacheFilePath)
+        
+        # Generate netCDF file from .txt file
+        print "Generating netCDF file in the cache directory...."
+        netcdf = Dataset(netCD_fileName, 'w') 
+        netcdf.globalAttName = 'The netCDF file for dataset:',datasetID, ', parameter:',paramID, ', latMin: ',latMin, ', latMax: ',latMax, ', lonMin: ',lonMin, ', lonMax: ',lonMax,' startTime: ',tim[0],' and endTime: ',tim[len(tim)-1],'.' 
+        netcdf.createDimension('dim', len(lats))
+        latitude = netcdf.createVariable('lat', 'f4', ('dim'))
+        longitude = netcdf.createVariable('lon', 'f4', ('dim'))
+        level = netcdf.createVariable('lev', 'f4', ('dim'))
+        time = netcdf.createVariable('time', 'd', ('dim'))
+        value = netcdf.createVariable('value', 'f4', ('dim'))
+        netcdf.variables['lat'].standard_name = 'latitude'
+        latitude.units = 'degrees_north'
+        netcdf.variables['lon'].standard_name = 'longitude'
+        longitude.units = 'degrees_east'
+        netcdf.variables['time'].standard_name = 'time'
+        time.units= 'hours since ',tim[0]
+        netcdf.variables['value'].standard_name = 'value'
+        value.units = unit
+        netcdf.variables['lev'].standard_name = 'level'
+        level.units = 'hPa'
+        latitude[:]=lats[:]
+        longitude[:]=lons[:]
+        level[:]=lev[:]
+        time[:]=hours[:]
+        value[:]=val[:]
+        netcdf.close()
+        latitudes, longitudes, uniqueLevels, timesUnique, mdata = read_netcdf(netCD_fileName,timestep)
+        
+        return latitudes, longitudes, uniqueLevels, timesUnique, mdata
+    
+def read_netcdf(netCD_fileName,timestep):
+        # use the created netCDF file
+        print 'Retrieving data from cache (netCDF file)'
+        netcdf = Dataset(netCD_fileName, 'r')
+        latitudes = netcdf.variables['lat'][:]
+        longitudes = netcdf.variables['lon'][:]
+        levels = netcdf.variables['lev'][:]
+        hours = netcdf.variables['time'][:]
+        values = netcdf.variables['value'][:]
+        netcdf.close()
+        
+        # Because time in netCDF file is based on hours since a date, it needs to be converted to date
+        times=[]
+        t="2003-10-15 00:00:00"
+        dt = datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+        for t in range(len(hours)):
+            d=timedelta(hours[t]/24)    
+            add=dt+d
+            times.append(str(add.year) + '-' + str("%02d" % (add.month)) + '-' + str("%02d" % (add.day)) + ' ' + str("%02d" % (add.hour)) + ':' + str("%02d" % (add.minute)) + ':' + str("%02d" % (add.second)))
+        
         # Make arrays of unique latitudes, longitudes, levels and times
         uniqueLatitudes = np.unique(latitudes)
         uniqueLongitudes = np.unique(longitudes)
         uniqueLevels = np.unique(levels)
-        uniqueTimestamps = np.unique(timestamps)
+        uniqueTimestamps = np.unique(times)
         
         # Calculate nx and ny
         uniqueLongitudeCount = len(uniqueLongitudes)
@@ -149,14 +256,16 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         uniqueLevelCount = len(uniqueLevels)
         uniqueTimeCount = len(uniqueTimestamps)
 
-        values, latitudes, longitudes = reorderXYT(longitudes, latitudes, timestamps, values)
+        values, latitudes, longitudes = reorderXYT(longitudes, latitudes, times, values)
 
         # Convert each unique time from strings into list of Python datetime objects
         # TODO - LIST COMPS!
         timeFormat = "%Y-%m-%d %H:%M:%S"
-        timesUnique = [datetime.datetime.strptime(t, timeFormat) for t in uniqueTimestamps]
+
+
+        timesUnique = [datetime.strptime(t, timeFormat) for t in uniqueTimestamps]
         timesUnique.sort()
-        timesUnique = process.normalizeDatetimes(timesUnique, timestep) 
+        timesUnique = process.normalizeDatetimes(timesUnique, timestep)
 
         # Reshape arrays
         latitudes = latitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
@@ -174,10 +283,6 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         #  -these make functions like values.mean(), values.max() etc ignore missing values
         mdi = -9999  # TODO: extract this value from the DB retrieval metadata
         mdata = ma.masked_array(values, mask=(values == mdi))
-
-        # Save 'pickles' files (=direct memory dump to file) of data variables
-        # for faster retrieval than txt cache files.
-        f = open(pickleFilePath, 'wb')
-        pickle.dump([latitudes, longitudes, uniqueLevels, timesUnique, mdata], f)
-        f.close()
+        
         return latitudes, longitudes, uniqueLevels, timesUnique, mdata
+    
