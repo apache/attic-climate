@@ -55,7 +55,7 @@ def findUnique(seq, idfun=None):
         result.append(item)
     return result
 
-def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir):
+def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir,timestep):
     """
     Main function to extract data from DB into numpy masked arrays
     
@@ -71,7 +71,7 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
         mdata: masked numpy arrays of data values
     
     """
-    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir)
+    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir,timestep)
 
     database,timestep,realm,instrument,start_date,end_date,unit=get_param_info(url)
     
