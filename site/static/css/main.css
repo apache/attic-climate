@@ -143,3 +143,8 @@ A:active { text-decoration: none; color: #275ec3 }
 table.jpl_universe td {
 	padding: 2px 3px;
 }
+
+/***** Customizations to the site content ******/
+.carousel {
+	margin-top:60px;
+}
