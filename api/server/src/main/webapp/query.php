@@ -12,119 +12,101 @@
  * 
  * @author ahart
  * @author cgoodale
+ * @author boustani
  * 
  */
 require_once("./api-config.php");
 
-$master_link = mysql_connect(WRM_DB_HOST,WRM_DB_USER,WRM_DB_PASS) or die("Could not connect: " . mysql_error());
-mysql_select_db(WRM_MASTER_DB_NAME) or die("Could not select db: " . mysql_error());
 
+$master_link = pg_connect("host=".WRM_DB_HOST
+			  ." dbname=".WRM_MASTER_DB_NAME 
+			  ." user=".WRM_DB_USER 
+			  ." password=".WRM_DB_PASS) or die("Could not connect: " . pg_last_error());
 
-function boundingBoxQuery($databaseName,$latMin,$latMax,$lonMin,$lonMax,$timeStart,$timeEnd) {
-		
-	// Convert from provided ISO time to MySql datetime (YYYYMMDDTHHMMZ --> YYYY-MM-DD HH:MM)
-	$timeStart = mysql_real_escape_string($timeStart);
+function boundingBoxQuery($db_link,$latMin,$latMax,$lonMin,$lonMax,$timeStart,$timeEnd) {
+	
+	// Convert from provided ISO time to Postgres datetime (YYYYMMDDTHHMMZ --> YYYY-MM-DD HH:MM)
+	$timeStart = pg_escape_string($timeStart);
 	$real_time_start = substr($timeStart,0,4) . '-' . substr($timeStart,4,2) . '-' . substr($timeStart,6,2) . ' '
 					 . substr($timeStart,9,2) . ':' . substr($timeStart,11,2) .':00';
-					 
-	// Convert from provided ISO time to MySql datetime (YYYYMMDDTHHMMZ --> YYYY-MM-DD HH:MM)
-	$timeEnd = mysql_real_escape_string($timeEnd);
+	// Convert from provided ISO time to Postgres datetime (YYYYMMDDTHHMMZ --> YYYY-MM-DD HH:MM)
+	$timeEnd = pg_escape_string($timeEnd);
 	$real_time_end   = substr($timeEnd,0,4) . '-' . substr($timeEnd,4,2) . '-' . substr($timeEnd,6,2) . ' '
 					 . substr($timeEnd,9,2) . ':' . substr($timeEnd,11,2) .':00';
-	
 	// Build the query SQL
-	$sql = "SELECT * FROM `dataPoint` dp WHERE "
-	  .  "dp.latitude>="     . mysql_real_escape_string($latMin)    . ' AND '
-	  .  "dp.latitude<="     . mysql_real_escape_string($latMax)    . ' AND '
-	  .  "dp.longitude>="    . mysql_real_escape_string($lonMin)    . ' AND '
-	  .  "dp.longitude<="    . mysql_real_escape_string($lonMax)    . ' AND '
-	  .  "dp.time>=\"{$real_time_start}\" AND "
-	  .  "dp.time<=\"{$real_time_end}\"; ";
-	
+
+        $sql = "SELECT latitude, longitude, vertical, time, value  FROM datapoint WHERE "
+          .  "latitude>="     . pg_escape_string($latMin)    . ' AND '
+          .  "latitude<="     . pg_escape_string($latMax)    . ' AND '
+          .  "longitude>="    . pg_escape_string($lonMin)    . ' AND '
+          .  "longitude<="    . pg_escape_string($lonMax)    . ' AND '
+          .  "time>='{$real_time_start}' AND "
+          .  "time<='{$real_time_end}'; ";	
 	// Return the response from the server
-       	return mysql_query($sql);
-}
-
-function translateParameterId($parameterId) {
-	global $master_link;
-	
-	$sql = "SELECT longName, shortName, `database` from `parameter`  "
-		.  "WHERE  parameter_id= " . mysql_real_escape_string($parameterId)
-		.  " LIMIT 1 ";
-	$r = mysql_query($sql,$master_link);
-	if ('' == mysql_error($master_link) && mysql_num_rows($r) == 1) {
-		$result = mysql_fetch_assoc($r);
-		return "{$result['shortName']} ({$result['longName']})";
-	} else {
-	  return "Unknown Parameter Id: {$parameterId}" . mysql_error();
-	}
-}
-
-function translateDatasetId($datasetId) {
-	global $master_link;
-	
-	$sql = "SELECT d.longName, d.shortName from `dataset` d "
-		.  "WHERE  d.dataset_id= " . mysql_real_escape_string($datasetId)
-		.  " LIMIT 1 ";
-	$r = mysql_query($sql,$master_link);
-	if ('' == mysql_error($master_link) && mysql_num_rows($r) == 1) {
-		$result = mysql_fetch_assoc($r);
-		return $result['longName'] . " ({$result['shortName']}) ";
-	} else {
-		return "Unknown Dataset Id: {$datasetId}";
-	}
-}
-
-function printDatasetMap() {
-  global $master_link;
-  $query = "SELECT * FROM `dataset` d;";
-  $resp  = mysql_query($query,$master_link);
-  while (false != ($row = mysql_fetch_assoc($resp))) {
-    echo "<tr><td>{$row['longName']}</td><td>{$row['dataset_id']}</td></tr>\r\n";
-  }
-  mysql_free_result($resp);
-}
-
-function printParameterMap() {
-	global $master_link;
-	$query = "SELECT * FROM `parameter` p;";
-	$resp  = mysql_query($query,$master_link);
-	while (false !=($row = mysql_fetch_assoc($resp))) {
-		echo "<tr><td>{$row['longName']}</td><td>{$row['parameter_id']}</td></tr>\r\n";
-	}
-	mysql_free_result($resp);
+	return pg_query($db_link,$sql);
 }
 
 
-function printQueryMetadata() {
-	$datasetName   = translateDatasetId($_GET['datasetId']);
-	$parameterName = translateParameterId($_GET['parameterId']);
-	echo " Dataset: {$datasetName} \r\n";
-	echo " Parameter: {$parameterName} (id:{$_GET['parameterId']})\r\n";
-	echo " latMin: {$_GET['latMin']}\r\n"
-		." latMax: {$_GET['latMax']}\r\n"
-		." lonMin: {$_GET['lonMin']}\r\n"
-		." lonMax: {$_GET['lonMax']}\r\n"
-		." timeStart: {$_GET['timeStart']}\r\n"
-		." timeEnd: {$_GET['timeEnd']}\r\n"
-		."\r\n";
+function translateParameterId($link,$parameterId) {
+
+        $sql = "SELECT  longname, shortname from parameter  "
+                .  "WHERE  parameter_id= " . pg_escape_string($parameterId)
+                .  " LIMIT 1 ";
+        $r = pg_query($link,$sql);
+        if ('' == pg_last_error($link) && pg_num_rows($r) == 1) {
+                $result = pg_fetch_row($r);
+                return "{$result[1]} ({$result[0]})";
+        } else {
+          return "Unknown Parameter Id: {$parameterId}" . pg_last_error();
+        }
+}
+
+function translateDatasetId($link,$datasetId) {
+
+$sql = "SELECT d.longname, d.shortname from dataset d "
+                .  "WHERE  d.dataset_id=$datasetId"
+                .  " LIMIT 1 ";
+
+        $r = pg_query($link,$sql);
+        if ('' == pg_last_error($link) && pg_num_rows($r) == 1) {
+                $result = pg_fetch_row($r);
+
+                return $result[0] . " ({$result[1]}) "; #index=0:longname and index=1:shortname
+        } else {
+                return "Unknown Dataset Id: {$datasetId}";
+        }
+}
+
+function printQueryMetadata($link) {
+
+        $datasetName   = translateDatasetId($link,$_GET['datasetId']);
+        $parameterName = translateParameterId($link,$_GET['parameterId']);
+        echo " Dataset: {$datasetName} \r\n";
+        echo " Parameter: {$parameterName} (id:{$_GET['parameterId']})\r\n";
+        echo " latMin: {$_GET['latMin']}\r\n"
+                ." latMax: {$_GET['latMax']}\r\n"
+                ." lonMin: {$_GET['lonMin']}\r\n"
+                ." lonMax: {$_GET['lonMax']}\r\n"
+                ." timeStart: {$_GET['timeStart']}\r\n"
+                ." timeEnd: {$_GET['timeEnd']}\r\n"
+                ."\r\n";
 }
 
 function get_result($sql,$link) {
   $result = array();
-  $resp   = mysql_query($sql,$link);
-  if (mysql_num_rows($resp) == 1) {
-    $result = mysql_fetch_assoc($resp);
+  $resp   = pg_query($link,$sql);
+  if (pg_num_rows($resp) == 1) {
+    $result = pg_fetch_row($resp);
   } else {
-    while (false != ($row = mysql_fetch_assoc($resp))) {
+    while (false != ($row = pg_fetch_row($resp))) {
       $result[] = $row;
     }
   }
-  mysql_free_result($resp);
+  pg_free_result($resp);
   return $result;
 }
 
-if (isset($_GET['latMin'])) {
+if (isset($_GET['parameterId'])) {
 
   // Ensure that required datasetId and parameterId were provided
   if (!isset($_GET['datasetId'])) {
@@ -138,56 +120,105 @@ if (isset($_GET['latMin'])) {
   // 
   $datasetId   = $_GET['datasetId'];
   $parameterId = $_GET['parameterId'];
-  $sql = "SELECT `parameter`.`database` from `parameter` "
-    . "WHERE `dataset_id`={$datasetId} "
-    . "AND   `parameter_id`={$parameterId} "
+  $sql = "SELECT database, timestep, realm, instrument, start_date, end_date, nx, ny, lon_res, lat_res, units from parameter "
+    . "WHERE dataset_id={$datasetId} "
+    . "AND   parameter_id={$parameterId} "
     . "LIMIT 1";
-  
+
   $result = get_result($sql,$master_link);
-  
+
   if (empty($result)) {
     die ("Invalid datasetId or parameterId provided. Please check your values and try again.");
   }
+$info=($_GET['info']);
+if($info=="yes"){
 
+$infos= array(
+  "database" 	=> $result[0],
+  "timestep" 	=> $result[1],
+  "realm"   	=> $result[2],
+  "instrument"	=> $result[3],
+  "start_date"  => $result[4],
+  "end_date"    => $result[5],
+  "nx"    	=> $result[6],
+  "ny"    	=> $result[7],
+  "lon_res"    	=> $result[8],
+  "lat_res"    	=> $result[9],
+  "units"    	=> $result[10]
+  );
 
+echo json_encode( $infos );
+
+}else{
   // Print Query Metadata
   echo "meta:\r\n";
-  echo printQueryMetadata();
+  echo printQueryMetadata($master_link);
   echo "data output format: [lat,lon,vertical,time,value]\r\n";
 
 
-
   // Get Data Points
-  $databaseName = $result['database'];
-  mysql_select_db($databaseName);
-  $resp = boundingBoxQuery(
-			   $databaseName,
-			   $_GET['latMin'],
-			   $_GET['latMax'],
-			   $_GET['lonMin'],
-			   $_GET['lonMax'],
-			   $_GET['timeStart'],
-			   $_GET['timeEnd']);
+  $databaseName = $result[0];
+  $DB_NAME=$databaseName;
+  $db_link = pg_connect("host=".WRM_DB_HOST 
+			." dbname=$DB_NAME"
+			." user=".WRM_DB_USER
+			." password=".WRM_DB_PASS) or die("Could not connect: " . pg_last_error());
 
-  if ('' !== mysql_error()) {
+  $resp = boundingBoxQuery(
+			   $db_link,
+                           $_GET['latMin'],
+                           $_GET['latMax'],
+                           $_GET['lonMin'],
+                           $_GET['lonMax'],
+                           $_GET['timeStart'],
+                           $_GET['timeEnd']);
+
+  if ('' !== pg_last_error()) {
     echo "<strong>Error:</strong>There was a problem with your query. Check your values and try again.";
     echo "You provided: <br/>\r\n";
     echo printQueryMetadata();
-    echo "MySQL said: " . mysql_error();
+    echo "Postgres said: " . pg_last_error();
     exit();
   }
-	
+
   // Print Data Points
   echo "data: \r\n";
-  while (false != ($row = mysql_fetch_assoc($resp))) {
-    // Simply echo to the screen in the form:  lat,lon,z,time,value\r\n 
-    echo "{$row['latitude']},{$row['longitude']},{$row['vertical']},{$row['time']},{$row['value']}\r\n";
+  while (false != ($row = pg_fetch_row($resp))) {
+    // Simply echo to the screen in the form:  lat,lon,vertical,time,value\r\n 
+    echo "{$row[0]},{$row[1]},{$row[2]},{$row[3]},{$row[4]}\r\n";
   }
 
   // Clean Up
-  mysql_close($master_link);
-  exit();
+  pg_close($db_link);
 }
+pg_close($master_link);
+exit();
+}
+
+/*--------------------------------------------------------------table info-----------------------------------------------------------------------*/
+
+function printDatasetMap_pg() {
+	global $master_link;
+  $query = "SELECT * FROM dataset;";
+  $resp  = pg_query($master_link,$query);
+  while (false != ($row = pg_fetch_row($resp))) {
+    echo "<tr><td>{$row[1]}</td><td>{$row[0]}</td></tr>\r\n";
+  }
+  pg_free_result($resp);
+}
+
+function printParameterMap_pg() {
+	global $master_link;
+	$query = "SELECT * FROM parameter;";
+	$resp  = pg_query($master_link,$query);
+	while (false !=($row = pg_fetch_row($resp))) {
+		echo "<tr><td>{$row[1]}</td><td>{$row[0]}</td><td>{$row[10]}</td></tr>\r\n";
+	}
+	pg_free_result($resp);
+}
+
+/*--------------------------------------------------------------HTML-----------------------------------------------------------------------*/
+
 ?>
 <html>
 <head>
@@ -204,14 +235,14 @@ code {
 </style>
 </head>
 <body>
-<h1>Water Resource Management</h1>
 <h2>Regional Climate Model Evaluation Database Query Service</h2>
 <h3>Overview</h3>
 <p>This service provides a REST-based access to the WRM Regional Climate Model Evaluation database. To request
 data, please formulate a query as follows:</p>
 <code>
-<?php echo "http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}";?>?datasetId=#&amp;parameterId=#&amp;latMin=#&amp;latMax=#&amp;lonMin=#&amp;lonMax=#&amp;timeStart=YYYYMMDDTHHMMZ&amp;timeEnd=YYYYMMDDTHHMMZ
+<?php echo "http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}";?>datasetId=#&amp;parameterId=#&amp;latMin=#&amp;latMax=#&amp;lonMin=#&amp;lonMax=#&amp;timeStart=YYYYMMDDTHHMMZ&amp;timeEnd=YYYYMMDDTHHMMZ&amp;info=yes/no
 </code>
+
 <h3>Query Parameters</h3>
 <dl>
   <dt>datasetId</dt>
@@ -230,25 +261,28 @@ data, please formulate a query as follows:</p>
   <dd>The ISO time marking the beginning of the desired time range (Format: YYYYMMDD<strong>T</strong>HHMM<strong>Z</strong>)</dd>
   <dt>timeEnd</dt>
   <dd>The ISO time marking the end of the time range (Format: YYYYMMDD<strong>T</strong>HHMM<strong>Z</strong>)</dd>
+  <dt>info</dt>
+  <dd>The general parameter's information returns by setting this to "yes"</dd>
 </dl>
 
 <a name="Datasets"></a>
-<h3>Datasets</h3>
+
+<h3>Datasets (Postgres)</h3>
 <p>The following is a lookup table which can be used to obtain the correct id for a given dataset</p>
 <table border="1" cellpadding="3">
   <tr><th>Dataset</th><th>Id</th></tr>
-  <?php printDatasetMap(); ?>
+  <?php printDatasetMap_pg(); ?>
 </table>
-<a name="Parameters"></a>
-<h3>Parameters</h3>
+<h3>Parameters (Postgres)</h3>
 <p>The following is a lookup table which can be used to obtain the correct parameter id of interest for any parameter in the database. </p>
 <table border="1" cellpadding="3">
-  <tr><th>Parameter</th><th>Id</th></tr>
-  <?php printParameterMap(); ?>
+  <tr><th>Parameter</th><<th>Parameter Id</th><th>Dataset Id</th></tr>
+  <?php printParameterMap_pg(); ?>
 </table>
+
 </body>
 </html>
-
-<?php 
-mysql_close($link);
+<?php
+pg_close($master_link_pg);
 exit();
+?>
