@@ -119,7 +119,7 @@ def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, e
     processing_version="processing_version"  # the processing version is still unknown
     start_date=str(startTime)[0:4]+str(startTime)[5:7]+str(startTime)[8:10]
     end_date=str(endTime)[0:4]+str(endTime)[5:7]+str(endTime)[8:10]
-    netCD_fileName=variable + '_' + project + '_' + processing_level + '_' + processing_version + '_' + start_date + '_' + end_date + '.nc'
+    netCD_fileName=variable + '_' + project + '_' + processing_level + '_' + processing_version + '_' + str(latMin) + '_' + str(latMax) + '_' + str(lonMin) + '_' + str(lonMax) + '_' + start_date + '_' + end_date + '.nc'
 
     # To check if netCDF file  exists, then use it
     if os.path.exists(path+"/"+netCD_fileName):
