@@ -3,7 +3,6 @@
 import os
 import urllib2
 import re
-import csv
 import numpy as np
 import numpy.ma as ma
 import json
@@ -153,140 +152,149 @@ def get_param_info(url):
 def create_netCDF(url, database, latMin, latMax, lonMin, lonMax, startTime, endTime, unit, netCD_fileName, timestep):
 
 
-        print 'Starting retrieval from DB (this may take several minutes)'
-        result = urllib2.urlopen(url)
-        datastring = result.read()    
-        d = re.search('data: \r\n', datastring)
-        datacsv = datastring[d.end():len(datastring)]
+    print 'Starting retrieval from DB (this may take several minutes)'
+    result = urllib2.urlopen(url)
+    datastring = result.read()    
+    d = re.search('data: \r\n', datastring)
+    data = datastring[d.end():len(datastring)]
+    
+    # To create a list of all datapoints
+    data=data.split('\r\n')    
+            
+    latitudes = []
+    longitudes = []
+    levels = []
+    values = []
+    timestamps = []
+    
+    # To make a series of lists from datapoints
+    for i in range(len(data)-1):  # Because the last row is empty, "len(data)-1" is used.
+        row=data[i].split(',')
+        latitudes.append(np.float32(row[0]))
+        longitudes.append(np.float32(row[1]))
+        levels.append(np.float32(row[2]))
+        # timestamps are strings so we will leave them alone for now
+        timestamps.append(row[3])
+        values.append(np.float32(row[4]))
         
-        # To create a list of all datapoints
-        datacsv=datacsv.split('\r\n')    
-                
-        latitudes = []
-        longitudes = []
-        levels = []
-        values = []
-        timestamps = []
-        
-        # To make a series of lists from datapoints
-        for i in range(len(datacsv)-1):  # Because the last row is empty, "len(datacsv)-1" is used.
-            row=datacsv[i].split(',')
-            latitudes.append(np.float32(row[0]))
-            longitudes.append(np.float32(row[1]))
-            levels.append(np.float32(row[2]))
-            # timestamps are strings so we will leave them alone for now
-            timestamps.append(row[3])
-            values.append(np.float32(row[4]))
-       
-        hours=[]
-        timeFormat = "%Y-%m-%d %H:%M:%S"
-        base_date=datetime.strptime(timestamps[0], timeFormat)
-        # To convert the date to hours 
-        for t in timestamps:
-            date=datetime.strptime(t, timeFormat)
-            dif=date-base_date
-            hours.append(dif.days*24)        
+       # Need to sort time to make sure start and end times are correct 
+    time_label_list = timestamps
+    print "start sort"
+    time_label_list.sort()
+    print "done sort"
+    start_time_label = time_label_list[0]
+    end_time_label = time_label_list[-1]
+   
+    hours=[]
+    timeFormat = "%Y-%m-%d %H:%M:%S"
+    base_date=datetime.strptime(start_time_label, timeFormat)
+    # To convert the date to hours 
+    for t in timestamps:
+        date=datetime.strptime(t, timeFormat)
+        dif=date-base_date
+        hours.append(dif.days*24)        
 
-        
-        # To generate netCDF file from database
-        print "Generating netCDF file in the cache directory...."
-        netcdf =  Nio.open_file(netCD_fileName,'w')
-        string="The netCDF file for parameter: " + database + ", latMin: " + str(latMin) + ", latMax: " + str(latMax) + ", lonMin: " + str(lonMin) + ", lonMax: " + str(lonMax) + " startTime: " + str(timestamps[0]) + " and endTime: " + str(timestamps[len(timestamps)-1]) + "."
-        netcdf.globalAttName = str(string)
-        netcdf.create_dimension('dim', len(latitudes))
-        latitude = netcdf.create_variable('lat', 'd', ('dim',))
-        longitude = netcdf.create_variable('lon', 'd', ('dim',))
-        level = netcdf.create_variable('lev', 'd', ('dim',))
-        time = netcdf.create_variable('time', 'd', ('dim',))
-        value = netcdf.create_variable('value', 'd', ('dim',))
-        
-        netcdf.variables['lat'].varAttName = 'latitude'
-        netcdf.variables['lat'].units = 'degrees_north'
-        netcdf.variables['lon'].varAttName = 'longitude'
-        netcdf.variables['lon'].units = 'degrees_east'
-        netcdf.variables['time'].varAttName = 'time'
-        netcdf.variables['time'].units = 'hours since ' + str(timestamps[0])
-        netcdf.variables['value'].varAttName = 'value'
-        netcdf.variables['value'].units = str(unit)
-        netcdf.variables['lev'].varAttName = 'level'
-        netcdf.variables['lev'].units = 'hPa'
-        latitude[:]=latitudes[:]
-        longitude[:]=longitudes[:]
-        level[:]=levels[:]
-        time[:]=hours[:]
-        value[:]=values[:]
-        netcdf.close()
-        
-        latitudes, longitudes, uniqueLevels, timesUnique, mdata = read_netcdf(netCD_fileName,timestep)
-        
-        return latitudes, longitudes, uniqueLevels, timesUnique, mdata
+    
+    # To generate netCDF file from database
+    print "Generating netCDF file in the cache directory...."
+    netcdf =  Nio.open_file(netCD_fileName,'w')
+    string="The netCDF file for parameter: " + database + ", latMin: " + str(latMin) + ", latMax: " + str(latMax) + ", lonMin: " + str(lonMin) + ", lonMax: " + str(lonMax) + " startTime: " + str(start_time_label) + " and endTime: " + str(end_time_label) + "."
+    netcdf.globalAttName = str(string)
+    netcdf.create_dimension('dim', len(latitudes))
+    latitude = netcdf.create_variable('lat', 'd', ('dim',))
+    longitude = netcdf.create_variable('lon', 'd', ('dim',))
+    level = netcdf.create_variable('lev', 'd', ('dim',))
+    time = netcdf.create_variable('time', 'd', ('dim',))
+    value = netcdf.create_variable('value', 'd', ('dim',))
+    
+    netcdf.variables['lat'].varAttName = 'latitude'
+    netcdf.variables['lat'].units = 'degrees_north'
+    netcdf.variables['lon'].varAttName = 'longitude'
+    netcdf.variables['lon'].units = 'degrees_east'
+    netcdf.variables['time'].varAttName = 'time'
+    netcdf.variables['time'].units = 'hours since ' + str(start_time_label)
+    netcdf.variables['value'].varAttName = 'value'
+    netcdf.variables['value'].units = str(unit)
+    netcdf.variables['lev'].varAttName = 'level'
+    netcdf.variables['lev'].units = 'hPa'
+    latitude[:]=latitudes[:]
+    longitude[:]=longitudes[:]
+    level[:]=levels[:]
+    time[:]=hours[:]
+    value[:]=values[:]
+    netcdf.close()
+    
+    print "Data stored as netCDF file (cache file)"
+    
+    latitudes, longitudes, uniqueLevels, timesUnique, mdata = read_netcdf(netCD_fileName,timestep)
+    
+    return latitudes, longitudes, uniqueLevels, timesUnique, mdata
     
 def read_netcdf(netCD_fileName,timestep):
     
-        # To use the created netCDF file
-        print 'Retrieving data from cache (netCDF file)'
-        netcdf = Nio.open_file(netCD_fileName , 'r')
-        # To get all data from netCDF file
-        latitudes = netcdf.variables['lat'][:]
-        longitudes = netcdf.variables['lon'][:]
-        levels = netcdf.variables['lev'][:]
-        hours = netcdf.variables['time'][:]
-        values = netcdf.variables['value'][:]
-        
-        # To get the base date
-        time_unit=netcdf.variables['time'].units
-        time_unit=time_unit.split(' ')
-        base_data=time_unit[2] + " " + time_unit[3]
-        
-        netcdf.close()
-        
-        timeFormat = "%Y-%m-%d %H:%M:%S"
-        
-        # Because time in netCDF file is based on hours since a specific date, it needs to be converted to date format
-        times=[]
-        # To convert the base date to the python datetime format
-        dt = datetime.strptime(base_data, timeFormat)
-        for t in range(len(hours)):
-            d=timedelta(hours[t]/24)    
-            add=dt+d
-            times.append(str(add.year) + '-' + str("%02d" % (add.month)) + '-' + str("%02d" % (add.day)) + ' ' + str("%02d" % (add.hour)) + ':' + str("%02d" % (add.minute)) + ':' + str("%02d" % (add.second)))
-        
-        # Make arrays of unique latitudes, longitudes, levels and times
-        uniqueLatitudes = np.unique(latitudes)
-        uniqueLongitudes = np.unique(longitudes)
-        uniqueLevels = np.unique(levels)
-        uniqueTimestamps = np.unique(times)
-        
-        # Calculate nx and ny
-        uniqueLongitudeCount = len(uniqueLongitudes)
-        uniqueLatitudeCount = len(uniqueLatitudes)
-        uniqueLevelCount = len(uniqueLevels)
-        uniqueTimeCount = len(uniqueTimestamps)
-
-        values, latitudes, longitudes = reorderXYT(longitudes, latitudes, times, values)
-
-        # Convert each unique time from strings into list of Python datetime objects
-        # TODO - LIST COMPS!
-        timesUnique = [datetime.strptime(t, timeFormat) for t in uniqueTimestamps]
-        timesUnique.sort()
-        timesUnique = process.normalizeDatetimes(timesUnique, timestep)
-
-        # Reshape arrays
-        latitudes = latitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
-        longitudes = longitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
-        levels = np.array(levels).reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
-        values = values.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
-
-        # Flatten dimension if only single level
-        if uniqueLevelCount == 1:
-            values = values[:, :, :, 0]
-            latitudes = latitudes[0, :, :, 0]
-            longitudes = longitudes[0, :, :, 0]
-
-        # Created masked array to deal with missing values
-        #  -these make functions like values.mean(), values.max() etc ignore missing values
-        mdi = -9999  # TODO: extract this value from the DB retrieval metadata
-        mdata = ma.masked_array(values, mask=(values == mdi))
-        
-        return latitudes, longitudes, uniqueLevels, timesUnique, mdata
+    # To use the created netCDF file
+    print 'Retrieving data from cache (netCDF file)'
+    netcdf = Nio.open_file(netCD_fileName , 'r')
+    # To get all data from netCDF file
+    latitudes = netcdf.variables['lat'][:]
+    longitudes = netcdf.variables['lon'][:]
+    levels = netcdf.variables['lev'][:]
+    hours = netcdf.variables['time'][:]
+    values = netcdf.variables['value'][:]
     
+    # To get the base date
+    time_unit=netcdf.variables['time'].units
+    time_unit=time_unit.split(' ')
+    base_data=time_unit[2] + " " + time_unit[3]
+    
+    netcdf.close()
+    
+    timeFormat = "%Y-%m-%d %H:%M:%S"
+    
+    # Because time in netCDF file is based on hours since a specific date, it needs to be converted to date format
+    times=[]
+    # To convert the base date to the python datetime format
+    dt = datetime.strptime(base_data, timeFormat)
+    for t in range(len(hours)):
+        d=timedelta(hours[t]/24)    
+        add=dt+d
+        times.append(str(add.year) + '-' + str("%02d" % (add.month)) + '-' + str("%02d" % (add.day)) + ' ' + str("%02d" % (add.hour)) + ':' + str("%02d" % (add.minute)) + ':' + str("%02d" % (add.second)))
+    
+    # Make arrays of unique latitudes, longitudes, levels and times
+    uniqueLatitudes = np.unique(latitudes)
+    uniqueLongitudes = np.unique(longitudes)
+    uniqueLevels = np.unique(levels)
+    uniqueTimestamps = np.unique(times)
+    
+    # Calculate nx and ny
+    uniqueLongitudeCount = len(uniqueLongitudes)
+    uniqueLatitudeCount = len(uniqueLatitudes)
+    uniqueLevelCount = len(uniqueLevels)
+    uniqueTimeCount = len(uniqueTimestamps)
+
+    values, latitudes, longitudes = reorderXYT(longitudes, latitudes, times, values)
+
+    # Convert each unique time from strings into list of Python datetime objects
+    # TODO - LIST COMPS!
+    timesUnique = [datetime.strptime(t, timeFormat) for t in uniqueTimestamps]
+    timesUnique.sort()
+    timesUnique = process.normalizeDatetimes(timesUnique, timestep)
+
+    # Reshape arrays
+    latitudes = latitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
+    longitudes = longitudes.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
+    levels = np.array(levels).reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
+    values = values.reshape(uniqueTimeCount, uniqueLatitudeCount, uniqueLongitudeCount, uniqueLevelCount)
+
+    # Flatten dimension if only single level
+    if uniqueLevelCount == 1:
+        values = values[:, :, :, 0]
+        latitudes = latitudes[0, :, :, 0]
+        longitudes = longitudes[0, :, :, 0]
+
+    # Created masked array to deal with missing values
+    #  -these make functions like values.mean(), values.max() etc ignore missing values
+    mdi = -9999  # TODO: extract this value from the DB retrieval metadata
+    mdata = ma.masked_array(values, mask=(values == mdi))
+    
+    return latitudes, longitudes, uniqueLevels, timesUnique, mdata
