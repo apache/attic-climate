@@ -1,0 +1,15 @@
+##NARCCAP
+
+[NARCCAP](http://www.narccap.ucar.edu/) is an international program designed to serve the regional-scale climate modeling needs of the United States, Canada, and northern Mexico using regional climate models ([RCMs](http://climateprediction.net/content/regional-climate-models)) nested within coupled global climate models ([GCMs](http://en.wikipedia.org/wiki/General_circulation_model)) to form multi-model ensemble climate scenarios over these regions. The primary application of these experiments is to investigate uncertainties in regional scale projections of future climate and generate climate change scenarios for use in impacts research. These experiments represent the main systematic, multi-model RCM climate simulation and projection resource for the U.S. National Climate Assessment ([NCA](http://www.globalchange.gov/what-we-do/assessment)).  In this capacity, NARCCAP serves as a critical source of finer-scale climate simulation, downscaling and projection information, with considerable importance to NCA’s objective of producing a quantitative national assessment with considerations of uncertainty. 
+
+![NARCCAP]([SITE_ROOT]/static/img/slides/narccap-domain.png)
+<br />
+<caption>Fig 1. NARCCAP modeling domain.</caption>
+<br /><br />
+NARCCAP provides a set of RCM simulations driven by atmospheric re-analyses and atmosphere-ocean GCMs over a domain covering N. America.  In the case of re-analyses (Phase I), the RCMs are driven with NCEP Reanalysis II data for a present-day climate period 1979-2004. This component is essential for evaluating RCMs over N. America.  In Phase II, GCMs provide boundary conditions (BCs) from a present-day climate period 1971-2000 – i.e. from the CMIP3 20th century simulations as well as from a future time period based on the SRES A2 emissions scenario for the 21st century, 2041-2070.  All the RCMs are run at a spatial resolution of 50 km. The NARCCAP program archives the model data and provides them to the users for the assessment of the impact of climate change on regionally important sectors.
+ 
+Because of the critical foundation that NARCCAP provides to the NCA, it is a high priority to bring as much observational scrutiny to the RCMs that contribute simulations and projections to NARCCAP. Within the context of NASA’s support of the U.S. NCA, RCMES is being utilized to provide an evaluation of these RCMs as well as provide foundational infrastructure to support the ongoing NCA process.
+
+Our principal NARCCAP collaborator is:
+
+* Linda Mearns – NCARRCAP / CORDEX – N. America Science and Program Lead, National Center for Atmospheric Research

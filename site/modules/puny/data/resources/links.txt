@@ -1,0 +1,13 @@
+# Links
+
+* [COordinated Regional climate Downscaling EXperiment (CORDEX)](http://wcrp-cordex.ipsl.jussieu.fr/)
+* [Coupled Model Intercomparison Project version 5 (CMIP5)](http://cmip-pcmdi.llnl.gov/cmip5/)
+* [Intergovernmental Panel on Climate Change](http://www.ipcc.ch/)
+* [NASA ESGF Portal - Remote Sensing contributions to CMIP5](http://esg-gateway.jpl.nasa.gov)
+* [obs4mips project](http://obs4mips.llnl.gov:8080/wiki)
+* [Sharing Observations for Climate Research Wiki](https://oodt.jpl.nasa.gov/wiki/display/CLIMATE/Sharing+Observations+for+Climate+Research)
+* [United States National Climate Assessment (NCA)](http://www.globalchange.gov/what-we-do/assessment)
+* [United States Global Change Research Program (USGCRP)](http://www.globalchange.gov/)
+* [World Climate Research Programme (WCRP)](http://www.wcrp-climate.org/) 
+* [California Department of Water Resources](http://www.water.ca.gov)
+* [Program for Climate Model Diagnostics and Intercomparison (PCMDI)](http://www-pcmdi.llnl.gov/)

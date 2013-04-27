@@ -1,0 +1,512 @@
+@CHARSET "UTF-8";
+/**
+ * color pallete
+ * 
+ * GREEN		ORANGE
+ * 006e4a		a63800
+ * 207f60		bf6030
+ * 00aa72		ff5600
+ * 35d4a0		ff8040
+ * 60d4ae		ffa273
+ *
+ */
+ 
+body {
+	
+}
+
+div#page {
+	position:relative;
+ 	border-top:none;
+	background-color:#eee;
+	width: 989px;	
+	margin:0px auto;
+}
+
+div.header {
+	background-color:#163551;	
+	position:relative;
+	border-top:solid 5px #a3a600;
+	border-bottom:solid 3px #0b2a43;
+	padding:5px 0px 10px 120px;
+	margin-top:2px; 
+}
+div.header h1 {
+	color:#fff;
+	margin: 4px 0px -1px 12px;
+	font-size:1.4em;
+        letter-spacing: 0.04.em;
+}
+div.header h2 {
+	letter-spacing:0.13em;
+	color:#fff;
+	border-top:dotted 1px #353;
+	padding-top:5px;
+        margin-top:5px;
+	font-size:1em;
+	font-weight:normal;
+        text-align:center;
+}
+img#rcmes-logo {
+	/*margin-right:20px;
+	margin-top:-95px;
+	margin-left:8px;
+        */
+        z-index:200;
+        width: 112px;
+        height: 99px;
+}
+
+/* not used currently commenting out incase we want to bring it back
+div#left-nav {
+	position:relative;
+	float:left;
+	width:319px;
+	min-height:400px;
+	margin:none;
+	background-color:#ccc;
+	border-right:solid 1px #aaa;
+	border-bottom:solid 1px #aaa;	
+}
+*/
+div#site-menu {
+    position:relative;
+    float:left;
+    margin:0px;
+    padding-left:120px;
+    width:869px;
+    background-color:#668000;
+    z-index:10;	
+
+}
+div#site-menu ul {
+    display: block;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+/* -- Top Level Navigation Elements -- */
+div#site-menu ul li {
+/*
+    border-right: 1px solid #333333;
+*/
+    color: #CCCCCC;
+    display: block;
+    float: left;
+    font-family: 'Actor',sans-serif;
+    padding: 5px 10px 10px;
+    text-align: center;
+    width: auto;
+}
+div#site-menu ul li.active {
+    background: url("../img/tri.png") no-repeat scroll center bottom transparent;
+    background-color:#557000;
+}
+div#site-menu ul li a {
+    color: #FFFFFF;
+    text-decoration: none;
+    text-shadow: 1px 1px 0 #555555;
+}
+/* -- Level 2 Drop Down List -- */
+div#site-menu ul li ul {
+    position: absolute;
+    left: -999em;
+    background-color:#557000;
+    top:32px;
+    margin-left:-10px;
+}
+/* Special Widths for Each Sub-Menu and EXTREMELY
+   specific to over-ride any cascading styles */
+div#site-menu ul li ul#about {
+    width: 8em;
+}
+div#site-menu ul li ul#collab {
+    width: 6em;
+}
+div#site-menu ul li ul#pubs{
+    width: 7.5em;
+}
+div#site-menu ul li ul#data {
+    width: 7em;
+}
+div#site-menu ul li ul#training {
+    width: 10.5em;
+}
+
+div#content-container {
+	width:100%;
+	margin:0px;
+	padding:0px;
+	background-color:#fff;
+}
+div#content {
+	margin-top:32px;
+	padding:12px 20px;
+	min-height:374px;
+	position:relative;
+}
+
+div#content h2 {
+	color:#163551;
+	border-bottom:dotted 1px #ccc;
+}
+
+div#content h3 {
+	margin-top:25px;
+}
+
+div#content p {
+	line-height:1.4em;
+}
+
+div#content ul {
+	margin-left:30px;
+	font-size:90%;
+	line-height:1.6em;
+}
+div#content ul li {
+	padding-left:5px;
+}
+
+div#content p strong {
+	color:#5b6c78;
+}
+
+div#content img.figure {
+	padding:10px;
+	border:solid 1px #ccc;
+	
+	-webkit-box-shadow: 2px 1px 12px 2px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 2px 1px 12px 2px rgba(0, 0, 0, 0.5);
+	box-shadow: 2px 1px 12px 2px rgba(0, 0, 0, 0.5);
+	
+	background-color:#fff;
+	width:500px;
+	margin:30px 0px;
+	margin-left:38px;
+}
+div#content p.caption {
+	margin:0px;
+	margin-left:38px;
+	margin-top:-25px;
+	font-size:85%;
+	font-weight:bold;
+}
+
+div#content dt {
+	margin-top:9px;
+}
+
+div#content div.box {
+	padding:8px;
+	margin:15px 0px;
+	-webkit-box-shadow: 2px 1px 8px 1px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: 2px 1px 8px 1px rgba(0, 0, 0, 0.3);
+        box-shadow: 2px 1px 8px 1px rgba(0, 0, 0, 0.3);
+}
+
+div#jpl-title {
+	position:absolute;
+	margin-top:-22px;
+	color:#443700;
+}
+ 
+
+div#mainSection {
+	padding-top:0px;	
+}
+
+div#mainSection table {
+	margin-top:10px;
+	font-size:90%;
+}
+div#mainSection table tr td,
+div#mainSection table tbody tr td {
+	border-right:solid 1px #eee;
+	border-bottom:solid 1px #eee;
+	padding:3px;
+	vertical-align:top;
+}
+div#mainSection table tr th,
+div#mainSection table tbody tr th {
+	border-bottom:solid 1px #bbb;
+}
+
+div#mainSection table.vertical tr th {
+	border-bottom:solid 1px #eee;
+}
+
+div.breadcrumbs {
+	margin:0px;
+	font-size:80%;	
+}
+
+
+
+
+
+/**********
+ * FOOTER
+**/
+
+div#logo {
+   position: relative;
+   margin-top: -5px;
+   margin-bottom: -105px;
+   padding-left: 10px;
+   z-index:100;
+   width:112px;
+   /*border: 2px dashed #990000;*/
+}
+
+div#site-footer {
+	font-size:90%;
+	text-align:center;
+	color:#444;	
+}
+div#site-footer div.footer-links {
+	color:#888;	
+}
+div#site-footer div.footer-links a {
+	padding:18px;
+	color:#555;
+}
+div#site-footer div.footer-links a.first {
+		
+}
+div#site-footer div.footer-links a.last {
+	
+}
+
+/**********
+ * RSS ITEMS
+**/
+div.prod_item_rss {
+	
+}
+div.prod_item_rss img {
+	float:left;
+	margin-right:18px;	
+	margin-bottom:20px;
+	border:none;
+}
+div.prod_item_rss_meta {
+	float:left;
+}
+
+
+/**********
+ * JPL LINKS
+**/
+#jpl-links {
+	position:absolute;
+	top:-20px;
+	right:-18px;
+}
+#jpl-links li {
+	display:inline;
+}
+#jpl-links li a {
+	padding:5px 5px;
+	font-size:90%;
+	text-transform:uppercase;
+	color:#443700;
+	text-decoration:none;	
+}
+#jpl-links li a:hover {
+	background-color: #aacc00;
+	color:#111
+}
+
+
+/**********
+ * HEADER ELEMENTS
+**/
+h2 {
+	 
+}
+h3 {
+	text-align:left;
+	border-bottom:solid 1px #ff8040;
+	color:#006e4a;
+}
+
+
+/**********
+ * DATABASE STATISTICS
+**/
+div#stats {
+	padding-left:120px;
+	padding-top:25px;
+}
+div.stat {
+	position:relative;
+	text-align:center;
+	float:left;
+	padding:5px;
+}
+div.stat img {
+	width:120px;
+	margin-left:-5px;
+	margin-right:5px;
+}
+div.number {
+	font-size:26px;
+	font-weight:bold;
+	position:absolute;
+	top:49px;
+	left:0px;
+	border:solid 0px #ccc;
+	width:125px;
+	padding:5px;
+	text-align:center;	
+	color:#042;
+}
+
+
+/**********
+ * NEWSFEEDS
+**/
+.nf_date {
+	border-bottom:solid 1px #888;	
+}
+.nf_author {
+	font-style:italic;
+	margin-bottom:6px;
+}
+div#newsfeed {
+	margin-left: 10px;
+}
+
+div.nf_entry {
+	margin-top:20px;
+}
+
+div.nf_entry ul {
+	margin-left:20px;
+}
+
+div.nf_date, div.nf_author {
+	font-size:90%;
+	background-color:#f3f3f3;
+	margin:0px;
+	padding:10px 5px 5px 5px;
+}
+div.nf_date {
+	background-color:#e4e4e4;
+	border-bottom:solid 1px #bbb;
+}
+div.nf_body {
+	background-color:#f3f3f3;
+	padding:5px;
+	margin:0px;
+}
+
+div#twtr-widget-1 {
+	margin-left:0px;
+}
+div.twtr-hd {
+	display:none;
+	border-top:solid 1px #aaa;
+}
+div.twtr-hd h3 {
+	border:none;
+}
+
+/*** SLIDE SHOW **/
+
+.slides_container div {
+        width:470px;
+        height:285px;
+        display:block;
+	margin-top:5px;
+	margin-left:-3px;
+}
+
+#slides {                                                                                                            
+  left: 50px;
+  position: absolute;
+  top: 15px;
+  z-index: 5;
+}
+
+.slides_container {
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
+
+#slides .next, #slides .prev {                                                                                       
+  display: block;
+  height: 43px;
+  left: -39px;
+  position: absolute;
+  overflow:hidden;
+  top: 107px;
+  width: 24px;
+  z-index: 101;
+}
+
+
+#slides .next {                                                                                                      
+  left: 585px;
+}
+
+.pagination {
+  margin: 26px auto 0;
+  width:100px;
+}
+
+ol, ul {
+  list-style:none outside none;
+}
+
+.pagination li {
+  float:left;
+  margin:0 1px;
+}
+
+.pagination li a {
+  background-image:url('../img/slides/pagination.png');
+  background-position: 0 0;
+  display: block;
+  float:left;
+  height: 0;
+  overflow: hidden;
+  padding-top:12px;
+  width:12px;
+}
+
+.pagination li.current a {
+  background-position: 0 -12px;
+}
+
+#frame {
+  margin-left:-54px;
+}
+
+
+/************
+ * Clear fixin' 
+**/
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+ 
+.clearfix {
+	display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+	display: block;
+}
+ 
+* html .clearfix {
+	height: 1%;
+}

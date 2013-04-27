@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cas:elements xmlns:cas="http://oodt.jpl.nasa.gov/1.0/cas">
+	<element id="urn:oodt:ProductId" name="CAS.ProductId">
+		<dcElement>Identifier</dcElement>
+        <!--  
+         You can optionally specify a 'trim' tag to identify whether
+         or not you want newlines trimmed from the element description. To
+         turn off trimming (now done by default), include the following with your
+         description definition: trim="false"       
+         -->
+		<description>
+			A Product's unique identifier within the CAS namespace.
+		</description>
+	</element>
+	<element id="urn:oodt:ProductName" name="CAS.ProductName">
+		<dcElement>Title</dcElement>
+		<description>
+			A Product's name within the CAS namespace.
+		</description>
+	</element>
+	<element id="urn:oodt:ProductReceivedTime"
+		name="CAS.ProductReceivedTime">
+		<dcElement />
+		<description>
+			The ISO 8601 formatted time that the Product was received.
+		</description>
+	</element>
+	<element id="urn:oodt:Filename" name="Filename">
+		<description>
+			The names of the files that represent this product.
+		</description>
+		<dcElement />
+	</element>
+	<element id="urn:oodt:FileLocation" name="FileLocation">
+		<description>
+			The locations of the files that represent this product.
+		</description>
+		<dcElement />
+	</element>
+	<element id="urn:oodt:ProductType" name="ProductType">
+		<description>
+			Type of product, as specified by, e.g., a data bible.
+		</description>
+		<dcElement />
+	</element>
+	<element id="urn:oodt:ProductStructure" name="ProductStructure">
+		<description>
+			Whether or not a product is Flat (e.g., a set of independent
+			files), or hierarchical, e.g., a dir structure.
+		</description>
+		<dcElement />
+	</element>
+	<element id="urn:oodt:MimeType" name="MimeType">
+		<description>The IETF mime type of this product.</description>
+		<dcElement />
+	</element>
+<!-- DATASET SECTION -->
+	<element id="urn:wrm:DatasetID" name="DatasetID">
+		<description>WRM Project Dataset ID Element</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:longName" name="longName">
+		<description>long name of the dataset</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:shortName" name="shortName">
+		<description>short name of the dataset</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:description" name="description">
+		<description>misc description of the dataset</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:source" name="source">
+		<description>source of something</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:referenceURL" name="referenceURL">
+		<description>URL of the original dataset/file</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:cellMethod" name="cellMethod">
+		<description>cellMethod element</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:missingDataFlag" name="missingDataFlag">
+		<description>value to flag missing data</description>
+		<dcElement />
+<!-- GRANULE ELEMENTS -->
+	</element>
+	<element id="urn:wrm:GranuleID" name="GranuleID">
+		<description>UUID for a Granule</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:filename" name="filename">
+		<description>name of file this granule came from</description>
+		<dcElement />
+	</element>
+<!-- DATAPOINT ELEMENTS -->
+	<element id="urn:wrm:DataPointID" name="DataPointID">
+		<description>UUID for a data point</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:time" name="time">
+		<description>time</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:latitude" name="latitude">
+		<description>latitude of a datapoint</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:longitude" name="longitude">
+		<description>longitude of a datapoint</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:vertical" name="vertical">
+		<description>vertical</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:value" name="value">
+		<description>value...not sure what it means</description>
+		<dcElement />
+	</element>
+<!-- PARAMETER ELEMENTS -->
+	<element id="urn:wrm:ParameterID" name="ParameterID">
+		<description>UUID for a parameter</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:paraLongName" name="paraLongName">
+		<description>long name of the parameter</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:paraShortName" name="paraShortName">
+		<description>short name of the parameter</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:paraDescription" name="paraDescription">
+		<description>Description of a parameter</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:paraReferenceURL" name="paraReferenceURL">
+		<description>Refernce URL for a Parameter</description>
+		<dcElement />
+	</element>
+	<element id="urn:wrm:units" name="units">
+		<description>units [of measure?] for a parameter</description>
+		<dcElement />
+	</element>
+</cas:elements>

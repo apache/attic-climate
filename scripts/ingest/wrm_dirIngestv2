@@ -1,0 +1,23 @@
+#!/bin/bash
+##
+## usage: give a target directory path with *.met files and it will ingest them 
+##
+INGEST_PATH=$1;
+
+
+for file in $INGEST_PATH/* ; do
+
+GRANULE=`basename $file .0.met`
+FULL_GRANULE=`basename $file`
+
+
+./filemgr-client --url http://localhost:9091 --operation --ingestProduct --productName $GRANULE \
+--productStructure Flat --productTypeName GenericFile --clientTransfer --dataTransfer \
+gov.nasa.jpl.oodt.cas.filemgr.datatransfer.InPlaceDataTransferFactory --metadataFile \
+file://$INGEST_PATH$FULL_GRANULE --refs \
+file://$INGEST_PATH$GRANULE 
+
+echo $GRANULE;
+echo $FULL_GRANULE;
+
+done

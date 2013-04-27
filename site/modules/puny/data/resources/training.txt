@@ -1,0 +1,17 @@
+## Training
+
+### RCMET Overview
+
+[RCMET Overview]([SITE_ROOT]/training/rcmet-overview)
+
+
+### RCMET User Guide
+
+Coming Soon...
+
+### RCMED API Spec
+The [RCMED API Spec]([SITE_ROOT]/training/rcmed-api-spec) is useful for developers that intend to interact directly with the database.
+
+### Videos
+
+Coming Soon...

@@ -1,0 +1,19 @@
+/**
+ * Regional Climate Model Evaluation System (RCMES)
+ * ::Regional Climate Model Evaluation Toolkit (RCMET)
+ *   :: Evaluation Web Application
+ *
+ * Element style declarations
+**/
+#rcmes-logo {
+    float:left;
+    margin-right:20px;
+    margin-bottom:15px;
+}
+
+#bal_footer {
+    border-top:solid 1px #594028;
+    padding-top:5px;
+    font-size:90%;
+    color:#65615E;
+}

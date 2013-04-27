@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" ng-app="rcmes">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RCMET UI</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/bootstrap-responsive.min.css"/>
+  <link rel="stylesheet" href="css/jasny-bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/jasny-bootstrap-responsive.min.css"/>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+  <![endif]-->
+  <link rel="stylesheet" href="css/app.css"/>
+</head>
+<body>
+  <bootstrap-modal modal-id="datasetSelect">
+	<div class="modal-header">
+		<button class="close">&times;</button>
+		<h3>Dataset Select</h3>
+	</div>
+	<div class="modal-body">
+		<div ng-view></div>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn btn-primary close">Close</a>
+	</div>
+  </bootstrap-modal>
+
+  <h1>RCMET Evaluation UI</h1>
+  <div ng-controller="WorldMapCtrl">
+    <sap id="map"></sap>
+  </div>
+
+  <div ng-controller="ParameterSelectCtrl">
+    <div class="row">
+      <div class="span1 offset2 text-center">Start Date:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="startDateInput"/>
+        </form>
+      </div>
+      <div class="span1 text-center">End Date:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="endDateInput"/>
+        </form>
+      </div>
+      <div class="span1">
+        <button ng-click="runEvaluation()" ng-disabled="shouldDisableControls()" class="btn btn-primary">Evaluate</button>
+      </div>
+      <div class="span2">
+        <button class="btn btn-success" bootstrap-modal-open="datasetSelect">Select a Dataset</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span1 offset2 text-center">North:</div>
+      <div class="span2">
+        <form action="">
+          <input type="text" class="span2" ng-model="northInput"/>
+        </form>
+      </div>
+      <div class="span1 text-center">East:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="eastInput"/>
+        </form>
+      </div>
+      <div class="span1">
+        <button ng-click="updateParameters()" ng-disabled="shouldDisableControls()" class="btn btn-info">Update</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span1 offset2 text-center">South:</div>
+      <div class="span2">
+        <form action="">
+          <input type="text" class="span2" ng-model="southInput"/>
+        </form>
+      </div>
+      <div class="span1 text-center">West:</div>
+      <div class="span2">
+        <form>
+          <input type="text" class="span2" ng-model="westInput"/>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+  -->
+  <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <!--<script src="js/bootstrap.min.js"></script>-->
+  <script src="js/bootstrap.js"></script>
+  <script src="js/jasny-bootstrap.min.js"></script>
+  <script src="lib/angular/angular.js"></script>
+  <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script>
+</body>
+</html>

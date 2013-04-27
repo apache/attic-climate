@@ -1,0 +1,12 @@
+## RCMET Downloads
+
+The RCMET Virtual Machine provides a self contained environment for interacting with the RCMET data and software. <br /> [Learn more about RCMET]([SITE_ROOT]/training/rcmet-overview)
+
+You must have [Oracle Virtual Box](https://www.virtualbox.org/) installed to use the RCMET Virtual Machine.
+
+### RCMET Virtual Machine version RC1
+Release Date: 21 February 2013
+
+[Download .ova file]([SITE_ROOT]/static/downloads/RCMET_RC1.ova)
+
+MD5: c35173ade607ba533ad6ed02fce00898 

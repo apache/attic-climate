@@ -1,0 +1,102 @@
+/**
+ * Regional Climate Model Evaluation System (RCMES)
+ * ::Regional Climate Model Evaluation Toolkit (RCMET)
+ *   :: Evaluation Web Application
+ *
+ *
+ * The color scheme in this application is derived from the colors in the
+ * RCMES logo (http://rcmes.jpl.nasa.gov/static/img/rcmes-logo.png). The
+ * primary colors, in order from lightest to darkest are:
+ *
+ * Darks
+ * -------
+ * #202020
+ * #33312F
+ * #45423F
+ * #65615E
+ *
+ * Greens
+ * -------
+ * #AAC056
+ * #A2C030
+ * #425300
+ * #516018
+ * #668000
+ *
+ * Browns
+ * -------
+ * #2E2114
+ * #42301E
+ * #594028
+ *
+ *
+ **/
+ 
+body {
+    background: url(../img/hexabump-bg.png) scroll left top repeat;
+    background-color:#202020;
+}
+
+.container {
+
+}
+
+.page {
+    
+}
+
+.box {
+    background-color:#dfdfdf;
+    -webkit-border-radius: 4px;
+    border-radius: 4px; 
+    margin-bottom:1em;
+}
+.box-content {
+    padding:15px;
+}
+.box-content h3 {
+    margin-top:0px;
+}
+.box .hint, .box .note {
+    margin-top:5px;
+    font-size:95%;
+    color:#555;
+    font-style:italic;
+}
+.box .note {
+    padding-bottom:13px;
+    padding-left:10px;
+}
+.box.nav {
+    background-color:transparent;
+    color:#65615E;
+}
+
+hr {
+    border-color:#594028;
+}
+
+h1 {
+    color:#65615E;
+    border-bottom:solid 2px #594028;
+    padding-bottom:5px;
+}
+
+h2 {
+
+}
+h2.title {
+    color:#AAC056;
+}
+
+h3 {
+
+}
+
+h4 {
+
+}
+
+h5 {
+
+}

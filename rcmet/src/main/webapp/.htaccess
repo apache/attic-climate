@@ -1,0 +1,45 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Rewrite rules for OODT Balance web applications. 
+#
+# Enable the rewrite engine
+RewriteEngine On
+
+# Make sure that the value for RewriteBase exactly matches the 
+# value for site_root in config.ini. This value should point to the 
+# location (relative to the server's document root) of the 
+# Balance webapp directory (the directory containing config.ini). For
+# example, if the application lives at the server's document root, then
+# RewriteBase should be set to '/'. If, on the other hand, the application
+# has been installed into a subdirectory 'foo' underneath the server's 
+# document root, RewriteBase (and site_root in config.ini) should be set
+# to '/foo/'
+RewriteBase /
+
+# This section forwards all requests to the Balance application's front
+# controller. Unless you are modifying the low-level behavior of the 
+# Balance application framework, there should be no need to make any
+# modifications below this line. -----------------------------------------
+#
+# Send all other non-static requests to the main controller
+RewriteCond %{REQUEST_URI} !/static/(.*)$
+RewriteCond %{REQUEST_URI} !/scripts/(.*)$
+RewriteCond %{REQUEST_URI} !/global/(.*)$
+RewriteCond %{REQUEST_URI} !index\.php/.+$
+RewriteRule ^(.+)$ ./index\.php/$1 [L,NC]
+

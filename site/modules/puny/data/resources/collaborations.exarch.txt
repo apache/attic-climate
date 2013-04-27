@@ -1,0 +1,22 @@
+# ExArch
+
+One of the most serious challenges in today's climate research is handling the massive amount of data generated from climate models and a multitude of observing platforms. The data from the Climate Model Inter-comparison Project 5 (CMIP 5) are expected to exceed 10 Peta-bytes. The amount of data to be handled will grow explosively with the proliferation of fine-resolution global and regional climate modeling to meet the need by the climate change impact assessments to assist policy makers in developing sustainable development plans in the presence of the anticipated climate change.
+
+The multi-national and multi-institutional ExArch project aims to answer this concern in the G8 call by exploring the challenges in developing a software management infrastructure to handle multi-exabyte data archives. The project teams come from institutions in US, Canada, and Europe including Rutherford Appleton Laboratory, Princeton University, UCLA, JPL, Deutsches Klimarechenzentrum, Institut Pierre Simon Laplace, University of Calento Lecce-Italy, and University of Toronto. The UCLA-JPL team funded by National Science Foundation is composed of climate, both global and regional, and Information Technology (IT) specialists to explore the handling and utilization of massive data archive for evaluating regional climate model outputs over the globe with an emphasis of the observations, analyses, and assimilations based on the spaceborne sensors.
+
+The Regional Climate Model Evaluation System (RCMES) is the main vehicle of the UCLA-JPL team in this effort. RCMES is used to explore both the handling of massive data archives and the access and utilization of the data for evaluating RCM outputs and related analysis from the big data handling and climate science perspectives, respectively. The specific tasks related with the big data handling includes deploying a Hadoop/HIVE-based data-point storage system, as well as a MySQL and MongoDB backend to house observational data in (lat,lng,time,value,height) format. In addition, a REST-ful web-service provides for rapid and effective access to the underlying observational data, and makes the information available to our [RCMET analysis system](../training/rcmet-overview).  The major tasks related with the climate science include the development of a methodology for flexible and convenient access to the data in the large data archive by users of both local and remote sites, the development of statistical metrics for widely-used model evaluation, and visualization of the evaluation metrics. As a part of the ExArch project, the team is applying the RCMES to the CORDEX-Africa project for evaluating multi-model hindcast experiment results.
+
+## Contacts
+
+* Climate science leader: [Dr. Duane E. Waliser](mailto:duane.e.waliser@jpl.nasa.gov)
+* IT leader: [Dr. Chris Mattmann](mailto:chris.a.mattmann@jpl.nasa.gov)
+
+## Collaborators
+
+* [Martin Juckes](mailto:martin.jukes@stfc.ac.uk), Deputy Head for Center for Environmental Data Archival, Rutherford Appleton Laboratory, UK
+* [Bryan Lawrence](mailto:bryan.lawrence@stfc.ac.uk), Head for Center for Environmental Data Archival, Rutherford Appleton Laboratory, UK
+* [Venkatramani Balaji, Head](mailto:balaji@princeton.edu), Modeling Systems Group, GFDL
+* [Michael Lautenschlager](mailto:lautenschlager@dkrz.de), Head, Data Management, Deutsches Klimarechenzentrum
+* [Sébastien Denvil](mailto:sebastien.denvil@ipsl.jussieu.fr), Institut Pierre Simon Laplace
+* [Giovanni Aloisio](mailto:giovanni.aloisio@unisalento.it), CMCC & Engineering Faculty of the University of Salento, Lecce-Italy
+* [Paul Kushner](http://pjk.atmosp.physics.utoronto.ca), Department of Physics, University of Toronto

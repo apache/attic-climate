@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+#
+## SETUP FOR TRMM dataset
+#
+# usage: give a target directory path with *.met files and it will ingest them 
+# example: ./wrm_TRMMdirIngest /home/cgoodale/wrm-home/met-out/TRMM
+#  
+INGEST_PATH=$1;
+
+for file in $INGEST_PATH/* ; do
+
+GRANULEBASE=`basename $file .met`
+GRANULE=${GRANULEBASE%.*}
+FULL_GRANULE=`basename $file`
+
+
+./filemgr-client --url http://localhost:9091 --operation --ingestProduct --productName $GRANULE \
+--productStructure Flat --productTypeName GenericFile --clientTransfer --dataTransfer \
+gov.nasa.jpl.oodt.cas.filemgr.datatransfer.InPlaceDataTransferFactory --metadataFile \
+file://$INGEST_PATH/$FULL_GRANULE --refs \
+file:///usr/local/wrm/data/TRMM/$GRANULE
+
+#echo "granuleBASE is "$GRANULEBASE;
+echo "GRANULE IS " $GRANULE;
+#echo "full granule is "$FULL_GRANULE;
+#echo "INGEST_PATH is "$INGEST_PATH;
+
+done

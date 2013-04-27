@@ -1,0 +1,16 @@
+#!/bin/bash
+##
+## usage: Granule filename including .nc but excluding PATH 
+##
+DATA_DIR=/usr/local/wrm/data/AIRX3STD/2002-08-30_upto_2004-01-01
+GRANULE=$1;
+SEGMENT=$2;
+
+
+
+./filemgr-client --url http://localhost:9091 --operation --ingestProduct --productName $GRANULE \
+--productStructure Flat --productTypeName GenericFile --clientTransfer --dataTransfer \
+gov.nasa.jpl.oodt.cas.filemgr.datatransfer.InPlaceDataTransferFactory --metadataFile \
+file:///usr/local/wrm/met-out/$GRANULE.$SEGMENT.met --refs \
+file://$DATA_DIR/$GRANULE 
+
