@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.util;
+package org.apache.climate.util;
 
 //JDK imports
 import java.sql.ResultSet;

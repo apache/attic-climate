@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.repository;
+package org.apache.climate.repository;
 
 //JDK imports
 import javax.sql.DataSource;

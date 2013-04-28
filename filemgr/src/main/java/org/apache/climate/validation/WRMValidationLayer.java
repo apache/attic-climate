@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.validation;
+package org.apache.climate.validation;
 
 //JDK imports
 import java.sql.Connection;
@@ -15,12 +15,13 @@ import java.util.Vector;
 
 import javax.sql.DataSource;
 
+import org.apache.climate.util.DatabaseStructFactory;
+
 //OODT imports
 import gov.nasa.jpl.oodt.cas.filemgr.structs.Element;
 import gov.nasa.jpl.oodt.cas.filemgr.structs.ProductType;
 import gov.nasa.jpl.oodt.cas.filemgr.structs.exceptions.ValidationLayerException;
 import gov.nasa.jpl.oodt.cas.filemgr.validation.ValidationLayer;
-import gov.nasa.jpl.wrm.util.DatabaseStructFactory;
 
 /**
  * 

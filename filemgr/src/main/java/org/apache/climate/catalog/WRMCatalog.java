@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.catalog;
+package org.apache.climate.catalog;
 
 //JDK imports
 import java.sql.Connection;
@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.sql.DataSource;
+
+import org.apache.climate.util.DatabaseStructFactory;
+
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -33,7 +36,6 @@ import gov.nasa.jpl.oodt.cas.filemgr.validation.ValidationLayer;
 import gov.nasa.jpl.oodt.cas.metadata.Metadata;
 
 //WRM imports
-import gov.nasa.jpl.wrm.util.DatabaseStructFactory;
 
 /**
  * WRMCatalog

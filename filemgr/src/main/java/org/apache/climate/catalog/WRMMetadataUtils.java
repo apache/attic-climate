@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.catalog;
+package org.apache.climate.catalog;
 
 import java.util.logging.Logger;
 import java.util.regex.Matcher;

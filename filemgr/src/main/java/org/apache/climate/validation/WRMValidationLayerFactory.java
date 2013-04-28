@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.validation;
+package org.apache.climate.validation;
 
 //JDK imports
 import javax.sql.DataSource;
@@ -30,13 +30,13 @@ public class WRMValidationLayerFactory implements ValidationLayerFactory {
     String jdbcUrl = null, user = null, pass = null, driver = null;
 
     jdbcUrl = PathUtils.replaceEnvVariables(System
-        .getProperty("gov.nasa.jpl.wrm.validation.jdbc.url"));
+        .getProperty("org.apache.climate.validation.jdbc.url"));
     user = PathUtils.replaceEnvVariables(System
-        .getProperty("gov.nasa.jpl.wrm.validation.jdbc.user"));
+        .getProperty("org.apache.climate.validation.jdbc.user"));
     pass = PathUtils.replaceEnvVariables(System
-        .getProperty("gov.nasa.jpl.wrm.validation.jdbc.pass"));
+        .getProperty("org.apache.climate.validation.jdbc.pass"));
     driver = PathUtils.replaceEnvVariables(System
-        .getProperty("gov.nasa.jpl.wrm.validation.jdbc.driver"));
+        .getProperty("org.apache.climate.validation.jdbc.driver"));
 
     this.dataSource = DatabaseConnectionBuilder.buildDataSource(user, pass,
         driver, jdbcUrl);

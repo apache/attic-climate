@@ -3,7 +3,7 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.repository;
+package org.apache.climate.repository;
 
 //JDK imports
 import java.sql.Connection;
@@ -17,11 +17,12 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.apache.climate.util.DatabaseStructFactory;
+
 //OODT imports
 import gov.nasa.jpl.oodt.cas.filemgr.repository.RepositoryManager;
 import gov.nasa.jpl.oodt.cas.filemgr.structs.ProductType;
 import gov.nasa.jpl.oodt.cas.filemgr.structs.exceptions.RepositoryManagerException;
-import gov.nasa.jpl.wrm.util.DatabaseStructFactory;
 
 /**
  * 

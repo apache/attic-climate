@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gov.nasa.jpl.wrm.catalog;
+package org.apache.climate.catalog;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

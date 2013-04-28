@@ -3,15 +3,16 @@
 //
 //$Id$
 
-package gov.nasa.jpl.wrm.catalog;
+package org.apache.climate.catalog;
 
 import javax.sql.DataSource;
+
+import org.apache.climate.validation.WRMValidationLayerFactory;
 
 import gov.nasa.jpl.oodt.cas.commons.database.DatabaseConnectionBuilder;
 import gov.nasa.jpl.oodt.cas.filemgr.catalog.Catalog;
 import gov.nasa.jpl.oodt.cas.filemgr.catalog.CatalogFactory;
 import gov.nasa.jpl.oodt.cas.metadata.util.PathUtils;
-import gov.nasa.jpl.wrm.validation.WRMValidationLayerFactory;
 
 /**
  * WRMCatalogFactory
@@ -36,20 +37,20 @@ public class WRMCatalogFactory implements CatalogFactory {
         String jdbcUrl = null, user = null, pass = null, driver = null;
 
         jdbcUrl = PathUtils.replaceEnvVariables(System
-                .getProperty("gov.nasa.jpl.wrm.catalog.datasource.jdbc.url"));
+                .getProperty("org.apache.climate.catalog.datasource.jdbc.url"));
         user = PathUtils.replaceEnvVariables(System
-                .getProperty("gov.nasa.jpl.wrm.catalog.datasource.jdbc.user"));
+                .getProperty("org.apache.climate.catalog.datasource.jdbc.user"));
         pass = PathUtils.replaceEnvVariables(System
-                .getProperty("gov.nasa.jpl.wrm.catalog.datasource.jdbc.pass"));
+                .getProperty("org.apache.climate.catalog.datasource.jdbc.pass"));
         driver = PathUtils
                 .replaceEnvVariables(System
-                        .getProperty("gov.nasa.jpl.wrm.catalog.datasource.jdbc.driver"));
+                        .getProperty("org.apache.climate.catalog.datasource.jdbc.driver"));
         
 
         dataSource = DatabaseConnectionBuilder.buildDataSource(user, pass,
                 driver, jdbcUrl);
         pageSize = Integer.valueOf(PathUtils.replaceEnvVariables(System
-            .getProperty("gov.nasa.jpl.wrm.catalog.datasource.pageSize")));
+            .getProperty("org.apache.climate.catalog.datasource.pageSize")));
 
     }
 
