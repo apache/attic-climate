@@ -150,7 +150,7 @@ def rcmetUI():
   
     # dbDatasets = ['TRMM','ERA-Interim','AIRS','MODIS','URD','CRU']
     # replace with list comprehension
-    # dbDatasets = [parameter['longName'] for parameter in parameters]
+    # dbDatasets = [parameter['longname'] for parameter in parameters]
   
   
     # datasetIds = [3,1,2,5,4,6]
@@ -182,7 +182,7 @@ def rcmetUI():
 
     for parameter in parameters:
         """( 38 ) - CRU3.1 Daily-Mean Temperature : monthly"""
-        print "({:^2}) - {:<35} :: {:<10}".format(parameter['parameter_id'], parameter['longName'], parameter['timestep'])
+        print "({:^2}) - {:<35} :: {:<10}".format(parameter['parameter_id'], parameter['longname'], parameter['timestep'])
 
     try:
         datasetChoice = int(raw_input('Please select which observational dataset you wish to compare against:\n> ')) 

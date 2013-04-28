@@ -144,7 +144,7 @@ def rcmet_cordexAF():
     except Exception:
         sys.exit()
     
-    datasets = [parameter['longName'] for parameter in parameters]
+    datasets = [parameter['longname'] for parameter in parameters]
     
     #   NOTE: the list must be updated whenever a new dataset is added to RCMED (current as of 11/22/2011)
     db_datasets = ['TRMM', 'ERA-Interim', 'AIRS', 'MODIS', 'URD', 'CRU3.0', 'CRU3.1']
@@ -679,7 +679,7 @@ def rcmet_cordexAF():
     Parameter to Object Mapping
     cachedir = settings.cacheDir
     workdir = settings.cacheDir
-    obsList = obsDatasetList.each['longName']
+    obsList = obsDatasetList.each['longname']
     """
 
     numOBS, numMDL, nT, ngrdY, ngrdX, Times, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList = toolkit.do_data_prep(\

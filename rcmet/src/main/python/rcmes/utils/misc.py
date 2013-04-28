@@ -984,7 +984,7 @@ def userDefinedStartEndTimes(obsList, modelList):
     for observation in obsList:
         startTimes.append(datetime.datetime.strptime(observation['start_date'],'%Y-%m-%d'))
         endTimes.append(datetime.datetime.strptime(observation['end_date'],'%Y-%m-%d'))
-        print template.format(observation['longName'], observation['start_date'], observation['end_date'])
+        print template.format(observation['longname'], observation['start_date'], observation['end_date'])
     print '-'*94
     for model in modelList:
         startTimes.append(model.minTime)

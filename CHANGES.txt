@@ -1,3 +1,13 @@
+Apache Open Climate Workbench Change Log
+============================================
+
+Incubating 0.1 - Current Development
+--------------------------------------------
+
+* CLIMATE-1 Rename parameters dict key 'longName' to 'longname' (goodale)
+
+
+
 Regional Climate Model Evaluation System
 JIRA located here: https://oodt.jpl.nasa.gov/jira/browse/RCMES
 
