@@ -3,7 +3,7 @@
 //
 //$Id: PolicyResource.java 7000 2009-10-26 16:39:11Z pramirez $
 
-package gov.nasa.jpl.oodt.cas.curation.service;
+package org.apache.climate.cas.curation.service;
 
 //OODT imports
 import gov.nasa.jpl.oodt.cas.curation.util.HTMLEncode;

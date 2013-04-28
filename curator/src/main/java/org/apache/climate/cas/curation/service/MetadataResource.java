@@ -3,7 +3,7 @@
 //
 //$Id: MetadataResource.java 7160 2009-11-17 15:52:16Z pramirez $
 
-package gov.nasa.jpl.oodt.cas.curation.service;
+package org.apache.climate.cas.curation.service;
 
 //OODT imports
 import gov.nasa.jpl.oodt.cas.curation.structs.ExtractorConfig;
