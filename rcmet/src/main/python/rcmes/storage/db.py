@@ -11,6 +11,7 @@ import Nio
 from classes import RCMED
 from toolkit import process
 from datetime import timedelta ,datetime
+from calendar import monthrange
 
 def reorderXYT(lons, lats, times, values):
     # Re-order values in values array such that when reshaped everywhere is where it should be
@@ -52,89 +53,12 @@ def findUnique(seq, idfun=None):
         result.append(item)
     return result
 
-def extractData(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep):
-    """
-    Main function to extract data from DB into numpy masked arrays
-    
-    Input::
-        datasetID, paramID: required identifiers of data in database
-        latMin, latMax, lonMin, lonMax: location range to extract data for
-        startTime, endTime: python datetime objects describing required time range to extract
-        cachedir: directory path used to store temporary cache files
-        timestep: "daily" | "monthly" so we can be sure to query the RCMED properly
-    Output:
-        uniqueLatitudes,uniqueLongitudes: 1d-numpy array of latitude and longitude grid values
-        uniqueLevels:	1d-numpy array of vertical level values
-        timesUnique: list of python datetime objects describing times of returned data
-        mdata: masked numpy arrays of data values
-    
-    """
-    
-    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, startTime, endTime, cachedir, timestep) 
-
-    # To get the parameter's information from parameter table
-    database,timestep,realm,instrument,start_date,end_date,unit=get_param_info(url)
-    
-    # Create a directory inside the cachedir folder
-    name=[]
-    # activity is a fix value
-    activity="obs4cmip5"
-    name.append(activity)
-    # product is a fix value
-    product="observations"
-    name.append(product)
-    # realm, variable,frequency and instrument will be get from parameter table
-    realm=realm
-    name.append(realm)
-    variable=database
-    name.append(variable)
-    frequency=timestep
-    name.append(frequency)
-    data_structure="grid"
-    name.append(data_structure)
-    institution="NASA"
-    name.append(institution)
-    project="RCMES"
-    name.append(project)
-    instrument=instrument
-    name.append(instrument)
-    version="v1"
-    name.append(version)
-    
-    # Check to see whether the folder is already created for netCDF or not, then it will be created
-    os.chdir(cachedir)
-    path=os.getcwd()
-    for n in name:
-        if os.path.exists(path+"/"+n):
-            os.chdir(path+"/"+n)
-            path=os.getcwd()
-        else:
-            os.mkdir(n)
-            os.chdir(path+"/"+n)
-            path=os.getcwd()
-
-    # To establish the netCDF file name
-    processing_level='L3'
-    processing_version="processing_version"  # the processing version is still unknown
-    start_date=str(startTime)[0:4]+str(startTime)[5:7]+str(startTime)[8:10]
-    end_date=str(endTime)[0:4]+str(endTime)[5:7]+str(endTime)[8:10]
-    netCD_fileName=variable + '_' + project + '_' + processing_level + '_' + processing_version + '_' + str(latMin) + '_' + str(latMax) + '_' + str(lonMin) + '_' + str(lonMax) + '_' + start_date + '_' + end_date + '.nc'
-
-    # To check if netCDF file  exists, then use it
-    if os.path.exists(path+"/"+netCD_fileName):
-        latitudes, longitudes, uniqueLevels, timesUnique, mdata=read_netcdf(path+"/"+netCD_fileName,timestep)
-    # If the netCDF file does not exists, then create one.
-    else:
-        latitudes, longitudes, uniqueLevels, timesUnique, mdata=create_netCDF(url, database, latMin, latMax, lonMin, lonMax, startTime, endTime, unit, path+"/"+netCD_fileName,timestep)
-
-    return latitudes, longitudes, uniqueLevels, timesUnique, mdata
-
 def get_param_info(url):
 
     '''
     This function will get the general information by given URL from the parameter table.
     '''
-    url=url + "&info=yes"
+    url = url + "&info=yes"
     result = urllib2.urlopen(url)
     datastring = result.read()
     datastring=json.loads(datastring)
@@ -146,13 +70,14 @@ def get_param_info(url):
     end_date=datastring["end_date"]
     unit=datastring["units"]
     
-    return database,timestep,realm,instrument,start_date,end_date,unit
+    return database, timestep, realm, instrument, start_date, end_date, unit
 
+def get_data(url):
+    
+    '''
+    This function will get the url, query from database and will return datapoints' latitude, longitude, level, time and value.
+    '''
 
-def create_netCDF(url, database, latMin, latMax, lonMin, lonMax, startTime, endTime, unit, netCD_fileName, timestep):
-
-
-    print 'Starting retrieval from DB (this may take several minutes)'
     result = urllib2.urlopen(url)
     datastring = result.read()    
     d = re.search('data: \r\n', datastring)
@@ -177,28 +102,18 @@ def create_netCDF(url, database, latMin, latMax, lonMin, lonMax, startTime, endT
         timestamps.append(row[3])
         values.append(np.float32(row[4]))
         
-       # Need to sort time to make sure start and end times are correct 
-    time_label_list = timestamps
-    print "start sort"
-    time_label_list.sort()
-    print "done sort"
-    start_time_label = time_label_list[0]
-    end_time_label = time_label_list[-1]
-   
-    hours=[]
-    timeFormat = "%Y-%m-%d %H:%M:%S"
-    base_date=datetime.strptime(start_time_label, timeFormat)
-    # To convert the date to hours 
-    for t in timestamps:
-        date=datetime.strptime(t, timeFormat)
-        dif=date-base_date
-        hours.append(dif.days*24)        
-
+    return latitudes, longitudes, levels, values, timestamps
     
+
+def create_netCDF(latitudes, longitudes, levels, values, timestamps, database, latMin, latMax, lonMin, lonMax, startTime, endTime, unit, netCD_fileName):
+    
+    '''
+    This function will generate netCDF files.
+    '''
+        
     # To generate netCDF file from database
-    print "Generating netCDF file in the cache directory...."
     netcdf =  Nio.open_file(netCD_fileName,'w')
-    string="The netCDF file for parameter: " + database + ", latMin: " + str(latMin) + ", latMax: " + str(latMax) + ", lonMin: " + str(lonMin) + ", lonMax: " + str(lonMax) + " startTime: " + str(start_time_label) + " and endTime: " + str(end_time_label) + "."
+    string="The netCDF file for parameter: " + database + ", latMin: " + str(latMin) + ", latMax: " + str(latMax) + ", lonMin: " + str(lonMin) + ", lonMax: " + str(lonMax) + " startTime: " + str(startTime) + " and endTime: " + str(endTime) + "."
     netcdf.globalAttName = str(string)
     netcdf.create_dimension('dim', len(latitudes))
     latitude = netcdf.create_variable('lat', 'd', ('dim',))
@@ -212,28 +127,35 @@ def create_netCDF(url, database, latMin, latMax, lonMin, lonMax, startTime, endT
     netcdf.variables['lon'].varAttName = 'longitude'
     netcdf.variables['lon'].units = 'degrees_east'
     netcdf.variables['time'].varAttName = 'time'
-    netcdf.variables['time'].units = 'hours since ' + str(start_time_label)
+    netcdf.variables['time'].units = 'hours since ' + str(startTime)
     netcdf.variables['value'].varAttName = 'value'
     netcdf.variables['value'].units = str(unit)
     netcdf.variables['lev'].varAttName = 'level'
     netcdf.variables['lev'].units = 'hPa'
+
+    hours=[]
+    timeFormat = "%Y-%m-%d %H:%M:%S"
+    base_date=startTime
+    # To convert the date to hours 
+    for t in timestamps:
+        date=datetime.strptime(t, timeFormat)
+        diff=date-base_date
+        hours.append(diff.days*24)
+        
     latitude[:]=latitudes[:]
     longitude[:]=longitudes[:]
     level[:]=levels[:]
     time[:]=hours[:]
     value[:]=values[:]
     netcdf.close()
+        
+def read_netcdf(netCD_fileName):
     
-    print "Data stored as netCDF file (cache file)"
-    
-    latitudes, longitudes, uniqueLevels, timesUnique, mdata = read_netcdf(netCD_fileName,timestep)
-    
-    return latitudes, longitudes, uniqueLevels, timesUnique, mdata
-    
-def read_netcdf(netCD_fileName,timestep):
-    
+    '''
+    This function will read the existed netCDF file, convert the hours from netCDF time variable
+    and return latitudes, longitudes, levels, times and values.
+    '''
     # To use the created netCDF file
-    print 'Retrieving data from cache (netCDF file)'
     netcdf = Nio.open_file(netCD_fileName , 'r')
     # To get all data from netCDF file
     latitudes = netcdf.variables['lat'][:]
@@ -245,7 +167,7 @@ def read_netcdf(netCD_fileName,timestep):
     # To get the base date
     time_unit=netcdf.variables['time'].units
     time_unit=time_unit.split(' ')
-    base_data=time_unit[2] + " " + time_unit[3]
+    base_date=time_unit[2] + " " + time_unit[3]
     
     netcdf.close()
     
@@ -254,11 +176,16 @@ def read_netcdf(netCD_fileName,timestep):
     # Because time in netCDF file is based on hours since a specific date, it needs to be converted to date format
     times=[]
     # To convert the base date to the python datetime format
-    dt = datetime.strptime(base_data, timeFormat)
-    for t in range(len(hours)):
-        d=timedelta(hours[t]/24)    
-        add=dt+d
-        times.append(str(add.year) + '-' + str("%02d" % (add.month)) + '-' + str("%02d" % (add.day)) + ' ' + str("%02d" % (add.hour)) + ':' + str("%02d" % (add.minute)) + ':' + str("%02d" % (add.second)))
+    base_date = datetime.strptime(base_date, timeFormat)
+    for each in range(len(hours)): 
+        hour=timedelta(hours[each]/24)    
+        eachTime=base_date + hour
+        times.append(str(eachTime.year) + '-' + str("%02d" % (eachTime.month)) + '-' + str("%02d" % (eachTime.day)) + ' ' + str("%02d" % (eachTime.hour)) + ':' + str("%02d" % (eachTime.minute)) + ':' + str("%02d" % (eachTime.second)))
+
+    return latitudes, longitudes, levels, times, values
+
+
+def improve_data(latitudes, longitudes, levels, times, values, timestep):
     
     # Make arrays of unique latitudes, longitudes, levels and times
     uniqueLatitudes = np.unique(latitudes)
@@ -276,6 +203,7 @@ def read_netcdf(netCD_fileName,timestep):
 
     # Convert each unique time from strings into list of Python datetime objects
     # TODO - LIST COMPS!
+    timeFormat = "%Y-%m-%d %H:%M:%S"
     timesUnique = [datetime.strptime(t, timeFormat) for t in uniqueTimestamps]
     timesUnique.sort()
     timesUnique = process.normalizeDatetimes(timesUnique, timestep)
@@ -296,5 +224,120 @@ def read_netcdf(netCD_fileName,timestep):
     #  -these make functions like values.mean(), values.max() etc ignore missing values
     mdi = -9999  # TODO: extract this value from the DB retrieval metadata
     mdata = ma.masked_array(values, mask=(values == mdi))
+
+
+    return latitudes, longitudes, uniqueLevels, timesUnique, mdata
     
+    
+def extractData ( datasetID, paramID, latMin, latMax, lonMin, lonMax, userStartTime, userEndTime, cachedir, timestep ):
+    
+    """
+    Main function to extract data from DB into numpy masked arrays, and also to create monthly netCDF file as cache
+    
+    Input::
+        datasetID, paramID: required identifiers of data in database
+        latMin, latMax, lonMin, lonMax: location range to extract data for
+        startTime, endTime: python datetime objects describing required time range to extract
+        cachedir: directory path used to store temporary cache files
+        timestep: "daily" | "monthly" so we can be sure to query the RCMED properly
+    Output:
+        uniqueLatitudes,uniqueLongitudes: 1d-numpy array of latitude and longitude grid values
+        uniqueLevels:	1d-numpy array of vertical level values
+        timesUnique: list of python datetime objects describing times of returned data
+        mdata: masked numpy arrays of data values
+    """
+
+    url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, userStartTime, userEndTime, cachedir, timestep) 
+    
+    # To get the parameter's information from parameter table
+    database, timestep, realm, instrument, dbStartDate, dbEndDate, unit = get_param_info(url)
+        
+    # Create a directory inside the cache directory
+    name = []
+    # activity is a fix value
+    activity = "obs4cmip5"
+    name.append(activity)
+    # product is a fix value
+    product = "observations"
+    name.append(product)
+    # realm, variable,frequency and instrument will be get from parameter table
+    realm = realm
+    name.append(realm)
+    variable = database
+    name.append(variable)
+    frequency = timestep
+    name.append(frequency)
+    data_structure = "grid"
+    name.append(data_structure)
+    institution = "NASA"
+    name.append(institution)
+    project = "RCMES"
+    name.append(project)
+    instrument = instrument
+    name.append(instrument)
+    version = "v1"
+    name.append(version)
+    
+    # Check to see whether the folder is already created for netCDF or not, then it will be created
+    os.chdir(cachedir)
+    path=os.getcwd()
+    for n in name:
+        if os.path.exists(path + "/" + n):
+            os.chdir(path + "/" + n)
+            path=os.getcwd()
+        else:
+            os.mkdir(n)
+            os.chdir(path + "/" + n)
+            path=os.getcwd()
+
+    processing_level = 'L3'
+    processing_version = "processing_version"  # the processing version is still unknown and can be added later
+    
+    timeFormat = "%Y-%m-%d %H:%M:%S"
+   
+    date_list, lats, longs, uniqueLevls, uniqueTimes, vals = [], [], [], [], [], []
+
+    # To make a list (date_list) of all months available based on user time request
+    while userStartTime <= userEndTime:
+        #To get the beginning of month
+        beginningOfMonth = str("%04d" % userStartTime.year) + "-" + str("%02d" % userStartTime.month) + "-" + "01 00:00:00"
+        #To get the end of month
+        endOfMonth = str("%04d" % userStartTime.year) + "-" + str("%02d" % userStartTime.month) + "-" + str(monthrange(userStartTime.year,userStartTime.month)[1]) + " 00:00:00"
+        #To convert both beginning and end of month from string to Python datetime format
+        beginningOfMonth = datetime.strptime(beginningOfMonth, timeFormat)
+        endOfMonth = datetime.strptime(endOfMonth, timeFormat)
+        #To add beginning and end of month as a list to the date_list list
+        date_list.append([beginningOfMonth, endOfMonth])
+        #To get the beginning of next month
+        userStartTime= endOfMonth + timedelta(days=1)
+
+    print 'Starting retrieval data (this may take several minutes) ...... ' 
+    # To loop over all months and return data
+    for date in date_list:
+        netCDF_name = variable + '_' + project + '_' + processing_level + '_' + processing_version + '_' + str(latMin) + '_' + str(latMax) + '_' + str(lonMin) + '_' + str(lonMax) + '_' + str("%04d" % date[0].year) + str("%02d" % date[0].month) + '.nc'
+        
+        # To check if netCDF file  exists, then use it
+        if os.path.exists(path+"/"+ netCDF_name):
+            latitudes, longitudes, levels, times, values = read_netcdf(path + "/" + netCDF_name)  
+        
+        # If the netCDF file does not exist, then create one and read it.
+        else:            
+            # To just query for one year of data
+            url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, date[0], date[1], cachedir, timestep)
+            
+            # To get data from DB
+            latitudes, longitudes, levels, values, timestamps = get_data(url)
+            create_netCDF(latitudes, longitudes, levels, values, timestamps, database, latMin, latMax, lonMin, lonMax, date[0], date[1], unit, path + "/" + netCDF_name)
+
+            # To read from netCDF files
+            latitudes, longitudes, levels, times, values = read_netcdf(path + "/" + netCDF_name)            
+
+        lats=np.append(lats,latitudes)
+        longs=np.append(longs,longitudes)
+        uniqueLevls=np.append(uniqueLevls,levels)
+        uniqueTimes=np.append(uniqueTimes,times)
+        vals=np.append(vals,values)
+        
+    latitudes, longitudes, uniqueLevels, timesUnique, mdata = improve_data(lats, longs, uniqueLevls, uniqueTimes, vals, timestep)
+        
     return latitudes, longitudes, uniqueLevels, timesUnique, mdata
