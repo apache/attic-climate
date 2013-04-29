@@ -5,9 +5,9 @@ $activeTab = 'data';
 // Get the global application object
 $app = App::Get();
 
-// Connect to the WRM MySql catalog
-require_once("Org/Apache/Oodt/Balance/Providers/Data/MySqlDataProvider.class.php");
-$provider = new Org_Apache_Oodt_Balance_Providers_Data_MySqlDataProvider();
+// Connect to the WRM Postgres catalog
+require_once("Org/Apache/Oodt/Balance/Providers/Data/PostgresDataProvider.class.php");
+$provider = new Org_Apache_Oodt_Balance_Providers_Data_PostgresDataProvider();
 $provider->connect(array(
 	"username" => $app->settings['wrm_user'],
 	"password" => $app->settings['wrm_pass'],
@@ -19,15 +19,10 @@ $provider->connect(array(
  ******************************************************************************/
 if (empty ($app->request->segments[0])):
 	
-	// Request the parameter information
-/*
-	$response = $provider->request("SELECT dataset.*,count(`parameter`.`parameter_id`) as numParameters "
-								  ."FROM `parameter`,`dataset` "
-								  ."WHERE dataset.dataset_id=parameter.dataset_id",
-							array("format"   => "assoc"));
-*/
-	$response = $provider->request("SELECT dataset.*  FROM 
-`dataset`  WHERE 1",array("format" => "assoc"));	
+	// Request the datasets information
+	$response = $provider->request("SELECT dataset.shortname, dataset.longname, dataset.description, dataset.dataset_id  FROM dataset",
+					array("format"   => "assoc"));
+	
 	// Build the table widget
 	require_once(HOME . '/scripts/widgets/HtmlTableWidget.php');
 	$tableWidget = new HtmlTableWidget();
@@ -38,9 +33,9 @@ if (empty ($app->request->segments[0])):
 
 	foreach ($response->data as $row) {
 		$tableWidget->addRow(array(
-			"<a href=\"" . SITE_ROOT . "/rcmed/datasets/{$row['shortName']}\">{$row['longName']}</a>",
-		    	"{$row['shortName']}",
-			"{$row['description']} ",
+			"<a href=\"" . SITE_ROOT . "/rcmed/datasets/{$row['shortname']}\">{$row['longname']}</a>", 
+		    	"{$row['shortname']}",
+			"{$row['description']} ", 
 			"{$row['dataset_id']} ",
 			));
 	}
@@ -68,10 +63,12 @@ else:
 $datasetShortName = $app->request->segments[0];
 
 $response = $provider->request(
-	"SELECT  `parameter`.*,`dataset`.`longName` as dsLongName FROM `parameter`,`dataset` "
-	. "WHERE `dataset`.`shortName`='{$datasetShortName}' "
-	. "AND   `dataset`.`dataset_id`=`parameter`.`dataset_id` ",
-	array("format"=>"assoc"));
+	"SELECT  parameter.shortname, parameter.longname, parameter.description, parameter.parameter_id"
+	.",dataset.longname as dslongname FROM parameter,dataset "
+	. "WHERE dataset.shortname='{$datasetShortName}' "
+	. "AND   dataset.dataset_id=parameter.dataset_id ",
+	array("format"   => "assoc"));
+
 $info     = $response->data[0];
 
 ?>
@@ -79,12 +76,12 @@ $info     = $response->data[0];
 <a href="<?php echo SITE_ROOT?>/">Home</a>&nbsp;&rarr;&nbsp;
 <a href="<?php echo SITE_ROOT?>/data/">Data</a>&nbsp;&rarr;&nbsp;
 <a href="<?php echo SITE_ROOT?>/rcmed/datasets">Dataset Index</a>&nbsp;&rarr;&nbsp;
-<?php echo $info['dsLongName'] . " ({$datasetShortName})"?>
+<?php echo $info['dslongname'] . " ({$datasetShortName})" ?>
 </div>
 <div class="span-7">&nbsp;</div>
 <div class="span-17 last" id="mainSection">
 	<h2 class="larger loud">Dataset Index</h2>
-	<h3>Parameters for <?php echo $info['dsLongName']?></h3>
+	<h3>Parameters for <?php echo $info['dslongname']?></h3>
 	<table>
 		<thead><tr><th>Parameter Name</th>
 				   <th>Description</th>
@@ -92,8 +89,8 @@ $info     = $response->data[0];
 				   </thead>
 		<tbody>
 	<?php foreach ($response->data as $param):?>
-	  <tr><td><a href="<?php echo SITE_ROOT?>/rcmed/parameters/<?php echo $param['shortName']?>"><?php echo $param['longName']?></a></td>
-	  	  <td><?php echo $param['description']?></td>
+	  <tr><td><a href="<?php echo SITE_ROOT?>/rcmed/parameters/<?php echo $param['shortname']?>"><?php echo $param['longname'] ?></a></td>
+	  	  <td><?php echo $param['description'] ?></td>
 	  	  <td><?php echo $param['parameter_id']?></td></tr>
 	<?php endforeach ?>
 		</tbody>
