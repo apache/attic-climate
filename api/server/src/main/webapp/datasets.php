@@ -17,14 +17,16 @@
 require_once("./api-config.php");
 ini_set('display_errors',1);
 
-$master_link = mysql_connect(WRM_DB_HOST,WRM_DB_USER,WRM_DB_PASS) or die("Could not connect: " . mysql_error());
-mysql_select_db(WRM_MASTER_DB_NAME) or die("Could not select db: " . mysql_error());
+$master_link = pg_connect("host=".WRM_DB_HOST
+                          ." dbname=".WRM_MASTER_DB_NAME
+                          ." user=".WRM_DB_USER
+                          ." password=".WRM_DB_PASS) or die("Could not connect: " . pg_last_error());
 
 function listDatasets() {
-	$sql    = "SELECT dataset_id,shortName,longName,source from `dataset` WHERE 1";
-	$result = mysql_query($sql);
+	$sql    = "SELECT dataset_id,shortname,longname,source from dataset";
+	$result = pg_query($sql);
 	$resultArray = array();
-	while ($row = mysql_fetch_assoc($result)) {
+	while ($row = pg_fetch_assoc($result)) {
 		$resultArray[] = $row;
 	}	
 	return $resultArray;
@@ -34,5 +36,5 @@ $format = isset($_GET['format']) ? $_GET['format'] : 'json';
 $data   = listDatasets();
 echo    json_encode($data);
 
-mysql_close($master_link);
+pg_close($master_link);
 exit();
