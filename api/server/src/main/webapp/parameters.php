@@ -17,17 +17,19 @@
 require_once("./api-config.php");
 ini_set('display_errors',1);
 
-$master_link = mysql_connect(WRM_DB_HOST,WRM_DB_USER,WRM_DB_PASS) or die("Could not connect: " . mysql_error());
-mysql_select_db(WRM_MASTER_DB_NAME) or die("Could not select db: " . mysql_error());
+$master_link = pg_connect("host=".WRM_DB_HOST
+                          ." dbname=".WRM_MASTER_DB_NAME
+                          ." user=".WRM_DB_USER
+                          ." password=".WRM_DB_PASS) or die("Could not connect: " . pg_last_error());
 
-function listParametersForDataset($shortName) {
-	$sql    = "SELECT parameter.parameter_id, parameter.shortName, dataset.shortName as datasetShortName,parameter.longName,parameter.units "
-			. "FROM `parameter` "
-			. "LEFT JOIN `dataset` USING(dataset_id) WHERE dataset.shortName='"
-			. mysql_real_escape_string($shortName) . "' ";
-	$result = mysql_query($sql);
+function listParametersForDataset($shortname) {
+	$sql    = "SELECT parameter.parameter_id, parameter.shortname, dataset.shortname as datasetshortname, parameter.longname, parameter.units "
+			. "FROM parameter "
+			. "LEFT JOIN dataset USING(dataset_id) WHERE dataset.shortname='"
+			. pg_escape_string($shortname) . "' ";
+	$result = pg_query($sql);
 	$resultArray = array();
-	while ($row = mysql_fetch_assoc($result)) {
+	while ($row = pg_fetch_assoc($result)) {
 		$resultArray[] = $row;
 	}
 	return $resultArray;
@@ -44,5 +46,5 @@ if ($dsLabel) {
 	header("HTTP/1.0 404 Not Found");
 }
 	
-mysql_close($master_link);
+pg_close($master_link);
 exit();
