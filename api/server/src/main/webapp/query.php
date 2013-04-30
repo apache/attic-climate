@@ -42,7 +42,8 @@ function boundingBoxQuery($db_link,$latMin,$latMax,$lonMin,$lonMax,$timeStart,$t
           .  "longitude<="    . pg_escape_string($lonMax)    . ' AND '
           .  "time>='{$real_time_start}' AND "
           .  "time<='{$real_time_end}'; ";	
-	// Return the response from the server
+    // Return the response from the server
+    // var_dump($sql);
 	return pg_query($db_link,$sql);
 }
 
@@ -222,7 +223,7 @@ function printParameterMap_pg() {
 ?>
 <html>
 <head>
-<title>WRM Regional Climate Modeling Database: Query Service</title>
+<title>Regional Climate Modeling Database: Query Service</title>
 <style type="text/css">
 code {
 	background-color:#eee;
@@ -235,12 +236,12 @@ code {
 </style>
 </head>
 <body>
-<h2>Regional Climate Model Evaluation Database Query Service</h2>
+<h1>Regional Climate Model Evaluation Database Query Service</h1>
 <h3>Overview</h3>
-<p>This service provides a REST-based access to the WRM Regional Climate Model Evaluation database. To request
+<p>This service provides a REST-based access to the Regional Climate Model Evaluation database. To request
 data, please formulate a query as follows:</p>
 <code>
-<?php echo "http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}";?>datasetId=#&amp;parameterId=#&amp;latMin=#&amp;latMax=#&amp;lonMin=#&amp;lonMax=#&amp;timeStart=YYYYMMDDTHHMMZ&amp;timeEnd=YYYYMMDDTHHMMZ&amp;info=yes/no
+<?php echo "http://{$_SERVER['SERVER_NAME']}{$_SERVER['REQUEST_URI']}?";?>datasetId=#&amp;parameterId=#&amp;latMin=#&amp;latMax=#&amp;lonMin=#&amp;lonMax=#&amp;timeStart=YYYYMMDDTHHMMZ&amp;timeEnd=YYYYMMDDTHHMMZ&amp;info=yes/no
 </code>
 
 <h3>Query Parameters</h3>
@@ -261,7 +262,7 @@ data, please formulate a query as follows:</p>
   <dd>The ISO time marking the beginning of the desired time range (Format: YYYYMMDD<strong>T</strong>HHMM<strong>Z</strong>)</dd>
   <dt>timeEnd</dt>
   <dd>The ISO time marking the end of the time range (Format: YYYYMMDD<strong>T</strong>HHMM<strong>Z</strong>)</dd>
-  <dt>info</dt>
+  <dt>info (optional)</dt>
   <dd>The general parameter's information returns by setting this to "yes"</dd>
 </dl>
 
@@ -276,13 +277,14 @@ data, please formulate a query as follows:</p>
 <h3>Parameters (Postgres)</h3>
 <p>The following is a lookup table which can be used to obtain the correct parameter id of interest for any parameter in the database. </p>
 <table border="1" cellpadding="3">
-  <tr><th>Parameter</th><<th>Parameter Id</th><th>Dataset Id</th></tr>
+  <tr><th>Parameter</th><th>Parameter Id</th><th>Dataset Id</th></tr>
   <?php printParameterMap_pg(); ?>
 </table>
 
 </body>
 </html>
-<?php
+
+<?php 
 pg_close($master_link_pg);
 exit();
 ?>
