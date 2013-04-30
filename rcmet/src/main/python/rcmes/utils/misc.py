@@ -962,7 +962,49 @@ def selectSubRegion(subRegions):
         sys.exit()
     return rgnSelect
 
+def getStartEndTimes(status, startOverLapTime, endOverLapTime):
+    '''
+    This function will get the start and end time from user.
+    It also check whether or not user enters the proper time for both start and end.
+    If user leaves the start and end time empty, it will get the largest time range as default (overlap).
+    '''
 
+    if status == "start":
+        time = raw_input("Please Enter a Start Date in range [%s" % startOverLapTime.strftime('%Y-%m-%d') + " - %s]: " % endOverLapTime.strftime('%Y-%m-%d'))
+        if not time:
+            time = startOverLapTime
+            print "Your time starts from [%s] " % time.strftime('%Y-%m-%d')
+            return time
+        time = datetime.datetime.strptime(time, '%Y-%m-%d')
+        if time < startOverLapTime:
+            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is before the proper time [%s]."  % startOverLapTime.strftime('%Y-%m-%d')
+            time = getStartEndTimes("start", startOverLapTime, endOverLapTime)
+            return time
+        elif time > endOverLapTime:
+            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is after the proper time [%s]. " % endOverLapTime.strftime('%Y-%m-%d')
+            time = getStartEndTimes("start", startOverLapTime, endOverLapTime)
+            return time
+        else:
+            return time
+    
+    if status == "end":
+        time = raw_input("Please Enter a End Date in range [%s" % startOverLapTime.strftime('%Y-%m-%d') + " - %s]: " % endOverLapTime.strftime('%Y-%m-%d'))
+        if not time:
+            time = endOverLapTime
+            print "Your time ends by [%s] " % time.strftime('%Y-%m-%d')
+            return time
+        time = datetime.datetime.strptime(time, '%Y-%m-%d')
+        if time > endOverLapTime:
+            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is after the proper time [%s]. " % endOverLapTime.strftime('%Y-%m-%d')
+            time = getStartEndTimes("end", startOverLapTime, endOverLapTime)
+            return time
+        elif time < startOverLapTime:
+            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is before the proper time [%s]."  % startOverLapTime.strftime('%Y-%m-%d')
+            time = getStartEndTimes("end", startOverLapTime, endOverLapTime)
+            return time
+        else:
+            return time
+    
 def userDefinedStartEndTimes(obsList, modelList):
     """
     The function will interactively ask the user to select a start and end time based on the start/end times
@@ -1006,21 +1048,19 @@ def userDefinedStartEndTimes(obsList, modelList):
     overLap = (maxstartTimes.strftime('%Y-%m-%d'), minendTimes.strftime('%Y-%m-%d'))
     # Present default overlap to user as default value
     print 'Standard Overlap in the selected datasets are %s through %s' % (overLap)
+
+    startOverLapTime = datetime.datetime.strptime(overLap[0],'%Y-%m-%d')
+    endOverLapTime = datetime.datetime.strptime(overLap[1],'%Y-%m-%d')
+
     # Enter Start Date
-    defaultTime = datetime.datetime.strptime(overLap[0],'%Y-%m-%d')
-    startTime = raw_input("Please Enter a Start Date [%s]: " % defaultTime.strftime('%Y-%m-%d'))
-    if not startTime:
-        startTime = defaultTime
-    else:
-        startTime = datetime.datetime.strptime(startTime, '%Y-%m-%d')
-    
+    startTime = getStartEndTimes("start", startOverLapTime, endOverLapTime)    
     # Enter End Date
-    defaultTime = datetime.datetime.strptime(overLap[1],'%Y-%m-%d')
-    endTime = raw_input("Please Enter an End Date [%s]: " % defaultTime.strftime('%Y-%m-%d'))
-    if not endTime:
-        endTime = defaultTime
-    else:
-        endTime = datetime.datetime.strptime(endTime, '%Y-%m-%d')
+    endTime = getStartEndTimes("end", startOverLapTime, endOverLapTime)
+        
+    if startTime > endTime:
+        print "WARNING: The start time you entered [%s]" % startTime.strftime('%Y-%m-%d') + " is after the end time you entered [%s]." % endTime.strftime('%Y-%m-%d')
+        startTime = getStartEndTimes("start", startOverLapTime, endOverLapTime)
+        endTime = getStartEndTimes("end", startOverLapTime, endOverLapTime)
 
     return startTime, endTime
 
