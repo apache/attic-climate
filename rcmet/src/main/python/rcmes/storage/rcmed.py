@@ -7,7 +7,7 @@ Future work includes rolling the rcmed querying code into this module as well.
 
 import requests, json
 
-paramUri = 'http://rcmes.jpl.nasa.gov:8886/rcmed/param.json'
+paramUri = 'http://rcmes.jpl.nasa.gov/bottle/rcmed/param.json'
 
 def getParams(uri=paramUri):
     '''This will return all of the parameters from the database as
