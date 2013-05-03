@@ -38,7 +38,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
 
     # Use list comprehensions to deconstruct obsDatasetList
     #  ['TRMM_pr_mon', 'CRU3.1_pr']    Basically a list of Dataset NAME +'_' + parameter name - THE 'CRU*' one triggers unit conversion issues later
-    # the plan here is to use the obsDatasetList which contains a longname key we can use.
+    # the plan here is to use the obsDatasetList which contains a longName key we can use.
     obsList = [str(x['longname']) for x in obsDatasetList]
     # Also using the obsDatasetList with a key of ['dataset_id']
     obsDatasetId = [str(x['dataset_id']) for x in obsDatasetList]
