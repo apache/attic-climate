@@ -19,6 +19,7 @@ import sys
 
 from toolkit import process
 from utils import fortranfile
+from utils import misc
 
 
 VARIABLE_NAMES = {'time': ['time', 'times', 'date', 'dates', 'julian'],
@@ -328,104 +329,94 @@ def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
     timestore = process.decode_model_timesK(ifile, timeVarName, file_type)
     return timestore, t2tmp, varUnit
 
-def find_time_var_name_from_file(filename, timename, file_type):
-    # Function to find what the time variable is called in a model file.
-    #       Input: 
-    #               filelist -list of filenames
-    #       Output: 
-    #               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-    #       Peter Lean   February 2011
-    f = Nio.open_file(filename)
-    var_name_list = f.variables.keys()
+def findTimeVariable(filename):
+    """
+     Function to find what the time variable is called in a model file.
+        Input::
+            filename - file to crack open and check for a time variable
+        Output::
+            timeName - name of the input file's time variable
+            variableNameList - list of variable names from the input filename
+    """
+    try:
+        f = Nio.open_file(filename, mode='r')
+    except:
+        print("Unable to open '%s' to try and read the Time variable" % filename)
+        raise
 
+    variableNameList = f.variables.keys()
     # convert all variable names into lower case
-    var_name_list_lower = [x.lower() for x in var_name_list]
-
-    # create a "set" from this list of names
-    varset = set(var_name_list_lower)
+    varNameListLowerCase = [x.lower() for x in variableNameList]
 
     # Use "set" types for finding common variable name from in the file and from the list of possibilities
-    time_possible_names = set(['time', 'times', 'date', 'dates', 'julian'])
+    possibleTimeNames = set(['time', 'times', 'date', 'dates', 'julian'])
+    
+    # Use the sets to find the intersection where variable names are in possibleNames
+    timeNameSet = possibleTimeNames.intersection(varNameListLowerCase)
+    
+    if len(timeNameSet) == 0:
+        print("Unable to autodetect the Time Variable Name in the '%s'" % filename)
+        timeName = misc.askUserForVariableName(variableNameList, targetName ="Time")
+    
+    else:
+        timeName = timeNameSet.pop()
+    
+    return timeName, variableNameList
 
 
-    # Search for common latitude name variants:
-    # Find the intersection of two sets, i.e. find what latitude is called in this file.
+def findLatLonVarFromFile(filename):
+    """
+    Function to find what the latitude and longitude variables are called in a model file.
+    
+    Input:: 
+        -filename 
+    Output::
+        -latVarName
+        -lonVarName
+        -latMin 
+        -latMax
+        -lonMin
+        -lonMax
+    """
     try:
-        time_var_name = list(varset & time_possible_names)[0]
-        success = 1
-        index = 0
-        for i in var_name_list_lower:
-            if i == time_var_name:
-                wh = index
-            index += 1
-        timename = var_name_list[wh]
-
+        f = Nio.open_file(filename, mode='r')
     except:
-        timename = 'not_found'
-        success = 0
+        print("Unable to open '%s' to try and read the Latitude and Longitude variables" % filename)
+        raise
 
-    if success == 0:
-        timename = ''
-
-    return success, timename, var_name_list
-
-def find_latlon_var_from_file(filename, file_type, latname, lonname):
-    # Function to find what the latitude and longitude variables are called in a model file.
-    #       Input: 
-    #               -filename 
-    #       Output: 
-    #               -success flag (1 or 0): were both latitude and longitude variable names found in the file?
-    #               -latMin -descriptions of lat/lon ranges in data files
-    #               -latMax
-    #               -lonMin
-    #               -lonMax
-    #       Peter Lean   February 2011
-
-    f = Nio.open_file(filename, mode='r', options=None, format=file_type)
-    var_name_list = f.variables.keys()
+    variableNameList = f.variables.keys()
     # convert all variable names into lower case
-    var_name_list_lower = [x.lower() for x in var_name_list]
-    # create a "set" from this list of names
-    varset = set(var_name_list_lower)
+    varNameListLowerCase = [x.lower() for x in variableNameList]
 
     # Use "set" types for finding common variable name from in the file and from the list of possibilities
-    lat_possible_names = set(['latitude', 'lat', 'lats', 'latitudes'])
-    lon_possible_names = set(['longitude', 'lon', 'lons', 'longitudes'])
+    possibleLatNames = set(['latitude', 'lat', 'lats', 'latitudes'])
+    possibleLonNames = set(['longitude', 'lon', 'lons', 'longitudes'])
     
-    # Search for common latitude name variants:
-    # Find the intersection of two sets, i.e. find what latitude is called in this file.
-    try:
-        lats = f.variables[latname][:]
-        successlat = 1
-        latMin = lats.min()
-        latMax = lats.max()
+    # Use the sets to find the intersection where variable names are in possibleNames
+    latNameSet = possibleLatNames.intersection(varNameListLowerCase)
+    lonNameSet = possibleLonNames.intersection(varNameListLowerCase)
     
-    except:
-        latname = 'not_found'
-        successlat = 0
+    if len(latNameSet) == 0 or len(lonNameSet) == 0:
+        print("Unable to autodetect Latitude and/or Longitude values in the file")
+        latName = misc.askUserForVariableName(variableNameList, targetName ="Latitude")
+        lonName = misc.askUserForVariableName(variableNameList, targetName ="Longitude")
     
-    # Search for common longitude name variants:
-    # Find the intersection of two sets, i.e. find what longitude is called in this file.
-    try:
-        lons = f.variables[lonname][:]
-        successlon = 1
-        lons[lons > 180] = lons[lons > 180] - 360.
-        lonMin = lons.min()
-        lonMax = lons.max()
+    else:
+        latName = latNameSet.pop()
+        lonName = lonNameSet.pop()
+    
+    lats = np.array(f.variables[latName][:])
+    lons = np.array(f.variables[lonName][:])
+    
+    latMin = lats.min()
+    latMax = lats.max()
+    
+    # Convert the lons from 0:360 into -180:180
+    lons[lons > 180] = lons[lons > 180] - 360.
+    lonMin = lons.min()
+    lonMax = lons.max()
 
-    except:
-        successlon = 0
-
-    # check if both longs and lats are successfully read from the data file (send message only if unsuccessful).
-    success = 0
-    if(successlat == successlon == 1): success = 1
-    #if success==1: print 'in rcmes_v12.find_latlon_var_from_file: both long/lat found'
-    if success == 0:
-        latname = lonname = latMin = lonMin = latMax = lonMax = ''
-        print 'rcmes_v12.find_latlon_var_from_file: either/both long or/& lat corresponding'
-        print '  to the provided var names are not found. Check your var names or data files: Exit'
-        return -1, -1, -1, -1
-    return success, latMin, latMax, lonMin, lonMax
+    return latName, lonName, latMin, latMax, lonMin, lonMax
 
 
 def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarName, file_type):
