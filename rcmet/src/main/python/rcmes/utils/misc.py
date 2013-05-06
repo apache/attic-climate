@@ -12,7 +12,7 @@ import numpy as np
 import numpy.ma as ma
 import Nio
 
-from classes import SubRegion
+import classes
 
 from fortranfile import FortranFile
 
@@ -65,7 +65,7 @@ def generateSubRegions(regions):
     subRegions = []
     for region in regions:
         name, latMax, latMin, lonMax, lonMin = json.loads(region[1])
-        subRegion = SubRegion(name, latMin, lonMin, latMax, lonMax)
+        subRegion = classes.SubRegion(name, latMin, lonMin, latMax, lonMax)
         subRegions.append(subRegion)
 
     return subRegions
