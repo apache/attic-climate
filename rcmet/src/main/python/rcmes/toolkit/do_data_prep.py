@@ -3,7 +3,7 @@
 
 import numpy as np
 import numpy.ma as ma
-import sys
+import sys, os
 
 import Nio
 
@@ -46,7 +46,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
     obsParameterId = [str(x['parameter_id']) for x in obsDatasetList]
     obsTimestep = [str(x['timestep']) for x in obsDatasetList]
     mdlList = [model.filename for model in modelList]
-    
+
     # Since all of the model objects in the modelList have the same Varnames and Precip Flag, I am going to merely 
     # pull this from modelList[0] for now
     modelVarName = modelList[0].varName
@@ -255,10 +255,21 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
     ##       the total number of months, respectively, in later multi-model calculations.
 
     typeF = 'nc'
-    #mdlName = []
     regridMdlData = []
+    # extract the model names and store them in the list 'mdlList'
+    mdlName = []
+    mdlListReversed=[]
+    if len(mdlList) >1:
+       for element in mdlList:
+           mdlListReversed.append(element[::-1])
+       prefix=os.path.commonprefix(mdlList)
+       postfix=os.path.commonprefix(mdlListReversed)[::-1]
+       for element in mdlList:
+           mdlName.append(element.replace(prefix,'').replace(postfix,''))
+    else:
+        mdlName.append('model') 
+
     
-    # extract the model names and store them in the list 'mdlName'
     for n in np.arange(numMDLs):
         # read model grid info, then model data
         ifile = mdlList[n]
@@ -360,4 +371,4 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
 
     # Processing complete
     print 'data_prep is completed: both obs and mdl data are re-gridded to a common analysis grid'
-    return numOBSs, numMDLs, nT, ngrdY, ngrdX, Times, lons, lats, obsData, modelData, obsList, mdlList
+    return numOBSs, numMDLs, nT, ngrdY, ngrdX, Times, lons, lats, obsData, modelData, obsList, mdlName
