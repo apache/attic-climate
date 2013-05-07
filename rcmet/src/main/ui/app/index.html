@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/jasny-bootstrap.min.css"/>
   <link rel="stylesheet" href="css/jasny-bootstrap-responsive.min.css"/>
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+  <link rel="stylesheet" href="css/font-awesome.min.css"/>
   <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
   <![endif]-->
@@ -28,7 +29,34 @@
 	</div>
   </bootstrap-modal>
 
-  <h1>RCMET Evaluation UI</h1>
+  <bootstrap-modal modal-id="evaluationResults">
+  <div class="modal-header">
+  	<button class="close">&times;</button>
+  	<h3>Evaluation Results</h3>
+  </div>
+  <div class="modal-body">
+	  <p>
+	  Comparison: <a href="http://localhost:8082/static/evalResults/{{evalResults.comparisonPath}}">
+		  {{evalResults.comparisonPath}}</a>
+	  </p>
+	  <p>
+	  Model: <a href="http://localhost:8082/static/evalResults/{{evalResults.modelPath}}">
+		  {{evalResults.modelPath}}</a>
+	  </p>
+	  <p>
+	  Observation: <a href="http://localhost:8082/static/evalResults/{{evalResults.obsPath}}">
+		  {{evalResults.obsPath}}</a>
+	  </p>
+	  <p><img src="http://localhost:8082/static/evalResults/{{evalResults.comparisonPath}}" alt="" /></p>
+	  <p><img src="http://localhost:8082/static/evalResults/{{evalResults.modelPath}}" alt="" /></p>
+	  <p><img src="http://localhost:8082/static/evalResults/{{evalResults.obsPath}}" alt="" /></p>
+  </div>
+  <div class="modal-footer">
+	  <a href="#" class="btn btn-primary close">Close</a>
+  </div>
+  </bootstrap-modal>
+
+  <h1 id="rcmetHeader">RCMET Evaluation UI</h1>
   <div ng-controller="WorldMapCtrl">
     <sap id="map"></sap>
   </div>
@@ -38,52 +66,110 @@
       <div class="span1 offset2 text-center">Start Date:</div>
       <div class="span2">
         <form>
-          <input type="text" class="span2" ng-model="startDateInput"/>
+		  <input ng-model="displayStart" type="text" class="span2" />
         </form>
       </div>
       <div class="span1 text-center">End Date:</div>
       <div class="span2">
         <form>
-          <input type="text" class="span2" ng-model="endDateInput"/>
+		  <input ng-model="displayEnd" type="text" class="span2" />
         </form>
       </div>
       <div class="span1">
-        <button ng-click="runEvaluation()" ng-disabled="shouldDisableControls()" class="btn btn-primary">Evaluate</button>
+		<button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluate()" class="btn btn-block btn-primary">
+		  <div ng-hide="runningEval">Evaluate</div>
+		  <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
+		</button>
       </div>
       <div class="span2">
-        <button class="btn btn-success" bootstrap-modal-open="datasetSelect">Select a Dataset</button>
+        <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select a Dataset</button>
       </div>
+	  <div class="span1">
+		  <button class="btn btn-block btn-primary" ng-disabled="shouldDisableResultsView()" bootstrap-modal-open="evaluationResults">Results</button>
+	  </div>
     </div>
     <div class="row">
       <div class="span1 offset2 text-center">North:</div>
       <div class="span2">
         <form action="">
-          <input type="text" class="span2" ng-model="northInput"/>
+		  <input ng-model="displayLatMax" type="text" class="span2" />
         </form>
       </div>
       <div class="span1 text-center">East:</div>
       <div class="span2">
         <form>
-          <input type="text" class="span2" ng-model="eastInput"/>
+		  <input ng-model="displayLonMax" type="text" class="span2" />
         </form>
       </div>
       <div class="span1">
-        <button ng-click="updateParameters()" ng-disabled="shouldDisableControls()" class="btn btn-info">Update</button>
+        <button ng-click="updateParameters()" ng-disabled="shouldDisableControls()" class="btn btn-block btn-info">Update</button>
       </div>
+	  <div class="span2">
+		<button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear Datasets</button>
+	  </div>
     </div>
     <div class="row">
       <div class="span1 offset2 text-center">South:</div>
       <div class="span2">
         <form action="">
-          <input type="text" class="span2" ng-model="southInput"/>
+		  <input ng-model="displayLatMin" type="text" class="span2" />
         </form>
       </div>
       <div class="span1 text-center">West:</div>
       <div class="span2">
         <form>
-          <input type="text" class="span2" ng-model="westInput"/>
+		  <input ng-model="displayLonMin" type="text" class="span2" />
         </form>
       </div>
+    </div>
+  </div>
+  <!--Dataset display-->
+  <div ng-controller="DatasetDisplayCtrl">
+    <div ng-repeat="dataset in datasets">
+	  <div class="row displayRow">
+  	    <div class="span10 offset2"><hr /></div>
+	  </div>
+	  <div class="row displayRow">
+		<div class="span4 offset2">
+		  <input class="span6 text-center" type="text" value="{{dataset.name}}" />
+		</div>
+	  </div>
+	  <!--Time Values!-->
+      <div class="row displayRow">
+        <div class="span1 offset2 text-center">Start Date:</div>
+		<div class="span2">
+		  <input class="span2 text-center" type="text" value="{{dataset.timeVals.start}}" readonly/>
+		</div>
+        <div class="span1 text-center">End Date:</div>
+		<div class="span2">
+		  <input class="span2 text-center" type="text" value="{{dataset.timeVals.end}}" readonly/>
+		</div>
+	  </div>
+	  <!--Lat/Long Values!-->
+      <div class="row displayRow">
+        <div class="span1 offset2 text-center">North:</div>
+		<div class="span2">
+		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.latMax}}" readonly/>
+		</div>
+        <div class="span1 text-center">East:</div>
+		<div class="span2">
+		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMax}}" readonly/>
+		</div>
+		<div class="span2">
+		  <a class="btn btn-block" ng-click="removeDataset($index)">Remove Dataset</a>
+		</div>
+    <div class="span1" style="background-color: {{fillColors[$index]}}; height: 28px; width: 28px;"></div>
+	  </div>
+      <div class="row displayRow">
+        <div class="span1 offset2 text-center">South:</div>
+		<div class="span2">
+		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.latMin}}" readonly/>
+		</div>
+        <div class="span1 text-center">West:</div>
+		<div class="span2">
+		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMin}}" readonly/>
+		</div>
+	  </div>
     </div>
   </div>
 

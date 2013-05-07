@@ -35,6 +35,7 @@
 import sys
 import Nio
 import bottle
+from bottle import request
 import json
 
 #filename = sys.argv[1]
@@ -120,13 +121,16 @@ def find_latlon(filename):
     #                          'lonname':lonname,'latMin':latMin, \
     #                           'latMax':latMax,'lonMin':lonMin, \
     #                           'lonMax':lonMax }, sort_keys=True, indent=4)
+    if (request.query.callback):
+      return "%s(%s)" % (request.query.callback, output)
     return output
-    
 
   if success==0:
     json_output = json.dumps({'success':success,
                                  'variables':var_name_list }, \
                                 sort_keys=True, indent=4)
+    if (request.query.callback):
+      return "%s(%s)" % (request.query.callback, json_output)
     return json_output
     #print success, var_name_list
 

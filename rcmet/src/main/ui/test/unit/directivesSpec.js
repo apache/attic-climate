@@ -1,9 +1,5 @@
 'use strict';
 
-/* jasmine specs for directives go here */
-
-// This should be testing the Leaflet map directive...
-//*
 describe('directives', function() {
 	beforeEach(module('rcmes'));
 
@@ -17,8 +13,9 @@ describe('directives', function() {
 			})
 		});
 	});
-
 	//*/
+	
+	// Testing the Bootstrap Modal directive
 	describe('bootstrap-modal directive', function() {
 		it('should create a div element of the correct form', function() {
 			inject(function($compile, $rootScope) {
@@ -37,4 +34,3 @@ describe('directives', function() {
 		});
 	});
 });
-//*/

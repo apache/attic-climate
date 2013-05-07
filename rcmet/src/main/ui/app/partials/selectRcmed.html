@@ -1,7 +1,28 @@
 <ul class="nav nav-pills">
 	<li><a href="#/obs">Local File</a></li>
 	<li class="active"><a href="#/rcmed">RCMED</a></li>
-	<li class="disabled"><a href="#/egs">EGS</a></li>
+	<li class="disabled"><a href="#/esg">ESG</a></li>
 </ul>
 
-<h3>This is temporary placeholder</h3>
+<div class="row">
+	<div class="span5">
+		Select the RCMED dataset that you would like use.
+	</div>
+</div>
+<div class="row">
+	<div class="span4">
+		<select ng-change="dataSelectUpdated()" class="span5" ng-model="datasetSelection" ng-options="obs as obs.longname for obs in availableObs"></select>
+	</div>
+</div>
+<div class="row">
+	<div class="span5">
+		Select the dataset parameter that you would like to test.
+	</div>
+</div>
+<div class="row">
+	<div class="span4">
+		<select class="span3" ng-model="parameterSelection" ng-options="param as param.shortname for param in retrievedObsParams"></select>
+	</div>
+</div>
+
+<button class="btn" ng-click="addObservation()">Add Observation</button>

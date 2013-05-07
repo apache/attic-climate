@@ -28,6 +28,7 @@
 
 import sys
 import bottle
+from bottle import request
 import Nio
 import json
 import decode_model_times as dmt
@@ -71,10 +72,15 @@ def list_time(filename):
         end_time = str(max(times))
         time_var = json.dumps({'success':success,'timename':timename,
                                'start_time':start_time,'end_time':end_time})
+        #return time_var
+        if (request.query.callback):
+            return "%s(%s)" % (request.query.callback, time_var)
         return time_var
-    
+        
     if success==0:
         json_output = json.dumps({'success':success,'variables':var_name_list })
+    if (request.query.callback):
+        return "%s(%s)" % (request.query.callback, json_output)
     return json_output
        
     #print success, var_name_list

@@ -93,6 +93,8 @@ StaticServlet.prototype.handleRequest = function(req, res) {
   var parts = path.split('/');
   if (parts[parts.length-1].charAt(0) === '.')
     return self.sendForbidden_(req, res, path);
+  if (~path.indexOf("dirlist"))
+    return self.getDirList_(req, res, path);
   fs.stat(path, function(err, stat) {
     if (err)
       return self.sendMissing_(req, res, path);
@@ -163,6 +165,55 @@ StaticServlet.prototype.sendRedirect_ = function(req, res, redirectUrl) {
   res.end();
   util.puts('301 Moved Permanently: ' + redirectUrl);
 };
+
+StaticServlet.prototype.getDirList_ = function(req, res, path) {
+  res.writeHead(200, {
+	'Content-Type': 'json'
+  });
+
+  // Grab the passed path value
+  var pathQuery = url.parse(req.url, true).query.path
+  // Using the supplied path, grab directory information
+  var dirList = fs.readdirSync(pathQuery);
+
+  // Filter out any hidden files or current/previous directory references
+  dirList = dirList.filter(function(item, index, array) {
+	return (item[0] !== ".");
+  });
+  
+  // Generate the full path names for all the items found when 'ls'-ing 
+  // the passed directory.
+  dirList = dirList.map(function(item, index, array) {
+    var temp = item; 
+
+	// Make sure the path is joined properly. Sometimes there will be a trailing
+	// '/' in the path and sometimes there won't. Don't want to end up with '//'.
+    if (pathQuery[pathQuery.length - 1] === "/") {
+      temp = pathQuery + item;
+    } else {
+  	  temp = pathQuery + "/" + item;
+    }
+  
+	// We want the directories that are found to have a trailing '/'. Let's make sure
+	// that we do that!
+    var ret = temp;
+    if (fs.existsSync(temp + "/")) {
+     ret = temp + "/";
+    }  
+
+    return ret;
+  });
+  
+  // Sort all the results alphabetically ignoring case.
+  dirList = dirList.sort(function(a, b) {
+    if (a.toLowerCase() < b.toLowerCase()) return -1;
+    if (a.toLowerCase() > b.toLowerCase()) return 1;
+    return 0;
+  });
+
+  res.write(JSON.stringify(dirList));
+  res.end();
+}
 
 StaticServlet.prototype.sendFile_ = function(req, res, path) {
   var self = this;

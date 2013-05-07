@@ -160,6 +160,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
         time = timesraw[:]
         ntimes = len(time)
         print 'file= ', i, 'ntimes= ', ntimes, filelist[i]
+        print 't2raw shape: ', t2raw.shape
         
         # Flatten dimensions which needn't exist, i.e. level 
         #   e.g. if for single level then often data have 4 dimensions, when 3 dimensions will do.

@@ -3,9 +3,8 @@
 import sys
 sys.path.append('../../.')
 from bottle import route, request
-#import Nio
 import json
-import rcmes.cli.do_rcmes_processing_sub as awesome
+import cli.do_rcmes_processing_sub as awesome
 import time
 import datetime
 import os
@@ -101,10 +100,10 @@ def rcmes_go():
     
     awesome.do_rcmes(settings, params, model, mask, options)
     
-    model_path = os.path.join(workdir, plotFileNameOption + "model.000001.png")
-    obs_path = os.path.join(workdir, plotFileNameOption + "obs.000001.png")
-    comp_path = os.path.join(workdir, plotFileNameOption + ".000001.png")
-    
+    model_path = os.path.join(workdir, plotFileNameOption + "model.png")
+    obs_path = os.path.join(workdir, plotFileNameOption + "obs.png")
+    comp_path = os.path.join(workdir, plotFileNameOption + ".png")
+
     product_dict = {'modelPath':model_path,
                     'obsPath': obs_path,
                     'comparisonPath':comp_path}

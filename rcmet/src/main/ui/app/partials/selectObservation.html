@@ -1,31 +1,25 @@
 <ul class="nav nav-pills">
 	<li class="active"><a href="#/obs">Local File</a></li>
 	<li><a href="#/rcmed">RCMED</a></li>
-	<li class="disabled"><a href="#/egs">EGS</a></li>
+	<li class="disabled"><a href="#/esg">ESG</a></li>
 </ul>
 
-<div class="fileupload fileupload-new" data-provides="fileupload">
-	<div class="input-append">
-		<div class="uneditable-input span3">
-			<i class="icon-file fileupload-exists"></i> 
-			<span class="fileupload-preview"></span>
-		</div>
-		<span class="btn btn-file">
-			<span class="fileupload-new">Select file</span>
-			<span class="fileupload-exists">Change</span>
-			<input type="file" />
-		</span>
-		<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Remove</a>
-		<button class="btn fileupload-exists" ng-click="uploadLocalFile()">Upload File</button>
-	</div>
-</div>
+<form class="form-inline" autocomplete="off">
+	<input id="observationFileInput" predictive-file-browser-input ng-model="filePathInput" type="text" class="input-xlarge" autocomplete="off" />
+	<button class="btn" ng-click="uploadLocalFile()">Upload File</button>
+</form>
 
 <div class="row">
 	<div class="span2 text-center">
 		Parameter Option
 	</div>
 	<div class="span3">
-		<select>
+		<!--
+			This is not really the correct way to handle this. The commented code should be used, but
+			it's not working. So...
+		-->
+		<!--<select ng-model="paramSelect" ng-options="val for val in params"></select>-->
+		<select id="paramSelect">
 			<option ng-repeat="param in params">{{param}}</option>
 		</select>
 	</div>
@@ -33,7 +27,7 @@
 		Latitude Variable
 	</div>
 	<div class="span3">
-		<select>
+		<select id="latsSelect">
 			<option ng-repeat="lat in lats">{{lat}}</option>
 		</select>
 	</div>
@@ -41,7 +35,7 @@
 		Longitude Variable
 	</div>
 	<div class="span3">
-		<select>
+		<select id="lonsSelect">
 			<option ng-repeat="lon in lons">{{lon}}</option>
 		</select>
 	</div>
@@ -49,7 +43,7 @@
 		Date/Time Variable
 	</div>
 	<div class="span3">
-		<select>
+		<select id="timesSelect">
 			<option ng-repeat="time in times">{{time}}</option>
 		</select>
 	</div>

@@ -26,6 +26,7 @@
 import sys
 import Nio
 import bottle
+from bottle import request
 import json
 #filename = sys.argv[1]
 
@@ -44,10 +45,15 @@ def list_vars(filename):
     if success:  #make some json
       var_name_list = json.dumps({'variables':f.variables.keys() }, \
                                  sort_keys=True, indent=2)
+      if (request.query.callback):
+          return "%s(%s)" % (request.query.callback, var_name_list)
       return var_name_list
   
     else:
-      return "FAIL: "+filename
+      failRet = "{\"FAIL\": \""+filename+"\"}"
+      if (request.query.callback):
+          return "%s(%s)" % (request.query.callback, failRet)
+      return failRet
   
 
 
