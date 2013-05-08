@@ -1,4 +1,0 @@
-## Background
-The project is a collaboration between the [NASA Jet Propulsion Laboratory (JPL)](http://www.jpl.nasa.gov/) and the [UCLA Joint Institute for Regional Earth System Science and Engineering (JIFRESSE)](https://jifresse.ucla.edu/). The project initially targeted the water resources management community by supporting efforts at model- to-observational data comparisons in the California delta region near Sacramento, CA.
-
-Based largely on the success of that project, the scope of the RCMES has been expanded to support the broader international community of regional climate modelers, and to serve as both a resource and platform for performing data-intensive model evaluation experiments. More information about the project can be found by clicking on the [About]([SITE_ROOT]/about) tab, above.

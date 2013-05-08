@@ -1,2 +1,0 @@
-* [Foo]([SITE_ROOT]/foo)
-* [Bar]([SITE_ROOT]/bar)
