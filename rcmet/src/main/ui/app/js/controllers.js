@@ -5,7 +5,9 @@ function WorldMapCtrl($scope) {
 }
 
 // Controller for dataset parameter selection/modification
-function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
+function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
+	$scope.datasets = selectedDatasetInformation.getDatasets();
+
 	// The min/max lat/lon values from the selected datasets
 	$scope.latMin = -90;
 	$scope.latMax = 90;
@@ -102,7 +104,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 	}
 
 	$scope.shouldDisableControls = function() {
-		return ($rootScope.datasets.length < 2);
+		return (selectedDatasetInformation.getDatasetCount() < 2);
 	}
 
 	$scope.shouldDisableEvaluate = function() {
@@ -110,7 +112,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 	}
 
 	$scope.shouldDisableClearButton = function() {
-		return ($rootScope.datasets.length === 0)
+		return (selectedDatasetInformation.getDatasetCount() == 0);
 	}
 
 	$scope.shouldDisableResultsView = function() {
@@ -123,7 +125,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 	}
 
 	$scope.clearDatasets = function() {
-		$rootScope.datasets = [];
+		selectedDatasetInformation.clearDatasets();
 	}
 
 	$scope.runEvaluation = function() {
@@ -134,8 +136,9 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 		// be the long-term case! This needs to be changed!!!!!!!!
 		var obsIndex = -1,
 			modelIndex = -1;
-		for (var i = 0; i < $rootScope.datasets.length; i++) {
-			if ($rootScope.datasets[i]['isObs'] == 1)
+
+		for (var i = 0; i < $scope.datasets.length; i++) {
+			if ($scope.datasets[i]['isObs'] == 1)
 				obsIndex = i;
 			else
 				modelIndex = i;
@@ -149,19 +152,19 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 			type: "POST",
 			url: "http://localhost:8082/rcmes/run/", 
 			data: { 
-				"obsDatasetId"     : $rootScope.datasets[obsIndex]['id'],
-				"obsParameterId"   : $rootScope.datasets[obsIndex]['param'],
+				"obsDatasetId"     : $scope.datasets[obsIndex]['id'],
+				"obsParameterId"   : $scope.datasets[obsIndex]['param'],
 				"startTime"        : $scope.displayStart,
 				"endTime"          : $scope.displayEnd,
 				"latMin"           : $scope.displayLatMin,
 				"latMax"           : $scope.displayLatMax,
 				"lonMin"           : $scope.displayLonMin,
 				"lonMax"           : $scope.displayLonMax,
-				"filelist"         : $rootScope.datasets[modelIndex]['id'],
-				"modelVarName"     : $rootScope.datasets[modelIndex]['param'],
-				"modelTimeVarName" : $rootScope.datasets[modelIndex]['time'],
-				"modelLatVarName"  : $rootScope.datasets[modelIndex]['lat'],
-				"modelLonVarName"  : $rootScope.datasets[modelIndex]['lon'],
+				"filelist"         : $scope.datasets[modelIndex]['id'],
+				"modelVarName"     : $scope.datasets[modelIndex]['param'],
+				"modelTimeVarName" : $scope.datasets[modelIndex]['time'],
+				"modelLatVarName"  : $scope.datasets[modelIndex]['lat'],
+				"modelLonVarName"  : $scope.datasets[modelIndex]['lon'],
 				"regridOption"     : "model",
 				"timeRegridOption" : "monthly",
 				"metricOption"     : "bias",
@@ -261,7 +264,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 
 	$scope.$watch('datasets', 
 		function() { 
-			var numDatasets = $rootScope.datasets.length;
+			var numDatasets = $scope.datasets.length;
 
  			if (numDatasets) {
  				var latMin = -90,
@@ -273,7 +276,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
  			
  				// Get the valid lat/lon range in the selected datasets.
  				for (var i = 0; i < numDatasets; i++) {
- 					var curDataset = $rootScope.datasets[i];
+ 					var curDataset = $scope.datasets[i];
  	
  					latMin = (curDataset['latlonVals']['latMin'] > latMin) ? curDataset['latlonVals']['latMin'] : latMin;
  					latMax = (curDataset['latlonVals']['latMax'] < latMax) ? curDataset['latlonVals']['latMax'] : latMax;
@@ -297,14 +300,16 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout) {
 }
 
 // Controller for dataset display
-function DatasetDisplayCtrl($rootScope, $scope) {
+function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
+	$scope.datasets = selectedDatasetInformation.getDatasets();
+
 	$scope.removeDataset = function($index) {
-		$rootScope.datasets.splice($index, 1);
+		selectedDatasetInformation.removeDataset($index);
 	}
 }
 
 // Controller for observation selection in modal
-function ObservationSelectCtrl($rootScope, $scope, $http) {
+function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInformation) {
 	$scope.params = ["Please select a file above"];
 	$scope.lats = ["Please select a file above"];
 	$scope.lons = ["Please select a file above"];
@@ -404,7 +409,7 @@ function ObservationSelectCtrl($rootScope, $scope, $http) {
 		newDataset['time'] = $('#timesSelect').val();
 		newDataset['timeVals'] = {"start": $scope.timeVals[0], "end": $scope.timeVals[1]};
 
-		$rootScope.datasets.push(newDataset);
+		selectedDatasetInformation.addDataset(newDataset);
 
 		// Reset all the fields!!
 		$scope.params = ["Please select a file above"];
@@ -419,7 +424,7 @@ function ObservationSelectCtrl($rootScope, $scope, $http) {
 	}
 }
 
-function RcmedSelectionCtrl($rootScope, $scope, $http) {
+function RcmedSelectionCtrl($rootScope, $scope, $http, selectedDatasetInformation) {
 	var getObservations = function() {
 		$http.jsonp('http://localhost:8082/getObsDatasets?callback=JSON_CALLBACK').
 			success(function(data) {
@@ -480,7 +485,7 @@ function RcmedSelectionCtrl($rootScope, $scope, $http) {
 		// Set a default for the time variable names for display convenience.
 		newDataset['time'] = "N/A";
 
-		$rootScope.datasets.push(newDataset);
+		selectedDatasetInformation.addDataset(newDataset);
 
 		// Clear the user selections by requery-ing RCMED. This is really hacky, but it works for now...
 		$scope.availableObs = [];

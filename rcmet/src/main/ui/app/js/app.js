@@ -8,8 +8,29 @@ angular.module('rcmes', []).
 			otherwise({redirectTo: '/obs'});
 	}]).
 	run(function($rootScope) {
-		$rootScope.datasets = [];
 		$rootScope.evalResults = ""; 
 		$rootScope.fillColors = ['#ff0000', '#00c90d', '#cd0074', '#f3fd00'];
 		$rootScope.surroundColors = ['#a60000', '#008209', '#8f004b', '#93a400']
+	}).
+	service('selectedDatasetInformation', function() {
+		var datasets = [];
+
+		return {
+			getDatasets: function() {
+				return datasets;
+			},
+			getDatasetCount: function() {
+				return datasets.length;
+			},
+			// TODO: Define the structure of the objects that are added with addDataset.
+			addDataset: function(dataset) {
+				datasets.push(dataset);
+			},
+			removeDataset: function(index) {
+				datasets.splice(index, 1);
+			},
+			clearDatasets: function() {
+				datasets.length = 0;
+			},
+		};
 	});
