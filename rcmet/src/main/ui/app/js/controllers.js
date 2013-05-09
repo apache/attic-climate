@@ -1,8 +1,73 @@
 'use strict';
 
 // Controller for the world map
-function WorldMapCtrl($scope) {
-}
+function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
+	$scope.datasets = selectedDatasetInformation.getDatasets();
+	$scope.regionParams = regionSelectParams.getParameters();
+
+	$scope.updateMap = function() {
+ 		
+ 		// Clear Group of layers from map if it exists
+ 		if ("rectangleGroup" in $rootScope) {
+ 			$rootScope.rectangleGroup.clearLayers();
+ 		}
+
+		// Don't process if we don't have any datasets added!!
+		if ($scope.datasets.length == 0)
+			return;
+ 		
+ 		if ("map" in $rootScope) {
+ 			// Create Group to add all rectangles to map
+ 			$rootScope.rectangleGroup = L.layerGroup();
+ 			
+ 			// Loop through datasets and add rectangles to Group 
+			var i = 0;
+ 			angular.forEach($scope.datasets, function(dataset) {
+ 				// Get bounds from dataset 
+ 				var maplatlon = dataset.latlonVals;
+ 				var bounds = [[maplatlon.latMax, maplatlon.lonMin], 
+ 				              [maplatlon.latMin, maplatlon.lonMax]];
+ 	
+ 				var polygon = L.rectangle(bounds,{
+					stroke: false,
+					fillColor: $rootScope.fillColors[i],
+ 				    fillOpacity: 0.3
+ 				});
+
+ 				// Add layer to Group
+ 				$rootScope.rectangleGroup.addLayer(polygon);
+				i++;
+ 			});
+
+			// Draw user selected region
+			if ($scope.regionParams.latMin != "" && $scope.regionParams.latMax != "" && 
+				$scope.regionParams.lonMin != "" && $scope.regionParams.lonMax != "") {
+
+				var bounds = [[$scope.regionParams.latMax, $scope.regionParams.lonMin],
+							  [$scope.regionParams.latMin, $scope.regionParams.lonMax]];
+
+				var polygon = L.rectangle(bounds, {
+					color: '#000000',
+					opacity: 1.0,
+					fill: false,
+				});
+
+				$rootScope.rectangleGroup.addLayer(polygon);
+			}
+
+ 			// Add rectangle Group to map
+ 			$rootScope.rectangleGroup.addTo($rootScope.map);
+ 		}
+	};
+
+	$scope.$watch('datasets', function() {
+		$scope.updateMap();
+	}, true);
+
+	$scope.$watch('regionParams', function() {
+		$scope.updateMap();
+	}, true);
+};
 
 // Controller for dataset parameter selection/modification
 function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation, regionSelectParams) {
@@ -24,7 +89,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	$scope.enteredStart = "";
 	$scope.enteredEnd = "";
 
-	// The min/max lat/loon values that are displayed
+	// The min/max lat/lon values that are displayed
 	$scope.displayParams = regionSelectParams.getParameters();
 
 	$scope.runningEval = false;
@@ -197,78 +262,19 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 
 		// Check if the user values are valid and update the display values.
 		updateDisplayValues();
-		// Update the map
-		$scope.updateMap();
 	}
-
-	$scope.updateMap = function() {
- 		
- 		// Clear Group of layers from map if it exists
- 		if ("rectangleGroup" in $rootScope) {
- 			$rootScope.rectangleGroup.clearLayers();
- 		}
-
-		// Don't process if we don't have any datasets added!!
-		if ($scope.datasets.length == 0)
-			return;
- 		
- 		if ("map" in $rootScope) {
- 			// Create Group to add all rectangles to map
- 			$rootScope.rectangleGroup = L.layerGroup();
- 			
- 			// Loop through datasets and add rectangles to Group 
-			var i = 0;
- 			angular.forEach($scope.datasets, function(dataset) {
- 				
- 				// Get bounds from dataset 
- 				var maplatlon = dataset.latlonVals;
- 				var bounds = [[maplatlon.latMax, maplatlon.lonMin], 
- 				              [maplatlon.latMin, maplatlon.lonMax]];
- 	
- 				var polygon = L.rectangle(bounds,{
-					//color: $rootScope.surroundColors[i],
-					stroke: false,
-					fillColor: $rootScope.fillColors[i],
- 				    fillOpacity: 0.3
- 				});
- 				
- 				// Add layer to Group
- 				$rootScope.rectangleGroup.addLayer(polygon);
-				i++;
- 			});
-
-			// Draw user selected region
-			if ($scope.displayParams.latMin != "" && $scope.displayParams.latMax != "" && 
-				$scope.displayParams.lonMin != "" && $scope.displayParams.lonMax != "") {
-				var bounds = [[$scope.displayParams.latMax, $scope.displayParams.lonMin],
-							  [$scope.displayParams.latMin, $scope.displayParams.lonMax]];
-				var polygon = L.rectangle(bounds, {
-					//color: '#1921b1',
-					color: '#000000',
-					opacity: 1.0,
-					fill: false,
-				});
-
-				$rootScope.rectangleGroup.addLayer(polygon);
-			}
- 			
- 			// Add rectangle Group to map
- 			$rootScope.rectangleGroup.addTo($rootScope.map);
-
- 		}
- 	};
 
 	$scope.$watch('datasets', 
 		function() { 
 			var numDatasets = $scope.datasets.length;
 
  			if (numDatasets) {
- 				var latMin = -90,
- 					latMax = 90,
- 					lonMin = -180,
- 					lonMax = 180,
- 					start = "1980-01-01 00:00:00",
- 					end = "2030-01-01 00:00:00";
+				var latMin = -90,
+					latMax = 90,
+					lonMin = -180,
+					lonMax = 180,
+					start  = "1980-01-01 00:00:00",
+					end    = "2030-01-01 00:00:00";
  			
  				// Get the valid lat/lon range in the selected datasets.
  				for (var i = 0; i < numDatasets; i++) {
@@ -291,7 +297,6 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			$scope.end = end;
 
 			updateDisplayValues();
-			$scope.updateMap();
 		}, true);
 }
 
