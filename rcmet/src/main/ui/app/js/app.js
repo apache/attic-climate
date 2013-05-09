@@ -33,4 +33,20 @@ angular.module('rcmes', []).
 				datasets.length = 0;
 			},
 		};
-	});
+	}).
+	service('regionSelectParams', function() {
+		var parameters = {
+			"latMin": "",
+			"latMax": "",
+			"lonMin": "",
+			"lonMax": "",
+			"start" : "",
+			"end"   : "",
+		};
+
+		return {
+			getParameters: function() {
+				return parameters;
+			},
+		};
+   });

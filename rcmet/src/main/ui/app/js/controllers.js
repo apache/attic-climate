@@ -5,7 +5,7 @@ function WorldMapCtrl($scope) {
 }
 
 // Controller for dataset parameter selection/modification
-function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
+function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation, regionSelectParams) {
 	$scope.datasets = selectedDatasetInformation.getDatasets();
 
 	// The min/max lat/lon values from the selected datasets
@@ -25,12 +25,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	$scope.enteredEnd = "";
 
 	// The min/max lat/loon values that are displayed
-	$scope.displayLatMin = "";
-	$scope.displayLatMax = "";
-	$scope.displayLonMin = "";
-	$scope.displayLonMax = "";
-	$scope.displayStart = "";
-	$scope.displayEnd = "";
+	$scope.displayParams = regionSelectParams.getParameters();
 
 	$scope.runningEval = false;
 	
@@ -43,63 +38,63 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			// If it's not a valid value...
 			if ($scope.enteredLatMin < $scope.latMin) {
 				// Reset enteredLatMin to the "unmodified" state and display the correct value.
-				$scope.displayLatMin = $scope.latMin;
+				$scope.displayParams.latMin = $scope.latMin;
 			} else {
-				$scope.displayLatMin = $scope.enteredLatMin;
+				$scope.displayParams.latMin = $scope.enteredLatMin;
 			}
 		// Otherwise, just display the value.
 		} else { 
-			$scope.displayLatMin = $scope.latMin;
+			$scope.displayParams.latMin = $scope.latMin;
 		}
 		// Update latMax
 		if ($scope.enteredLatMin != "") {
 			if ($scope.enteredLatMax > $scope.latMax) {
-				$scope.displayLatMax = $scope.latMax;
+				$scope.displayParams.latMax = $scope.latMax;
 			} else {
-				$scope.displayLatMax = $scope.enteredLatMax;
+				$scope.displayParams.latMax = $scope.enteredLatMax;
 			}
 		} else { 
-			$scope.displayLatMax = $scope.latMax;
+			$scope.displayParams.latMax = $scope.latMax;
 		}
 		// Update lonMin
 		if ($scope.enteredLonMin != "") {
 			if ($scope.enteredLonMin < $scope.lonMin) {
-				$scope.displayLonMin = $scope.lonMin;
+				$scope.displayParams.lonMin = $scope.lonMin;
 			} else {
-				$scope.displayLonMin = $scope.enteredLonMin;
+				$scope.displayParams.lonMin = $scope.enteredLonMin;
 			}
 		} else { 
-			$scope.displayLonMin = $scope.lonMin;
+			$scope.displayParams.lonMin = $scope.lonMin;
 		}
 		// Update lonMax
 		if ($scope.enteredLonMax != "") {
 			if ($scope.enteredLonMax > $scope.lonMax) {
-				$scope.displayLonMax = $scope.lonMax;
+				$scope.displayParams.lonMax = $scope.lonMax;
 			} else {
-				$scope.displayLonMax = $scope.enteredLonMax;
+				$scope.displayParams.lonMax = $scope.enteredLonMax;
 			}
 		} else { 
-			$scope.displayLonMax = $scope.lonMax;
+			$scope.displayParams.lonMax = $scope.lonMax;
 		}
 		// Update Start time
 		if ($scope.enteredStart != "") {
 			if ($scope.enteredStart < $scope.start) {
-				$scope.displayStart = $scope.start;
+				$scope.displayParams.start = $scope.start;
 			} else {
-				$scope.displayStart = $scope.enteredStart;
+				$scope.displayParams.start = $scope.enteredStart;
 			}
 		} else {
-			$scope.displayStart = $scope.start;
+			$scope.displayParams.start = $scope.start;
 		}
 		// Update End time
 		if ($scope.enteredEnd != "") {
 			if ($scope.enteredEnd > $scope.end) {
-				$scope.displayEnd = $scope.end;
+				$scope.displayParams.end = $scope.end;
 			} else {
-				$scope.displayEnd = $scope.enteredEnd;
+				$scope.displayParams.end = $scope.enteredEnd;
 			}
 		} else {
-			$scope.displayEnd = $scope.end;
+			$scope.displayParams.end = $scope.end;
 		}
 	}
 
@@ -154,12 +149,12 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			data: { 
 				"obsDatasetId"     : $scope.datasets[obsIndex]['id'],
 				"obsParameterId"   : $scope.datasets[obsIndex]['param'],
-				"startTime"        : $scope.displayStart,
-				"endTime"          : $scope.displayEnd,
-				"latMin"           : $scope.displayLatMin,
-				"latMax"           : $scope.displayLatMax,
-				"lonMin"           : $scope.displayLonMin,
-				"lonMax"           : $scope.displayLonMax,
+				"startTime"        : $scope.displayParams.start,
+				"endTime"          : $scope.displayParams.end,
+				"latMin"           : $scope.displayParams.latMin,
+				"latMax"           : $scope.displayParams.latMax,
+				"lonMin"           : $scope.displayParams.lonMin,
+				"lonMax"           : $scope.displayParams.lonMax,
 				"filelist"         : $scope.datasets[modelIndex]['id'],
 				"modelVarName"     : $scope.datasets[modelIndex]['param'],
 				"modelTimeVarName" : $scope.datasets[modelIndex]['time'],
@@ -193,12 +188,12 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 
 	$scope.updateParameters = function() {
 		// Save the user input, even if it isn't valid.
-		$scope.enteredLatMin = $scope.displayLatMin;
-		$scope.enteredLatMax = $scope.displayLatMax;
-		$scope.enteredLonMin = $scope.displayLonMin;
-		$scope.enteredLonMax = $scope.displayLonMax;
-		$scope.enteredStart = $scope.displayStart;
-		$scope.enteredEnd = $scope.displayEnd;
+		$scope.enteredLatMin = $scope.displayParams.latMin;
+		$scope.enteredLatMax = $scope.displayParams.latMax;
+		$scope.enteredLonMin = $scope.displayParams.lonMin;
+		$scope.enteredLonMax = $scope.displayParams.lonMax;
+		$scope.enteredStart  = $scope.displayParams.start;
+		$scope.enteredEnd    = $scope.displayParams.end;
 
 		// Check if the user values are valid and update the display values.
 		updateDisplayValues();
@@ -243,9 +238,10 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
  			});
 
 			// Draw user selected region
-			if ($scope.displayLatMin != "" && $scope.displayLatMax != "" && $scope.displayLonMin != "" && $scope.displayLonMax != "") {
-				var bounds = [[$scope.displayLatMax, $scope.displayLonMin],
-							  [$scope.displayLatMin, $scope.displayLonMax]];
+			if ($scope.displayParams.latMin != "" && $scope.displayParams.latMax != "" && 
+				$scope.displayParams.lonMin != "" && $scope.displayParams.lonMax != "") {
+				var bounds = [[$scope.displayParams.latMax, $scope.displayParams.lonMin],
+							  [$scope.displayParams.latMin, $scope.displayParams.lonMax]];
 				var polygon = L.rectangle(bounds, {
 					//color: '#1921b1',
 					color: '#000000',
