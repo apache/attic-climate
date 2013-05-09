@@ -14,38 +14,25 @@
 		Parameter Option
 	</div>
 	<div class="span3">
-		<!--
-			This is not really the correct way to handle this. The commented code should be used, but
-			it's not working. So...
-		-->
-		<!--<select ng-model="paramSelect" ng-options="val for val in params"></select>-->
-		<select id="paramSelect">
-			<option ng-repeat="param in params">{{param}}</option>
-		</select>
+    <select ng-model="paramSelect" ng-options="param for param in params"></select>
 	</div>
 	<div class="span2 text-center">
 		Latitude Variable
 	</div>
 	<div class="span3">
-		<select id="latsSelect">
-			<option ng-repeat="lat in lats">{{lat}}</option>
-		</select>
+    <select ng-model="latsSelect" ng-options="lat for lat in lats"></select>
 	</div>
 	<div class="span2 text-center">
 		Longitude Variable
 	</div>
 	<div class="span3">
-		<select id="lonsSelect">
-			<option ng-repeat="lon in lons">{{lon}}</option>
-		</select>
+    <select ng-model="lonsSelect" ng-options="lon for lon in lons"></select>
 	</div>
 	<div class="span2 text-center">
 		Date/Time Variable
 	</div>
 	<div class="span3">
-		<select id="timesSelect">
-			<option ng-repeat="time in times">{{time}}</option>
-		</select>
+    <select ng-model="timeSelect" ng-options="time for time in times"></select>
 	</div>
 </div>
 

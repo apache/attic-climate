@@ -311,10 +311,17 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 
 // Controller for observation selection in modal
 function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInformation) {
-	$scope.params = ["Please select a file above"];
-	$scope.lats = ["Please select a file above"];
-	$scope.lons = ["Please select a file above"];
-	$scope.times = ["Please select a file above"];
+	// Initalize the option arrays and default to the first element
+	$scope.params      = ["Please select a file above"];
+	$scope.paramSelect = $scope.params[0];
+	$scope.lats        = ["Please select a file above"];
+	$scope.latsSelect  = $scope.lats[0];
+	$scope.lons        = ["Please select a file above"];
+	$scope.lonsSelect  = $scope.lons[0];
+	$scope.times       = ["Please select a file above"];
+	$scope.timeSelect  = $scope.times[0];
+
+	// TODO: We could probably completely remove these variables...
 	$scope.latLonVals = [];
 	$scope.timeVals = [];
 	$scope.localSelectForm = {};
@@ -336,13 +343,16 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 			success(function(data) {
 				if ("FAIL" in data) {
 					$scope.params = ["Unable to find variable(s)"];
-					return;
+				} else {
+					$scope.params = data['variables'];
 				}
 
-				$scope.params = data['variables'];
+				// Select the first element so the display isn't empty
+				$scope.paramSelect = $scope.params[0];
 			}).
 			error(function(data) {
 				$scope.params = ["Unable to find variable(s)"];
+				$scope.paramSelect = $scope.params[0];
 			});		
 
 		// Get Lat and Lon variables
@@ -351,17 +361,23 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 				if (data["success"] == 0) {
 					$scope.lats = ["Unable to find variable(s)"];
 					$scope.lons = ["Unable to find variable(s)"];
-					return;
+				} else {
+					$scope.lats = [data["latname"]];
+					$scope.lons = [data["lonname"]];
+
+					var tmpMinsMaxs = [data["latMin"], data["latMax"], data["lonMin"], data["lonMax"]];
+					$scope.latLonVals = tmpMinsMaxs.map(parseFloat);
 				}
 
-				$scope.lats = [data["latname"]];
-				$scope.lons = [data["lonname"]];
-				var tmpMinsMaxs = [data["latMin"], data["latMax"], data["lonMin"], data["lonMax"]];
-				$scope.latLonVals = tmpMinsMaxs.map(parseFloat);
+				// Select the first element so the displays aren't empty
+				$scope.latsSelect = $scope.lats[0];
+				$scope.lonsSelect = $scope.lons[0];
 			}).
 			error(function(data) {
 				$scope.lats = ["Unable to find variable(s)"];
 				$scope.lons = ["Unable to find variable(s)"];
+				$scope.latsSelect = $scope.lats[0];
+				$scope.lonsSelect = $scope.lons[0];
 			});		
 
 		// Get Time variables
@@ -369,19 +385,22 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 			success(function(data) {
 				if (data["success"] == 0) {
 					$scope.times = ["Unable to find variable(s)"];
-					return;
-				}
-
-				if (data["timename"] instanceof Array) {
-					$scope.times = data["timename"];
 				} else {
-					$scope.times = [data["timename"]];
+					if (data["timename"] instanceof Array) {
+						$scope.times = data["timename"];
+					} else {
+						$scope.times = [data["timename"]];
+					}
+
+					$scope.timeVals = [data["start_time"], data["end_time"]];
 				}
 
-				$scope.timeVals = [data["start_time"], data["end_time"]];
+				// Select the first element so the display isn't empty
+				$scope.timeSelect = $scope.times[0];
 			}).
 			error(function(data) {
 				$scope.times = ["Unable to find variable(s)"];
+				$scope.timeSelect = $scope.times[0];
 			});		
 	};
 
@@ -399,24 +418,29 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 		var splitFilePath = input.split('/');
 		newDataset['name'] = splitFilePath[splitFilePath.length - 1];
 		// Save the model parameter variable. We save it twice for consistency and display convenience.
-		newDataset['param'] = $('#paramSelect').val();
+		newDataset['param'] = $scope.paramSelect;
 		newDataset['paramName'] = newDataset['param'];
 		// Save the lat/lon information
-		newDataset['lat'] = $('#latsSelect').val();
-		newDataset['lon'] = $('#lonsSelect').val();
+		newDataset['lat'] = $scope.latsSelect;
+		newDataset['lon'] = $scope.lonsSelect;
+
 		newDataset['latlonVals'] = {"latMin": $scope.latLonVals[0], "latMax": $scope.latLonVals[1],
 									"lonMin": $scope.latLonVals[2], "lonMax": $scope.latLonVals[3]};
 		// Get the time information
-		newDataset['time'] = $('#timesSelect').val();
+		newDataset['time'] = $scope.timeSelect;
 		newDataset['timeVals'] = {"start": $scope.timeVals[0], "end": $scope.timeVals[1]};
 
 		selectedDatasetInformation.addDataset(newDataset);
 
 		// Reset all the fields!!
 		$scope.params = ["Please select a file above"];
+		$scope.paramSelect = $scope.params[0];
 		$scope.lats = ["Please select a file above"];
+		$scope.latsSelect = $scope.lats[0];
 		$scope.lons = ["Please select a file above"];
+		$scope.lonsSelect = $scope.lons[0];
 		$scope.times = ["Please select a file above"];
+		$scope.timeSelect = $scope.times[0];
 		$scope.latLonVals = [];
 		$scope.timeVals = [];
 
