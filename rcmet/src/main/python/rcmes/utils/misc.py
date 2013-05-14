@@ -53,6 +53,80 @@ def readSubRegionsFile(regionsFile):
     else:
         raise IOError
 
+def getSubRegionsInteractively(counts, workdir):
+    """
+    Purpose::
+        This function provides a commandline Q&A session to help users define 
+        SubRegion Objects.
+    Input::
+        counts - dictionary with int counts of various metric inputs
+            i.e. {'observations': 3,
+                  'models'      : 1,
+                  'times'       : 120}
+        workdir - string of the current working directory where auxillary files
+        can be found.  In this case the directory will be used to locate an 
+        existing sub_regions.txt file.
+
+    Output:: 
+        subRegions = List of Parsed SubRegion Objects based on User inputs 
+    """
+    do_timeseries = None
+    yes_no_list = ['y', 'n', '']
+    
+    while do_timeseries not in yes_no_list:
+        do_timeseries = raw_input('Calculate area-mean timeseries for subregions? y/n: [n] \n>>>')
+        if do_timeseries not in yes_no_list:
+            print("'%s' is not a valid answer please try again" % do_timeseries)
+
+    if do_timeseries == 'y':
+        interactive_subregions = None
+        while interactive_subregions not in yes_no_list:
+            interactive_subregions = raw_input('Input Sub Region info interactively? y/n: [n] \n>>>')
+            if interactive_subregions not in yes_no_list:
+                print("'%s' is not a valid answer please try again" % interactive_subregions)
+            
+        if interactive_subregions == 'y':
+            while interactive_subregions == 'y':
+                regions = []
+                region = createSubRegionObjectInteractively()
+                regions.append(region)
+                anotherRegion = None
+                while anotherRegion == None:
+                    another = raw_input("Would you like to add another sub region? y/n [n] \n>>>")
+                    if another not in yes_no_list:
+                        print("'%s' is not a valid answer please try again" % another)
+                    elif another in ['', 'n']:
+                        anotherRegion = 'n'
+                        interactive_subregions = 'n'
+                    else:
+                        anotherRegion = 'y'
+
+        else:
+            subRegionFilename = None
+            while subRegionFilename == None:
+                readDefault = raw_input('Read from a default file (workdir + "/sub_regions.txt")? y/n: [y] \n>>>')
+
+                if readDefault == 'y' or readDefault == '':
+                    subRegionFilename = workdir + "/sub_regions.txt"
+                    print("Attempting to parse %s..." % subRegionFilename)
+                    regions = readSubRegionsFile(subRegionFilename)
+
+                elif readDefault == 'n':
+                    while subRegionFilename == None:
+                        # ask about using a non default filename
+                        subRegionFilename = raw_input('Enter the full path to the Sub Region file to read from:\n>>>')
+                        print("Attempting to parse %s..." % subRegionFilename)
+                        regions = readSubRegionsFile(subRegionFilename)
+
+                elif readDefault == 'NONE':
+                    subRegionFilename = 'NONE'
+                    regions = []
+            
+                else:
+                    print("'%'s is not a valid selection.  Please try again.  To proceed without Sub Regions defined enter NONE at the prompt" % readDefault)
+
+        return regions
+
 def generateSubRegions(regions):
     """ Takes in a list of ConfigParser tuples and returns a list of SubRegion objects
     
@@ -921,28 +995,37 @@ def assign_subRgns_from_a_text_file(infile):
     print 'subRgnLat1: ', subRgnLat1
     return numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
 
-def assign_subRgns_interactively():
+def createSubRegionObjectInteractively():
     """
-     Interacrively select subregions for which area-mean time series are to be evaluated
-     input : GUI, a logical variable used to decide input option
-                  (interactive screen IO vs. pre-determined processing steps)
+    Purpose::
+        Mini command line program to enable users to enter SubRegion Information
+    Input::
+        None
+    Output::
+        SubRegion Object
     """
-    numSubRgn = int(raw_input('Enter the number of sub-Regions for examining the area-mean timeseries: \n> '))
-    subRgnName = []
-    subRgnLon0 = ma.zeros(numSubRgn)
-    subRgnLon1 = ma.zeros(numSubRgn)
-    subRgnLat0 = ma.zeros(numSubRgn)
-    subRgnLat1 = ma.zeros(numSubRgn)
-    if numSubRgn > 0:
-        for n in np.arange(numSubRgn):
-            print 'For the sub-region: ', n + 1
-            name = raw_input('Enter the sub-Region name: \n> ')
-            subRgnName.append(name)
-            subRgnLon0[n] = raw_input('Enter the beginning longitude of sub-Region: \n> ')
-            subRgnLon1[n] = raw_input('Enter the ending longitude of sub-Region: \n> ')
-            subRgnLat0[n] = raw_input('Enter the beginning latitude of sub-Region: \n> ')
-            subRgnLat1[n] = raw_input('Enter the ending latitude of sub-Region: \n> ')
-    return numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
+    rawInput = None
+    while rawInput == None:
+        userMessage = ("Enter information for 1 Sub Region using the following "
+                       "pipe '|' separated format: \n"
+                       "RegionName | Degrees North | Degrees South | Degrees East | Degrees West \n>>>")
+        userInput = raw_input(userMessage)
+        inputList = userInput.split('|')
+        if len(inputList) != 5:
+            badLengthMessage = ("Unable to parse %s.  You should have 5 inputs "
+                                "separated by 4 pipe characters. \n"
+                                "Example:  Region Name | 85 | 80 | 10 | -30" % userInput)
+            print(badLengthMessage)
+        else:
+            name = str(inputList[0]).strip()
+            latMax = str(inputList[1]).strip()
+            latMin = str(inputList[2]).strip()
+            lonMax = str(inputList[3]).strip()
+            lonMin = str(inputList[4]).strip()
+            subRegion = classes.SubRegion(name, latMin, lonMin, latMax, lonMax)
+            rawInput = True
+
+    return subRegion
 
 def selectSubRegion(subRegions):
     # interactively select the sub-region ID for area-mean time-series evaluation
@@ -1004,7 +1087,106 @@ def getStartEndTimes(status, startOverLapTime, endOverLapTime):
             return time
         else:
             return time
+
+def getDirSettings(settings):
+    """
+    This function will collect 2 parameters from the user about the RCMET run they have started.
     
+    Input::
+        settings - Empty Python Dictionary they will be used to store the user supplied inputs
+        
+    Output::
+        None - The user inputs will be added to the supplied dictionary.
+    """
+    settings['workDir'] = os.path.abspath(raw_input('Please enter workDir:\n> '))
+    if os.path.isdir(settings['workDir']):
+        pass
+    else:
+        makeDirectory(settings['workDir'])
+    
+    settings['cacheDir'] = os.path.abspath(raw_input('Please enter cacheDir:\n> '))
+    if os.path.isdir(settings['cacheDir']):
+        pass
+    else:
+        makeDirectory(settings['cacheDir'])
+
+def getModelFiles():
+    modelList = []
+    while len(modelList) < 1:
+        userInput = raw_input('Please enter model file (or specify multiple files using wildcard):\n> ')
+        modelList = glob.glob(userInput)
+        if len(modelList) == 0:
+            print("Sorry we were unable to find any files at - %s" % userInput)
+            print("Please try again, and use the asterisk * for the wildcard")
+        
+    return modelList
+
+def getTemporalGrid(settings):
+    options = ['annual', 'monthly', 'daily']
+    print("Please select one of the following Temporal Grid Options:\n")
+    for key, option in enumerate(options):
+        print("[%s] - %s" % (key, option))
+    choice = int(raw_input(">>>"))
+    try:
+        temporalGrid = options[choice]
+    except IndexError:
+        getTemporalGrid(settings)
+    else:
+        settings['temporalGrid'] = temporalGrid
+
+def getSpatialGrid():
+    options = ['obs', 'model', 'user']
+    print("Please select one of the following Spatial Grid Options:\n")
+    for key, option in enumerate(options):
+        print("[%s] - %s" % (key, option))
+
+    choice = int(raw_input(">>>"))
+    try:
+        spatialGrid = options[choice]
+    except IndexError:
+        getSpatialGrid()
+
+    return spatialGrid
+
+def askUserForVariableName(variableNames, targetName):
+    if targetName == "analysis":
+        print("Select the variable you want to use for analysis/metrics:")
+    else:
+        print("Select the variable that corresponds to %s:" % targetName)
+
+    for idx, variable in enumerate(variableNames):
+        print("[%s] - %s" % (idx, variable))
+    userChoice = int(raw_input(">>>"))
+    try:
+        variableName = variableNames[userChoice]
+    except IndexError:
+        askUserForVariableName(variableNames, targetName)
+    
+    return variableName
+        
+        
+
+def getLatLonStep(settings):
+    pass
+
+def getSpatialBounds(settings):
+    pass
+
+
+def getUserSpatialSettings(settings):
+    getLatLonStep(settings)
+    getSpatialBounds(settings)
+
+def makeDirectory(directory):
+    print "%s doesn't exist.  Trying to create it now." % directory
+    try:
+        os.mkdir(directory)
+        print("Created %s successfully" % directory)
+    except OSError:
+        print "This program cannot create dir: %s due to permission issues." % directory
+        sys.exit()
+
+
 def userDefinedStartEndTimes(obsList, modelList):
     """
     The function will interactively ask the user to select a start and end time based on the start/end times
@@ -1112,12 +1294,11 @@ def select_metrics():
     print 'Metric options'
     print '[0] Bias: mean bias across full time range'
     print '[1] Mean Absolute Error: across full time range'
-    print '[2] Anomaly Correlation> in time: results in 2-d array of temporal anom correln'
-    print '[3] Anomaly Correlation> in space: results in a single correlation coeff'
-    print '[4] Pattern Correlation> in time: results in 2-d array of temporal anom correln'
-    print '[5] Pattern Correlation> in space: results in a single correlation coeff'
-    print '[6] RMSE in time: results in a 2-d array of RMSE over two time series'
-    print '[7] TODO: Probability Distribution Function similarity score'
+    print '[2] Spatial Pattern Correlation: results in a time series of spatial correlation coeff'
+    print '[3] Temporal Correlation: results in 2-d array of temporal correlation coefficient'
+    print '[4] Spatial Pattern Correlation between averaged fields: results in a single correlation coeff'
+    print '[5] RMSE in time: results in a 2-d array of RMSE over two time series'
+    print '[6] TODO: Probability Distribution Function similarity score'
     choice = int(raw_input('Please make a selection from the options above\n> '))
     # assign the evaluation metric to be calculated
     if choice == 0:
@@ -1125,16 +1306,14 @@ def select_metrics():
     elif choice == 1:
         metricOption = 'MAE'
     elif choice == 2:
-        metricOption = 'ACCt'
+        metricOption = 'PCt'
     elif choice == 3:
-        metricOption = 'ACCs'
+        metricOption = 'TC'
     elif choice == 4:
-        metricOption = 'PCCt'
+        metricOption = 'PCC'
     elif choice == 5:
-        metricOption = 'PCCs'
-    elif choice == 6:
         metricOption = 'RMSt'
-    elif choice == 7:
+    elif choice == 6:
         metricOption = 'pdfSkillScore'
     print 'in subroutine metricOption = ', metricOption
     return metricOption

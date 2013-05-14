@@ -726,5 +726,3 @@ def createTimeTitle( options, timeSlice, rcmedData, modelData ):
     return timeTitle
 
 
-print 'RCMES processing completed.'
-

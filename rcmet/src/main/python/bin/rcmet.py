@@ -15,6 +15,7 @@ import storage.rcmed as db
 from toolkit import do_data_prep, process, metrics
 from utils import misc
 from classes import JobProperties, Model, GridBox
+from cli import rcmet_ui as ui
 
 parser = argparse.ArgumentParser(description='Regional Climate Model Evaluation Toolkit.  Use -h for help and options')
 parser.add_argument('-c', '--config', dest='CONFIG', help='Path to an evaluation configuration file')
@@ -38,29 +39,7 @@ def checkConfigSettings(config):
             _ =  misc.isDirGood(os.path.abspath(key_val[1]))
 
         else:
-            pass
-
-def getSettings(settings):
-    """
-    This function will collect 2 parameters from the user about the RCMET run they have started.
-    
-    Input::
-        settings - Empty Python Dictionary they will be used to store the user supplied inputs
-        
-    Output::
-        None - The user inputs will be added to the supplied dictionary.
-    """
-    settings['workDir'] = os.path.abspath(raw_input('Please enter workDir:\n> '))
-    if os.path.isdir(settings['workDir']):
-        pass
-    else:
-        makeDirectory(settings['workDir'])
-    
-    settings['cacheDir'] = os.path.abspath(raw_input('Please enter cacheDir:\n> '))
-    if os.path.isdir(settings['cacheDir']):
-        pass
-    else:
-        makeDirectory(settings['cacheDir'])    
+            pass    
 
 def setSettings(settings, config):
     """
@@ -75,14 +54,6 @@ def setSettings(settings, config):
         None - The settings dictionary will be updated in place.
     """
     pass
-
-def makeDirectory(directory):
-    print "%s doesn't exist.  Trying to create it now." % directory
-    try:
-        os.mkdir(directory)
-    except OSError:
-        print "This program cannot create dir: %s due to permission issues." % directory
-        sys.exit()
 
 def generateModels(modelConfig):
     """
@@ -134,7 +105,7 @@ def generateSettings(config):
             workdir - string i.e. '/nas/run/rcmet/work/'
             cachedir - string i.e. '/tmp/rcmet/cache/'
     Output::
-        settings - Settings Object
+        JobProperties - JobProperties Object
     """
     # Setup the config Data Dictionary to make parsing easier later
     configData = {}
@@ -201,6 +172,8 @@ def runUsingConfig(argsConfig):
         raise
 
     jobProperties = generateSettings(userConfig.items('SETTINGS'))
+    workdir = jobProperties.workDir
+    
     try:
         gridBox = GridBox(jobProperties.latMin, jobProperties.lonMin, jobProperties.latMax,
                           jobProperties.lonMax, jobProperties.gridLonStep, jobProperties.gridLatStep)
@@ -210,20 +183,6 @@ def runUsingConfig(argsConfig):
     models = generateModels(userConfig.items('MODEL'))
     
     datasetDict = makeDatasetsDictionary(userConfig.items('RCMED'))
-    
-    
-    try:
-        subRegionConfig = misc.configToDict(userConfig.items('SUB_REGION'))
-        subRegions = misc.parseSubRegions(subRegionConfig)
-        # REORDER SUBREGION OBJECTS until we standardize on Python 2.7
-        # TODO Remove once Python 2.7 support is finalized
-        if subRegions:
-            subRegions.sort(key=lambda x:x.name)
-        
-    except ConfigParser.NoSectionError:
-        print 'SUB_REGION header not defined.  Processing without SubRegion support'
-        subRegions = False
-        
 
 
     # Go get the parameter listing from the database
@@ -246,9 +205,27 @@ def runUsingConfig(argsConfig):
     numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlName = do_data_prep.prep_data(jobProperties, obsDatasetList, gridBox, models)
 
     print 'Input and regridding of both obs and model data are completed. now move to metrics calculations'
+    
+    try:
+        subRegionConfig = misc.configToDict(userConfig.items('SUB_REGION'))
+        subRegions = misc.parseSubRegions(subRegionConfig)
+        # REORDER SUBREGION OBJECTS until we standardize on Python 2.7
+        # TODO Remove once Python 2.7 support is finalized
+        if subRegions:
+            subRegions.sort(key=lambda x:x.name)
+        
+    except ConfigParser.NoSectionError:
+        
+        counts = {'observations': numOBS,
+                  'models'      : numMDL,
+                  'times'       : nT}
+        subRegions = misc.getSubRegionsInteractively(counts, workdir)
+        
+        if len(subRegions) == 0:
+            print 'Processing without SubRegion support'
+        
 
     # TODO: New function Call
-    workdir = jobProperties.workDir
     fileOutputOption = jobProperties.writeOutFile
     modelVarName = models[0].varName
     metrics.metrics_plots(modelVarName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlName, workdir, subRegions, fileOutputOption)
@@ -262,7 +239,6 @@ if __name__ == "__main__":
 
     else:
         print 'Interactive mode has been enabled'
-        #getSettings(SETTINGS)
-        print "But isn't implemented.  Try using the -c option instead"
+        ui.rcmetUI()
 
     #rcmet_cordexAF()

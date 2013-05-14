@@ -5,6 +5,7 @@ import urllib
 
 import storage.files as files
 import toolkit.process as process
+import utils.misc
 
 class BoundingBox(object):
     
@@ -69,24 +70,49 @@ class JobProperties(object):
     
 class Model(object):
     
-    def __init__(self, filename, latVariable, lonVariable, timeVariable, timeStep, varName, precipFlag):
-        self.filename = filename
-        self.name = os.path.basename(self.filename)
-        self.latVariable = latVariable
-        self.lonVariable = lonVariable
-        self.timeVariable = timeVariable
-        self.timeStep = timeStep
-        self.varName = varName
-        self.times, _ = process.getModelTimes(self.filename, self.timeVariable)
-        self.minTime = min(self.times)
-        self.maxTime = max(self.times)
-        self.setLatitudeRange()
-        self.setLongitudeRange()
+    def __init__(self, *args, **kwargs):
+        """
+        This Class can be instantiated with either a single filename or a dictionary of parameters.
+        If a single filename is used, then the class will use internal methods to parse the file 
+        and set the needed attributes.
+        
+        Input (single file)::
+            filename - Full path to a local model file
+        
+        Input (keyword dictionary)::
+            filename - Full path to a local model file
+            latVariable - the name of the latitude variable within the file
+            lonVariable - the name of the longitude variable within the file
+            timeVariable - the name of the time variable within the file
+            timeStep - description of the time between readings ['hourly','daily','monthly','annual']
+            varName - name of the variable to analyze within the model
+            precipFlag - boolean telling if this is precipitation data
+        
+        Output::
+            Model object
+        """
+        if len(args) == 1:
+            self.filename = args[0]
+            self.name = os.path.basename(self.filename)
+            self.processModelFile()
+        if len(kwargs) == 7:
+            self.filename = kwargs['filename']
+            self.name = os.path.basename(self.filename)
+            self.latVariable = kwargs['latVariable']
+            self.lonVariable = kwargs['lonVariable']
+            self.timeVariable = kwargs['timeVariable']
+            self.timeStep = kwargs['timeStep']
+            self.varName = kwargs['varName']
+            self.times, _ = process.getModelTimes(self.filename, self.timeVariable)
+            self.minTime = min(self.times)
+            self.maxTime = max(self.times)
+            self.setLatitudeRange()
+            self.setLongitudeRange()
     
-        if precipFlag == 'True':
-            self.precipFlag = True
-        else:
-            self.precipFlag = False
+            if kwargs['precipFlag'] == 'True':
+                self.precipFlag = True
+            else:
+                self.precipFlag = False
         
     
     def setLatitudeRange(self):
@@ -94,6 +120,17 @@ class Model(object):
     
     def setLongitudeRange(self):
         self.lonMin, self.lonMax = files.getVariableRange(self.filename, self.lonVariable)
+    
+    def processModelFile(self):
+        """ This series of steps should be consolidated to merely pass around a PyNIO object
+            Until then we will be opening the same file repeatedly.  And clearly wasting I/O
+        """
+        self.latVariable, self.lonVariable, self.latMin, self.latMax, self.lonMin, self.lonMax = files.findLatLonVarFromFile(self.filename)
+        self.timeVariable, modelVariables = files.findTimeVariable(self.filename)
+        self.times, self.timeStep = process.getModelTimes(self.filename, self.timeVariable)
+        self.varName = utils.misc.askUserForVariableName(modelVariables, "analysis")
+        self.minTime = min(self.times)
+        self.maxTime = max(self.times)
         
 class Parameter(object):
     def __init__(self, param_id, shortName=None, description=None, endDate=None ):
