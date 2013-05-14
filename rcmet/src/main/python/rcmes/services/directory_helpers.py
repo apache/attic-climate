@@ -27,7 +27,16 @@ def getDirectoryInfo(dirPath):
         returnJSON = []
 
     returnJSON = json.dumps(returnJSON)
-    if (request.query.callback):
+    if request.query.callback:
+        return "%s(%s)" % (request.query.callback, returnJSON)
+    else:
+        return returnJSON
+
+@route('/getPathLeader/')
+def getPathLeader():
+    returnJSON = {"leader": PATH_LEADER}
+
+    if request.query.callback:
         return "%s(%s)" % (request.query.callback, returnJSON)
     else:
         return returnJSON

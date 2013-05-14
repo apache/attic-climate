@@ -321,6 +321,13 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 	$scope.times       = ["Please select a file above"];
 	$scope.timeSelect  = $scope.times[0];
 
+	// Grab the path leader information that the webserver is using to limit directory access.
+	$scope.pathLeader = 'False';
+	$http.jsonp('http://localhost:8082/getPathLeader/?callback=JSON_CALLBACK').
+		success(function(data) {
+			$scope.pathLeader = data.leader;
+	});
+
 	// TODO: We could probably completely remove these variables...
 	$scope.latLonVals = [];
 	$scope.timeVals = [];
@@ -335,10 +342,16 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 		// it the wrong way temporarily...
 		var input = $('#observationFileInput').val();
 
+		// If the backend is limiting directory access we need to add that leader to our path
+		// so it remains valid!
+		if ($scope.pathLeader != 'False') {
+			input = $scope.pathLeader + input
+		}
+
 		// TODO: We're not really handling the case where there is a failure here at all. 
 		// Should check for fails and allow the user to make changes.
 		//
-	    // Get model variables
+		// Get model variables
 		$http.jsonp('http://localhost:8082/list/vars/"' + input + '"?callback=JSON_CALLBACK').
 			success(function(data) {
 				if ("FAIL" in data) {
@@ -410,6 +423,12 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 
 		var newDataset = {};
 		var input = $('#observationFileInput').val();
+
+		// If the backend is limiting directory access we need to add that leader to our path
+		// so it remains valid!
+		if ($scope.pathLeader != 'False') {
+			input = $scope.pathLeader + input
+		}
 
 		newDataset['isObs'] = 0;
 		// Save the model path. Note that the path is effectively the "id" for the model.
