@@ -310,7 +310,7 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 }
 
 // Controller for observation selection in modal
-function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInformation) {
+function ObservationSelectCtrl($rootScope, $scope, $http, $q, selectedDatasetInformation) {
 	// Initalize the option arrays and default to the first element
 	$scope.params      = ["Please select a file above"];
 	$scope.paramSelect = $scope.params[0];
@@ -328,12 +328,16 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 			$scope.pathLeader = data.leader;
 	});
 
-	// TODO: We could probably completely remove these variables...
+	// Toggle load button view depending on upload state of selected files
+	$scope.loadingFile = false;
+
 	$scope.latLonVals = [];
 	$scope.timeVals = [];
 	$scope.localSelectForm = {};
 
 	$scope.uploadLocalFile = function() {
+		$scope.loadingFile = true;
+
 		// TODO: Need to try to validate the input a bit. At least make sure we're not
 		// pointing at a directory perhaps?
 		
@@ -352,69 +356,49 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 		// Should check for fails and allow the user to make changes.
 		//
 		// Get model variables
-		$http.jsonp('http://localhost:8082/list/vars/"' + input + '"?callback=JSON_CALLBACK').
-			success(function(data) {
-				if ("FAIL" in data) {
-					$scope.params = ["Unable to find variable(s)"];
-				} else {
-					$scope.params = data['variables'];
-				}
-
-				// Select the first element so the display isn't empty
-				$scope.paramSelect = $scope.params[0];
-			}).
-			error(function(data) {
-				$scope.params = ["Unable to find variable(s)"];
-				$scope.paramSelect = $scope.params[0];
-			});		
-
+		var varsPromise = $http.jsonp('http://localhost:8082/list/vars/"' + input + '"?callback=JSON_CALLBACK');
 		// Get Lat and Lon variables
-		$http.jsonp('http://localhost:8082/list/latlon/"' + input + '"?callback=JSON_CALLBACK').
-			success(function(data) {
-				if (data["success"] == 0) {
-					$scope.lats = ["Unable to find variable(s)"];
-					$scope.lons = ["Unable to find variable(s)"];
-				} else {
-					$scope.lats = [data["latname"]];
-					$scope.lons = [data["lonname"]];
-
-					var tmpMinsMaxs = [data["latMin"], data["latMax"], data["lonMin"], data["lonMax"]];
-					$scope.latLonVals = tmpMinsMaxs.map(parseFloat);
-				}
-
-				// Select the first element so the displays aren't empty
-				$scope.latsSelect = $scope.lats[0];
-				$scope.lonsSelect = $scope.lons[0];
-			}).
-			error(function(data) {
-				$scope.lats = ["Unable to find variable(s)"];
-				$scope.lons = ["Unable to find variable(s)"];
-				$scope.latsSelect = $scope.lats[0];
-				$scope.lonsSelect = $scope.lons[0];
-			});		
-
+		var latlonPromise = $http.jsonp('http://localhost:8082/list/latlon/"' + input + '"?callback=JSON_CALLBACK');
 		// Get Time variables
-		$http.jsonp('http://localhost:8082/list/time/"' + input + '"?callback=JSON_CALLBACK').
-			success(function(data) {
-				if (data["success"] == 0) {
-					$scope.times = ["Unable to find variable(s)"];
-				} else {
-					if (data["timename"] instanceof Array) {
-						$scope.times = data["timename"];
-					} else {
-						$scope.times = [data["timename"]];
-					}
+		var timesPromise = $http.jsonp('http://localhost:8082/list/time/"' + input + '"?callback=JSON_CALLBACK');
 
-					$scope.timeVals = [data["start_time"], data["end_time"]];
+			$q.all([varsPromise, latlonPromise, timesPromise]).then(
+				// Handle success fetches!
+				function(arrayOfResults) {
+					$scope.loadingFile = false;
+
+					// Handle parameter results
+					var data = arrayOfResults[0].data.variables;
+					$scope.params = (data instanceof Array) ? data : [data];
+					$scope.paramSelect = $scope.params[0];
+
+					// Handle lat/lon results
+					var data = arrayOfResults[1].data;
+					$scope.lats = [data.latname];
+					$scope.lons = [data.lonname];
+					$scope.latLonVals = [data.latMin, data.latMax, data.lonMin, data.lonMax];
+					$scope.latsSelect = $scope.lats[0];
+					$scope.lonsSelect = $scope.lons[0];
+
+					// Handle time results
+					var data = arrayOfResults[2].data
+					$scope.times = [data.timename];
+					$scope.timeSelect = $scope.times[0];
+				},
+				// Uh oh! AT LEAST on of our fetches failed
+				function(arrayOfFailure) {
+					$scope.loadingFile = false;
+
+					$scope.params      = ["Unable to load variable(s)"];
+					$scope.paramSelect = $scope.params[0];
+					$scope.lats        = ["Unable to load variable(s)"];
+					$scope.latsSelect  = $scope.lats[0];
+					$scope.lons        = ["Unable to load variable(s)"];
+					$scope.lonsSelect  = $scope.lons[0];
+					$scope.times       = ["Unable to load variable(s)"];
+					$scope.timeSelect  = $scope.times[0];
 				}
-
-				// Select the first element so the display isn't empty
-				$scope.timeSelect = $scope.times[0];
-			}).
-			error(function(data) {
-				$scope.times = ["Unable to find variable(s)"];
-				$scope.timeSelect = $scope.times[0];
-			});		
+			);
 	};
 
 	$scope.addDataSet = function() {
@@ -465,6 +449,10 @@ function ObservationSelectCtrl($rootScope, $scope, $http, selectedDatasetInforma
 
 		// Clear the input box
 		$('#observationFileInput').val("");
+	}
+
+	$scope.shouldDisableLoadButton = function() {
+		return $scope.loadingFile;
 	}
 }
 

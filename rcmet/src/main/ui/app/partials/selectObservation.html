@@ -6,7 +6,10 @@
 
 <form class="form-inline" autocomplete="off">
 	<input id="observationFileInput" predictive-file-browser-input ng-model="filePathInput" type="text" class="input-xlarge" autocomplete="off" />
-	<button class="btn" ng-click="uploadLocalFile()">Upload File</button>
+	<button class="btn" ng-click="uploadLocalFile()" ng-disabled="shouldDisableLoadButton()">
+    <div ng-hide="loadingFile">Load File</div>
+    <div ng-show="loadingFile"><i class="icon-spinner icon-spin"></i></div>
+  </button>
 </form>
 
 <div class="row">
