@@ -310,7 +310,7 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 }
 
 // Controller for observation selection in modal
-function ObservationSelectCtrl($rootScope, $scope, $http, $q, selectedDatasetInformation) {
+function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 	// Initalize the option arrays and default to the first element
 	$scope.params      = ["Please select a file above"];
 	$scope.paramSelect = $scope.params[0];
@@ -330,6 +330,9 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, selectedDatasetInf
 
 	// Toggle load button view depending on upload state of selected files
 	$scope.loadingFile = false;
+
+	// Toggle display of a confirmation when loading a dataset
+	$scope.fileAdded = false;
 
 	$scope.latLonVals = [];
 	$scope.timeVals = [];
@@ -362,43 +365,43 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, selectedDatasetInf
 		// Get Time variables
 		var timesPromise = $http.jsonp('http://localhost:8082/list/time/"' + input + '"?callback=JSON_CALLBACK');
 
-			$q.all([varsPromise, latlonPromise, timesPromise]).then(
-				// Handle success fetches!
-				function(arrayOfResults) {
-					$scope.loadingFile = false;
+		$q.all([varsPromise, latlonPromise, timesPromise]).then(
+			// Handle success fetches!
+			function(arrayOfResults) {
+				$scope.loadingFile = false;
 
-					// Handle parameter results
-					var data = arrayOfResults[0].data.variables;
-					$scope.params = (data instanceof Array) ? data : [data];
-					$scope.paramSelect = $scope.params[0];
+				// Handle parameter results
+				var data = arrayOfResults[0].data.variables;
+				$scope.params = (data instanceof Array) ? data : [data];
+				$scope.paramSelect = $scope.params[0];
 
-					// Handle lat/lon results
-					var data = arrayOfResults[1].data;
-					$scope.lats = [data.latname];
-					$scope.lons = [data.lonname];
-					$scope.latLonVals = [data.latMin, data.latMax, data.lonMin, data.lonMax];
-					$scope.latsSelect = $scope.lats[0];
-					$scope.lonsSelect = $scope.lons[0];
+				// Handle lat/lon results
+				var data = arrayOfResults[1].data;
+				$scope.lats = [data.latname];
+				$scope.lons = [data.lonname];
+				$scope.latLonVals = [data.latMin, data.latMax, data.lonMin, data.lonMax];
+				$scope.latsSelect = $scope.lats[0];
+				$scope.lonsSelect = $scope.lons[0];
 
-					// Handle time results
-					var data = arrayOfResults[2].data
-					$scope.times = [data.timename];
-					$scope.timeSelect = $scope.times[0];
-				},
-				// Uh oh! AT LEAST on of our fetches failed
-				function(arrayOfFailure) {
-					$scope.loadingFile = false;
+				// Handle time results
+				var data = arrayOfResults[2].data
+				$scope.times = [data.timename];
+				$scope.timeSelect = $scope.times[0];
+			},
+			// Uh oh! AT LEAST on of our fetches failed
+			function(arrayOfFailure) {
+				$scope.loadingFile = false;
 
-					$scope.params      = ["Unable to load variable(s)"];
-					$scope.paramSelect = $scope.params[0];
-					$scope.lats        = ["Unable to load variable(s)"];
-					$scope.latsSelect  = $scope.lats[0];
-					$scope.lons        = ["Unable to load variable(s)"];
-					$scope.lonsSelect  = $scope.lons[0];
-					$scope.times       = ["Unable to load variable(s)"];
-					$scope.timeSelect  = $scope.times[0];
-				}
-			);
+				$scope.params      = ["Unable to load variable(s)"];
+				$scope.paramSelect = $scope.params[0];
+				$scope.lats        = ["Unable to load variable(s)"];
+				$scope.latsSelect  = $scope.lats[0];
+				$scope.lons        = ["Unable to load variable(s)"];
+				$scope.lonsSelect  = $scope.lons[0];
+				$scope.times       = ["Unable to load variable(s)"];
+				$scope.timeSelect  = $scope.times[0];
+			}
+		);
 	};
 
 	$scope.addDataSet = function() {
@@ -449,6 +452,12 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, selectedDatasetInf
 
 		// Clear the input box
 		$('#observationFileInput').val("");
+
+		// Display a confirmation message for a little bit
+		$scope.fileAdded = true;
+		$timeout(function() {
+			$scope.fileAdded = false;
+		}, 2000);
 	}
 
 	$scope.shouldDisableLoadButton = function() {
@@ -456,7 +465,9 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, selectedDatasetInf
 	}
 }
 
-function RcmedSelectionCtrl($rootScope, $scope, $http, selectedDatasetInformation) {
+function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
+	$scope.fileAdded = false;
+
 	var getObservations = function() {
 		$http.jsonp('http://localhost:8082/getObsDatasets?callback=JSON_CALLBACK').
 			success(function(data) {
@@ -523,6 +534,12 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, selectedDatasetInformatio
 		$scope.availableObs = [];
 		$scope.retrievedObsParams = [];
 		getObservations();
+
+		// Display a confirmation message for a little bit
+		$scope.fileAdded = true;
+		$timeout(function() {
+			$scope.fileAdded = false;
+		}, 2000);
 	};
 
 	// Grab the available observations from RCMED
