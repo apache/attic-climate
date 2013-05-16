@@ -9,9 +9,9 @@ directive('sap', function($rootScope) {
 		template: '<div></div>',
 		link: function(scope, element, attrs) {
 			$rootScope.map = L.map(attrs.id, {
-				//center: [40, -86],
 				center: [40, 0],
-				zoom: 2
+				zoom: 2,
+				scrollWheelZoom: false,
 			});
 			//create a CloudMade tile layer and add it to the map
 			L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {
