@@ -492,6 +492,8 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDataset
 		$http.jsonp('http://localhost:8082/getObsDatasets?callback=JSON_CALLBACK').
 			success(function(data) {
 				$scope.availableObs = data;
+				$scope.availableObs.splice(0, 0, {longname: 'Please select an option'});
+				$scope.datasetSelection = $scope.availableObs[0];
 			}).
 			error(function(data) {
 				$scope.availableObs = ["Unable to query RCMED"]
@@ -518,6 +520,9 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDataset
 		$http.jsonp(urlString).
 			success(function(data) {
 				$scope.retrievedObsParams = data;
+				if ($scope.retrievedObsParams.length > 1) 
+					$scope.retrievedObsParams.splice(0, 0, {shortname: 'Please select a parameter'});
+				$scope.parameterSelection = $scope.retrievedObsParams[0];
 			});
 	};
 
