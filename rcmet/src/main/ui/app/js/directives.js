@@ -32,14 +32,18 @@ directive('bootstrapModal', function($timeout) {
 				closeModal();
 		}
 
-		openModal = function(event, hasBackground, hasEscapeExit) {
+		openModal = function(event, toggleBackground, toggleKeyboardEscape) {
 			// Grab the current modal tag based on the modalId attribute in the bootstrapModal tag
 			var modal = $('#' + attrs.modalId);
 
 			// Make all the modal's children of class "close" call the appropriate function for closing!
 			$('.close', modal).bind('click', closeModal);
 
-			modal.modal('show');
+			modal.modal({
+				show: true,
+				backdrop: toggleBackground,
+				keyboard: toggleKeyboardEscape,
+			});
 		};
 
 		closeModal = function(event) {
@@ -76,11 +80,11 @@ directive('bootstrapModalOpen', function() {
 		link: function(scope, elem, attrs) {
 			// Default to showing the background if the user didn't specify a value for this.
 			var hasBackground = (attrs.background === undefined ? true : attrs.background);
-			// Default to allowing an exit on escape if the user didn't provide a value for this.
-			var hasEscapeExit = (attrs.escapeExit === undefined ? true : attrs.escapeExit);
+			// Enable keyboard closing of modal with escape key.
+			var hasKeyboardEscape = (attrs.keyboard === undefined ? true : attrs.keyboard);
 
 			$(elem).bind('click', function() {
-				$('#' + attrs.bootstrapModalOpen).trigger('modalOpen', hasBackground, hasEscapeExit);
+				$('#' + attrs.bootstrapModalOpen).trigger('modalOpen', [hasBackground, hasKeyboardEscape]);
 			});
 		}
 	};
