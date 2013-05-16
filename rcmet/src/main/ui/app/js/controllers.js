@@ -311,6 +311,9 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 
 // Controller for observation selection in modal
 function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
+	// Grab a copy of the datasets so we can display a count to the user!
+	$scope.datasetCount = selectedDatasetInformation.getDatasets();
+
 	// Initalize the option arrays and default to the first element
 	$scope.params      = ["Please select a file above"];
 	$scope.paramSelect = $scope.params[0];
@@ -466,6 +469,8 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 }
 
 function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
+	// Grab a copy of the datasets so we can display a count to the user!
+	$scope.datasetCount = selectedDatasetInformation.getDatasets();
 	$scope.fileAdded = false;
 
 	var getObservations = function() {
