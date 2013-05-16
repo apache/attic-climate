@@ -373,11 +373,6 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 			function(arrayOfResults) {
 				$scope.loadingFile = false;
 
-				// Handle parameter results
-				var data = arrayOfResults[0].data.variables;
-				$scope.params = (data instanceof Array) ? data : [data];
-				$scope.paramSelect = $scope.params[0];
-
 				// Handle lat/lon results
 				var data = arrayOfResults[1].data;
 				$scope.lats = [data.latname];
@@ -390,6 +385,17 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 				var data = arrayOfResults[2].data
 				$scope.times = [data.timename];
 				$scope.timeSelect = $scope.times[0];
+
+				// Handle parameter results
+				var data = arrayOfResults[0].data.variables;
+				$scope.params = (data instanceof Array) ? data : [data];
+				$scope.params = $.grep($scope.params, 
+									function(val) {
+										return ($.inArray(val, $scope.lats)  != 0 && 
+											    $.inArray(val, $scope.lons)  != 0 && 
+											    $.inArray(val, $scope.times) != 0);
+									});
+				$scope.paramSelect = $scope.params[0];
 			},
 			// Uh oh! AT LEAST on of our fetches failed
 			function(arrayOfFailure) {
