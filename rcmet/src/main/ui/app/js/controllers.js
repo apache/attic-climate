@@ -378,12 +378,19 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 				$scope.lats = [data.latname];
 				$scope.lons = [data.lonname];
 				$scope.latLonVals = [data.latMin, data.latMax, data.lonMin, data.lonMax];
+
+				// If there is more than one option for the user, tell them they need to pick one!
+				if ($scope.lats.length > 1) $scope.lats.splice(0, 0, "Please select an option");
+				if ($scope.lons.length > 1) $scope.lons.splice(0, 0, "Please select an option");
+				// Default the display to the first available option.
 				$scope.latsSelect = $scope.lats[0];
 				$scope.lonsSelect = $scope.lons[0];
 
 				// Handle time results
 				var data = arrayOfResults[2].data
 				$scope.times = [data.timename];
+
+				if ($scope.times.length > 1) $scope.times.splice(0, 0, "Please select an option");
 				$scope.timeSelect = $scope.times[0];
 
 				// Handle parameter results
@@ -392,9 +399,11 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 				$scope.params = $.grep($scope.params, 
 									function(val) {
 										return ($.inArray(val, $scope.lats)  != 0 && 
-											    $.inArray(val, $scope.lons)  != 0 && 
-											    $.inArray(val, $scope.times) != 0);
+												$.inArray(val, $scope.lons)  != 0 && 
+												$.inArray(val, $scope.times) != 0);
 									});
+				
+				if ($scope.params.length > 1) $scope.params.splice(0, 0, "Please select an option");
 				$scope.paramSelect = $scope.params[0];
 			},
 			// Uh oh! AT LEAST on of our fetches failed
