@@ -36,48 +36,13 @@ directive('bootstrapModal', function($timeout) {
 			// Grab the current modal tag based on the modalId attribute in the bootstrapModal tag
 			var modal = $('#' + attrs.modalId);
 
-			//if (hasBackground) {
-				//// Check if there is a modal-backdrop tag and add it if it doesn't exist
-				//if (!document.getElementById('modal-backdrop')) {
-					//$('body').append('<div id="modal-backdrop" class="modal-backdrop"></div>');
-				//}
-
-				//// Show the modal background and bind a click event to the function for closing the modal
-				//$('#modal-backdrop').
-					//css({display: 'block'}).
-					//bind('click', closeModal);
-			//}
-
-			//// Pressing escape should close the modal
-			//if (hasEscapeExit) {
-				//$('body').bind('keyup', escapeEvent);
-			//}
-
 			// Make all the modal's children of class "close" call the appropriate function for closing!
 			$('.close', modal).bind('click', closeModal);
 
-			// Display the modal
-			// modal.css({display: 'block'});
-			// If we want to animate the modals later the open and close functions can be changed
-			// to effectively be a simple function call. This is arguably the better way to handle
-			// this anyway! Then again, switching to http://angular-ui.github.io/bootstrap/ is probably
-			// even better...
 			modal.modal('show');
 		};
 
 		closeModal = function(event) {
-			// Clean up the modal-backdrop by removing the click event and hiding it.
-			//$('#modal-backdrop').
-				//unbind('click', closeModal).
-				//css({display: 'none'});
-
-			//// Remove the event for closing the body from the body
-			//$('body').
-				//unbind('keyup', escapeEvent)
-
-			// Hide the modal
-			//$('#' + attrs.modalId).css({display: 'none'});
-			// See above about animation
 			$('#' + attrs.modalId).modal('hide');
 			
 		};
@@ -99,8 +64,6 @@ directive('bootstrapModal', function($timeout) {
 		scope: {
 			modalId: '@' 
 		},
-		//template: '<div id="{{modalId}}" class="modal hide"><div ng-transclude></div></div>',
-		// We can't have fade if we use the display: {block,none} method for showing the modal
 		template: '<div id="{{modalId}}" class="modal hide fade"><div ng-transclude></div></div>',
 		transclude: true
 	};
