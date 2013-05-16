@@ -68,7 +68,7 @@ directive('bootstrapModal', function($timeout) {
 		scope: {
 			modalId: '@' 
 		},
-		template: '<div id="{{modalId}}" class="modal hide fade"><div ng-transclude></div></div>',
+		template: '<div id="{{modalId}}" class="modal hide fade" tabindex="-1"><div ng-transclude></div></div>',
 		transclude: true
 	};
 }).
