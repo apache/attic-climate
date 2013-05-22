@@ -209,25 +209,25 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 		// $http.post call but it is with this. So...there you go! This should be
 		// changed eventually!!
 		$.ajax({
-			type: "POST",
-			url: "http://localhost:8082/rcmes/run/", 
+			type: 'POST',
+			url: $rootScope.baseURL + '/rcmes/run/', 
 			data: { 
-				"obsDatasetId"     : $scope.datasets[obsIndex]['id'],
-				"obsParameterId"   : $scope.datasets[obsIndex]['param'],
-				"startTime"        : $scope.displayParams.start,
-				"endTime"          : $scope.displayParams.end,
-				"latMin"           : $scope.displayParams.latMin,
-				"latMax"           : $scope.displayParams.latMax,
-				"lonMin"           : $scope.displayParams.lonMin,
-				"lonMax"           : $scope.displayParams.lonMax,
-				"filelist"         : $scope.datasets[modelIndex]['id'],
-				"modelVarName"     : $scope.datasets[modelIndex]['param'],
-				"modelTimeVarName" : $scope.datasets[modelIndex]['time'],
-				"modelLatVarName"  : $scope.datasets[modelIndex]['lat'],
-				"modelLonVarName"  : $scope.datasets[modelIndex]['lon'],
-				"regridOption"     : "model",
-				"timeRegridOption" : "monthly",
-				"metricOption"     : "bias",
+				'obsDatasetId'     : $scope.datasets[obsIndex]['id'],
+				'obsParameterId'   : $scope.datasets[obsIndex]['param'],
+				'startTime'        : $scope.displayParams.start,
+				'endTime'          : $scope.displayParams.end,
+				'latMin'           : $scope.displayParams.latMin,
+				'latMax'           : $scope.displayParams.latMax,
+				'lonMin'           : $scope.displayParams.lonMin,
+				'lonMax'           : $scope.displayParams.lonMax,
+				'filelist'         : $scope.datasets[modelIndex]['id'],
+				'modelVarName'     : $scope.datasets[modelIndex]['param'],
+				'modelTimeVarName' : $scope.datasets[modelIndex]['time'],
+				'modelLatVarName'  : $scope.datasets[modelIndex]['lat'],
+				'modelLonVarName'  : $scope.datasets[modelIndex]['lon'],
+				'regridOption'     : 'model',
+				'timeRegridOption' : 'monthly',
+				'metricOption'     : 'bias',
 			},
 			success: function(data) {
 				var comp = data['comparisonPath'].split('/');
@@ -326,7 +326,7 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 
 	// Grab the path leader information that the webserver is using to limit directory access.
 	$scope.pathLeader = 'False';
-	$http.jsonp('http://localhost:8082/getPathLeader/?callback=JSON_CALLBACK').
+	$http.jsonp($rootScope.baseURL + '/getPathLeader/?callback=JSON_CALLBACK').
 		success(function(data) {
 			$scope.pathLeader = data.leader;
 	});
@@ -362,11 +362,11 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 		// Should check for fails and allow the user to make changes.
 		//
 		// Get model variables
-		var varsPromise = $http.jsonp('http://localhost:8082/list/vars/"' + input + '"?callback=JSON_CALLBACK');
+		var varsPromise = $http.jsonp($rootScope.baseURL + '/list/vars/"' + input + '"?callback=JSON_CALLBACK');
 		// Get Lat and Lon variables
-		var latlonPromise = $http.jsonp('http://localhost:8082/list/latlon/"' + input + '"?callback=JSON_CALLBACK');
+		var latlonPromise = $http.jsonp($rootScope.baseURL + '/list/latlon/"' + input + '"?callback=JSON_CALLBACK');
 		// Get Time variables
-		var timesPromise = $http.jsonp('http://localhost:8082/list/time/"' + input + '"?callback=JSON_CALLBACK');
+		var timesPromise = $http.jsonp($rootScope.baseURL + '/list/time/"' + input + '"?callback=JSON_CALLBACK');
 
 		$q.all([varsPromise, latlonPromise, timesPromise]).then(
 			// Handle success fetches!
@@ -489,7 +489,7 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDataset
 	$scope.fileAdded = false;
 
 	var getObservations = function() {
-		$http.jsonp('http://localhost:8082/getObsDatasets?callback=JSON_CALLBACK').
+		$http.jsonp($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
 			success(function(data) {
 				$scope.availableObs = data;
 				$scope.availableObs.splice(0, 0, {longname: 'Please select an option'});
@@ -514,7 +514,7 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDataset
 	};
 
 	$scope.dataSelectUpdated = function() {
-		var urlString = 'http://localhost:8082/getDatasetParam?dataset=' + 
+		var urlString = $rootScope.baseURL + '/getDatasetParam?dataset=' + 
 							$scope.datasetSelection["shortname"] + 
 							"&callback=JSON_CALLBACK";
 		$http.jsonp(urlString).

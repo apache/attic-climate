@@ -169,7 +169,7 @@ directive('predictiveFileBrowserInput', function() {
 		 */
 		// TODO Make this use $HTTP
 		$scope.fetchFiles = function(path) {
-			$.get('http://localhost:8082/getDirInfo/' + path, {},
+			$.get($scope.baseURL + '/getDirInfo/' + path, {},
 				 function(data) {
 					 $scope.setNewData(data);
 					 $scope.updateAutoComplete();
@@ -189,7 +189,7 @@ directive('predictiveFileBrowserInput', function() {
 		 */
 		// TODO Why isn't this using $http?!?!?! Because I copy and pasted!!!!
 		$scope.fetchFilesAndFilter = function(path) {
-			$.get('http://localhost:8082/getDirInfo/' + path, {},
+			$.get($scope.baseURL + '/getDirInfo/' + path, {},
 				 function(data) {
 					 $scope.setNewData(data);
 					 $scope.filterResults();
@@ -368,6 +368,7 @@ directive('predictiveFileBrowserInput', function() {
 
 	return {
 		link: link,
+		scope: true,
 		restrict: 'A'
 	};
 });

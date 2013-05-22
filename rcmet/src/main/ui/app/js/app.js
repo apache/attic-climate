@@ -11,6 +11,7 @@ angular.module('rcmes', []).
 		$rootScope.evalResults = ""; 
 		$rootScope.fillColors = ['#ff0000', '#00c90d', '#cd0074', '#f3fd00'];
 		$rootScope.surroundColors = ['#a60000', '#008209', '#8f004b', '#93a400']
+		$rootScope.baseURL = 'http://localhost:8082';
 	}).
 	service('selectedDatasetInformation', function() {
 		var datasets = [];
