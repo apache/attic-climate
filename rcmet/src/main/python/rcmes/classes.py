@@ -33,14 +33,19 @@ class GridBox(BoundingBox):
 
 class JobProperties(object):
     
-    def __init__(self, workDir, cacheDir, spatialGrid, temporalGrid, gridLonStep, gridLatStep, outputFile='false', 
+    def __init__(self, workDir, cacheDir, spatialGrid, temporalGrid, gridLonStep=None, gridLatStep=None, outputFile='false', 
                  latMin=None, latMax=None, lonMin=None, lonMax=None, startDate=None, endDate=None):
         self.workDir = os.path.abspath(workDir)
         self.cacheDir = os.path.abspath(cacheDir)
         self.spatialGrid = spatialGrid
         self.temporalGrid = temporalGrid
-        self.gridLonStep = float(gridLonStep)
-        self.gridLatStep = float(gridLatStep)
+        
+        if gridLonStep and gridLatStep:
+            self.gridLonStep = float(gridLonStep)
+            self.gridLatStep = float(gridLatStep)
+        else:
+            self.gridLonStep = None
+            self.gridLatStep = None
         
         # Support for both User provided Dates, and Interactive Date Collection
         if startDate and endDate:
@@ -95,6 +100,7 @@ class Model(object):
             self.filename = args[0]
             self.name = os.path.basename(self.filename)
             self.processModelFile()
+            self.precipFlag = False
         if len(kwargs) == 7:
             self.filename = kwargs['filename']
             self.name = os.path.basename(self.filename)

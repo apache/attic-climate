@@ -108,10 +108,6 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
     numMDLs = len(mdlList)
     
     # assign parameters that must be preserved throughout the process
-    # User must provide startTime and endTime if not defined
-    if settings.startDate == None or settings.endDate == None:
-        settings.startDate, settings.endDate = misc.userDefinedStartEndTimes(obsDatasetList, modelList)
-    
     
     print 'start & end time = ', settings.startDate, settings.endDate
     yymm0 = settings.startDate.strftime("%Y%m")

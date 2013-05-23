@@ -1053,62 +1053,68 @@ def getStartEndTimes(status, startOverLapTime, endOverLapTime):
     '''
 
     if status == "start":
-        time = raw_input("Please Enter a Start Date in range [%s" % startOverLapTime.strftime('%Y-%m-%d') + " - %s]: " % endOverLapTime.strftime('%Y-%m-%d'))
-        if not time:
-            time = startOverLapTime
-            print "Your time starts from [%s] " % time.strftime('%Y-%m-%d')
-            return time
-        time = datetime.datetime.strptime(time, '%Y-%m-%d')
-        if time < startOverLapTime:
-            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is before the proper time [%s]."  % startOverLapTime.strftime('%Y-%m-%d')
-            time = getStartEndTimes("start", startOverLapTime, endOverLapTime)
-            return time
-        elif time > endOverLapTime:
-            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is after the proper time [%s]. " % endOverLapTime.strftime('%Y-%m-%d')
-            time = getStartEndTimes("start", startOverLapTime, endOverLapTime)
-            return time
-        else:
-            return time
+        try:
+            time = raw_input("Please Enter a Start Date [%s]: " % startOverLapTime.strftime('%Y-%m-%d'))
+            if not time:
+                time = startOverLapTime
+                print "Your time starts from [%s] " % time.strftime('%Y-%m-%d')
+                return time
+            time = datetime.datetime.strptime(time, '%Y-%m-%d')
+            if time < startOverLapTime:
+                print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is before the minimum start time [%s]."  % startOverLapTime.strftime('%Y-%m-%d')
+                time = getStartEndTimes("start", startOverLapTime, endOverLapTime)
+                return time
+            elif time > endOverLapTime:
+                print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is after the maximum end time [%s]. " % endOverLapTime.strftime('%Y-%m-%d')
+                time = getStartEndTimes("start", startOverLapTime, endOverLapTime)
+                return time
+            else:
+                return time
+        except ValueError:
+            getStartEndTimes(status, startOverLapTime, endOverLapTime)
     
     if status == "end":
-        time = raw_input("Please Enter a End Date in range [%s" % startOverLapTime.strftime('%Y-%m-%d') + " - %s]: " % endOverLapTime.strftime('%Y-%m-%d'))
-        if not time:
-            time = endOverLapTime
-            print "Your time ends by [%s] " % time.strftime('%Y-%m-%d')
-            return time
-        time = datetime.datetime.strptime(time, '%Y-%m-%d')
-        if time > endOverLapTime:
-            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is after the proper time [%s]. " % endOverLapTime.strftime('%Y-%m-%d')
-            time = getStartEndTimes("end", startOverLapTime, endOverLapTime)
-            return time
-        elif time < startOverLapTime:
-            print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is before the proper time [%s]."  % startOverLapTime.strftime('%Y-%m-%d')
-            time = getStartEndTimes("end", startOverLapTime, endOverLapTime)
-            return time
-        else:
-            return time
+        try:
+            time = raw_input("Please Enter an End Date [%s]: " % endOverLapTime.strftime('%Y-%m-%d'))
+            if not time:
+                time = endOverLapTime
+                print "Your time ends by [%s] " % time.strftime('%Y-%m-%d')
+                return time
+            time = datetime.datetime.strptime(time, '%Y-%m-%d')
+            if time > endOverLapTime:
+                print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is after the maximum end time [%s]. " % endOverLapTime.strftime('%Y-%m-%d')
+                time = getStartEndTimes("end", startOverLapTime, endOverLapTime)
+                return time
+            elif time < startOverLapTime:
+                print "WARNING: The time you inputted [%s] " % time.strftime('%Y-%m-%d') + " is before the minimum start time [%s]."  % startOverLapTime.strftime('%Y-%m-%d')
+                time = getStartEndTimes("end", startOverLapTime, endOverLapTime)
+                return time
+            else:
+                return time
+        except ValueError:
+            getStartEndTimes(status, startOverLapTime, endOverLapTime)
 
-def getDirSettings(settings):
+
+def getDirSettings():
     """
     This function will collect 2 parameters from the user about the RCMET run they have started.
     
-    Input::
-        settings - Empty Python Dictionary they will be used to store the user supplied inputs
-        
     Output::
-        None - The user inputs will be added to the supplied dictionary.
+        dirs - Tuple of strings i.e. ('workDirPath', 'cacheDirPath')
     """
-    settings['workDir'] = os.path.abspath(raw_input('Please enter workDir:\n> '))
-    if os.path.isdir(settings['workDir']):
+    workDir = os.path.abspath(raw_input('Please enter workDir:\n> '))
+    if os.path.isdir(workDir):
         pass
     else:
-        makeDirectory(settings['workDir'])
+        makeDirectory(workDir)
     
-    settings['cacheDir'] = os.path.abspath(raw_input('Please enter cacheDir:\n> '))
-    if os.path.isdir(settings['cacheDir']):
+    cacheDir= os.path.abspath(raw_input('Please enter cacheDir:\n> '))
+    if os.path.isdir(cacheDir):
         pass
     else:
-        makeDirectory(settings['cacheDir'])
+        makeDirectory(cacheDir)
+    
+    return (workDir, cacheDir)
 
 def getModelFiles():
     modelList = []
@@ -1121,7 +1127,7 @@ def getModelFiles():
         
     return modelList
 
-def getTemporalGrid(settings):
+def getTemporalGrid():
     options = ['annual', 'monthly', 'daily']
     print("Please select one of the following Temporal Grid Options:\n")
     for key, option in enumerate(options):
@@ -1130,9 +1136,9 @@ def getTemporalGrid(settings):
     try:
         temporalGrid = options[choice]
     except IndexError:
-        getTemporalGrid(settings)
+        getTemporalGrid()
     else:
-        settings['temporalGrid'] = temporalGrid
+        return temporalGrid
 
 def getSpatialGrid():
     options = ['obs', 'model', 'user']

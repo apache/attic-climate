@@ -1,5 +1,7 @@
 #!/usr/local/bin/python
 """ 
+    PENDING DEPRICATION - YOU SHOULD INSTEAD USE THE rcmet.py within the bin dir
+    
     Module that is used to lauch the rcmes processing from the rcmet_ui.py
     script.
 """

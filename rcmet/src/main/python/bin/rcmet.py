@@ -201,6 +201,9 @@ def runUsingConfig(argsConfig):
 
     #TODO: Unhardcode this when we decided where this belongs in the Config File
     jobProperties.maskOption = True
+    # User must provide startTime and endTime if not defined
+    if jobProperties.startDate == None or jobProperties.endDate == None:
+        jobProperties.startDate, jobProperties.endDate = misc.userDefinedStartEndTimes(obsDatasetList, models)
 
     numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, obsData, mdlData, obsList, mdlName = do_data_prep.prep_data(jobProperties, obsDatasetList, gridBox, models)
 
