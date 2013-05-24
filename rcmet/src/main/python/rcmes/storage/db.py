@@ -279,16 +279,12 @@ def extractData ( datasetID, paramID, latMin, latMax, lonMin, lonMax, userStartT
     name.append(version)
     
     # Check to see whether the folder is already created for netCDF or not, then it will be created
-    os.chdir(cachedir)
-    path=os.getcwd()
     for n in name:
-        if os.path.exists(path + "/" + n):
-            os.chdir(path + "/" + n)
-            path=os.getcwd()
+        path = os.path.join(cachedir, n)
+        if os.path.exists(path):
+            pass
         else:
-            os.mkdir(n)
-            os.chdir(path + "/" + n)
-            path=os.getcwd()
+            os.mkdir(path)
 
     processing_level = 'L3'
     processing_version = "processing_version"  # the processing version is still unknown and can be added later
