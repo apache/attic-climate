@@ -431,7 +431,7 @@ def calc_temporal_stdv(t1):
     Output:
         A 2-D array of temporal standard deviation
     '''
-    # TODO Make sure the first dimension of t1 is teh time axis.
+    # TODO Make sure the first dimension of t1 is the time axis.
     stdv = t1.std(axis = 0)
     return stdv
 
