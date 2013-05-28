@@ -25,6 +25,10 @@ angular.module('rcmes', []).
 			},
 			// TODO: Define the structure of the objects that are added with addDataset.
 			addDataset: function(dataset) {
+				// All datasets need a shouldDisplay attribute that is used when rendering
+				// the overlays on the map!
+				dataset.shouldDisplay = true;
+
 				datasets.push(dataset);
 			},
 			removeDataset: function(index) {
