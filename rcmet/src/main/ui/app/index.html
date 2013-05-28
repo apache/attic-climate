@@ -146,31 +146,35 @@
 		</div>
 	  </div>
 	  <!--Lat/Long Values!-->
-      <div class="row displayRow">
-        <div class="span1 offset2 text-center">North:</div>
-		<div class="span2">
-		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.latMax}}" readonly/>
-		</div>
-        <div class="span1 text-center">East:</div>
-		<div class="span2">
-		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMax}}" readonly/>
-		</div>
-		<div class="span2">
-		  <a class="btn btn-block" ng-click="removeDataset($index)">Remove Dataset</a>
-		</div>
-    <div class="span1" style="background-color: {{fillColors[$index]}}; height: 28px; width: 28px;"></div>
+    <div class="row displayRow">
+      <div class="span1 offset2 text-center">North:</div>
+      <div class="span2">
+        <input class="span2 text-center" type="text" value="{{dataset.latlonVals.latMax}}" readonly/>
+      </div>
+      <div class="span1 text-center">East:</div>
+      <div class="span2">
+        <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMax}}" readonly/>
+      </div>
+      <div class="span2">
+        <a class="btn btn-block" ng-click="removeDataset($index)">Remove Dataset</a>
+      </div>
+      <div class="span1" style="background-color: {{fillColors[$index]}}; height: 28px; width: 28px;"></div>
 	  </div>
-      <div class="row displayRow">
-        <div class="span1 offset2 text-center">South:</div>
-		<div class="span2">
-		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.latMin}}" readonly/>
-		</div>
-        <div class="span1 text-center">West:</div>
-		<div class="span2">
-		  <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMin}}" readonly/>
-		</div>
+    <div class="row displayRow">
+      <div class="span1 offset2 text-center">South:</div>
+      <div class="span2">
+        <input class="span2 text-center" type="text" value="{{dataset.latlonVals.latMin}}" readonly/>
+      </div>
+      <div class="span1 text-center">West:</div>
+      <div class="span2">
+        <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMin}}" readonly/>
+      </div>
+      <div class="span2">
+        <label><input type="checkbox" ng-model="dataset.shouldDisplay" /> Display Overlay</label>
+      </div>
 	  </div>
     </div>
+    {{datasets}}
   </div>
 
   <!-- In production use:
