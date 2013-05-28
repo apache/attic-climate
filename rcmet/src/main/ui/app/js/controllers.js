@@ -21,8 +21,15 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
  			$rootScope.rectangleGroup = L.layerGroup();
  			
  			// Loop through datasets and add rectangles to Group 
-			var i = 0;
+			var i = -1;
  			angular.forEach($scope.datasets, function(dataset) {
+				// Keep track of dataset count for displaying colors
+				i++;
+
+				// If the user disabled the overlay then get out of here!
+				if (!dataset.shouldDisplay)
+					return;
+
  				// Get bounds from dataset 
  				var maplatlon = dataset.latlonVals;
  				var bounds = [[maplatlon.latMax, maplatlon.lonMin], 
@@ -36,7 +43,6 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
 
  				// Add layer to Group
  				$rootScope.rectangleGroup.addLayer(polygon);
-				i++;
  			});
 
 			// Draw user selected region
