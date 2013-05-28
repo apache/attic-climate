@@ -56,6 +56,18 @@
   </div>
   </bootstrap-modal>
 
+  <bootstrap-modal modal-id="evaluationSettings">
+  <div class="modal-header">
+  	<button class="close">&times;</button>
+  	<h3>Settings</h3>
+  </div>
+  <div class="modal-body">
+  </div>
+  <div class="modal-footer">
+	  <a href="#" class="btn btn-primary close">Close</a>
+  </div>
+  </bootstrap-modal>
+
   <h1 id="rcmetHeader">RCMET UI</h1>
   <div ng-controller="WorldMapCtrl">
     <sap id="map"></sap>
@@ -104,9 +116,12 @@
       <div class="span1">
         <button ng-click="updateParameters()" ng-disabled="shouldDisableControls()" class="btn btn-block btn-info">Update</button>
       </div>
-	  <div class="span2">
-		<button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear Datasets</button>
-	  </div>
+      <div class="span2">
+        <button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear Datasets</button>
+      </div>
+      <div class="span1">
+        <button class="btn btn-block" background="false" bootstrap-modal-open="evaluationSettings">Settings</button>
+      </div>
     </div>
     <div class="row">
       <div class="span1 offset2 text-center">South:</div>
