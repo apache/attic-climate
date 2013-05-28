@@ -61,7 +61,11 @@
   	<button class="close">&times;</button>
   	<h3>Settings</h3>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" ng-controller="SettingsCtrl">
+    <h4>Select the metrics you would like to run.</h4>
+    <div ng-repeat="metric in settings.metrics">
+      <label><input type="checkbox" ng-model="metric.select"> {{metric.name}}</label>
+    </div>
   </div>
   <div class="modal-footer">
 	  <a href="#" class="btn btn-primary close">Close</a>

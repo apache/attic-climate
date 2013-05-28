@@ -57,10 +57,10 @@ angular.module('rcmes', []).
     }).
 	service('evaluationSettings', function() {
 		var settings = {
-			'metrics': {
-				'bias': true,
-				'mean difference': false,
-			},
+			'metrics': [ 
+				{'name': 'bias', 'select': true},
+				{'name': 'mean difference', 'select': false},
+			],
 		};
 
 		return {

@@ -576,3 +576,7 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDataset
 	// Grab the available observations from RCMED
 	getObservations();
 }
+
+function SettingsCtrl($scope, evaluationSettings) {
+	$scope.settings = evaluationSettings.getSettings();
+}
