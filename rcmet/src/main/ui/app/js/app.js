@@ -54,4 +54,18 @@ angular.module('rcmes', []).
 				return parameters;
 			},
 		};
-   });
+    }).
+	service('evaluationSettings', function() {
+		var settings = {
+			'metrics': {
+				'bias': true,
+				'mean difference': false,
+			},
+		};
+
+		return {
+			getSettings: function() {
+				return settings;
+			}
+		};
+	});	
