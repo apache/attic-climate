@@ -287,7 +287,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 				'modelLatVarName'  : $scope.datasets[modelIndex]['lat'],
 				'modelLonVarName'  : $scope.datasets[modelIndex]['lon'],
 				'regridOption'     : 'model',
-				'timeRegridOption' : 'monthly',
+				'timeRegridOption' : evaluationSettings.getSettings().temporal.selected,
 				'metricOption'     : metricToRun,
 			},
 			success: function(data) {
