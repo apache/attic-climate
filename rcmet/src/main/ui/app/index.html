@@ -67,6 +67,9 @@
     <div ng-repeat="metric in settings.metrics">
       <label><input type="checkbox" ng-model="metric.select"> {{metric.name}}</label>
     </div>
+    <hr />
+    <h4>Select how you would like to temporally re-grid the datasets.</h4>
+    <select ng-model="settings.temporal.selected" ng-options="opt for opt in settings.temporal.options"></select>
   </div>
   <div class="modal-footer">
 	  <a href="#" class="btn btn-primary close">Close</a>
