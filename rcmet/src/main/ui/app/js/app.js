@@ -28,6 +28,8 @@ angular.module('rcmes', []).
 				// All datasets need a shouldDisplay attribute that is used when rendering
 				// the overlays on the map!
 				dataset.shouldDisplay = true;
+				// The regrid attribute indicates which dataset should be used for spatial regridding
+				dataset.regrid = false;
 
 				datasets.push(dataset);
 			},
