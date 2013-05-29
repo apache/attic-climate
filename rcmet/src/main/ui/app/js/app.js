@@ -59,7 +59,6 @@ angular.module('rcmes', []).
 		var settings = {
 			'metrics': [ 
 				{'name': 'bias', 'select': true},
-				{'name': 'mean difference', 'select': false},
 			],
 		};
 
