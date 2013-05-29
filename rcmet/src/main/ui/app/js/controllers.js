@@ -328,6 +328,12 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 	$scope.removeDataset = function($index) {
 		selectedDatasetInformation.removeDataset($index);
 	}
+
+	$scope.setRegridBase = function(index) {
+		for (var i = 0; i < $scope.datasets.length; i++) {
+			$scope.datasets[i].regrid = ((i == index) ? true : false);
+		}
+	}
 }
 
 // Controller for observation selection in modal

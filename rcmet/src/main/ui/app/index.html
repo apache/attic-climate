@@ -192,7 +192,10 @@
         <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMin}}" readonly/>
       </div>
       <div class="span2">
-        <label><input type="checkbox" ng-model="dataset.regrid" /> Regrid Base</label>
+        <label>
+          <input type="checkbox" ng-model="dataset.regrid" ng-click="setRegridBase($index)"/> 
+          Regrid Base
+        </label>
       </div>
 	  </div>
     </div>
