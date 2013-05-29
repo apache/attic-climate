@@ -76,7 +76,8 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
 };
 
 // Controller for dataset parameter selection/modification
-function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation, regionSelectParams) {
+function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation, 
+							 regionSelectParams, evaluationSettings) {
 	$scope.datasets = selectedDatasetInformation.getDatasets();
 
 	// The min/max lat/lon values from the selected datasets
@@ -210,6 +211,20 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 				modelIndex = i;
 		}
 
+		// TODO At the moment we aren't running all the metrics that the user selected. We're only
+		// running the first available metric that the user provides. If the user un-checks all
+		// metrics then the default of 'bias' is used.
+		var metricToRun = 'bias';
+		var settings = evaluationSettings.getSettings().metrics;
+		for (var i = 0; i < settings.length; i++) {
+			var setting = settings[i];
+
+			if (setting.select) {
+				metricToRun = setting.name;
+				break;
+			}
+		};
+
 		// You might wonder why this is using a jQuery ajax call instead of a built
 		// in $http.post call. The reason would be that it wasn't working with the 
 		// $http.post call but it is with this. So...there you go! This should be
@@ -233,7 +248,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 				'modelLonVarName'  : $scope.datasets[modelIndex]['lon'],
 				'regridOption'     : 'model',
 				'timeRegridOption' : 'monthly',
-				'metricOption'     : 'bias',
+				'metricOption'     : metricToRun,
 			},
 			success: function(data) {
 				var comp = data['comparisonPath'].split('/');
