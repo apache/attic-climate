@@ -331,7 +331,7 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 
 	$scope.setRegridBase = function(index) {
 		for (var i = 0; i < $scope.datasets.length; i++) {
-			$scope.datasets[i].regrid = ((i == index) ? true : false);
+			$scope.datasets[i].regrid = ((i == index) ? $scope.datasets[i].regrid : false);
 		}
 	}
 }
