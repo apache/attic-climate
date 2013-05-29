@@ -62,6 +62,10 @@ angular.module('rcmes', []).
 			'metrics': [ 
 				{'name': 'bias', 'select': true},
 			],
+			'temporal': {
+				'options': ['daily', 'monthly', 'yearly'],
+				'selected': 'monthly',
+			},
 		};
 
 		return {
