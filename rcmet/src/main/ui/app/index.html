@@ -154,16 +154,20 @@
 		</div>
 	  </div>
 	  <!--Time Values!-->
-      <div class="row displayRow">
-        <div class="span1 offset2 text-center">Start Date:</div>
-		<div class="span2">
-		  <input class="span2 text-center" type="text" value="{{dataset.timeVals.start}}" readonly/>
-		</div>
-        <div class="span1 text-center">End Date:</div>
-		<div class="span2">
-		  <input class="span2 text-center" type="text" value="{{dataset.timeVals.end}}" readonly/>
-		</div>
-	  </div>
+    <div class="row displayRow">
+      <div class="span1 offset2 text-center">Start Date:</div>
+      <div class="span2">
+        <input class="span2 text-center" type="text" value="{{dataset.timeVals.start}}" readonly/>
+      </div>
+      <div class="span1 text-center">End Date:</div>
+      <div class="span2">
+        <input class="span2 text-center" type="text" value="{{dataset.timeVals.end}}" readonly/>
+      </div>
+      <div class="span2">
+        <a class="btn btn-block" ng-click="removeDataset($index)">Remove Dataset</a>
+      </div>
+      <div class="span1" style="background-color: {{fillColors[$index]}}; height: 28px; width: 28px;"></div>
+    </div>
 	  <!--Lat/Long Values!-->
     <div class="row displayRow">
       <div class="span1 offset2 text-center">North:</div>
@@ -175,9 +179,8 @@
         <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMax}}" readonly/>
       </div>
       <div class="span2">
-        <a class="btn btn-block" ng-click="removeDataset($index)">Remove Dataset</a>
+        <label><input type="checkbox" ng-model="dataset.shouldDisplay" /> Display Overlay</label>
       </div>
-      <div class="span1" style="background-color: {{fillColors[$index]}}; height: 28px; width: 28px;"></div>
 	  </div>
     <div class="row displayRow">
       <div class="span1 offset2 text-center">South:</div>
@@ -189,7 +192,7 @@
         <input class="span2 text-center" type="text" value="{{dataset.latlonVals.lonMin}}" readonly/>
       </div>
       <div class="span2">
-        <label><input type="checkbox" ng-model="dataset.shouldDisplay" /> Display Overlay</label>
+        <label><input type="checkbox" ng-model="dataset.regrid" /> Regrid Base</label>
       </div>
 	  </div>
     </div>
