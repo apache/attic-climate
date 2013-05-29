@@ -142,6 +142,16 @@
         </form>
       </div>
     </div>
+    <div class="row" ng-show="areInUserRegridState">
+      <div class="span1 offset2 text-center">Lat. Step: {{latSliderVal}}</div>
+      <div class="span2">
+        <div id="latSlider"></div>
+      </div>
+      <div class="span1 text-center">Lon. Step: {{lonSliderVal}}</div>
+      <div class="span2">
+        <div id="lonSlider"></div>
+      </div>
+    </div>
   </div>
   <!--Dataset display-->
   <div ng-controller="DatasetDisplayCtrl">

@@ -100,6 +100,46 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	$scope.displayParams = regionSelectParams.getParameters();
 
 	$scope.runningEval = false;
+
+	// Flag for toggling re-grid controls based on whether or not the user has selected a grid
+	// base from the selected datasets. By default we have no datasets so we don't need to show
+	// the controls!
+	$scope.areInUserRegridState = false;
+
+	// Initialization for the lat/lon grid step sliders
+	// TODO There has to be a better way of dealing with this. Perhaps a directive??
+	$scope.latSliderVal = 0;
+	$scope.lonSliderVal = 0;
+
+	$('#latSlider').slider({
+		value: 0,
+		step: 0.25,
+		min: 0.25,
+		max: 180,
+		slide: function(event, ui) {
+			updateLatSliderDisplayValue(ui.value);
+		},
+	});
+
+	$('#lonSlider').slider({
+		value: 0,
+		step: 0.25,
+		min: 0.25,
+		max: 360,
+		slide: function(event, ui) {
+			updateLonSliderDisplayValue(ui.value);
+		},
+	});
+
+	var updateLatSliderDisplayValue = function(value) {
+		$scope.latSliderVal = value;
+		$scope.$apply();
+	}
+
+	var updateLonSliderDisplayValue = function(value) {
+		$scope.lonSliderVal = value;
+		$scope.$apply();
+	}
 	
 	var updateDisplayValues = function() {
 		// Update the displayed lat/lon values. We give precedence to users entered values assuming
@@ -288,15 +328,16 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	$scope.$watch('datasets', 
 		function() { 
 			var numDatasets = $scope.datasets.length;
+			$scope.areInUserRegridState = false;
 
  			if (numDatasets) {
-				var latMin = -90,
-					latMax = 90,
-					lonMin = -180,
-					lonMax = 180,
-					start  = "1980-01-01 00:00:00",
-					end    = "2030-01-01 00:00:00";
- 			
+				var latMin        = -90,
+					latMax        = 90,
+					lonMin        = -180,
+					lonMax        = 180,
+					start         = "1980-01-01 00:00:00",
+					end           = "2030-01-01 00:00:00",
+					datasetRegrid = false;
  				// Get the valid lat/lon range in the selected datasets.
  				for (var i = 0; i < numDatasets; i++) {
  					var curDataset = $scope.datasets[i];
@@ -307,7 +348,12 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
  					lonMax = (curDataset['latlonVals']['lonMax'] < lonMax) ? curDataset['latlonVals']['lonMax'] : lonMax;
  					start = (curDataset['timeVals']['start'] > start) ? curDataset['timeVals']['start'] : start;
  					end = (curDataset['timeVals']['end'] < end) ? curDataset['timeVals']['end'] : end;
+
+					datasetRegrid = datasetRegrid || curDataset.regrid;
+
 				}
+
+				$scope.areInUserRegridState = !datasetRegrid
 			}
 
 			$scope.latMin = latMin;
