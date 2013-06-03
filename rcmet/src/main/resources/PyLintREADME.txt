@@ -15,7 +15,7 @@ used with PyLint (http://pypi.python.org/pypi/pylint/).
 
 After you have installed pylint follow these directions.  Happy linting!
 
-Assuming you want to lint the metrics.py file within lib/rcmes, do the following
+Assuming you want to lint the rcmet_ui.py file within the cli module, do the following
 
 $> cd rcmes/rcmet/src/main/python/rcmes
 $> pylint --rcfile=../../resources/pyLintRcFile.txt cli/rcmet_ui.py
