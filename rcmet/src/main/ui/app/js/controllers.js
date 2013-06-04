@@ -140,7 +140,13 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 		$scope.lonSliderVal = value;
 		$scope.$apply();
 	}
-	
+
+	// Settings for jQuery datepicker directives!
+	$scope.datepickerSettings = {
+		changeMonth: true,
+		changeYear: true,
+	};
+
 	var updateDisplayValues = function() {
 		// Update the displayed lat/lon values. We give precedence to users entered values assuming
 		// they're valid given the current set of datasets selected.
@@ -275,8 +281,8 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			data: { 
 				'obsDatasetId'     : $scope.datasets[obsIndex]['id'],
 				'obsParameterId'   : $scope.datasets[obsIndex]['param'],
-				'startTime'        : $scope.displayParams.start,
-				'endTime'          : $scope.displayParams.end,
+				'startTime'        : $scope.displayParams.start + " 00:00:00",
+				'endTime'          : $scope.displayParams.end + " 00:00:00",
 				'latMin'           : $scope.displayParams.latMin,
 				'latMax'           : $scope.displayParams.latMax,
 				'lonMin'           : $scope.displayParams.lonMin,
@@ -360,8 +366,8 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			$scope.latMax = latMax;
 			$scope.lonMin = lonMin;
 			$scope.lonMax = lonMax;
-			$scope.start = start;
-			$scope.end = end;
+			$scope.start = start.split(" ")[0];
+			$scope.end = end.split(" ")[0];
 
 			updateDisplayValues();
 		}, true);

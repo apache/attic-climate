@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('rcmes', []).
+angular.module('rcmes', ['ui.date']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
 			when('/obs', {templateUrl: 'partials/selectObservation.html',   controller: ObservationSelectCtrl}).

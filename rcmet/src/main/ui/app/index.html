@@ -86,13 +86,13 @@
       <div class="span1 offset2 text-center">Start Date:</div>
       <div class="span2">
         <form>
-      <input ng-model="displayParams.start" type="text" class="span2" />
+          <input type="text" class="text-center span2" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" />
         </form>
       </div>
       <div class="span1 text-center">End Date:</div>
       <div class="span2">
         <form>
-		  <input ng-model="displayParams.end" type="text" class="span2" />
+          <input type="text" class="text-center span2" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" />
         </form>
       </div>
       <div class="span1">
@@ -156,6 +156,7 @@
       </div>
     </div>
   </div>
+
   <!--Dataset display-->
   <div ng-controller="DatasetDisplayCtrl">
     <div ng-repeat="dataset in datasets">
