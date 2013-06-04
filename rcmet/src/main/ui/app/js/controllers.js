@@ -6,7 +6,6 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
 	$scope.regionParams = regionSelectParams.getParameters();
 
 	$scope.updateMap = function() {
- 		
  		// Clear Group of layers from map if it exists
  		if ("rectangleGroup" in $rootScope) {
  			$rootScope.rectangleGroup.clearLayers();
@@ -32,9 +31,8 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
 
  				// Get bounds from dataset 
  				var maplatlon = dataset.latlonVals;
- 				var bounds = [[maplatlon.latMax, maplatlon.lonMin], 
- 				              [maplatlon.latMin, maplatlon.lonMax]];
- 	
+ 				var bounds = [[maplatlon.latMax, maplatlon.lonMin], [maplatlon.latMin, maplatlon.lonMax]];
+
  				var polygon = L.rectangle(bounds,{
 					stroke: false,
 					fillColor: $rootScope.fillColors[i],
@@ -71,10 +69,6 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
 	});
 
 	$scope.$watch('datasets', function() {
-		$scope.updateMap();
-	}, true);
-
-	$scope.$watch('regionParams', function() {
 		$scope.updateMap();
 	}, true);
 };
