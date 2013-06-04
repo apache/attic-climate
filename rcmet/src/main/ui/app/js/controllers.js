@@ -88,14 +88,6 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	$scope.start = "1980-01-01 00:00:00";
 	$scope.end = "2030-01-01 00:00:00";
 
-	// The min/max lat/lon values entered by the user
-	$scope.enteredLatMin = "";
-	$scope.enteredLatMax = "";
-	$scope.enteredLonMin = "";
-	$scope.enteredLonMax = "";
-	$scope.enteredStart = "";
-	$scope.enteredEnd = "";
-
 	// The min/max lat/lon values that are displayed
 	$scope.displayParams = regionSelectParams.getParameters();
 
@@ -146,75 +138,6 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 		changeMonth: true,
 		changeYear: true,
 	};
-
-	var updateDisplayValues = function() {
-		// Update the displayed lat/lon values. We give precedence to users entered values assuming
-		// they're valid given the current set of datasets selected.
-		//
-		// If the user has entered a value for latMin
-		if ($scope.enteredLatMin != "") {
-			// If it's not a valid value...
-			if ($scope.enteredLatMin < $scope.latMin) {
-				// Reset enteredLatMin to the "unmodified" state and display the correct value.
-				$scope.displayParams.latMin = $scope.latMin;
-			} else {
-				$scope.displayParams.latMin = $scope.enteredLatMin;
-			}
-		// Otherwise, just display the value.
-		} else { 
-			$scope.displayParams.latMin = $scope.latMin;
-		}
-		// Update latMax
-		if ($scope.enteredLatMin != "") {
-			if ($scope.enteredLatMax > $scope.latMax) {
-				$scope.displayParams.latMax = $scope.latMax;
-			} else {
-				$scope.displayParams.latMax = $scope.enteredLatMax;
-			}
-		} else { 
-			$scope.displayParams.latMax = $scope.latMax;
-		}
-		// Update lonMin
-		if ($scope.enteredLonMin != "") {
-			if ($scope.enteredLonMin < $scope.lonMin) {
-				$scope.displayParams.lonMin = $scope.lonMin;
-			} else {
-				$scope.displayParams.lonMin = $scope.enteredLonMin;
-			}
-		} else { 
-			$scope.displayParams.lonMin = $scope.lonMin;
-		}
-		// Update lonMax
-		if ($scope.enteredLonMax != "") {
-			if ($scope.enteredLonMax > $scope.lonMax) {
-				$scope.displayParams.lonMax = $scope.lonMax;
-			} else {
-				$scope.displayParams.lonMax = $scope.enteredLonMax;
-			}
-		} else { 
-			$scope.displayParams.lonMax = $scope.lonMax;
-		}
-		// Update Start time
-		if ($scope.enteredStart != "") {
-			if ($scope.enteredStart < $scope.start) {
-				$scope.displayParams.start = $scope.start;
-			} else {
-				$scope.displayParams.start = $scope.enteredStart;
-			}
-		} else {
-			$scope.displayParams.start = $scope.start;
-		}
-		// Update End time
-		if ($scope.enteredEnd != "") {
-			if ($scope.enteredEnd > $scope.end) {
-				$scope.displayParams.end = $scope.end;
-			} else {
-				$scope.displayParams.end = $scope.enteredEnd;
-			}
-		} else {
-			$scope.displayParams.end = $scope.end;
-		}
-	}
 
 	$scope.shouldDisableControls = function() {
 		return (selectedDatasetInformation.getDatasetCount() < 2);
@@ -318,19 +241,6 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 		});
 	}
 
-	$scope.updateParameters = function() {
-		// Save the user input, even if it isn't valid.
-		$scope.enteredLatMin = $scope.displayParams.latMin;
-		$scope.enteredLatMax = $scope.displayParams.latMax;
-		$scope.enteredLonMin = $scope.displayParams.lonMin;
-		$scope.enteredLonMax = $scope.displayParams.lonMax;
-		$scope.enteredStart  = $scope.displayParams.start;
-		$scope.enteredEnd    = $scope.displayParams.end;
-
-		// Check if the user values are valid and update the display values.
-		updateDisplayValues();
-	}
-
 	$scope.$watch('datasets', 
 		function() { 
 			var numDatasets = $scope.datasets.length;
@@ -362,14 +272,12 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 				$scope.areInUserRegridState = !datasetRegrid
 			}
 
-			$scope.latMin = latMin;
-			$scope.latMax = latMax;
-			$scope.lonMin = lonMin;
-			$scope.lonMax = lonMax;
-			$scope.start = start.split(" ")[0];
-			$scope.end = end.split(" ")[0];
-
-			updateDisplayValues();
+			$scope.displayParams.latMin = latMin;
+			$scope.displayParams.latMax = latMax;
+			$scope.displayParams.lonMin = lonMin;
+			$scope.displayParams.lonMax = lonMax;
+			$scope.displayParams.start = start.split(" ")[0];
+			$scope.displayParams.end = end.split(" ")[0];
 		}, true);
 }
 
