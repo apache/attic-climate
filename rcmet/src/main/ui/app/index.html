@@ -96,17 +96,23 @@
         </form>
       </div>
       <div class="span1">
-		<button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluate()" class="btn btn-block btn-primary">
-		  <div ng-hide="runningEval">Evaluate</div>
-		  <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
-		</button>
+        <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select</button>
       </div>
-      <div class="span2">
-        <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select a Dataset</button>
+      <div class="span1">
+        <button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear</button>
       </div>
-	  <div class="span1">
-		  <button class="btn btn-block btn-primary" ng-disabled="shouldDisableResultsView()" bootstrap-modal-open="evaluationResults">Results</button>
-	  </div>
+      <div class="span1">
+        <button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluate()" class="btn btn-block btn-primary">
+          <div ng-hide="runningEval">Evaluate</div>
+          <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
+        </button>
+      </div>
+      <div class="span1">
+        <button class="btn btn-block btn-primary" ng-disabled="shouldDisableResultsView()" bootstrap-modal-open="evaluationResults">Results</button>
+      </div>
+      <div class="span1">
+        <button class="btn btn-block" background="false" bootstrap-modal-open="evaluationSettings"><i class="icon-cogs"></i></button>
+      </div>
     </div>
     <div class="row">
       <div class="span1 offset2 text-center">North:</div>
@@ -115,24 +121,25 @@
 		      <input ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span2 text-center" />
         </form>
       </div>
-      <div class="span1 text-center">East:</div>
-      <div class="span2">
-        <form>
-		      <input ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span2 text-center" />
-        </form>
-      </div>
-      <div class="span2">
-        <button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear Datasets</button>
-      </div>
-      <div class="span1">
-        <button class="btn btn-block" background="false" bootstrap-modal-open="evaluationSettings">Settings</button>
-      </div>
-    </div>
-    <div class="row">
-      <div class="span1 offset2 text-center">South:</div>
+      <div class="span1 text-center">South:</div>
       <div class="span2">
         <form action="">
 		      <input ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span2 text-center" />
+        </form>
+      </div>
+      <div ng-show="areInUserRegridState">
+        <div class="span1 text-center">Lat. Step:</div>
+        <div class="span2">
+          <div id="latSlider"></div>
+        </div>
+        <div class="span1 text-center">{{latSliderVal}}</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span1 offset2 text-center">East:</div>
+      <div class="span2">
+        <form>
+		      <input ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span2 text-center" />
         </form>
       </div>
       <div class="span1 text-center">West:</div>
@@ -141,15 +148,12 @@
 		      <input ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span2 text-center" />
         </form>
       </div>
-    </div>
-    <div class="row" ng-show="areInUserRegridState">
-      <div class="span1 offset2 text-center">Lat. Step: {{latSliderVal}}</div>
-      <div class="span2">
-        <div id="latSlider"></div>
-      </div>
-      <div class="span1 text-center">Lon. Step: {{lonSliderVal}}</div>
-      <div class="span2">
-        <div id="lonSlider"></div>
+      <div ng-show="areInUserRegridState">
+        <div class="span1 text-center">Lon. Step:</div>
+        <div class="span2">
+          <div id="lonSlider"></div>
+        </div>
+        <div class="span1 text-center">{{lonSliderVal}}</div>
       </div>
     </div>
   </div>
