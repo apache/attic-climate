@@ -44,8 +44,7 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
  			});
 
 			// Draw user selected region
-			if ($scope.regionParams.latMin != "" && $scope.regionParams.latMax != "" && 
-				$scope.regionParams.lonMin != "" && $scope.regionParams.lonMax != "") {
+			if ($scope.regionParams.areValid) {
 
 				var bounds = [[$scope.regionParams.latMax, $scope.regionParams.lonMin],
 							  [$scope.regionParams.latMin, $scope.regionParams.lonMax]];
@@ -262,6 +261,7 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	$scope.$watch('datasets', 
 		function() { 
 			var numDatasets = $scope.datasets.length;
+			$scope.displayParams.areValid = false;
 			$scope.areInUserRegridState = false;
 
  			if (numDatasets) {
@@ -305,6 +305,9 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			$scope.lonMax = lonMax;
 			$scope.start = start.split(" ")[0];
 			$scope.end = end.split(" ")[0];
+
+			$scope.displayParams.areValid = true;
+			$rootScope.$broadcast('redrawOverlays', []);
 		}, true);
 }
 

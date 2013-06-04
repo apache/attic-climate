@@ -43,12 +43,13 @@ angular.module('rcmes', ['ui.date']).
 	}).
 	service('regionSelectParams', function() {
 		var parameters = {
-			"latMin": "",
-			"latMax": "",
-			"lonMin": "",
-			"lonMax": "",
-			"start" : "",
-			"end"   : "",
+			"areValid" : true,
+			"latMin"   : "",
+			"latMax"   : "",
+			"lonMin"   : "",
+			"lonMax"   : "",
+			"start"    : "",
+			"end"      : "",
 		};
 
 		return {
