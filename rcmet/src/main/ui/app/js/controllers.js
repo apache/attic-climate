@@ -462,6 +462,7 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 				// Handle time results
 				var data = arrayOfResults[2].data
 				$scope.times = [data.timename];
+				$scope.timeVals = [data.start_time, data.end_time];
 
 				if ($scope.times.length > 1) $scope.times.splice(0, 0, "Please select an option");
 				$scope.timeSelect = $scope.times[0];
