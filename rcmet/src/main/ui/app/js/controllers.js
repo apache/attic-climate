@@ -241,17 +241,22 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 	// Check the Parameter selection boxes after the user has changed input to ensure that valid
 	// values were entered
 	$scope.checkParameters = function() {
-		if ($scope.displayParams.latMin < $scope.latMin) 
+		if (parseFloat($scope.displayParams.latMin) < parseFloat($scope.latMin))
 			$scope.displayParams.latMin = $scope.latMin;
-		if ($scope.displayParams.latMax > $scope.latMax) 
+
+		if (parseFloat($scope.displayParams.latMax) > parseFloat($scope.latMax))
 			$scope.displayParams.latMax = $scope.latMax;
-		if ($scope.displayParams.lonMin < $scope.lonMin) 
+
+		if (parseFloat($scope.displayParams.lonMin) < parseFloat($scope.lonMin)) 
 			$scope.displayParams.lonMin = $scope.lonMin;
-		if ($scope.displayParams.lonMax > $scope.lonMax) 
+
+		if (parseFloat($scope.displayParams.lonMax) > parseFloat($scope.lonMax)) 
 			$scope.displayParams.lonMax = $scope.lonMax;
+
 		if ($scope.displayParams.start < $scope.start) 
 			$scope.displayParams.start = $scope.start;
-		if ($scope.displayParams.end > $scope.end) 
+
+		if ($scope.displayParams.end > $scope.end)
 			$scope.displayParams.end = $scope.end;
 
 		$scope.$apply();
