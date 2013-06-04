@@ -258,10 +258,11 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			$scope.displayParams.lonMax = $scope.lonMax;
 		if ($scope.displayParams.start < $scope.start) 
 			$scope.displayParams.start = $scope.start;
-		if ($scope.displayParams.end > $scope.end)
+		if ($scope.displayParams.end > $scope.end) 
 			$scope.displayParams.end = $scope.end;
 
 		$scope.$apply();
+		$rootScope.$broadcast('redrawOverlays', []);
 	}
 
 	$scope.$watch('datasets', 
