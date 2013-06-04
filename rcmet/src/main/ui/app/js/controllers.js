@@ -66,6 +66,10 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
  		}
 	};
 
+	$scope.$on('redrawOverlays', function(event, parameters) {
+		$scope.updateMap();
+	});
+
 	$scope.$watch('datasets', function() {
 		$scope.updateMap();
 	}, true);
