@@ -102,7 +102,7 @@
         <button ng-click="clearDatasets()" ng-hide="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear</button>
       </div>
       <div class="span1">
-        <button ng-click="runEvaluation()" ng-hide="shouldDisableEvaluate()" class="btn btn-block btn-primary">
+        <button ng-click="runEvaluation()" ng-hide="shouldDisableControls()" ng-disabled="runningEval" class="btn btn-block btn-primary">
           <div ng-hide="runningEval">Evaluate</div>
           <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
         </button>

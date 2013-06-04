@@ -140,10 +140,6 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 		return (selectedDatasetInformation.getDatasetCount() < 2);
 	}
 
-	$scope.shouldDisableEvaluate = function() {
-		return ($scope.shouldDisableControls() || $scope.runningEval);
-	}
-
 	$scope.shouldDisableClearButton = function() {
 		return (selectedDatasetInformation.getDatasetCount() == 0);
 	}
