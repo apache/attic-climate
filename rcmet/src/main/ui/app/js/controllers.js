@@ -241,6 +241,25 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 		});
 	}
 
+	// Check the Parameter selection boxes after the user has changed input to ensure that valid
+	// values were entered
+	$scope.checkParameters = function() {
+		if ($scope.displayParams.latMin < $scope.latMin) 
+			$scope.displayParams.latMin = $scope.latMin;
+		if ($scope.displayParams.latMax > $scope.latMax) 
+			$scope.displayParams.latMax = $scope.latMax;
+		if ($scope.displayParams.lonMin < $scope.lonMin) 
+			$scope.displayParams.lonMin = $scope.lonMin;
+		if ($scope.displayParams.lonMax > $scope.lonMax) 
+			$scope.displayParams.lonMax = $scope.lonMax;
+		if ($scope.displayParams.start < $scope.start) 
+			$scope.displayParams.start = $scope.start;
+		if ($scope.displayParams.end > $scope.end)
+			$scope.displayParams.end = $scope.end;
+
+		$scope.$apply();
+	}
+
 	$scope.$watch('datasets', 
 		function() { 
 			var numDatasets = $scope.datasets.length;
@@ -272,12 +291,21 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 				$scope.areInUserRegridState = !datasetRegrid
 			}
 
+			// Update the display parameters with the new valid overlap that we've found!
 			$scope.displayParams.latMin = latMin;
 			$scope.displayParams.latMax = latMax;
 			$scope.displayParams.lonMin = lonMin;
 			$scope.displayParams.lonMax = lonMax;
 			$scope.displayParams.start = start.split(" ")[0];
 			$scope.displayParams.end = end.split(" ")[0];
+
+			// Update the local store values!
+			$scope.latMin = latMin;
+			$scope.latMax = latMax;
+			$scope.lonMin = lonMin;
+			$scope.lonMax = lonMax;
+			$scope.start = start.split(" ")[0];
+			$scope.end = end.split(" ")[0];
 		}, true);
 }
 

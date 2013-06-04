@@ -86,13 +86,13 @@
       <div class="span1 offset2 text-center">Start Date:</div>
       <div class="span2">
         <form>
-          <input type="text" class="text-center span2" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" />
+          <input type="text" class="text-center span2" on-blur="checkParameters();" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" />
         </form>
       </div>
       <div class="span1 text-center">End Date:</div>
       <div class="span2">
         <form>
-          <input type="text" class="text-center span2" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" />
+          <input type="text" class="text-center span2" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" />
         </form>
       </div>
       <div class="span1">
@@ -112,13 +112,13 @@
       <div class="span1 offset2 text-center">North:</div>
       <div class="span2">
         <form action="">
-		      <input ng-model="displayParams.latMax" type="text" class="span2 text-center" />
+		      <input ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span2 text-center" />
         </form>
       </div>
       <div class="span1 text-center">East:</div>
       <div class="span2">
         <form>
-		      <input ng-model="displayParams.lonMax" type="text" class="span2 text-center" />
+		      <input ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span2 text-center" />
         </form>
       </div>
       <div class="span2">
@@ -132,13 +132,13 @@
       <div class="span1 offset2 text-center">South:</div>
       <div class="span2">
         <form action="">
-		      <input ng-model="displayParams.latMin" type="text" class="span2 text-center" />
+		      <input ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span2 text-center" />
         </form>
       </div>
       <div class="span1 text-center">West:</div>
       <div class="span2">
         <form>
-		      <input ng-model="displayParams.lonMin" type="text" class="span2 text-center" />
+		      <input ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span2 text-center" />
         </form>
       </div>
     </div>
