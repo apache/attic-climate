@@ -123,7 +123,7 @@ fi
 
 ### Install the latest RCMET code for development!
 header "Grabbing RCMET code"
-svn co http://oodt.jpl.nasa.gov/repo/projects/rcmes/trunk/rcmet/src/main/python/rcmes src/rcmes
+svn co https://svn.apache.org/repos/asf/incubator/climate/trunk/rcmet/src/main/python/rcmes/ src/rcmes
 
 ### Build
 header "Begin Buildout"
