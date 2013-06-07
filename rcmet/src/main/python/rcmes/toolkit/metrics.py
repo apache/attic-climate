@@ -19,139 +19,215 @@
 Module storing functions to calculate statistical metrics from numpy arrays
 '''
 
-import datetime
 import subprocess
-import sys
 import os
 import numpy as np
 import numpy.ma as ma
+import scipy.stats as stats
+import scipy.stats.mstats as mstats
 from toolkit import plots, process
 from utils import misc
 from storage import files 
 
-def calc_ann_mean(t2, time):
+def calcAnnualCycleMeans(dataset1, times):
     '''
-    Calculate annual cycle in terms of monthly means at every grid point.
-    '''
-    # Calculate annual cycle in terms of monthly means at every grid point including single point case (ndim=1)
+    Purpose:: 
+        Calculate annual cycle in terms of monthly means at every grid point.
+
+    Input::
+        dataset1 - 3d numpy array of data in (t,lat,lon) or 1d numpy array timeseries
+        times - an array of python datetime objects
+
+    Output:: 
+        means - if 3d numpy was entered, 3d (# of months,lat,lon), if 1d data entered
+        it is a timeseries of the data of length # of months
+
+     '''
+    
     # note: this routine is identical to 'calc_annual_cycle_means': must be converted to calculate the annual mean
     # Extract months from time variable
-    months = np.empty(len(time))
-    for t in np.arange(len(time)):
+    months = np.empty(len(times))
+
+    for t in np.arange(len(times)):
         months[t] = time[t].month
-    if t2.ndim == 3:
-        means = ma.empty((12, t2.shape[1], t2.shape[2])) # empty array to store means
+
+    if dataset1.ndim == 3:
+        means = ma.empty((12, dataset1.shape[1], dataset1.shape[2])) # empty array to store means
         # Calculate means month by month
         for i in np.arange(12)+1:
-            means[i - 1, :, :] = t2[months == i, :, :].mean(0)
-    if t2.ndim == 1:
+            means[i - 1, :, :] = dataset1[months == i, :, :].mean(0)
+
+    if dataset1.ndim == 1:
         means = np.empty((12)) # empty array to store means
         # Calculate means month by month
         for i in np.arange(12)+1:
-            means[i - 1] = t2[months == i].mean(0)
+            means[i - 1] = dataset1[months == i].mean(0)
+
     return means
 
+'''
+def calcClimMonth(dataset1, times):
+    
+    Purpose:: 
+        Calculate annual cycle in terms of monthly means at every grid point.
 
-def calc_clim_month(t2, time):
-    '''
-    Calculate monthly means at every grid point.
-    '''
-    # Calculate monthly means at every grid point including single point case (ndim=1)
-    # Extract months from time variable
-    months = np.empty(len(time))
-    for t in np.arange(len(time)):
+    Input::
+        dataset1 - 3d numpy array of data in (t,lat,lon) or 1d numpy array timeseries
+        times - an array of python datetime objects
+
+    Output:: means - if 3d numpy was entered, 3d (# of months,lat,lon), if 1d data entered
+        it is a timeseries of the data of length # of months
+
+    Same as calcAnnulCycleMeans
+    Deprivable as not called anywhere in the code. 5 Jun 2013.
+    
+    months = np.empty(len(times))
+
+    for t in np.arange(len(times)):
         months[t] = time[t].month
-    if t2.ndim == 3:
-        means = ma.empty((12, t2.shape[1], t2.shape[2])) # empty array to store means
+
+    if dataset1.ndim == 3:
+        means = ma.empty((12, dataset1.shape[1], dataset1.shape[2])) # empty array to store means
         # Calculate means month by month
-        for i in np.arange(12) + 1:
-            means[i - 1, :, :] = t2[months == i, :, :].mean(0)
-    if t2.ndim == 1:
+        for i in np.arange(12)+1:
+            means[i - 1, :, :] = dataset1[months == i, :, :].mean(0)
+
+    if dataset1.ndim == 1:
         means = np.empty((12)) # empty array to store means
         # Calculate means month by month
-        for i in np.arange(12) + 1:
-            means[i - 1] = t2[months == i].mean(0)
+        for i in np.arange(12)+1:
+            means[i - 1] = dataset1[months == i].mean(0)
+
     return means
+'''
 
-
-def calc_clim_year(nYR, nT, ngrdY, ngrdX, t2, time):
+def calcClimYear(nYR, dataset1, times):
     '''
-    Calculate annual mean timeseries and climatology for both 2-D and point time series.
+    Purpose:: 
+       Calculate annual mean timeseries and climatology for both 2-D and point time series.
+
+    Input::
+        nYR - an integer for the number of years
+        dataset1 - 3d numpy array of data in (t,lat,lon) or 1d numpy array timeseries
+        times - an array of python datetime objects
+
+    Output:: 
+        tSeries - if 3d numpy was entered, 3d (nYr,lat,lon), if 1d data entered
+        it is a timeseries of the data of length nYr
+        means - if 3d numpy was entered, 2d (lat,lon), if 1d data entered
+        it is a floating point number representing the overall mean
     '''
     # Extract months from time variable
-    yy = np.empty(nT)
-    mm = np.empty(nT)
-    for t in np.arange(nT):
-        yy[t] = time[t].year
-        mm[t] = time[t].month
-    if t2.ndim == 3:
+    nT = dataset1.shape[0]
+    ngrdY = dataset1.shape[1]
+    ngrdX = dataset1.shape[2]
+    yy = times.year
+    mm = times.month
+
+    #np.empty(nT)
+    #mm = np.empty(nT)
+
+    #for t in np.arange(nT):
+    #    yy[t] = time[t].year
+    #    mm[t] = time[t].month
+
+    if dataset1.ndim == 3:
         tSeries = ma.zeros((nYR, ngrdY, ngrdX))
-        i = 0
-        for myunit in np.unique(yy):
-            wh = (yy == myunit)
-            data = t2[wh, :, :]
-            tSeries[i, :, :] = ma.average(data, axis = 0)
+        #i = 0
+        for i, myunit in enumerate(np.unique(yy)):
+            dataTemporary = dateset1[(yy == myunit), :, :]
+            tSeries[i, :, :] = ma.average(dataTemporary, axis = 0)
             #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy
-            i += 1
-        means = ma.zeros((ngrdY, ngrdX))
         means = ma.average(tSeries, axis = 0)
-    elif t2.ndim == 1:
+
+    elif dateset1.ndim == 1:
         tSeries = ma.zeros((nYR))
-        i = 0
-        for myunit in np.unique(yy):
-            wh = (yy == myunit)
-            data = t2[wh]
-            tSeries[i] = ma.average(data, axis = 0)
+        for i, myunit in enumerate(np.unique(yy)):
+            dataTemporary = dateset1[(yy == myunit)]
+            tSeries[i] = ma.average(dataTemporary, axis = 0)
             #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy
-            i += 1
-        means = ma.zeros((ngrdY, ngrdX))
         means = ma.average(tSeries, axis = 0)
+
     return tSeries, means
 
 
-def calc_clim_season(nYR, nT, mB, mE, ngrdY, ngrdX, t2, time):
+def calcClimSeason(monthBegin, monthEnd, dataset1, times):
     '''
-    Calculate seasonal mean timeseries and climatology for both 2-D and point time series.
+    Purpose :: 
+       Calculate seasonal mean timeseries and climatology for both 3-D and point time series.
+       For example, to calculate DJF mean time series, monthBegin = 12, monthEnd =2 
+       This can handle monthBegin=monthEnd i.e. for climatology of a specific month
+
+    Input::
+        monthBegin - an integer for the beginning month (Jan =1)
+        monthEnd - an integer for the ending month (Jan = 1)
+        dataset1 - 3d numpy array of data in (t,lat,lon) or 1d numpy array timeseries
+        times - an array of python datetime objects
+
+    Output:: 
+        tSeries - if 3d numpy was entered, 3d (number of years/number of years -1 if monthBegin > monthEnd,lat,lon),
+        if 1d data entered it is a timeseries of the data of length number of years
+        means - if 3d numpy was entered, 2d (lat,lon), if 1d data entered
+        it is a floating point number representing the overall mean
     '''
     #-------------------------------------------------------------------------------------
     # Calculate seasonal mean timeseries and climatology for both 2-d and point time series
     # The season to be calculated is defined by moB and moE; moE>=moB always
     #-------------------------------------------------------------------------------------
     # Extract months from time variable
-    yy = np.empty(nT)
-    mm = np.empty(nT)
-    for t in np.arange(nT):
-        yy[t] = time[t].year
-        mm[t] = time[t].month
-    if t2.ndim == 3:
-        tSeries = ma.zeros((nYR, ngrdY, ngrdX))
-        i = 0
-        for myunit in np.unique(yy):
-            wh = (yy == myunit) & (mm >= mB) & (mm <= mE)
-            data = t2[wh, :, :]
-            tSeries[i, :, :] = ma.average(data, axis = 0)
-            #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy
-            i += 1
-        means = ma.zeros((ngrdY, ngrdX))
+    nT = dataset1.shape[0]
+    ngrdY = dataset1.shape[1]
+    ngrdX = dataset1.shape[2]
+    mm = times.month
+
+    indexBeginMonth=np.where(mm==monthBegin)   # beginning month of each year
+    indexEndMonth=np.where(mm==monthEnd)   # ending month of each year
+    # For special case where monthEnd is smaller then monthBegin e.g. DJF
+    indexB2=np.array(indexBeginMonth[0])
+    indexE2=np.array(indexEndMonth[0])
+    indexBeginMonth=indexB2[np.where(indexB2 < indexE2.max())]
+    indexEndMonth=indexE2[np.where(indexE2 > indexB2.min())]
+    
+    if dataset1.ndim == 3:
+        tSeries = ma.zeros((len(indexBeginMonth), ngrdY, ngrdX))
+       
+        for i,myunit in enumerate(np.arange(len(indexBeginMonth))):
+            dataTemporary = dataset1[indexBeginMonth[i]:indexEndMonth[i]+1, :, :]
+            tSeries[i, :, :] = ma.average(dataTemporary, axis = 0)
+            #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy      
+       
         means = ma.average(tSeries, axis = 0)
-    elif t2.ndim == 1:
+
+    elif dataset1.ndim == 1:
         tSeries = ma.zeros((nYR))
-        i = 0
-        for myunit in np.unique(yy):
-            wh = (yy == myunit) & (mm >= mB) & (mm <= mE)
-            data = t2[wh]
-            tSeries[i] = ma.average(data, axis = 0)
+        for i, myunit in enumerate(np.arange(len(indexBeginMonth))):
+            dataTemporary = dataset1[indexBeginMonth[i]:indexEndMonth[i]+1]
+            tSeries[i] = ma.average(dataTemporary, axis = 0)
             #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy
-            i += 1
-        means = ma.zeros((ngrdY, ngrdX))
+           
         means = ma.average(tSeries, axis = 0)
     return tSeries, means
 
-
+'''
 def calc_clim_mo(nYR, nT, ngrdY, ngrdX, t2, time):
-    '''
-    Calculate monthly means at every grid points and the annual time series of single model.
-    '''
+    
+    Purpose:: 
+       Calculate monthly means at every grid points and the annual time series of single model.
+
+    Input::
+        monthBegin - an integer for the beginning month (Jan =1)
+        monthEnd - an integer for the ending month (Jan = 1)
+        dataset1 - 3d numpy array of data in (t,lat,lon) or 1d numpy array timeseries
+        times - an array of python datetime objects
+
+    Output:: 
+        tSeries - if 3d numpy was entered, 3d (number of years/number of years -1 if monthBegin > monthEnd,lat,lon),
+        if 1d data entered it is a timeseries of the data of length number of years
+        means - if 3d numpy was entered, 2d (lat,lon), if 1d data entered
+        it is a floating point number representing the overall mean
+
+    Deprivable because this funtionality has been handled in the general function calcClimSeason
+    
     #-------------------------------------------------------------------------------------
     # JK20: This routine is modified from 'calc_clim_month'  with additional arguments and
     #       output, the annual time series of single model output (mData)
@@ -188,12 +264,13 @@ def calc_clim_mo(nYR, nT, ngrdY, ngrdX, t2, time):
         for i in np.arange(12) + 1:
             means[i - 1] = t2[months == i].mean(0)
     return mData, means
-
-
+'''
+'''
 def calc_clim_One_month(moID, nYR, nT, t2, time):
-    '''
+    
     Calculate the montly mean at every grid point for a specified month.
-    '''
+    Deprivable because this funtionality has been handled in the general function calcClimSeason
+    
     #-------------------------------------------------------------------------------------
     # Calculate monthly means at every grid point for a specified month
     #-------------------------------------------------------------------------------------
@@ -211,16 +288,18 @@ def calc_clim_One_month(moID, nYR, nT, t2, time):
         # Calculate means for the month specified by moID
         means[:, :] = t2[months == moID, :, :].mean(0)
     return mData, means
-
-
+'''
+'''
 def calc_annual_cycle_means(data, time):
-    '''
+    
      Calculate monthly means for every grid point
      
      Inputs:: 
      	data - masked 3d array of the model data (time, lon, lat)
      	time - an array of python datetime objects
-    '''
+     
+     Deprivable because this does the exact same calculation as calcAnnualCycleMeans
+
     # Extract months from time variable
     months = np.empty(len(time))
     
@@ -246,82 +325,122 @@ def calc_annual_cycle_means(data, time):
             means[i - 1] = data[months == i].mean(0)
     
     return means
+'''
 
-
-def calc_annual_cycle_std(data, time):
+def calcAnnualCycleStdev(dataset1, times):
     '''
-     Calculate monthly standard deviations for every grid point
+     Purpose:: 
+        Calculate monthly standard deviations for every grid point
+     
+     Input::
+        dataset1 - 3d numpy array of data in (12* number of years,lat,lon) 
+        times - an array of python datetime objects
+
+     Output:: 
+        stds - if 3d numpy was entered, 3d (12,lat,lon)
     '''
     # Extract months from time variable
-    months = np.empty(len(time))
-    
-    for t in np.arange(len(time)):
-        months[t] = time[t].month
+    months = times.month
     
     # empty array to store means
-    stds = np.empty((12, data.shape[1], data.shape[2]))
+    stds = np.empty((12, dataset1.shape[1], dataset1.shape[2]))
     
-    # Calculate means month by month
-    for i in np.arange(12) + 1:
-        stds[i - 1, :, :] = data[months == i, :, :].std(axis = 0, ddof = 1)
+    # Calculate sample standard deviation month by month (January - December)
+    for i in np.arange(12):
+        stds[i, :, :] = dataset1[months == i+1, :, :].std(axis = 0, ddof = 1)
     
     return stds
 
 
-def calc_annual_cycle_domain_means(data, time):
+def calcAnnualCycleDomainMeans(dataset1, times):
     '''
-     Calculate domain means for each month of the year
+     Purpose:: 
+        Calculate spatially averaged monthly climatology and standard deviation
+
+     Input::
+        dataset1 - 3d numpy array of data in (12* number of years,lat,lon) 
+        times - an array of python datetime objects
+
+     Output::  
+        means - time series (12)
     '''
-    # Extract months from time variable
-    months = np.empty(len(time))
-    
-    for t in np.arange(len(time)):
-        months[t] = time[t].month
+     # Extract months from time variable
+    months = times.month
        	
     means = np.empty(12) # empty array to store means
     
     # Calculate means month by month
     for i in np.arange(12) + 1:
-        means[i - 1] = data[months == i, :, :].mean()
+        means[i - 1] = dataset1[months == i, :, :].mean()
     
     return means
 
-
-def calc_annual_cycle_domain_std(data, time):
+def calcTemporalStdev(dataset1):
     '''
-     Calculate domain standard deviations for each month of the year
+     Purpose:: 
+        Calculate sample standard deviations over the time
+
+     Input::
+        dataset1 - 3d numpy array of data in (time,lat,lon) 
+        
+
+     Output::  
+        stds - time series (lat, lon)
+    '''
+    stds = dataset1.std(axis=0, ddof=1)
+    return stds
+
+def calcAnnualCycleDomainStdev(dataset1, times):
+    '''
+     Purpose:: 
+        Calculate sample standard deviations representing the domain in each month
+
+     Input::
+        dataset1 - 3d numpy array of data in (12* number of years,lat,lon) 
+        times - an array of python datetime objects
+
+     Output::  
+        stds - time series (12)
     '''
     # Extract months from time variable
-    months = np.empty(len(time))
+    months = times.month
     
-    for t in np.arange(len(time)):
-        months[t] = time[t].month
+    stds = np.empty(12) # empty array to store standard deviations
     
-    stds = np.empty(12) # empty array to store means
-    
-    # Calculate means month by month
+    # Calculate standard deviations of the entire domain from January through December
     for i in np.arange(12) + 1:
-        stds[i - 1] = data[months == i, :, :].std(ddof = 1)
+        stds[i - 1] = dataset1[months == i, :, :].std(ddof = 1)
     
     return stds
 
 
-def calc_bias_annual(t1, t2, optn):        # Mean Bias
+def calcBiasAveragedOverTime(evaluationData, referenceData, option):        # Mean Bias
     '''
-    Calculate the mean difference between two fields over time for each grid point.
+    Purpose:: 
+        Calculate the mean difference between two fields over time for each grid point.
+
+     Input::
+        referenceData - array of data 
+        evaluationData - array of data with same dimension of referenceData 
+        option - string indicating absolute values or not
+
+     Output::  
+        bias - difference between referenceData and evaluationData averaged over the first dimension
+    
     '''
     # Calculate mean difference between two fields over time for each grid point
     # Precrocessing of both obs and model data ensures the absence of missing values
-    diff = t1-t2
-    if(open == 'abs'): 
+    diff = evaluationData - referenceData
+    if(option == 'abs'): 
         diff = abs(diff)
     bias = diff.mean(axis = 0)
     return bias
 
 
-def calc_bias(t1, t2):
+def calcBiasAveragedOverTimeAndSigLev(evaluationData, referenceData):
     '''
-    Calculate mean difference between two fields over time for each grid point
+    Purpose::
+        Calculate mean difference between two fields over time for each grid point
     
     Classify missing data resulting from multiple times (using threshold 
     data requirement)
@@ -330,40 +449,77 @@ def calc_bias(t1, t2):
     multiple months of data then when we show mean of several months, we need
     to decide what threshold of missing data we tolerate before classifying a
     data point as missing data.
+ 
+        
+     Input::
+        referenceData - array of data 
+        evaluationData - array of data with same dimension of referenceData 
+
+     Output::  
+        bias - difference between referenceData and evaluationData averaged over the first dimension
+        sigLev - significance of the difference (masked array)
+        For example: sig[iy,ix] = 0.95 means that the observation and model is different at 95% confidence level 
+        at X=ix and Y=iy
     '''
-    t1Mask = process.create_mask_using_threshold(t1, threshold = 0.75)
-    t2Mask = process.create_mask_using_threshold(t2, threshold = 0.75)
+    evaluationDataMask = process.create_mask_using_threshold(evaluationData, threshold = 0.75)
+    referenceDataMask = process.create_mask_using_threshold(referenceData, threshold = 0.75)
     
-    diff = t1 - t2
+    diff = evaluationData - referenceData
     bias = diff.mean(axis = 0)
-    
+    ngrdY = evaluationData.shape[1]
+    ngrdX = evaluationData.shape[2]
+    sigLev = ma.zeros([ngrdY,ngrdX])-100.
+    for iy in np.arange(ngrdY):
+        for ix in np.arange(ngrdX):
+            if not evaluationDataMask[iy,ix] and not referenceDataMask[iy,ix]:
+               sigLev [iy,ix] = 1-stats.ttest_rel(evaluationData[:,iy,ix],referenceData[:,iy,ix])[1]
+                
+    sigLev = ma.masked_equal(sigLev.data, -100.) 
     # Set mask for bias metric using missing data in obs or model data series
     #   i.e. if obs contains more than threshold (e.g.50%) missing data 
     #        then classify time average bias as missing data for that location. 
-    bias = ma.masked_array(bias.data, np.logical_or(t1Mask, t2Mask))
-    return bias
+    bias = ma.masked_array(bias.data, np.logical_or(evaluationDataMask, referenceDataMask))
+    return bias, sigLev
 
 
-def calc_bias_dom(t1, t2):
+def calcBiasAveragedOverTimeAndDomain(evaluationData, referenceData):
     '''
-     Calculate domain mean difference between two fields over time
+    Purpose:: 
+        Calculate the mean difference between two fields over time and domain
+     Input::
+        referenceData - array of data 
+        evaluationData - array of data with same dimension of referenceData 
+        
+     Output::  
+        bias - difference between referenceData and evaluationData averaged over time and space
+    
     '''
-    diff = t1 - t2
+
+    diff = evaluationData - referenceData
+    
     bias = diff.mean()
     return bias
 
+def calcBias(evaluationData, referenceData):
+    '''
+    Purpose:: 
+        Calculate the difference between two fields at each grid point
 
-def calc_difference(t1, t2):
+     Input::
+        referenceData - array of data 
+        evaluationData - array of data with same dimension of referenceData 
+        
+     Output::  
+        diff - difference between referenceData and evaluationData
+    
     '''
-     Calculate mean difference between two fields over time for each grid point
-    '''
-    print 'Calculating difference'
-    diff = t1 - t2
+
+    diff = evaluationData - referenceData
     return diff
 
-
+'''
 def calc_mae(t1, t2):
-    '''
+   
     Calculate mean difference between two fields over time for each grid point
     
     Classify missing data resulting from multiple times (using threshold 
@@ -373,7 +529,8 @@ def calc_mae(t1, t2):
     multiple months of data then when we show mean of several months, we need
     to decide what threshold of missing data we tolerate before classifying
     a data point as missing data.
-    '''
+    Deprivable because this funtionality has been handled in the general function calcBiasAveragedOverTime
+   
     t1Mask = process.create_mask_using_threshold(t1, threshold = 0.75)
     t2Mask = process.create_mask_using_threshold(t2, threshold = 0.75)
     
@@ -387,124 +544,144 @@ def calc_mae(t1, t2):
     #        then classify time average mae as missing data for that location. 
     mae = ma.masked_array(mae.data, np.logical_or(t1Mask, t2Mask))
     return mae
-
-
+'''
+'''
 def calc_mae_dom(t1, t2):
-    '''
+   
      Calculate domain mean difference between two fields over time
-    '''
+     Deprivable because this funtionality has been handled in the general function calcBiasAveragedOverTimeAndDomain
+    
     diff = t1 - t2
     adiff = abs(diff)
     mae = adiff.mean()
     return mae
+'''
 
+def calcRootMeanSquaredDifferenceAveragedOverTime(evaluationData, referenceData):
+    '''
+    Purpose:: 
+        Calculate root mean squared difference (RMS errors) averaged over time between two fields for each grid point
 
-def calc_rms(t1, t2):
+     Input::
+        referenceData - array of data 
+        evaluationData - array of data with same dimension of referenceData 
+        
+     Output::  
+        rms - root mean squared difference, if the input is 1-d data, the output becomes a single floating number.
+    
     '''
-     Calculate mean difference between two fields over time for each grid point
-    '''
-    diff = t1 - t2
-    sqdiff = diff ** 2
-    msd = sqdiff.mean(axis = 0)
-    rms = np.sqrt(msd)
+    sqdiff = (evaluationData - referenceData)** 2
+    rms = np.sqrt(sqdiff.mean(axis = 0))
     return rms
 
 
-def calc_rms_dom(t1, t2):
+def calcRootMeanSquaredDifferenceAveragedOverTimeAndDomain(evaluationData, referenceData):
     '''
-     Calculate domain mean difference between two fields over time
+    Purpose:: 
+        Calculate root mean squared difference (RMS errors) averaged over time and space between two fields
+
+     Input::
+        referenceData - array of data (should be 3-d array)
+        evaluationData - array of data with same dimension of referenceData 
+        
+     Output::  
+        rms - root mean squared difference averaged over time and space
     '''
-    diff = t1 - t2
-    sqdiff = diff ** 2
-    msd = sqdiff.mean()
-    rms = np.sqrt(msd)
+    sqdiff = (evaluationData - referenceData)** 2
+    rms = np.sqrt(sqdiff.mean())
     return rms
 
-
-def calc_temporal_stdv(t1):
+def calcTemporalCorrelation(evaluationData, referenceData):
     '''
-    Calculate the temporal standard deviation.
+    Purpose ::
+        Calculate the temporal correlation.
 
-    Input:
-        t1 - data array of any shape
+    Assumption(s) ::
+        The first dimension of two datasets is the time axis.
 
-    Output:
-        A 2-D array of temporal standard deviation
-    '''
-    # TODO Make sure the first dimension of t1 is the time axis.
-    stdv = t1.std(axis = 0)
-    return stdv
+    Input ::
+        evaluationData - model data array of any shape
+        referenceData- observation data array of any shape
 
-
-def calc_temporal_anom_cor(mD, oD):
-    '''
-    Calculate the temporal anomaly correlation.
-
-    Assumption(s);
-        The first dimension of mD and oD is the time axis.
-
-    Input:
-        mD - model data array of any shape
-        oD - observation data array of any shape
-
-    Output:
-        A 2-D array of time series pattern correlation coefficients at each grid point.
+    Output::
+        temporalCorelation - A 2-D array of temporal correlation coefficients at each grid point.
+        sigLev - A 2-D array of confidence levels related to temporalCorelation 
 
     REF: 277-281 in Stat methods in atmos sci by Wilks, 1995, Academic Press, 467pp.
+    sigLev: the correlation between model and observation is significant at sigLev * 100 %
     '''
-    mo = oD.mean(axis = 0)
-    nt = oD.shape[0]
-    deno1 = ((mD - mo) * (mD - mo)).sum(axis = 0)
-    deno2 = ((oD - mo) * (oD - mo)).sum(axis = 0)
-    patcor = ((mD - mo) * (oD - mo)).sum(axis = 0) / sqrt(deno1 * deno2)
-    return patcor
+    evaluationDataMask = process.create_mask_using_threshold(evaluationData, threshold = 0.75)
+    referenceDataMask = process.create_mask_using_threshold(referenceData, threshold = 0.75)
+
+    ngrdY = evaluationData.shape[1] 
+    ngrdX = evaluationData.shape[2] 
+    temporalCorrelation = ma.zeros([ngrdY,ngrdX])-100.
+    sigLev = ma.zeros([ngrdY,ngrdX])-100.
+    for iy in np.arange(ngrdY):
+        for ix in np.arange(ngrdX):
+            if not evaluationDataMask[iy,ix] and not referenceDataMask[iy,ix]:
+                t1=evaluationData[:,iy,ix]
+                t2=referenceData[:,iy,ix]
+                if t1.min()!=t1.max() and t2.min()!=t2.max():
+                    temporalCorrelation[iy,ix], sigLev[iy,ix]=stats.pearsonr(t1[(t1.mask==False) & (t2.mask==False)],
+                                                  t2[(t1.mask==False) & (t2.mask==False)])
+                    sigLev[iy,ix]=1-sigLev[iy,ix]  # p-value => confidence level
+
+    temporalCorrelation=ma.masked_equal(temporalCorrelation.data, -100.)        
+    sigLev=ma.masked_equal(sigLev.data, -100.)    
+
+    return temporalCorrelation, sigLev
 
 
-def calc_spatial_anom_cor(mD, oD):
+def calcPatternCorrelation(evaluationData, referenceData):
     '''
-    Calculate anomaly correlation between two 2-D arrays.
+    Purpose ::
+        Calculate the spatial correlation.
 
-    Input:
-        mD - 2-D array of model data
-        oD - 2-D array of observation data
+    Input ::
+        evaluationData - model data array (lat, lon)
+        referenceData- observation data array (lat,lon)
 
-    Output:
-        The anomaly correlation between the two input arrays.
-    '''
-    mo = oD.mean()
-    d1 = ((mD - mo)*(mD - mo)).sum()
-    d1 = ((oD - mo)*(oD - mo)).sum()
-    patcor = ((mD - mo) * (oD - mo)).sum() / sqrt(d1 * d2)
-    return patcor
-
-
-def calc_temporal_pat_cor(t1, t2):
-    '''
-     Calculate the Temporal Pattern Correlation
+    Output::
+        patternCorrelation - a single floating point
+        sigLev - a single floating point representing the confidence level 
     
-      Input::
-        t1 - 3d array of model data
-        t2 - 3d array of obs data
-         
-      Output::
-        2d array of time series pattern correlation coefficients at each grid point.
-        **Note:** std_dev is standardized on 1 degree of freedom
     '''
-    mt1 = t1[:, :, :].mean(axis = 0)
-    mt2 = t2[:, :, :].mean(axis = 0)
-    nt = t1.shape[0]
-    sigma_t1 = t1.std(axis = 0, ddof = 1)
-    sigma_t2 = t2.std(axis = 0, ddof = 1)
-    # TODO - What is ddof=1?  Will a user want to change this value?
-    patcor = ((((t1[:, :, :] - mt1) * 
-                (t2[:, :, :] - mt2)).sum(axis = 0)) / 
-              (nt)) / (sigma_t1 * sigma_t2)
-    
-    return patcor
+   
+    patternCorrelation, sigLev = stats.pearsonr(evaluationData[(evaluationData.mask==False) & (referenceData.mask==False)],
+                          referenceData[(evaluationData.mask==False) & (referenceData.mask==False)])
+    return patternCorrelation, sigLev
 
 
+def calcPatternCorrelationEachTime(evaluationData, referenceData):
+    '''
+     Purpose ::
+        Calculate the spatial correlation for each time
+
+     Assumption(s) ::
+        The first dimension of two datasets is the time axis.
+
+     Input ::
+        evaluationData - model data array (time,lat, lon)
+        referenceData- observation data array (time,lat,lon)
+
+     Output::
+        patternCorrelation - a timeseries (time)
+        sigLev - a time series (time)
+    '''
+     
+    nT = evaluationData.shape[0]
+    patternCorrelation = ma.zeros(nT)-100.
+    sigLev = ma.zeros(nT)-100.
+    for it in np.arange(nT):
+        patternCorrelation[it], sigLev[it] = calcPatternCorrelation(evaluationData[it,:,:], referenceData[it,:,:])
+
+    return patternCorrelation,sigLev
+
+'''
+Deprivable because of overlapping function, calcPatternCorrelation, exist
 def calc_spatial_pat_cor(t1, t2, nY, nX):
-    '''
+    
     Calcualte pattern correlation between 2-D arrays.
 
     Input:
@@ -515,7 +692,7 @@ def calc_spatial_pat_cor(t1, t2, nY, nX):
 
     Output:
         Pattern correlation between two input arrays.
-    '''
+    
     # TODO - Update docstring. What are nY and nX?
     mt1 = t1.mean()
     mt2 = t2.mean()
@@ -523,10 +700,12 @@ def calc_spatial_pat_cor(t1, t2, nY, nX):
     st2 = t2.std()
     patcor = ((t1 - mt1) * (t2 - mt2)).sum() / (float(nX * nY) * st1 * st2)
     return patcor
+'''
 
-
+'''
+Deprivable because of overlapping function, calcPatternCorrelationEachTime, exist
 def calc_pat_cor2D(t1, t2, nT):
-    '''
+    
     Calculate the pattern correlation between 3-D input arrays.
 
     Input:
@@ -536,7 +715,7 @@ def calc_pat_cor2D(t1, t2, nT):
 
     Output:
         1-D array (time series) of pattern correlation coefficients.
-    '''
+    
     # TODO - Update docstring. What is nT?
     nt = t1.shape[0]
     if(nt != nT):
@@ -549,7 +728,7 @@ def calc_pat_cor2D(t1, t2, nT):
         mt2 = t2[t, :, :].mean()
         sigma_t1 = t1[t, :, :].std()
         sigma_t2 = t2[t, :, :].std()
-        # TODO: make means and standard deviations weighted by grid box area.
+         # TODO: make means and standard deviations weighted by grid box area.
         patcor.append((((((t1[t, :, :] - mt1) * (t2[t, :, :] - mt2)).sum()) / 
                      (t1.shape[1] * t1.shape[2]) ) / (sigma_t1 * sigma_t2)))
         print t, mt1.shape, mt2.shape, sigma_t1.shape, sigma_t2.shape, patcor[t]
@@ -558,9 +737,11 @@ def calc_pat_cor2D(t1, t2, nT):
     patcor = numpy.array(patcor)
     print patcor.shape
     return patcor
-
+'''    
+'''
+Deprivable because of overlapping function, calcPatternCorrelationEachTime, exists
 def calc_pat_cor(dataset_1, dataset_2):
-    '''
+    
      Purpose: Calculate the Pattern Correlation Timeseries
 
      Assumption(s)::  
@@ -577,7 +758,7 @@ def calc_pat_cor(dataset_1, dataset_2):
     
      **Note:** Standard deviation is using 1 degree of freedom.  Debugging print 
      statements to show the difference the n-1 makes. http://docs.scipy.org/doc/numpy/reference/generated/numpy.std.html
-    '''
+    
 
     # TODO:  Add in try block to ensure the shapes match
     nt = dataset_1.shape[0]
@@ -606,10 +787,11 @@ def calc_pat_cor(dataset_1, dataset_2):
     
     print patcor.shape
     return patcor
-
-
+'''
+'''
+TODO: KDW working on pattern correlation against reference climatology. 5 Jun 2013 
 def calc_anom_corn(dataset_1, dataset_2, climatology = None):
-    '''
+    
     Calculate the anomaly correlation.
 
     Input:
@@ -620,7 +802,7 @@ def calc_anom_corn(dataset_1, dataset_2, climatology = None):
 
     Output:
         The anomaly correlation.
-    '''
+    
     # TODO: Update docstring with actual useful information
 
     # store results in list for convenience (then convert to numpy array)
@@ -653,12 +835,12 @@ def calc_anom_corn(dataset_1, dataset_2, climatology = None):
     anomcor = np.array(anomcor)
     print anomcor.shape, anomcor.ndim, anomcor
     return anomcor
-
-
+'''
+'''
 def calc_anom_cor(t1, t2):
-    '''
+    
      Calculate the Anomaly Correlation (Deprecated)
-    '''
+    
     
     nt = t1.shape[0]
     
@@ -686,10 +868,11 @@ def calc_anom_cor(t1, t2):
     anomcor = np.array(anomcor)
     print anomcor.shape, anomcor.ndim, anomcor
     return anomcor
-
+'''
 
 def calc_nash_sutcliff(dataset_1, dataset_2):
     '''
+    TODO: KYO and KDW 5 Jun 2013
     Routine to calculate the Nash-Sutcliff coefficient of efficiency (E)
     
     Assumption(s)::  
@@ -724,6 +907,7 @@ def calc_nash_sutcliff(dataset_1, dataset_2):
 
 def calc_pdf(dataset_1, dataset_2):
     '''
+    TODO: KYO and KDW 5 Jun 2013
     Routine to calculate a normalized Probability Distribution Function with 
     bins set according to data range.
     Equation from Perkins et al. 2007
@@ -811,17 +995,19 @@ def calc_pdf(dataset_1, dataset_2):
     print 'similarity_score is', similarity_score
     return similarity_score
 
-
-def calc_stdev(t1):
-    ''' 
-    Calculate the standard deviation for a given dataset.
+'''
+Deprivable functionality in calcTemporalStdev
+def calcStdev(dataset1):
+     
+    Purpose::
+        Calculate the standard deviation for a given dataset.
 
     Input:
         t1 - Dataset to calculate the standard deviation on.
 
     Output:
         Array of the standard deviations for each month in the provided dataset.
-    '''
+    
     nt = t1.shape[0]
     sigma_t1 = []
     for t in xrange(nt):
@@ -829,10 +1015,10 @@ def calc_stdev(t1):
     sigma_t1 = np.array(sigma_t1)
     print sigma_t1, sigma_t1.shape
     return sigma_t1
+'''
 
-
-def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
-                  lats, obsData, mdlData, obsList, mdlList, workdir, subRegions, fileOutputOption):
+def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, 
+                  lats, obsData, mdlData, obsList, mdlList, workdir,subRegions, FoutOption):
     '''
     Calculate evaluation metrics and generate plots.
     '''
@@ -857,7 +1043,6 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     #        obsList          - string describing the observation data files
     #        mdlList          - string describing model file names
     #        workdir        - string describing the directory path for storing results and plots
-    #        subRegions        - list of SubRegion Objects or False
     #JK2.0:  mdlSelect        - the mdl data to be evaluated: Locally determined in v.2.0
     #JK2.0:  obsSelect        - the obs data to be used as the reference for evaluation: Locally determined in v.2.0
     #JK2.0:  numSubRgn        - the number of subregions: Locally determined in v.2.0
@@ -890,50 +1075,48 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     # modify this to add an option to read-in from data file(s)
     #----------------------------------------------------------------------------------------------------
     if subRegions:
-        numSubRgn = len(subRegions)
-        subRgnName = [ x.name   for x in subRegions ]
-        subRgnLon0 = [ x.lonMin for x in subRegions ]
-        subRgnLon1 = [ x.lonMax for x in subRegions ]
-        subRgnLat0 = [ x.latMin for x in subRegions ]
-        subRgnLat1 = [ x.latMax for x in subRegions ]
+       numSubRgn = len(subRegions)
+       subRgnName = [ x.name   for x in subRegions ]
+       subRgnLon0 = [ x.lonMin for x in subRegions ]
+       subRgnLon1 = [ x.lonMax for x in subRegions ]
+       subRgnLat0 = [ x.latMin for x in subRegions ]
+       subRgnLat1 = [ x.latMax for x in subRegions ]
     else:
-        print ''
-        ans = raw_input('Calculate area-mean timeseries for subregions? y/n: [n] \n')
-        print ''
-        if ans == 'y':
-            ans = raw_input('Input subregion info interactively? y/n: \n> ')
-            if ans == 'y':
-                numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
-            else:
-                print 'Read subregion info from a pre-fabricated text file'
-                ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
-                if ans == 'y':
-                    subRgnFileName = workdir + "/sub_regions.txt"
-                else:
-                    subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
-                print 'subRgnFileName ', subRgnFileName
-                numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
-            print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
-        else:
-            numSubRgn = 0
+       print ''
+       ans = raw_input('Calculate area-mean timeseries for subregions? y/n: \n> ')
+       print ''
+       if ans == 'y':
+           ans = raw_input('Input subregion info interactively? y/n: \n> ')
+           if ans == 'y':
+               numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
+           else:
+               print 'Read subregion info from a pre-fabricated text file'
+               ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
+               if ans == 'y':
+                   subRgnFileName = workdir + "/sub_regions.txt"
+               else:
+                   subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
+               print 'subRgnFileName ', subRgnFileName
+               numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
+           print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
+       else:
+           numSubRgn = 0
+
     # compute the area-mean timeseries for all subregions if subregion(s) are defined.
     #   the number of subregions is usually small and memory usage is usually not a concern
-    
     obsRgn = ma.zeros((numOBS, numSubRgn, nT))
     mdlRgn = ma.zeros((numMDL, numSubRgn, nT))
-            
-    if subRegions:        
+    if numSubRgn > 0:
         print 'Enter area-averaging: mdlData.shape, obsData.shape ', mdlData.shape, obsData.shape
-        print 'Using Latitude/Longitude Mask for Area Averaging'  
+        print 'Use Latitude/Longitude Mask for Area Averaging'
         for n in np.arange(numSubRgn):
             # Define mask using regular lat/lon box specified by users ('mask=True' defines the area to be excluded)
-            maskLonMin = subRegions[n].lonMin 
-            maskLonMax = subRegions[n].lonMax
-            maskLatMin = subRegions[n].latMin
-            maskLatMax = subRegions[n].latMax
+            maskLonMin = subRgnLon0[n] 
+            maskLonMax = subRgnLon1[n]
+            maskLatMin = subRgnLat0[n]
+            maskLatMax = subRgnLat1[n]
             mask = np.logical_or(np.logical_or(lats <= maskLatMin, lats >= maskLatMax), 
                                 np.logical_or(lons <= maskLonMin, lons >= maskLonMax))
-            
             # Calculate area-weighted averages within this region and store in a new list
             for k in np.arange(numOBS):           # area-average obs data
                 Store = []
@@ -948,19 +1131,18 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             Store = []                               # release the memory allocated by temporary vars
 
     #-------------------------------------------------------------------------
-    # (mp.002) fileOutputOption: The option to create a binary or netCDF file of processed 
+    # (mp.002) FoutOption: The option to create a binary or netCDF file of processed 
     #                      (re-gridded and regionally-averaged) data for user-specific processing. 
     #                      This option is useful for advanced users who need more than
     #                      the metrics and vidualization provided in the basic package.
     #----------------------------------------------------------------------------------------------------
     print ''
-    if not fileOutputOption:
-        while fileOutputOption not in ['no', 'nc']:
-            fileOutputOption = raw_input('Option for output files of obs/model data: Enter no/nc \
-                                for no, netCDF file \n> ').lower()
+    if not FoutOption:
+       FoutOption = raw_input('Option for output files of obs/model data: Enter no/bn/nc \
+                               for no, binary, netCDF file \n> ').lower()
     print ''
     # write a binary file for post-processing if desired
-    if fileOutputOption == 'bn':
+    if FoutOption == 'bn':
         fileName = workdir + '/lonlat_eval_domain' + '.bn'
         if(os.path.exists(fileName) == True):
             cmnd = 'rm -f ' + fileName
@@ -974,19 +1156,19 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             cmnd = 'rm -f ' + fileName
             subprocess.call(cmnd, shell=True)
         files.writeBNdata(fileName, numOBS, numMDL, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgn, mdlRgn)
-        print 'The regridded obs and model data are written in the binary file ', fileName
-
     # write a netCDF file for post-processing if desired
-    if fileOutputOption == 'nc':
-        fileName = '%s/%s_Tseries' % (workdir, varName)
+    if FoutOption == 'nc':
+        fileName = workdir + '/'+varName+'_Tseries' 
         tempName = fileName + '.' + 'nc'
         if(os.path.exists(tempName) == True):
             print "removing %s from the local filesystem, so it can be replaced..." % (tempName,)
             cmnd = 'rm -f ' + tempName
             subprocess.call(cmnd, shell=True)
         files.writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, subRegions)
+    if FoutOption == 'bn':
+        print 'The regridded obs and model data are written in the binary file ', fileName
+    elif FoutOption == 'nc':
         print 'The regridded obs and model data are written in the netCDF file ', fileName
-
 
     #####################################################################################################
     ###################### Metrics calculation and plotting cycle starts from here ######################
@@ -1025,7 +1207,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
         anlDomain = 'n'
         anlRgn = 'n'
         print ' '
-        analSelect = int(raw_input('Eval over domain (Enter 0) or time series of selected Sub Regions (Enter 1) \n> '))
+        analSelect = int(raw_input('Eval over domain (Enter 0) or time series of selected regions (Enter 1) \n> '))
         print ' '
         if analSelect == 0:
             anlDomain = 'y'
@@ -1058,8 +1240,8 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 timeScale = 'Annual'
                 # compute the annual-mean time series and climatology. 
                 # mTser=ma.zeros((nYR,ngrdY,ngrdX)), mClim = ma.zeros((ngrdY,ngrdX))
-                mTser, mClim = calc_clim_year(nYR, nT, ngrdY, ngrdX, mdlData[mdlSelect, :, :, :], Times)
-                oTser, oClim = calc_clim_year(nYR, nT, ngrdY, ngrdX, obsData[obsSelect, :, :, :], Times)
+                mTser, mClim = calcClimYear(nYR, mdlData[mdlSelect, :, :, :], Times)
+                oTser, oClim = calcClimYear(nYR, obsData[obsSelect, :, :, :], Times)
             elif timeOption == 2:
                 timeScale = 'Seasonal'
                 # select the timeseries and climatology for a season specifiec by a user
@@ -1067,59 +1249,16 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 moBgn = int(raw_input('Enter the beginning month for your season. 1-12: \n> '))
                 moEnd = int(raw_input('Enter the ending month for your season. 1-12: \n> '))
                 print ' '
-                if moEnd >= moBgn:
-                    nMoPerSeason = moEnd - moBgn + 1
-                    mTser, mClim = calc_clim_season(nYR, nT, moBgn, moEnd, ngrdY, ngrdX, 
-                                                                mdlData[mdlSelect, :, :, :], Times)
-                    oTser, oClim = calc_clim_season(nYR, nT, moBgn, moEnd, ngrdY, ngrdX, 
-                                                                obsData[obsSelect, :, :, :], Times)
-                elif moEnd == moBgn:
-                    # Eval for a single month. mTser, oTser are the annual time series 
-                    # for the specified month (moEnd), and  mClim, oClim are the corresponding climatology
-                    mTser, mClim = calc_clim_One_month(moEnd, nYR, nT, mdlData[mdlSelect, :, :, :], Times)
-                    oTser, oClim = calc_clim_One_month(moEnd, nYR, nT, obsData[obsSelect, :, :, :], Times)
-                elif moEnd < moBgn:        # have to lose the ending year. redefine nYR=nYR-1, and drop the YR[nYR]
-                    nMoS1 = 12 - moBgn + 1
-                    nMoS2 = moEnd
-                    nMoPerSeason = nMoS1 + nMoS2
-                    # calculate the seasonal timeseries and climatology for the model data
-                    mTser1, mClim1 = calc_clim_season(nYR, nT, moBgn, 12, ngrdY, ngrdX, 
-                                                                mdlData[mdlSelect, :, :, :], Times)
-                    mTser2, mClim2 = calc_clim_season(nYR, nT, 1, moEnd, ngrdY, ngrdX, 
-                                                                mdlData[mdlSelect, :, :, :], Times)
-                    mTser = ma.zeros((nYR - 1, ngrdY, ngrdX))
-                    for i in np.arange(nYR - 1):
-                        mTser[i, :, :] = (real(nMoS1) * mTser1[i, :, :] + 
-                            real(nMoS2) * mTser2[i + 1, :, :]) / nMoPerSeason
-                    mClim = ma.zeros((ngrdY, ngrdX))
-                    mClim = ma.average(mTser, axis=0)
-                    # repeat for the obs data
-                    mTser1, mClim1 = calc_clim_season(nYR, nT, moBgn, 12, ngrdY, ngrdX, 
-                                                                obsData[obsSelect, :, :, :], Times)
-                    mTser2, mClim2 = calc_clim_season(nYR, nT, 1, moEnd, ngrdY, ngrdX, 
-                                                                obsData[obsSelect, :, :, :], Times)
-                    oTser = ma.zeros((nYR - 1, ngrdY, ngrdX))
-                    for i in np.arange(nYR - 1):
-                        oTser[i, :, :] = (real(nMoS1) * mTser1[i, :, :] + 
-                            real(nMoS2) * mTser2[i + 1, :, :]) / nMoPerSeason
-                    oClim = ma.zeros((ngrdY, ngrdX))
-                    oClim = ma.average(oTser, axis=0)
-                    nYR = nYR - 1
-                    yy = ma.empty(nYR)
-                    for i in np.arange(nYR):
-                        yy[i] = YR[i]
-                    mTser1 = 0.
-                    mTser2 = 0.
-                    mClim1 = 0.
-                    mClim2 = 0.
+                mTser, mClim = calcClimSeason(moBgn, moEnd, mdlData[mdlSelect, :, :, :], Times)
+                oTser, oClim = calcClimSeason(moBgn, moEnd, obsData[obsSelect, :, :, :], Times)
             elif timeOption == 3:
                 timeScale = 'Monthly'
                 # compute the monthly-mean time series and climatology
                 # Note that the shapes of the output vars are: 
                 #   mTser = ma.zeros((nYR,12,ngrdY,ngrdX)) & mClim = ma.zeros((12,ngrdY,ngrdX))
                 # Also same for oTser = ma.zeros((nYR,12,ngrdY,ngrdX)) &,oClim = ma.zeros((12,ngrdY,ngrdX))
-                mTser, mClim = calc_clim_mo(mdlData[mdlSelect, :, :, :], Times)
-                oTser, oClim = calc_clim_mo(obsData[mdlSelect, :, :, :], Times)
+                mTser, mClim = calcAnnualCycleMeans(mdlData[mdlSelect, :, :, :], Times)
+                oTser, oClim = calcAnnualCycleMeans(obsData[mdlSelect, :, :, :], Times)
             else:
                 # undefined process options. exit
                 print 'The desired temporal scale is not available this time. END the job'
@@ -1133,26 +1272,24 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             metricOption = misc.select_metrics()
             print ' '
 
-            # metrics below yields 2-d array, i.e., metricDat = ma.zeros((ngrdY,ngrdX))
+            # metrics below yields 2-d array, i.e., metricDat = ma.array((ngrdY,ngrdX))
             if metricOption == 'BIAS':
-                metricDat = calc_bias(mTser, oTser)
-                oStdv = calc_temporal_stdv(oTser)
+                metricDat, sigLev = calcBiasAveragedOverTimeAndSigLev(mTser, oTser)
+                oStdv = calcTemporalStdv(oTser)
             elif metricOption == 'MAE':
-                metricDat = calc_mae(mTser, oTser)
-            elif metricOption == 'ACCt':
-                metricDat = calc_temporal_anom_cor(mTser, oTser)
-            elif metricOption == 'PCCt':
-                metricDat = calc_temporal_pat_cor(mTser, oTser)
-            elif metricOption == 'RMSt':
-                metricDat = calc_rms(mTser, oTser)
-
+                metricDat, sigLev = calcBiasAveragedOverTime(mTser, oTser, 'abs')
+            # metrics below yields 1-d time series
+            elif metricOption == 'PCt':
+                metricDat, sigLev = calcPatternCorrelationEachTime(mTser, oTser)
+            # metrics below yields 2-d array, i.e., metricDat = ma.array((ngrdY,ngrdX))
+            elif metricOption == 'TC':
+                metricDat, sigLev = calcTemporalCorrelation(mTser, oTser)
             # metrics below yields a scalar values
-            elif metricOption == 'ACCs':
-                metricDat = spatial_anom_cor(mClim, oClim)
-            elif metricOption == 'PCCs':
-                metricDat = spatial_pat_cor(mClim, oClim, ngrdY, ngrdX)
-            elif metricOption == 'RMSs':
-                metricDat = rms_dom(mClim, oClim)
+            elif metricOption == 'PCC':
+                metricDat, sigLev = calcPatternCorrelation(mClim, oClim)
+            # metrics below yields 2-d array, i.e., metricDat = ma.array((ngrdY,ngrdX))
+            elif metricOption == 'RMSt':
+                metricDat = calcRootMeanSquaredDifferenceAveragedOverTime(mTser, oTser)
 
             #--------------------------------
             # (mp.007) Plot the metrics. First, enter plot info
@@ -1178,7 +1315,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 obsDataMask = np.zeros_like(oClim.data[:, :])
                 metricDat = ma.masked_array(metricDat, obsDataMask)
                 oClim = ma.masked_array(oClim, obsDataMask)
-                oStdv = ma.masked_array(oStdv, obsDataMask)
+                oStdv = ma.masked_array(oClim, obsDataMask)
                 plotDat = metricDat
                 mymax = plotDat.max()
                 mymin = plotDat.min()
@@ -1281,13 +1418,10 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 print ''
 
         # metrics and plots for regional time series
-        elif anlRgn == 'y' and subRegions == False:
-            print 'No SubRegions have been defined.  Regional Time Series Plots cannot be created'
-
         elif anlRgn == 'y':
             # select the region(s) for evaluation. model and obs have been selected before entering this if block
-            print 'There are %s subregions. Select the subregion(s) for evaluation' % numSubRgn
-            rgnSelect = misc.selectSubRegion(subRegions)
+            print 'There are ', numSubRgn, ' subregions. Select the subregion(s) for evaluation'
+            rgnSelect = misc.select_subRgn(numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1)
             print 'selected region for evaluation= ', rgnSelect
             # Select the model & obs data to be evaluated
             oData = ma.zeros(nT)
@@ -1296,8 +1430,8 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             mData = mdlRgn[mdlSelect, rgnSelect, :]
 
             # compute the monthly-mean climatology to construct the annual cycle
-            obsAnnCyc = calc_annual_cycle_means(oData, Times)
-            mdlAnnCyc = calc_annual_cycle_means(mData, Times)
+            obsAnnCyc = calcAnnualCycleMeans(oData, Times)
+            mdlAnnCyc = calcAnnualCycleMeans(mData, Times)
             print 'obsAnnCyc= ', obsAnnCyc
             print 'mdlAnnCyc= ', mdlAnnCyc
 
@@ -1307,9 +1441,9 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             #metricOption = misc.select_metrics()
             # Temporarily, compute the RMSE and pattern correlation for the simulated 
             # and observed annual cycle based on monthly means
-            # TODO tempRMS and tempCOR are not used in the code and throwing errors.
-#            tempRMS = calc_rms(mdlAnnCyc, obsAnnCyc)
-#            tempCOR = calc_temporal_pat_cor(mdlAnnCyc, obsAnnCyc)
+            # TODO This aren't used. Missing something here???
+            tempRMS = calcRootMeanSquaredDifferenceAveragedOverTime(mdlAnnCyc, obsAnnCyc)
+            tempCOR = calcPatternCorrelationEachTime(mdlAnnCyc, obsAnnCyc)
 
             #--------------------------------
             # (mp.009) Plot results
@@ -1320,12 +1454,12 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 colorbar = 'precip2_17lev'
 
             # 1-d data, e.g. Time series plots
-            plotFileName = 'anncyc_' + varName + '_' + subRegions[rgnSelect].name
+            plotFileName = 'anncyc_' + varName + '_' + subRgnName[rgnSelect][0:3]
             if(os.path.exists(plotFileName) == True):
                 cmnd = 'rm -f ' + plotFileName
                 subprocess.call(cmnd, shell = True)
             year_labels = False         # for annual cycle plots
-            mytitle = 'Annual Cycle of ' + varName + ' at Sub-Region ' + subRegions[rgnSelect].name
+            mytitle = 'Annual Cycle of ' + varName + ' at Sub-Region ' + subRgnName[rgnSelect][0:3]
             # Create a list of datetimes to represent the annual cycle, one per month.
             times = []
             for m in xrange(12):
