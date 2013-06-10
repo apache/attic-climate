@@ -16,6 +16,29 @@ import classes
 
 from fortranfile import FortranFile
 
+def reshapeMonthlyData(dataset1):
+    """
+    Purpose::
+       Returns a view of an array with shape (nMonth, ...)
+       reshaped to (nYR, 12, ...) in order to assist in monthly
+       calculations
+    Input::
+       dataset1 - an input array with the first dimension corresponding
+       to the number of months, which must be a multiple of 12
+    Output::
+       data - A view of dataset1 but with shape (nYR, 12, ...).
+    """
+    
+    # Create a view of dataset1. This lets us change the shape
+    # without copying or modifying the original array.
+    data = dataset1[:]
+    ishape = data.shape
+    nMonth = ishape[0]
+    nshape = nMonth/12, 12
+    
+    # Combine the number of years / months (nshape) with other dimensions
+    data.shape = tuple(list(nshape) + list(ishape[1:]))
+    return data
 
 def configToDict(config):
     """
