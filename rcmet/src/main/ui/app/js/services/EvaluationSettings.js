@@ -16,7 +16,7 @@
 //
 
 // EvaluationSettings gives controllers access to the user's selected evaluation settings.
-angular.module('rcmes').service('evaluationSettings', function() {
+App.Services.service('evaluationSettings', function() {
 	var settings = {
 		'metrics': [ 
 			{'name': 'bias', 'select': true},

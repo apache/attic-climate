@@ -17,7 +17,7 @@
 
 // Service for giving controllers access to the information on datasets that 
 // the user has selected for evaluation.
-angular.module('rcmes').service('selectedDatasetInformation', function() {
+App.Services.service('selectedDatasetInformation', function() {
 	var datasets = [];
 
 	return {

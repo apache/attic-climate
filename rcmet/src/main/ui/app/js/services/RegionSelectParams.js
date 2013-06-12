@@ -16,7 +16,7 @@
 //
 
 // RegionSelectParams gives controllers access to the user selected evaluation region. 
-angular.module('rcmes').service('regionSelectParams', function() {
+App.Services.service('regionSelectParams', function() {
 	var parameters = {
 		"areValid" : true,
 		"latMin"   : "",

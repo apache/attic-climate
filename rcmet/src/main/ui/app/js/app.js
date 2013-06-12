@@ -4,7 +4,9 @@
 // names isolated to a single location as well as simplifying future init code.
 var App =  App || {};
 
-angular.module('rcmes', ['ui.date']).
+App.Services = angular.module('rcmes.services', []);
+
+angular.module('rcmes', ['rcmes.services', 'ui.date']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
 			when('/obs', {templateUrl: 'partials/selectObservation.html',   controller: ObservationSelectCtrl}).
