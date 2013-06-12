@@ -1,26 +1,7 @@
 'use strict';
 
-// Directive for dealing with the Leaflet map
-angular.module('rcmes').
-directive('leafletMap', function($rootScope) {
-	return {
-		restrict: 'E',
-		replace: true,
-		template: '<div></div>',
-		link: function(scope, element, attrs) {
-			$rootScope.map = L.map(attrs.id, {
-				center: [40, 0],
-				zoom: 2,
-				scrollWheelZoom: false,
-			});
-			//create a CloudMade tile layer and add it to the map
-			L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {
-				maxZoom: 4, minZoom: 2,
-			}).addTo($rootScope.map);
-		}
-	};
-}).
 // Directive for inserting bootstrap modals
+angular.module('rcmes').
 directive('bootstrapModal', function($timeout) {
 	var link = function(scope, elem, attrs) {
 		var escapeEvent;
