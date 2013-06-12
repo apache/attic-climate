@@ -22,7 +22,7 @@
 // Consider the test function "testFunc". If you wanted this to run on the blur event
 // for an input box you would use the following:
 //   <input type="text" on-blur="testFunc();" />
-angular.module('rcmes').directive('onBlur', function() {
+App.Directives.directive('onBlur', function() {
 	return {
         restrict: 'A',
         link: function($scope, $elem, $attrs) {

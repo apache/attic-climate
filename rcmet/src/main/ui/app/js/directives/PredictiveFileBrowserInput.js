@@ -16,7 +16,7 @@
 //
 
 // Setup a text input that the user will use to input a path to a local file.
-angular.module('rcmes').directive('predictiveFileBrowserInput', function() {
+App.Directives.directive('predictiveFileBrowserInput', function() {
 	var link = function($scope, $elem, $attrs) {
 		$scope.autocomplete = [];
 		

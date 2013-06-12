@@ -20,7 +20,7 @@
 // what features the modal should have. The user can turn off the semi-opaque background
 // by having the background attribute set to 'false'. The user can also turn off the
 // ability to close the modal with ESC by having the keyboard attribute set to 'false'.
-angular.module('rcmes').directive('bootstrapModalOpen', function() {
+App.Directives.directive('bootstrapModalOpen', function() {
 	return {
 		restrict: 'A',
 		link: function(scope, elem, attrs) {

@@ -16,7 +16,7 @@
 //
 
 // Directive for dealing with the Leaflet map
-angular.module('rcmes').directive('leafletMap', function($rootScope) {
+App.Directives.directive('leafletMap', function($rootScope) {
 	return {
 		restrict: 'E',
 		replace: true,

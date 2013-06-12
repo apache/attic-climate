@@ -16,7 +16,7 @@
 //
 
 // Directive for inserting bootstrap modals
-angular.module('rcmes').directive('bootstrapModal', function($timeout) {
+App.Directives.directive('bootstrapModal', function($timeout) {
 	var link = function(scope, elem, attrs) {
 		var escapeEvent;
 		var openModal;

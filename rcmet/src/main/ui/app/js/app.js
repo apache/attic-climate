@@ -5,8 +5,9 @@
 var App =  App || {};
 
 App.Services = angular.module('rcmes.services', []);
+App.Directives = angular.module('rcmes.directives', []);
 
-angular.module('rcmes', ['rcmes.services', 'ui.date']).
+angular.module('rcmes', ['rcmes.services', 'rcmes.directives', 'ui.date']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
 			when('/obs', {templateUrl: 'partials/selectObservation.html',   controller: ObservationSelectCtrl}).
