@@ -10,7 +10,7 @@ import sys
 
 import numpy as np
 import numpy.ma as ma
-import Nio
+import netCDF
 
 import classes
 
@@ -234,7 +234,7 @@ def calc_base_time_wrf(filename):
     '''
     
     # Extract time from netCDF file (in units of 'minutes since beginning of simulation')
-    f = Nio.open_file(filename, format='nc')
+    f = netCDF4.Dataset(filename, mode='r')
     timesraw = f.variables["XTIME"]
     model_time = timesraw[0]
     
@@ -412,7 +412,7 @@ def read_trmm_3b42_files(filelist, latMin, latMax, lonMin, lonMax):
     #    ii) find out how many timesteps in the file 
     #        (assume same ntimes in each file in list)
     #     -allows you to create an empty array to store variable data for all times
-    tmp = Nio.open_file(filelist[0], format='nc')
+    tmp = netCDF4.Dataset(filelist[0], mode='r')
     latsraw = tmp.variables["latitude"]
     lonsraw = tmp.variables["longitude"]
     lat = latsraw[:]
@@ -457,7 +457,7 @@ def read_trmm_3b42_files(filelist, latMin, latMax, lonMin, lonMax):
     #      as no assumption made that same number of times in each file...
     for ifile in filelist:
         print 'Loading data from file: ', filelist[i]
-        f = Nio.open_file(ifile, format='nc')
+        f = netCDF4.Dataset(ifile, mode='r')
         t2raw = f.variables['hrf']
         
         # Read time from filename (NB. 'time' variable in netCDF always set to zero)
@@ -515,7 +515,7 @@ def read_airs_lev3_files(filelist, myvar, latMin, latMax, lonMin, lonMax):
     #    ii) find out how many timesteps in the file 
     #        (assume same ntimes in each file in list)
     #     -allows you to create an empty array to store variable data for all times
-    tmp = Nio.open_file(filelist[0], format='nc')
+    tmp = netCDF4.Dataset(filelist[0], mode='r')
     latsraw = tmp.variables["lat"]
     lonsraw = tmp.variables["lon"]
     lat = latsraw[:]
@@ -552,7 +552,7 @@ def read_airs_lev3_files(filelist, myvar, latMin, latMax, lonMin, lonMax):
     #      as no assumption made that same number of times in each file...
     for ifile in filelist:
         print 'Loading data from file: ', filelist[i]
-        f = Nio.open_file(ifile, format='nc')
+        f = netCDF4.open_file(ifile, mode='r')
         t2raw = f.variables[myvar]
         
         # Read time from filename (NB. 'time' variable in netCDF always set to zero)
@@ -765,7 +765,7 @@ def read_eraint_surf_files(filelist, myvar, latMin, latMax, lonMin, lonMax):
     #    ii) find out how many timesteps in the file 
     #        (assume same ntimes in each file in list)
     #     -allows you to create an empty array to store variable data for all times
-    tmp = Nio.open_file(filelist[0])
+    tmp = netCDF4.Dataset(filelist[0],mode='r')
     latsraw = tmp.variables["latitude"]
     lonsraw = tmp.variables["longitude"]
     lat = latsraw[:]
@@ -799,7 +799,7 @@ def read_eraint_surf_files(filelist, myvar, latMin, latMax, lonMin, lonMax):
     #      as no assumption made that same number of times in each file...
     for ifile in filelist:
         print 'Loading data from file: ', filelist[i]
-        f = Nio.open_file(ifile, format='nc')
+        f = netCDF4.Dataset(ifile, mode='r')
         data = f.variables[myvar][:]
         scale = f.variables[myvar].scale_factor
         offset = f.variables[myvar].add_offset
