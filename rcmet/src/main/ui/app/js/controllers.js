@@ -1,20 +1,5 @@
 'use strict';
 
-// Controller for dataset display
-function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
-	$scope.datasets = selectedDatasetInformation.getDatasets();
-
-	$scope.removeDataset = function($index) {
-		selectedDatasetInformation.removeDataset($index);
-	}
-
-	$scope.setRegridBase = function(index) {
-		for (var i = 0; i < $scope.datasets.length; i++) {
-			$scope.datasets[i].regrid = ((i == index) ? $scope.datasets[i].regrid : false);
-		}
-	}
-}
-
 // Controller for observation selection in modal
 function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 	// Grab a copy of the datasets so we can display a count to the user!
