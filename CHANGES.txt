@@ -4,6 +4,7 @@ Apache Open Climate Workbench Change Log
 Incubating 0.1 - Current Development
 --------------------------------------------
 
+* CLIMATE-3 Purge Unnecessary JPL Internal Development Files/Folders (goodale)
 * CLIMATE-6 Add the Interactive Mode back into rcmet.py (goodale)
 * CLIMATE-5 Fixed a bad import in misc.py (goodale)
 * CLIMATE-4 Add back in extra JPL commits to the CLIMATE trunk (goodale)
