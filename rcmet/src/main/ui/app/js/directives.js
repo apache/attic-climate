@@ -2,7 +2,7 @@
 
 // Directive for dealing with the Leaflet map
 angular.module('rcmes').
-directive('sap', function($rootScope) {
+directive('leafletMap', function($rootScope) {
 	return {
 		restrict: 'E',
 		replace: true,
