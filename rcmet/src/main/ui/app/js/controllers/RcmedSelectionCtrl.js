@@ -15,7 +15,8 @@
 // limitations under the License.
 //
 
-function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
+App.Controllers.controller('RcmedSelectionCtrl', ['$rootScope', '$scope', '$http', '$timeout', 'selectedDatasetInformation', 
+function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 	// Grab a copy of the datasets so we can display a count to the user!
 	$scope.datasetCount = selectedDatasetInformation.getDatasets();
 	$scope.fileAdded = false;
@@ -101,4 +102,4 @@ function RcmedSelectionCtrl($rootScope, $scope, $http, $timeout, selectedDataset
 
 	// Grab the available observations from RCMED
 	getObservations();
-}
+}]);

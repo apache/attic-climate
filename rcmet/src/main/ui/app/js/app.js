@@ -6,12 +6,13 @@ var App =  App || {};
 
 App.Services = angular.module('rcmes.services', []);
 App.Directives = angular.module('rcmes.directives', []);
+App.Controllers = angular.module('rcmes.controllers', []);
 
-angular.module('rcmes', ['rcmes.services', 'rcmes.directives', 'ui.date']).
+angular.module('rcmes', ['rcmes.services', 'rcmes.directives', 'rcmes.controllers', 'ui.date']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
-			when('/obs', {templateUrl: 'partials/selectObservation.html',   controller: ObservationSelectCtrl}).
-			when('/rcmed', {templateUrl: 'partials/selectRcmed.html', controller: RcmedSelectionCtrl}).
+			when('/obs', {templateUrl: 'partials/selectObservation.html', controller: 'ObservationSelectCtrl'}).
+			when('/rcmed', {templateUrl: 'partials/selectRcmed.html', controller: 'RcmedSelectionCtrl'}).
 			otherwise({redirectTo: '/obs'});
 	}]).
 	run(function($rootScope) {

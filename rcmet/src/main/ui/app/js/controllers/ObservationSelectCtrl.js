@@ -16,7 +16,8 @@
 //
 
 // Controller for observation selection in modal
-function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
+App.Controllers.controller('ObservationSelectCtrl', ['$rootScope', '$scope', '$http', '$q', '$timeout', 'selectedDatasetInformation',
+function($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 	// Grab a copy of the datasets so we can display a count to the user!
 	$scope.datasetCount = selectedDatasetInformation.getDatasets();
 
@@ -188,4 +189,4 @@ function ObservationSelectCtrl($rootScope, $scope, $http, $q, $timeout, selected
 	$scope.shouldDisableLoadButton = function() {
 		return $scope.loadingFile;
 	}
-}
+}]);

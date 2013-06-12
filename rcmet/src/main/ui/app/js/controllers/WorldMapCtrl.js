@@ -16,7 +16,8 @@
 //
 
 // Controller for the world map
-function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
+App.Controllers.controller('WorldMapCtrl', ['$rootScope', '$scope', 'selectedDatasetInformation', 'regionSelectParams',
+function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
 	$scope.datasets = selectedDatasetInformation.getDatasets();
 	$scope.regionParams = regionSelectParams.getParameters();
 
@@ -85,4 +86,4 @@ function WorldMapCtrl($rootScope, $scope, selectedDatasetInformation, regionSele
 	$scope.$watch('datasets', function() {
 		$scope.updateMap();
 	}, true);
-};
+}]);

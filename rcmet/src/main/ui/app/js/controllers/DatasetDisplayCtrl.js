@@ -16,7 +16,8 @@
 //
 
 // Controller for dataset display
-function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
+App.Controllers.controller('DatasetDisplayCtrl', ['$rootScope', '$scope', 'selectedDatasetInformation', 
+function($rootScope, $scope, selectedDatasetInformation) {
 	$scope.datasets = selectedDatasetInformation.getDatasets();
 
 	$scope.removeDataset = function($index) {
@@ -28,4 +29,4 @@ function DatasetDisplayCtrl($rootScope, $scope, selectedDatasetInformation) {
 			$scope.datasets[i].regrid = ((i == index) ? $scope.datasets[i].regrid : false);
 		}
 	}
-}
+}]);

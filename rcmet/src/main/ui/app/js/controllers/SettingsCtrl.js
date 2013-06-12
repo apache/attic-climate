@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
-function SettingsCtrl($scope, evaluationSettings) {
+App.Controllers.controller('SettingsCtrl', ['$scope', 'evaluationSettings',
+function($scope, evaluationSettings) {
 	$scope.settings = evaluationSettings.getSettings();
-}
+}]);

@@ -16,8 +16,9 @@
 //
 
 // Controller for dataset parameter selection/modification
-function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatasetInformation, 
-							 regionSelectParams, evaluationSettings) {
+App.Controllers.controller('ParameterSelectCtrl', ['$rootScope', '$scope', '$http', '$timeout', 
+						   'selectedDatasetInformation', 'regionSelectParams', 'evaluationSettings', 
+function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, regionSelectParams, evaluationSettings) {
 	$scope.datasets = selectedDatasetInformation.getDatasets();
 
 	// The min/max lat/lon values from the selected datasets
@@ -253,4 +254,4 @@ function ParameterSelectCtrl($rootScope, $scope, $http, $timeout, selectedDatase
 			$scope.displayParams.areValid = true;
 			$rootScope.$broadcast('redrawOverlays', []);
 		}, true);
-}
+}]);
