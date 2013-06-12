@@ -4,11 +4,11 @@
 // names isolated to a single location as well as simplifying future init code.
 var App =  App || {};
 
-App.Services = angular.module('rcmes.services', []);
-App.Directives = angular.module('rcmes.directives', []);
-App.Controllers = angular.module('rcmes.controllers', []);
+App.Services = angular.module('ocw.services', []);
+App.Directives = angular.module('ocw.directives', []);
+App.Controllers = angular.module('ocw.controllers', []);
 
-angular.module('rcmes', ['rcmes.services', 'rcmes.directives', 'rcmes.controllers', 'ui.date']).
+angular.module('ocw', ['ocw.services', 'ocw.directives', 'ocw.controllers', 'ui.date']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
 			when('/obs', {templateUrl: 'partials/selectObservation.html', controller: 'ObservationSelectCtrl'}).
