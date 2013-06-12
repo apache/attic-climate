@@ -10,7 +10,7 @@ import sys
 
 import numpy as np
 import numpy.ma as ma
-import netCDF
+import netCDF4
 
 import classes
 
