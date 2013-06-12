@@ -1,5 +1,9 @@
 'use strict';
 
+// We're creating a "global" application object. This allows us to keep module 
+// names isolated to a single location as well as simplifying future init code.
+var App =  App || {};
+
 angular.module('rcmes', ['ui.date']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
