@@ -4,12 +4,10 @@
 # Import Statements
 
 from math import floor, log
-import matplotlib
-import Ngl 
+from matplotlib import pyplot as plt
+from mpl_toolkits.basemap import Basemap
 import numpy as np
-import pylab
 import os
-
 
 def pow_round(x):
     '''
@@ -81,256 +79,84 @@ def calc_nice_color_bar_values(mymin, mymax, target_nlevs):
     
     return newmin, newmax, new_nlevs
 
+def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'png', cMap = plt.cm.jet):
+    '''
+    Purpose::
+        Plots a filled contour map.
+       
+    Input::
+        pVar - 2d array of the field to be plotted with shape (nLon, nLat)
+        lon - 1d array of longitudes 
+        lat = latitude  (1-d)
+        mnLvl - an integer specifying the minimum contour level
+        mxLvl - an integer specifying the maximum contour level
+        pTitle - a string specifying plot title
+        pName  - a string specifying the filename of the plot
+        pType  - an optional string specifying the filetype, default is .png
+        cMap - an optional matplotlib.LinearSegmentedColormap object denoting the colormap,
+               default is matplotlib.pyplot.cm.jet
 
-def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, cMap, wksType):
-    """
-        File:
-          cn05p.py
-        Synopsis:
-          Draws an animation of global surface temperature over a map.
-        Category:
-          Contours over maps
-        Author:
-          Mary Haley (based on example of Tim Scheitlin)
-        Date of initial publication:    
-          November, 2005
-        Description:
-          This example draws an animation of filled contours over a map 
-          showing surface temperatures (if "Animate" is set to True).
-          Instead of calling Ngl.contour_map for every time step,
-          Ngl.set_values is used to change the data and title after the
-          initial time step.
-       Effects illustrated
-          o  Reading data from a netCDF file.
-          o  Creating a color map using RGB triplets.
-          o  Drawing color filled contours over a map.
-          o  Using Ngl.set_values to change the data for the animation.
-          o  Using a resource list to set many resources, for example to:
-               + set color map
-               + set contour levels
-               + set fill colors
-               + turn off contour lines and line labels
-               + set some labelbar, title,  and tickmark resources
-       Input:
-          pVar   : the field to be plotted (2d)
-          lon    : longitude (1-d)
-          lat    : latitude  (1-d)
-          mnLvl  : the minimum countour level
-          mxLvl  : the maximum countour level
-          spLvl  : label spacing
-          pTitle : plot title
-          pName  : name of the plot file
-          cMap   : color map
-          wksType: workstation type (character)
-       Output:
-          If "Animate" is set to True, then an animation of 31 frames
-          (one per day on January) is produced. Otherwise, just one frame
-          is produced.
-    """
+        TODO: Let user specify map projection, whether to mask bodies of water??
+        
+    '''
+    # Set up the figure
+    fig = plt.figure()
+    ax = fig.gca()
 
-    # Open workstation
-    wres = Ngl.Resources()
-    wres.wkColorMap = cMap
-    # plot size setup for the pdf file option
-    if wksType == 'pdf':
-        wres.wkPaperSize = "A4"
+    # Determine the map boundaries and construct a Basemap object
+    lonMin = lon.min()
+    lonMax = lon.max()
+    latMin = lat.min()
+    latMax = lat.max()
+    m = Basemap(projection = 'cyl', llcrnrlat = latMin, urcrnrlat = latMax,
+            llcrnrlon = lonMin, urcrnrlon = lonMax, resolution = 'l', ax = ax)
 
-    wks = Ngl.open_wks(wksType, pName, wres)
+    # Draw the borders for coastlines and countries
+    m.drawcoastlines(linewidth = 1)
+    m.drawcountries(linewidth = .75)
+    
+    # Draw 6 parallels / meridians.
+    m.drawmeridians(np.linspace(lonMin, lonMax, 5), labels = [0, 0, 0, 1])
+    m.drawparallels(np.linspace(latMin, latMax, 5), labels = [1, 0, 0, 1])
 
-    # Set up variable to hold the various plot
-    # resources we want to set.
-    res = Ngl.Resources()
-    # assign resolution for png option (default = 1024x1024)
-    if wksType == 'png':
-        res.wkWidth = 1000
-        res.wkHeight = 1000
+    # Convert lats and lons to projection coordinates
+    lons, lats = np.meshgrid(lon, lat)
+    x, y = m(lons, lats)
 
-    # Set some scalar field resources.
-    res.sfXArray = lon
-    res.sfYArray = lat
-    # Define map lat,lon limits
-    res.mpLimitMode = "LatLon"    # Limit the map view.
-    res.mpMinLonF = float(lon.min())
-    res.mpMaxLonF = float(lon.max())
-    res.mpMinLatF = float(lat.min())
-    res.mpMaxLatF = float(lat.max())
-    res.mpPerimOn = True        # Turn on map perimeter.
-    # Set some contour resources
-    res.cnFillOn = True
-    res.cnLinesOn = False             # draw (True) or not (False) contour lines
-    res.cnLineLabelsOn = False             # control the writing of contour labels
+    # Plot data with filled contours
     nsteps = 24
     mnLvl, mxLvl, nsteps = calc_nice_color_bar_values(mnLvl, mxLvl, nsteps)
     spLvl = (mxLvl - mnLvl) / nsteps
-    res.cnLevelSelectionMode = "ExplicitLevels" # Define own levels. valid values are "ManualLevels", "AutomaticLevels"
-    res.cnMinLevelValF = mnLvl
-    res.cnMaxLevelValF = mxLvl
-    res.cnLevels = np.arange(mnLvl, mxLvl, spLvl)
-    # Set some labelbar resources.
-    res.lbLabelsOn = True         # write or not the color-bar labels
-    res.lbBoxLinesOn = True
-    res.lbLabelStride = 2            # control the interval at which color-bar label is written (defult = 1)
-    res.lbLabelFont = "default"
-    res.lbLabelFontQuality = "High"
-    res.lbLabelFontHeightF = .015    # Label font height. Default = .02
-    res.lbLabelFontThicknessF = 2.   # default = 1.
-    res.lbOrientation = "Vertical"   # or "Horizontal"
-    res.lbBottomMarginF = 0.1        # default = 0.05
-    res.lbTopMarginF = 0.1        # default = 0.05
-    # Set a map resource.
-    res.mpGridAndLimbOn = False
-    res.mpGeophysicalLineColor = "Black"
-    # Set some title resources.
-    res.tiMainString = pTitle
-    res.tiMainFontHeightF = 0.02
-    # If 1d lat,lon array then assumed to be regular lat,lon grid
-    if len(lat.shape) == 1:
-        print 'Assuming the lat,lon grid is regularly spaced'
-        res.sfXCStartV = float(lon.min())
-        res.sfXCEndV = float(lon.max())
-        res.sfYCStartV = float(lat.min())
-        res.sfYCEndV = float(lat.max())
+    clevs = np.arange(mnLvl, mxLvl, spLvl)
+    cs = m.contourf(x, y, pVar, cmap = cMap)
 
-    contourMap = Ngl.contour_map(wks,pVar,res)
-    # Clean up
-    Ngl.destroy(wks)
-    del contourMap
-    del res
-    del wks
-
-
-def draw_map_color_filled(data, lats, lons, filename, workdir, mytitle='', rangeMax='not set', rangeMin='not set', diff=False, nsteps=20, colorTable='rainbow', niceValues=False):
-    '''
-     Function to draw a color filled contour map using the masked array data
-     
-     Input:: 
-         data  -a masked numpy array of data masked by missing values
-         lats,lons  -1d numpy arrays of unique latitudes and longitudes of grid points
-         filename  -stub of png file created e.g. 'myfile' -> myfile.png
-         workdir - directory to save images in
-         mytitle - chart title
-         rangeMax - (optional) max range for color bar (including for difference plots)
-         rangeMin - (optional) min range for color bar
-         diff    - boolean flag to say if this is a difference plot or not
-     	 (if true then uses different color scale and ranges)
-         nsteps  - (optional) number of color bar intervals
-    	 colorTable - (optional) name of PyNGL color table
-         niceValues - (optional) use nice round values for color bar labels
-    
-     Output::
-    	 no data returned from function
-         Image file produced with name {filename}.png
-    '''
-
-    # set optional argument if not set by user
-    if(rangeMax == 'not set'):
-        rangeMax = data.max()
-
-    if(rangeMin == 'not set'):
-        rangeMin = data.min()
- 
-    # For difference plots, we want color bar showing zero=white, positive=red, negative=blue
-    #  so set range centred about zero
-    if np.logical_and((diff == True), rangeMax == 'not set'):
-        absmax = np.abs(data).max()
-        rangeMin = -absmax
-        rangeMax = absmax
-
-    # Sometimes doing a difference plot, the plot becomes saturated by a few very high values
-    # In this case, you can specify the maximum range using rangeMax optional argument
-    if np.logical_and((diff == True), (rangeMax != 'not set')):
-        absmax = rangeMax
-        rangeMin = -absmax
-        rangeMax = absmax
-
-    print 'Making map plot with color filled contours'
-
-    # Map plot
-    wks_type = 'png'
-    res = Ngl.Resources()
-    res.wkWidth = 1000
-    res.wkHeight = 1000
-    res.wkColorMap = colorTable	 
-
-    if(diff == True):
-        res.wkColorMap = "BlueDarkRed18"
-
-    filePath = os.path.join(workdir, filename)
-    wks = Ngl.open_wks(wks_type, filePath, res)
-    
-    resources = Ngl.Resources()
-
-    resources.nglMaximize = True  # didn't seem to have any effect
-    resources.vpWidthF = 0.8    resources.vpHeightF = resources.vpWidthF / 2.5
-
-    # Define data lat,lon limits
-    resources.cnFillOn = True     # Turn on contour fill.
-    # If 2d lat,lon arrays then may not be regular lat,lon grid
-    if len(lats.shape) > 1:
-        resources.sfXArray = lons  # Portion of map on which to overlay
-        resources.sfYArray = lats  # contour plot.
-
-    # If 1d lat,lon array then assumed to be regular lat,lon grid
-    if len(lats.shape) == 1:
-        resources.sfXCStartV = float(lons.min())
-        resources.sfXCEndV = float(lons.max())
-        resources.sfYCStartV = float(lats.min())
-        resources.sfYCEndV = float(lats.max())
-
-    # Define map lat,lon limits
-    resources.mpLimitMode = "LatLon"    # Limit the map view.
-
-    resources.mpMinLonF = float(lons.min())
-    resources.mpMaxLonF = float(lons.max())
-    resources.mpMinLatF = float(lats.min())
-    resources.mpMaxLatF = float(lats.max())
-
-    resources.mpPerimOn = True        # Turn on map perimeter.
-
-    resources.tiMainString = "~F22~" + mytitle
-    resources.tiMainFontHeightF = 0.01
- 
-    resources.cnLineLabelsOn = False   # Turn off contour line lables
-    resources.cnLinesOn = False  # Turn off contour lines (only use color filled)
-
-    # Set up the contour levels
-    if(niceValues):
-        rangeMin, rangeMax, nsteps = calc_nice_color_bar_values(rangeMin, rangeMax, nsteps)
-
-
-    resources.cnLevelSelectionMode = "ExplicitLevels" # Define own levels.
-    resources.cnLevels = np.arange(rangeMin, rangeMax, (rangeMax - rangeMin) / nsteps)
-
-    plot = Ngl.contour_map(wks, data, resources)
-
-    # Clean up
-    Ngl.destroy(wks) 
-    del plot 
-    del resources
-    del wks
-
+    # Add a colorbar and save the figure
+    cbar = m.colorbar(cs, ax = ax, pad = .05)
+    plt.title(pTitle)
+    fig.savefig('%s.%s' %(pName, pType))
 
 def draw_time_series_plot(data, times, myfilename, myworkdir, data2='', mytitle='', ytitle='Y', xtitle='time', year_labels=True):
     '''
-     Function to draw a time series plot
+     Purpose::
+         Function to draw a time series plot
      
      Input:: 
-         data   -a masked numpy array of data masked by missing values		
-         times  -a list of python datetime objects
-         myfilename  -stub of png file created e.g. 'myfile' -> myfile.png
+         data - a masked numpy array of data masked by missing values		
+         times - a list of python datetime objects
+         myfilename - stub of png file created e.g. 'myfile' -> myfile.png
          myworkdir - directory to save images in
          data2 - (optional) second data line to plot assumes same time values)
          mytitle - (optional) chart title
     	 xtitle - (optional) y-axis title
     	 ytitle - (optional) y-axis title
     
-     Output:
+     Output::
          no data returned from function
          Image file produced with name {filename}.png
     '''
     print 'Producing time series plot'
 
-    fig = pylab.figure()
+    fig = plt.figure()
     ax = fig.gca()
 
     if year_labels == False:
@@ -338,10 +164,10 @@ def draw_time_series_plot(data, times, myfilename, myworkdir, data2='', mytitle=
         ax.xaxis.set_major_formatter(xfmt)
 
     # x-axis title
-    pylab.xlabel(xtitle)
+    plt.xlabel(xtitle)
 
     # y-axis title
-    pylab.ylabel(ytitle)
+    plt.ylabel(ytitle)
 
     # Main title
     fig.suptitle(mytitle, fontsize=12)
@@ -362,7 +188,7 @@ def draw_time_series_plot(data, times, myfilename, myworkdir, data2='', mytitle=
     ymax = ymax + ((ymax - ymin) * 0.1)
 
     # Set y-axis range
-    pylab.ylim((ymin, ymax))
+    plt.ylim((ymin, ymax))
 
     # Make plot, specifying marker style ('x'), linestyle ('-'), linewidth and line color
     line1 = ax.plot_date(times, data, 'bo-', markersize=6, linewidth=2, color='#AAAAFF')
@@ -377,67 +203,3 @@ def draw_time_series_plot(data, times, myfilename, myworkdir, data2='', mytitle=
         fig.legend((lines), ('model', 'obs'), loc='upper right')
 
     fig.savefig(myworkdir + '/' + myfilename + '.png')
-
-def draw_time_series_plot_old(data, times, myfilename, myworkdir, mytitle='', ytitle='Y', xtitle='time'):
-    '''
-     **DEPRECATED: This old version used PyNGL which couldn't handle dates.**
-     
-     New improved version (draw_time_series_plot) uses matplotlib which handles dates well.  
-     
-     Function to draw a time series plot
-     
-     Input:: 
-        data   -a masked numpy array of data masked by missing values
-        NB. for multiple lines use a list of arrays
-
-        times  -a list of python datetime objects
-        myfilename  -stub of png file created e.g. 'myfile' -> myfile.png
-        myworkdir - directory to save images in
-        mytitle - (optional) chart title
-        xtitle - (optional) y-axis title
-        ytitle - (optional) y-axis title
-
-     Output::
-         No data returned from function
-         Image file produced with name {filename}.png
-    '''
-    
-    wks_type = "png"
-    wks = Ngl.open_wks(wks_type, myworkdir + '/' + myfilename)  # Open a workstation.
-    t = np.arange(len(times))
-
-    #  Set resources for titling.
-    resources = Ngl.Resources()
-
-    resources.tiMainFont = "Helvetica" # Font for title
-    resources.tiXAxisFont = "Helvetica" # Font for X axis label
-    resources.tiYAxisFont = "Helvetica" # Font for Y axis label
-    resources.tiMainString = mytitle
-    resources.tiXAxisString = xtitle
-    resources.tiYAxisString = ytitle
-   
-    resources.xyLineThicknesses = [2.]    # Define line thicknesses
-
-    resources.xyMarkLineModes = ["MarkLines"]
-    resources.xyMarkers = [1]         # (none, dot, asterisk)
-    resources.xyMarkerSizeF = 0.02        # Marker size (default
-                                            # is 0.01)
-                                            # (1.0 is the default).
-
-    # Special handling dependent on if data is for a single line, 
-    #  or a multiple dimensions for mulitple lines
-    if len(data.shape) == 1:
-        resources.xyLineColors = [189]  # Define line colors.
-        resources.xyMarkerColor = [189]
-
-    if len(data.shape) > 1:
-        resources.xyLineColors = [189, 210]  # Define line colors.
-        resources.xyMarkerColor = [189, 210]
-
-    plot = Ngl.xy(wks, t, data, resources)   # Draw an XY plot.
-
-    # Clean up.
-    Ngl.destroy(wks) 
-    del plot 
-    del resources
-    del wks
