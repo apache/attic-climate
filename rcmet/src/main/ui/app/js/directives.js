@@ -1,24 +1,7 @@
 'use strict';
 
-// This directive process bootstrap-modal-open attributes. This lets the user bind the opening of a specific modal
-// as well as specifying how that modal should open.
-angular.module('rcmes').
-directive('bootstrapModalOpen', function() {
-	return {
-		restrict: 'A',
-		link: function(scope, elem, attrs) {
-			// Default to showing the background if the user didn't specify a value for this.
-			var hasBackground = (attrs.background === undefined ? true : (attrs.background == "true"));
-			// Enable keyboard closing of modal with escape key.
-			var hasKeyboardEscape = (attrs.keyboard === undefined ? true : (attrs.keyboard == "true"));
-
-			$(elem).bind('click', function() {
-				$('#' + attrs.bootstrapModalOpen).trigger('modalOpen', [hasBackground, hasKeyboardEscape]);
-			});
-		}
-	};
-}).
 // Setup a text input that the user will use to input a path to a local file.
+angular.module('rcmes').
 directive('predictiveFileBrowserInput', function() {
 	var link = function($scope, $elem, $attrs) {
 		$scope.autocomplete = [];
