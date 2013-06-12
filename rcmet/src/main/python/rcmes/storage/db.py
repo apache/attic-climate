@@ -6,7 +6,7 @@ import re
 import numpy as np
 import numpy.ma as ma
 import json
-import Nio
+import netCDF4
 
 from classes import RCMED
 from toolkit import process
@@ -112,15 +112,15 @@ def create_netCDF(latitudes, longitudes, levels, values, timestamps, database, l
     '''
         
     # To generate netCDF file from database
-    netcdf =  Nio.open_file(netCD_fileName,'w')
+    netcdf =  netCDF4.Dataset(netCD_fileName,mode='w')
     string="The netCDF file for parameter: " + database + ", latMin: " + str(latMin) + ", latMax: " + str(latMax) + ", lonMin: " + str(lonMin) + ", lonMax: " + str(lonMax) + " startTime: " + str(startTime) + " and endTime: " + str(endTime) + "."
     netcdf.globalAttName = str(string)
-    netcdf.create_dimension('dim', len(latitudes))
-    latitude = netcdf.create_variable('lat', 'd', ('dim',))
-    longitude = netcdf.create_variable('lon', 'd', ('dim',))
-    level = netcdf.create_variable('lev', 'd', ('dim',))
-    time = netcdf.create_variable('time', 'd', ('dim',))
-    value = netcdf.create_variable('value', 'd', ('dim',))
+    netcdf.createDimension('dim', len(latitudes))
+    latitude = netcdf.createVariable('lat', 'd', ('dim',))
+    longitude = netcdf.createVariable('lon', 'd', ('dim',))
+    level = netcdf.createVariable('lev', 'd', ('dim',))
+    time = netcdf.createVariable('time', 'd', ('dim',))
+    value = netcdf.createVariable('value', 'd', ('dim',))
     
     netcdf.variables['lat'].varAttName = 'latitude'
     netcdf.variables['lat'].units = 'degrees_north'
@@ -156,7 +156,7 @@ def read_netcdf(netCD_fileName):
     and return latitudes, longitudes, levels, times and values.
     '''
     # To use the created netCDF file
-    netcdf = Nio.open_file(netCD_fileName , 'r')
+    netcdf = netCDF4.Dataset(netCD_fileName , mode='r')
     # To get all data from netCDF file
     latitudes = netcdf.variables['lat'][:]
     longitudes = netcdf.variables['lon'][:]
@@ -165,7 +165,7 @@ def read_netcdf(netCD_fileName):
     values = netcdf.variables['value'][:]
     
     # To get the base date
-    time_unit=netcdf.variables['time'].units
+    time_unit=netcdf.variables['time'].units.encode()
     time_unit=time_unit.split(' ')
     base_date=time_unit[2] + " " + time_unit[3]
     

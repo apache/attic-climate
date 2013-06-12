@@ -1,18 +1,13 @@
 """
-Module for handling data input files.  Requires PyNIO and Numpy be 
+Module for handling data input files.  Requires netCDF and Numpy be 
 installed.
 
-This module can easily open NetCDF, HDF and Grib files.  Search the PyNIO
+This module can easily open NetCDF, HDF and Grib files.  Search the netCDF4
 documentation for a complete list of supported formats.
 """
 
 from os import path
-
-try:
-    import Nio
-except ImportError:
-    import nio as Nio
-
+import netCDF4
 import numpy as np
 import numpy.ma as ma
 import sys
@@ -48,15 +43,15 @@ def getVariableByType(filename, variableType):
         name match cannot be found.
     """
     try:
-        f = Nio.open_file(filename)
+        f = netCDF4.Dataset(filename, mode='r')
     except:
         #print 'PyNio had an issue opening the filename (%s) you provided' % filename
-        print "NIOError:", sys.exc_info()[0]
+        print "netCDF4Error:", sys.exc_info()[0]
         raise
     
     variableKeys = f.variables.keys()
     f.close()
-    variableKeys = [variable.lower() for variable in variableKeys]
+    variableKeys = [variable.encode().lower() for variable in variableKeys]
     variableMatch = VARIABLE_NAMES[variableType]
 
     commonVariables = list(set(variableKeys).intersection(variableMatch)) 
@@ -80,10 +75,9 @@ def getVariableRange(filename, variableName):
         variableRange - tuple of order (variableMin, variableMax)
     """
     try:
-        f = Nio.open_file(filename)
+        f = netCDF4.Dataset(filename, mode='r')
     except:
-        #print 'PyNio had an issue opening the filename (%s) you provided' % filename
-        print "NIOError:", sys.exc_info()[0]
+        print "netCDF4Error:", sys.exc_info()[0]
         raise
     
     varArray = f.variables[variableName][:]
@@ -121,7 +115,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     #    ii) find out how many timesteps in the file 
     #        (assume same ntimes in each file in list)
     #     -allows you to create an empty array to store variable data for all times
-    tmp = Nio.open_file(filename)
+    tmp = netCDF4.Dataset(filename, mode='r')
     latsraw = tmp.variables[latVarName][:]
     lonsraw = tmp.variables[lonVarName][:]
     lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
@@ -154,7 +148,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     for ifile in filelist:
 
         #print 'Loading data from file: ',filelist[i]
-        f = Nio.open_file(ifile)
+        f = netCDF4.Dataset(ifile, mode='r')
         t2raw = f.variables[myvar][:]
         timesraw = f.variables[timeVarName]
         time = timesraw[:]
@@ -217,12 +211,12 @@ def select_var_from_file(myfile, fmt='not set'):
     print fmt
     
     if fmt == 'not set':
-        f = Nio.open_file(myfile)
+        f = netCDF4.Dataset(myfile, mode='r')
     
     if fmt != 'not set':
-        f = Nio.open_file(myfile, format=fmt)
+        f = netCDF4.Dataset(myfile, mode='r', format=fmt)
     
-    keylist = f.variables.keys()
+    keylist = [key.encode().lower() for key in f.variables.keys()]
     
     i = 0
     for v in keylist:
@@ -248,9 +242,8 @@ def select_var_from_wrf_file(myfile):
         Peter Lean  September 2010
     '''
 
-    f = Nio.open_file(myfile, format='nc')
-    
-    keylist = f.variables.keys()
+    f = netCDF4.Dataset(myfile, mode='r', format='NETCDF4')
+    keylist = [key.encode().lower() for key in f.variables.keys()]
 
     i = 0
     for v in keylist:
@@ -287,7 +280,7 @@ def read_lolaT_from_file(filename, latVarName, lonVarName, timeVarName, file_typ
         
     """
 
-    tmp = Nio.open_file(filename, format=file_type)
+    tmp = netCDF4.Dataset(filename, mode='r', format=file_type)
     lonsraw = tmp.variables[lonVarName][:]
     latsraw = tmp.variables[latVarName][:]
     lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
@@ -315,9 +308,9 @@ def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
     # 2. Because one of the model data exceeds 240 mos (243 mos), the model data must be
     #    truncated to the 240 mons using the ntimes determined from the first file.
     ##################################################################################
-    f = Nio.open_file(ifile)
+    f = netCDF4.Dataset(ifile, mode='r')
     try:
-        varUnit = f.variables[myvar].units.upper()
+        varUnit = f.variables[myvar].units.encode().upper()
     except:
         varUnit = raw_input('Enter the model variable unit: \n> ').upper()
     t2raw = f.variables[myvar][:]
@@ -340,12 +333,12 @@ def findTimeVariable(filename):
             variableNameList - list of variable names from the input filename
     """
     try:
-        f = Nio.open_file(filename, mode='r')
+        f = netCDF4.dtaset(filename, mode='r')
     except:
         print("Unable to open '%s' to try and read the Time variable" % filename)
         raise
 
-    variableNameList = f.variables.keys()
+    variableNameList = [variable.encode() for variable in f.variables.keys()]
     # convert all variable names into lower case
     varNameListLowerCase = [x.lower() for x in variableNameList]
 
@@ -380,12 +373,12 @@ def findLatLonVarFromFile(filename):
         -lonMax
     """
     try:
-        f = Nio.open_file(filename, mode='r')
+        f = netCDF4.Dataset(filename, mode='r')
     except:
         print("Unable to open '%s' to try and read the Latitude and Longitude variables" % filename)
         raise
 
-    variableNameList = f.variables.keys()
+    variableNameList = [variable.encode() for variable in f.variables.keys()]
     # convert all variable names into lower case
     varNameListLowerCase = [x.lower() for x in variableNameList]
 
@@ -446,7 +439,7 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     #    i)  read in lats, lons
     #    ii) find out how many timesteps in the file (assume same ntimes in each file in list)
     #     -allows you to create an empty array to store variable data for all times
-    tmp = Nio.open_file(filelist[0], format=file_type)
+    tmp = netCDF4.Dataset(filelist[0], mode='r', format=file_type)
     latsraw = tmp.variables[latVarName][:]
     lonsraw = tmp.variables[lonVarName][:]
     lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
@@ -474,7 +467,7 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     i = 0
     for ifile in filelist:
         #print 'Loading data from file: ',filelist[i]
-        f = Nio.open_file(ifile)
+        f = netCDF4.Dataset(ifile, mode='r')
         t2raw = f.variables[myvar][:]
         timesraw = f.variables[timeVarName]
         time = timesraw[0:ntimes]
@@ -520,7 +513,7 @@ def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
     filename = filelist[0]
     
     try:
-        f = Nio.open_file(filename)
+        f = netCDF4.Dataset(filename, mode='r')
         
         lats = f.variables[lat_var_name][:]
         latMin = lats.min()
@@ -618,30 +611,30 @@ def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, md
     dimY = mdlData.shape[2]      # y-dimension
     dimX = mdlData.shape[3]      # x-dimension
     dimR = obsRgnAvg.shape[1]    # the number of subregions
-    f = Nio.open_file(fileName, mode='w', format='nc')
+    f = netCDF4.Dataset(fileName, mode='w', format='NETCDF4')
     print mdlRgnAvg.shape, dimM, dimR, dimT
     #create global attributes
-    f.globalAttName = ''
+    f.description = ''
     # create dimensions
     print 'Creating Dimensions within the NetCDF Object...'
-    f.create_dimension('unity', 1)
-    f.create_dimension('time', dimT)
-    f.create_dimension('west_east', dimX)
-    f.create_dimension('south_north', dimY)
-    f.create_dimension('obs', dimO)
-    f.create_dimension('models', dimM)
+    f.createDimension('unity', 1)
+    f.createDimension('time', dimT)
+    f.createDimension('west_east', dimX)
+    f.createDimension('south_north', dimY)
+    f.createDimension('obs', dimO)
+    f.createDimension('models', dimM)
         
     # create the variable (real*4) to be written in the file
     print 'Creating Variables...'
-    f.create_variable('lon', 'd', ('south_north', 'west_east'))
-    f.create_variable('lat', 'd', ('south_north', 'west_east'))
-    f.create_variable('oDat', 'd', ('obs', 'time', 'south_north', 'west_east'))
-    f.create_variable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
+    f.createVariable('lon', 'd', ('south_north', 'west_east'))
+    f.createVariable('lat', 'd', ('south_north', 'west_east'))
+    f.createVariable('oDat', 'd', ('obs', 'time', 'south_north', 'west_east'))
+    f.createVariable('mDat', 'd', ('models', 'time', 'south_north', 'west_east'))
     
     if subRegions:
-        f.create_dimension('regions', dimR)
-        f.create_variable('oRgn', 'd', ('obs', 'regions', 'time'))
-        f.create_variable('mRgn', 'd', ('models', 'regions', 'time'))
+        f.createDimension('regions', dimR)
+        f.createVariable('oRgn', 'd', ('obs', 'regions', 'time'))
+        f.createVariable('mRgn', 'd', ('models', 'regions', 'time'))
         f.variables['oRgn'].varAttName = 'Observation time series: Subregions'
         f.variables['mRgn'].varAttName = 'Model time series: Subregions'
 
@@ -660,33 +653,32 @@ def writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgnAvg, md
     f.variables['mDat'].varAttName = 'Model time series: entire domain'
 
     # assign the values to the variable and write it
-    f.variables['lon'][:, :] = lons
-    f.variables['lat'][:, :] = lats
+    f.variables['lon'][:] = lons[:]
+    f.variables['lat'][:] = lats[:]
     if subRegions:
-        f.variables['oRgn'][:, :, :] = obsRgnAvg
-        f.variables['mRgn'][:, :, :] = mdlRgnAvg
+        f.variables['oRgn'][:] = obsRgnAvg[:]
+        f.variables['mRgn'][:] = mdlRgnAvg[:]
 
     f.close()
 
 def loadDataIntoNetCDF(fileObject, datasets, dataArray, dataType):
     """
     Input::
-        fileObject - PyNIO file object data will be loaded into
+        fileObject - netCDF4 file object data will be loaded into
         datasets - List of dataset names
         dataArray - Multi-dimensional array of data to be loaded into the NetCDF file
         dataType - String with value of either 'Model' or 'Observation'
     Output::
-        No return value.  PyNIO file object is updated in place
+        No return value.  netCDF4 file object is updated in place
     """
     datasetCount = 0
-    for dataset in datasets:
+    for datasetCount, dataset in enumerate(datasets):
         if dataType.lower() == 'observation':
             datasetName = dataset.replace(' ','')
         elif dataType.lower() == 'model':
             datasetName = path.splitext(path.basename(dataset))[0]
         print "Creating variable %s" % datasetName
-        fileObject.create_variable(datasetName, 'd', ('time', 'south_north', 'west_east'))
+        fileObject.createVariable(datasetName, 'd', ('time', 'south_north', 'west_east'))
         fileObject.variables[datasetName].varAttName = 'Obseration time series: entire domain'
         print 'Loading values into %s' % datasetName
-        fileObject.variables[datasetName].assign_value(dataArray[datasetCount,:,:,:])
-        datasetCount += 1
+        fileObject.variables[datasetName][:] = dataArray[datasetCount,:,:,:]

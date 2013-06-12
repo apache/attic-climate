@@ -1158,12 +1158,9 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
         files.writeBNdata(fileName, numOBS, numMDL, nT, ngrdX, ngrdY, numSubRgn, obsData, mdlData, obsRgn, mdlRgn)
     # write a netCDF file for post-processing if desired
     if FoutOption == 'nc':
-        fileName = workdir + '/'+varName+'_Tseries' 
-        tempName = fileName + '.' + 'nc'
-        if(os.path.exists(tempName) == True):
+        fileName = workdir + '/'+varName+'_Tseries.nc' 
+        if(os.path.exists(fileName) == True):
             print "removing %s from the local filesystem, so it can be replaced..." % (tempName,)
-            cmnd = 'rm -f ' + tempName
-            subprocess.call(cmnd, shell=True)
         files.writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, subRegions)
     if FoutOption == 'bn':
         print 'The regridded obs and model data are written in the binary file ', fileName

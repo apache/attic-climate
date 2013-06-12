@@ -10,7 +10,7 @@ import sys
 import time
 
 # 3rd Party Imports
-import Nio
+import netCDF4
 import numpy as np
 import numpy.ma as ma
 from scipy.ndimage import map_coordinates
@@ -573,9 +573,9 @@ def getModelTimes(modelFile, timeVarName):
         modelTimeStep - 'hourly','daily','monthly','annual'
     '''
 
-    f = Nio.open_file(modelFile)
+    f = netCDF4.Dataset(modelFile, mode='r')
     xtimes = f.variables[timeVarName]
-    timeFormat = xtimes.attributes['units']
+    timeFormat = xtimes.units.encode()
 
     # search to check if 'since' appears in units
     try:
@@ -1056,9 +1056,9 @@ def decode_model_timesK(ifile,timeVarName,file_type):
     #      times  - list of python datetime objects describing model data times
     #     Peter Lean February 2011
     #################################################################################################
-    f = Nio.open_file(ifile,mode='r',options=None,format=file_type)
+    f = netCDF4.Dataset(ifile,mode='r',format=file_type)
     xtimes = f.variables[timeVarName]
-    timeFormat = xtimes.attributes['units']
+    timeFormat = xtimes.units.encode()
     #timeFormat = "days since 1979-01-01 00:00:00"
     # search to check if 'since' appears in units
     try:

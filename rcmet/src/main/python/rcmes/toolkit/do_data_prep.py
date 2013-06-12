@@ -5,8 +5,6 @@ import numpy as np
 import numpy.ma as ma
 import sys, os
 
-import Nio
-
 from storage import db, files
 import process
 from utils import misc
