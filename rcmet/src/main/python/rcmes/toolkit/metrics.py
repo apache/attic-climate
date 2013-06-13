@@ -365,9 +365,9 @@ def calcAnnualCycleDomainMeans(dataset1, times):
      Output::  
         means - time series (12)
     '''
-     # Extract months from time variable
+    # Extract months from time variable
     months = times.month
-       	
+
     means = np.empty(12) # empty array to store means
     
     # Calculate means month by month
@@ -1076,32 +1076,32 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     # modify this to add an option to read-in from data file(s)
     #----------------------------------------------------------------------------------------------------
     if subRegions:
-       numSubRgn = len(subRegions)
-       subRgnName = [ x.name   for x in subRegions ]
-       subRgnLon0 = [ x.lonMin for x in subRegions ]
-       subRgnLon1 = [ x.lonMax for x in subRegions ]
-       subRgnLat0 = [ x.latMin for x in subRegions ]
-       subRgnLat1 = [ x.latMax for x in subRegions ]
+        numSubRgn = len(subRegions)
+        subRgnName = [ x.name   for x in subRegions ]
+        subRgnLon0 = [ x.lonMin for x in subRegions ]
+        subRgnLon1 = [ x.lonMax for x in subRegions ]
+        subRgnLat0 = [ x.latMin for x in subRegions ]
+        subRgnLat1 = [ x.latMax for x in subRegions ]
     else:
-       print ''
-       ans = raw_input('Calculate area-mean timeseries for subregions? y/n: \n> ')
-       print ''
-       if ans == 'y':
-           ans = raw_input('Input subregion info interactively? y/n: \n> ')
-           if ans == 'y':
-               numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
-           else:
-               print 'Read subregion info from a pre-fabricated text file'
-               ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
-               if ans == 'y':
-                   subRgnFileName = workdir + "/sub_regions.txt"
-               else:
-                   subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
-               print 'subRgnFileName ', subRgnFileName
-               numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
-           print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
-       else:
-           numSubRgn = 0
+        print ''
+        ans = raw_input('Calculate area-mean timeseries for subregions? y/n: \n> ')
+        print ''
+        if ans == 'y':
+            ans = raw_input('Input subregion info interactively? y/n: \n> ')
+            if ans == 'y':
+                numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_interactively()
+            else:
+                print 'Read subregion info from a pre-fabricated text file'
+                ans = raw_input('Read from a defaule file (workdir + "/sub_regions.txt")? y/n: \n> ')
+                if ans == 'y':
+                    subRgnFileName = workdir + "/sub_regions.txt"
+                else:
+                    subRgnFileName = raw_input('Enter the subRgnFileName to read from \n')
+                print 'subRgnFileName ', subRgnFileName
+                numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1 = misc.assign_subRgns_from_a_text_file(subRgnFileName)
+            print subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
+        else:
+            numSubRgn = 0
 
     # compute the area-mean timeseries for all subregions if subregion(s) are defined.
     #   the number of subregions is usually small and memory usage is usually not a concern
@@ -1139,7 +1139,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     #----------------------------------------------------------------------------------------------------
     print ''
     if not FoutOption:
-       FoutOption = raw_input('Option for output files of obs/model data: Enter no/bn/nc \
+        FoutOption = raw_input('Option for output files of obs/model data: Enter no/bn/nc \
                                for no, binary, netCDF file \n> ').lower()
     print ''
     # write a binary file for post-processing if desired
