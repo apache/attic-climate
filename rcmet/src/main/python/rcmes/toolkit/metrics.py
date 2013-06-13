@@ -20,11 +20,12 @@ Module storing functions to calculate statistical metrics from numpy arrays
 '''
 
 import subprocess
-import os
+import os, sys
 import numpy as np
 import numpy.ma as ma
 import scipy.stats as stats
 import scipy.stats.mstats as mstats
+import datetime
 from toolkit import plots, process
 from utils import misc
 from storage import files 
@@ -49,7 +50,7 @@ def calcAnnualCycleMeans(dataset1, times):
     months = np.empty(len(times))
 
     for t in np.arange(len(times)):
-        months[t] = time[t].month
+        months[t] = times[t].month
 
     if dataset1.ndim == 3:
         means = ma.empty((12, dataset1.shape[1], dataset1.shape[2])) # empty array to store means
@@ -135,15 +136,15 @@ def calcClimYear(nYR, dataset1, times):
         tSeries = ma.zeros((nYR, ngrdY, ngrdX))
         #i = 0
         for i, myunit in enumerate(np.unique(yy)):
-            dataTemporary = dateset1[(yy == myunit), :, :]
+            dataTemporary = dataset1[(yy == myunit), :, :]
             tSeries[i, :, :] = ma.average(dataTemporary, axis = 0)
             #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy
         means = ma.average(tSeries, axis = 0)
 
-    elif dateset1.ndim == 1:
+    elif dataset1.ndim == 1:
         tSeries = ma.zeros((nYR))
         for i, myunit in enumerate(np.unique(yy)):
-            dataTemporary = dateset1[(yy == myunit)]
+            dataTemporary = dataset1[(yy == myunit)]
             tSeries[i] = ma.average(dataTemporary, axis = 0)
             #print 'data.shape= ',data.shape,'  i= ',i,'  yy= ',yy
         means = ma.average(tSeries, axis = 0)
@@ -199,7 +200,7 @@ def calcClimSeason(monthBegin, monthEnd, dataset1, times):
         means = ma.average(tSeries, axis = 0)
 
     elif dataset1.ndim == 1:
-        tSeries = ma.zeros((nYR))
+        tSeries = ma.zeros((len(indexBeginMonth)))
         for i, myunit in enumerate(np.arange(len(indexBeginMonth))):
             dataTemporary = dataset1[indexBeginMonth[i]:indexEndMonth[i]+1]
             tSeries[i] = ma.average(dataTemporary, axis = 0)
@@ -472,7 +473,7 @@ def calcBiasAveragedOverTimeAndSigLev(evaluationData, referenceData):
     for iy in np.arange(ngrdY):
         for ix in np.arange(ngrdX):
             if not evaluationDataMask[iy,ix] and not referenceDataMask[iy,ix]:
-               sigLev [iy,ix] = 1-stats.ttest_rel(evaluationData[:,iy,ix],referenceData[:,iy,ix])[1]
+                sigLev [iy,ix] = 1-stats.ttest_rel(evaluationData[:,iy,ix],referenceData[:,iy,ix])[1]
                 
     sigLev = ma.masked_equal(sigLev.data, -100.) 
     # Set mask for bias metric using missing data in obs or model data series
@@ -1160,7 +1161,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
     if FoutOption == 'nc':
         fileName = workdir + '/'+varName+'_Tseries.nc' 
         if(os.path.exists(fileName) == True):
-            print "removing %s from the local filesystem, so it can be replaced..." % (tempName,)
+            print "removing %s from the local filesystem, so it can be replaced..." % (fileName,)
         files.writeNCfile(fileName, numSubRgn, lons, lats, obsData, mdlData, obsRgn, mdlRgn, obsList, mdlList, subRegions)
     if FoutOption == 'bn':
         print 'The regridded obs and model data are written in the binary file ', fileName
@@ -1272,7 +1273,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             # metrics below yields 2-d array, i.e., metricDat = ma.array((ngrdY,ngrdX))
             if metricOption == 'BIAS':
                 metricDat, sigLev = calcBiasAveragedOverTimeAndSigLev(mTser, oTser)
-                oStdv = calcTemporalStdv(oTser)
+                oStdv = calcTemporalStdev(oTser)
             elif metricOption == 'MAE':
                 metricDat, sigLev = calcBiasAveragedOverTime(mTser, oTser, 'abs')
             # metrics below yields 1-d time series
@@ -1418,7 +1419,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
         elif anlRgn == 'y':
             # select the region(s) for evaluation. model and obs have been selected before entering this if block
             print 'There are ', numSubRgn, ' subregions. Select the subregion(s) for evaluation'
-            rgnSelect = misc.select_subRgn(numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1)
+            rgnSelect = misc.selectSubRegion(subRegions)
             print 'selected region for evaluation= ', rgnSelect
             # Select the model & obs data to be evaluated
             oData = ma.zeros(nT)
