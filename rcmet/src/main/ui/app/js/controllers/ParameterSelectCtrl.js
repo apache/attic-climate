@@ -242,16 +242,16 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			$scope.displayParams.latMax = latMax;
 			$scope.displayParams.lonMin = lonMin;
 			$scope.displayParams.lonMax = lonMax;
-			$scope.displayParams.start = start.split(" ")[0];
-			$scope.displayParams.end = end.split(" ")[0];
+			$scope.displayParams.start = (typeof start == 'undefined') ? "" : start.split(" ")[0];
+			$scope.displayParams.end = (typeof end == 'undefined') ? "" : end.split(" ")[0];
 
 			// Update the local store values!
 			$scope.latMin = latMin;
 			$scope.latMax = latMax;
 			$scope.lonMin = lonMin;
 			$scope.lonMax = lonMax;
-			$scope.start = start.split(" ")[0];
-			$scope.end = end.split(" ")[0];
+			$scope.start = (typeof start == 'undefined') ? "" : start.split(" ")[0];
+			$scope.end = (typeof end == 'undefined') ? "" : end.split(" ")[0];
 
 			$scope.displayParams.areValid = true;
 			$rootScope.$broadcast('redrawOverlays', []);
