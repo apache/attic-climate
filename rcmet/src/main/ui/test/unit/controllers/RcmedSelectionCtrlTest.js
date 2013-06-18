@@ -82,5 +82,40 @@ describe('OCW Controllers', function() {
 				expect(scope.getObservationTimeRange(-1)).toEqual(false);
 			});
 		});
+
+		it('should initialize dataSelectUpdated function', function() {
+			inject(function($rootScope, $controller, $httpBackend) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+					respond(200, [{longname: 1}, {longname: 2}]);
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("RcmedSelectionCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				// Add the test dataset to our scope
+				scope.datasetSelection = {shortname: 'TRMM'}
+
+				// Test return with only single parameter
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getDatasetParam?dataset=' + 
+										scope.datasetSelection['shortname'] + 
+										'&callback=JSON_CALLBACK').
+							 respond(200, ['pcp']);
+				scope.dataSelectUpdated();
+				$httpBackend.flush();
+
+				expect(scope.parameterSelection).toEqual('pcp');
+
+				// Test return with multiple parameters
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getDatasetParam?dataset=' + 
+										scope.datasetSelection['shortname'] + 
+										'&callback=JSON_CALLBACK').
+							 respond(200, ['pcp', 'pcp2']);
+				scope.dataSelectUpdated();
+				$httpBackend.flush();
+
+				expect(scope.parameterSelection).toEqual({shortname: 'Please select a parameter'});
+			});
+		});
 	});
 });
