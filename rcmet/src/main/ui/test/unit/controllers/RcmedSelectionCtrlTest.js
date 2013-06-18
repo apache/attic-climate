@@ -117,5 +117,45 @@ describe('OCW Controllers', function() {
 				expect(scope.parameterSelection).toEqual({shortname: 'Please select a parameter'});
 			});
 		});
+
+		it('should initialze the addObservation function', function() {
+			inject(function($rootScope, $controller, $httpBackend) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+					respond(200, [{longname: 1}, {longname: 2}]);
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("RcmedSelectionCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				scope.datasetSelection = {
+					"dataset_id" : "3",
+					"shortname"  : "TRMM",
+					"longname"   : "Tropical Rainfall Measuring Mission Dataset",
+					"source"     : "Readme for the Tropical Rainfall Measuring Mission (TRMM) Data Set"
+				};
+
+				scope.parameterSelection = {
+					"parameter_id":"36",
+					"shortname":"pcp",
+					"datasetshortname":"TRMM",
+					"longname":"TRMM v.6 Monthly Precipitation",
+					"units":"mm\/day"
+				};
+
+				// addObservations does a refresh of the selections with a re-query of the backend
+				// so we need to catch that call!
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+					respond(200, [{longname: 1}, {longname: 2}]);
+
+				scope.addObservation();
+				$httpBackend.flush();
+				
+				expect(scope.datasetCount.length).toBe(1);
+				// The selection observation should be reset so we shouldn't have
+				// any selected observation parameters.
+				expect(scope.retrievedObsParams).toEqual([]);
+			});
+		});
 	});
 });
