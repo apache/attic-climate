@@ -35,7 +35,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 			});
 	};
 
-	var getObservationTimeRange = function(datasetID) {
+	$scope.getObservationTimeRange = function(datasetID) {
 		var times = {
 			'1' : {'start' : '1989-01-01 00:00:00','end' : '2009-12-31 00:00:00'},	// ERA-Interim
 			'2' : {'start' : '2002-08-31 00:00:00','end' : '2010-01-01 00:00:00'},	// AIRS
@@ -65,7 +65,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 		// This is a horrible hack for temporarily getting a valid time range
 		// for the selected observation. Eventually we need to handle this more
 		// elegantly than indexing into an array...
-		var timeRange = getObservationTimeRange($scope.datasetSelection["dataset_id"]);
+		var timeRange = $scope.getObservationTimeRange($scope.datasetSelection["dataset_id"]);
 
 		var newDataset = {};
 
