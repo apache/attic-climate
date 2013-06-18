@@ -133,52 +133,46 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			}
 		};
 
-		// You might wonder why this is using a jQuery ajax call instead of a built
-		// in $http.post call. The reason would be that it wasn't working with the 
-		// $http.post call but it is with this. So...there you go! This should be
-		// changed eventually!!
-		$.ajax({
-			type: 'POST',
-			url: $rootScope.baseURL + '/rcmes/run/', 
-			data: { 
-				'obsDatasetId'     : $scope.datasets[obsIndex]['id'],
-				'obsParameterId'   : $scope.datasets[obsIndex]['param'],
-				'startTime'        : $scope.displayParams.start + " 00:00:00",
-				'endTime'          : $scope.displayParams.end + " 00:00:00",
-				'latMin'           : $scope.displayParams.latMin,
-				'latMax'           : $scope.displayParams.latMax,
-				'lonMin'           : $scope.displayParams.lonMin,
-				'lonMax'           : $scope.displayParams.lonMax,
-				'filelist'         : $scope.datasets[modelIndex]['id'],
-				'modelVarName'     : $scope.datasets[modelIndex]['param'],
-				'modelTimeVarName' : $scope.datasets[modelIndex]['time'],
-				'modelLatVarName'  : $scope.datasets[modelIndex]['lat'],
-				'modelLonVarName'  : $scope.datasets[modelIndex]['lon'],
-				'regridOption'     : 'model',
-				'timeRegridOption' : evaluationSettings.getSettings().temporal.selected,
-				'metricOption'     : metricToRun,
-			},
-			success: function(data) {
-				var comp = data['comparisonPath'].split('/');
-				var model = data['modelPath'].split('/');
-				var obs = data['obsPath'].split('/');
+		var data = {params: { 
+			'obsDatasetId'     : $scope.datasets[obsIndex]['id'],
+			'obsParameterId'   : $scope.datasets[obsIndex]['param'],
+			'startTime'        : $scope.displayParams.start + " 00:00:00",
+			'endTime'          : $scope.displayParams.end + " 00:00:00",
+			'latMin'           : $scope.displayParams.latMin,
+			'latMax'           : $scope.displayParams.latMax,
+			'lonMin'           : $scope.displayParams.lonMin,
+			'lonMax'           : $scope.displayParams.lonMax,
+			'filelist'         : $scope.datasets[modelIndex]['id'],
+			'modelVarName'     : $scope.datasets[modelIndex]['param'],
+			'modelTimeVarName' : $scope.datasets[modelIndex]['time'],
+			'modelLatVarName'  : $scope.datasets[modelIndex]['lat'],
+			'modelLonVarName'  : $scope.datasets[modelIndex]['lon'],
+			'regridOption'     : 'model',
+			'timeRegridOption' : evaluationSettings.getSettings().temporal.selected,
+			'metricOption'     : metricToRun,
+			'callback'         : 'JSON_CALLBACK',
+		}};
 
-				$rootScope.evalResults = {};
-				$rootScope.evalResults.comparisonPath = comp[comp.length - 1];
-				$rootScope.evalResults.modelPath = model[model.length - 1];
-				$rootScope.evalResults.obsPath = obs[obs.length - 1];
+		$http.jsonp($rootScope.baseURL + '/rcmes/run/', data).
+		success(function(data) {
+			var comp = data['comparisonPath'].split('/');
+			var model = data['modelPath'].split('/');
+			var obs = data['obsPath'].split('/');
 
-				$scope.runningEval = false;
+			$rootScope.evalResults = {};
+			$rootScope.evalResults.comparisonPath = comp[comp.length - 1];
+			$rootScope.evalResults.modelPath = model[model.length - 1];
+			$rootScope.evalResults.obsPath = obs[obs.length - 1];
 
-				$timeout(function() {
-					$('#evaluationResults').trigger('modalOpen', true, true);
-				}, 100);
-			},
-			error: function(xhr, status, error) {
-				$scope.runningEval = false;
-			},
+			$scope.runningEval = false;
+
+			$timeout(function() {
+				$('#evaluationResults').trigger('modalOpen', true, true);
+			}, 100);
+		}).error(function() {
+			$scope.runningEval = false;
 		});
-	}
+	};
 
 	// Check the Parameter selection boxes after the user has changed input to ensure that valid
 	// values were entered
