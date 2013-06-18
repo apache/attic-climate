@@ -7,7 +7,7 @@ describe('OCW Controllers', function() {
 
 
 	describe('ParameterSelectCtrl', function() {
-		it('initialize spatial and temporal range default values properly', function() {
+		it('should initialize spatial and temporal range default values properly', function() {
 			inject(function($rootScope, $controller) {
 				var scope = $rootScope.$new();
 				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
@@ -21,7 +21,7 @@ describe('OCW Controllers', function() {
 			});
 		});
 
-		it('grab the default set of selected datasets from the service', function() {
+		it('should grab the default set of selected datasets from the service', function() {
 			inject(function($rootScope, $controller) {
 				var scope = $rootScope.$new();
 				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
