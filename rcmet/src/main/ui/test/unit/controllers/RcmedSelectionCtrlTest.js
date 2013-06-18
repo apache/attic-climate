@@ -66,5 +66,21 @@ describe('OCW Controllers', function() {
 
 			});
 		});
+
+		it('should initialze the getObservationTimeRange function', function() {
+			inject(function($rootScope, $controller, $httpBackend) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+					respond(200, [{longname: 1}, {longname: 2}]);
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("RcmedSelectionCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				expect(scope.getObservationTimeRange(1)).toEqual({'start' : '1989-01-01 00:00:00',
+				                                                    'end' : '2009-12-31 00:00:00'});
+				expect(scope.getObservationTimeRange(-1)).toEqual(false);
+			});
+		});
 	});
 });
