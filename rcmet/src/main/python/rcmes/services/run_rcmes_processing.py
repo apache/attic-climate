@@ -43,7 +43,7 @@ titleOption = 'default'   #this means that ' model vs obs :' will be used
 plotFileNameOption = 'default'  #another good option we can use.
 ###########################################################
 
-@route('/rcmes/run/', method='POST')
+@route('/rcmes/run/')
 def rcmes_go():
     print "**********\nBEGIN RCMES2.0_RUN\n**********"
     print 'cachedir', cachedir
@@ -56,50 +56,50 @@ def rcmes_go():
         print "I/O error({0}: {1}".format(e.errno, e.strerror)
         sys.exit(1)
 
-    obsDatasetId = int(request.POST.get('obsDatasetId', '').strip())
+    obsDatasetId = int(request.query.get('obsDatasetId', '').strip())
     print 'obsDatasetId', obsDatasetId
-    obsParameterId = int(request.POST.get('obsParameterId', '').strip())
+    obsParameterId = int(request.query.get('obsParameterId', '').strip())
     print 'obsParameterId', obsParameterId
 
     #reformat DateTime after pulling it out of the POST
-    POSTstartTime = str(request.POST.get('startTime', '').strip())
+    POSTstartTime = str(request.query.get('startTime', '').strip())
     startTime = datetime.datetime.fromtimestamp(time.mktime(time.strptime(POSTstartTime, time_format_new)))
     print 'startTime', startTime
     #reformat DateTime after pulling it out of the POST
-    POSTendTime = str(request.POST.get('endTime', '').strip())
+    POSTendTime = str(request.query.get('endTime', '').strip())
     endTime = datetime.datetime.fromtimestamp(time.mktime(time.strptime(POSTendTime, time_format_new)))
     print 'endTime', endTime
 
-    latMin = float(request.POST.get('latMin', '').strip())
+    latMin = float(request.query.get('latMin', '').strip())
     print 'latMin', latMin
-    latMax = float(request.POST.get('latMax', '').strip())
+    latMax = float(request.query.get('latMax', '').strip())
     print 'latMax', latMax 
-    lonMin = float(request.POST.get('lonMin', '').strip())
+    lonMin = float(request.query.get('lonMin', '').strip())
     print 'lonMin', lonMin
-    lonMax = float(request.POST.get('lonMax', '').strip())
+    lonMax = float(request.query.get('lonMax', '').strip())
     print 'lonMax', lonMax
 
-    filelist = [request.POST.get('filelist', '').strip()]
+    filelist = [request.query.get('filelist', '').strip()]
     print 'filelist', filelist[0]
 
-    modelVarName = str(request.POST.get('modelVarName', '').strip())
+    modelVarName = str(request.query.get('modelVarName', '').strip())
     print 'modelVarName', modelVarName
-    precipFlag = request.POST.get('precipFlag', '').strip()
+    precipFlag = request.query.get('precipFlag', '').strip()
     print 'precipFlag', precipFlag
-    modelTimeVarName = str(request.POST.get('modelTimeVarName', '').strip())
+    modelTimeVarName = str(request.query.get('modelTimeVarName', '').strip())
     print 'modelTimeVarName', modelTimeVarName
-    modelLatVarName = str(request.POST.get('modelLatVarName', '').strip())
+    modelLatVarName = str(request.query.get('modelLatVarName', '').strip())
     print 'modelLatVarName', modelLatVarName
-    modelLonVarName = str(request.POST.get('modelLonVarName', '').strip())
+    modelLonVarName = str(request.query.get('modelLonVarName', '').strip())
     print 'modelLonVarName', modelLonVarName
 
-    regridOption = str(request.POST.get('regridOption', '').strip())
+    regridOption = str(request.query.get('regridOption', '').strip())
     print 'regridOption', regridOption
-    timeRegridOption = str(request.POST.get('timeRegridOption', '').strip())
+    timeRegridOption = str(request.query.get('timeRegridOption', '').strip())
     print 'timeRegridOption', timeRegridOption
-    seasonalCycleOption = request.POST.get('seasonalCycleOption', '').strip()
+    seasonalCycleOption = request.query.get('seasonalCycleOption', '').strip()
     print 'seasonalCycleOption', seasonalCycleOption
-    metricOption = str(request.POST.get('metricOption', '').strip())
+    metricOption = str(request.query.get('metricOption', '').strip())
     print 'metricOption', metricOption    
     
     settings = {"cacheDir": cachedir, "workDir": workdir, "fileList": filelist}
@@ -127,4 +127,7 @@ def rcmes_go():
     #Extra Code in case bottle has an issue with my Dictionary
     #json_output = json.dumps(product_dict, sort_keys=True, indent=4)
     
-    return product_dict
+    if (request.query.callback):
+        return"%s(%s)" % (request.query.callback, product_dict)
+    else:
+        return product_dict
