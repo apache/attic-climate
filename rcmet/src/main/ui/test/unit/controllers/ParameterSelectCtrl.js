@@ -99,5 +99,17 @@ describe('OCW Controllers', function() {
 				expect(scope.shouldDisableControls()).toBe(false);
 			});
 		});
+
+		it('should initialize the disable clear button function', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				expect(scope.shouldDisableClearButton()).toBe(true);
+				scope.datasets.push(1);
+				scope.datasets.push(2);
+				expect(scope.shouldDisableClearButton()).toBe(false);
+			});
+		});
 	});
 });
