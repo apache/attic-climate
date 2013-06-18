@@ -58,5 +58,18 @@ describe('OCW Controllers', function() {
 				expect(scope.lonSliderVal).toBe(0);
 			});
 		});
+
+		it('should set the default datepicker settings', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				// This tests the default values that get passed to the datepicker objects that we
+				// initialize with a directive.
+				expect(Object.keys(scope.datepickerSettings).length).toBe(2);
+				expect(scope.datepickerSettings.changeMonth).toBe(true);
+				expect(scope.datepickerSettings.changeYear).toBe(true);
+			});
+		});
 	});
 });
