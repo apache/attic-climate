@@ -9,8 +9,8 @@ describe('OCW Controllers', function() {
 	describe('ParameterSelectCtrl', function() {
 		it('initialize spatial and temporal range default values properly', function() {
 			inject(function($rootScope, $controller) {
-				var scope = $rootScope.$new(),
-					ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
 
 				expect(scope.latMin).toBe(-90);
 				expect(scope.latMax).toBe(90);
