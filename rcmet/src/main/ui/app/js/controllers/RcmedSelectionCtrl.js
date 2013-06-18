@@ -23,7 +23,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 	$scope.datasetCount = selectedDatasetInformation.getDatasets();
 	$scope.fileAdded = false;
 
-	var getObservations = function() {
+	$scope.getObservations = function() {
 		$http.jsonp($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
 			success(function(data) {
 				$scope.availableObs = data;
@@ -103,5 +103,5 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 	};
 
 	// Grab the available observations from RCMED
-	getObservations();
+	$scope.getObservations();
 }]);
