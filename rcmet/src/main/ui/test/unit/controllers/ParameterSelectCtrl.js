@@ -166,5 +166,94 @@ describe('OCW Controllers', function() {
 				expect(scope.displayParams.end).toBe('2030-01-01 00:00:00');
 			});
 		});
+
+		it('should properly set the results of running an evaluation', function() {
+			inject(function($rootScope, $controller, $httpBackend) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				// Seed rootScope with a known URL for test queries and holder for eval results
+				$rootScope.baseURL = "http://localhost:9876";
+				$rootScope.evalResults = {};
+
+				// Seed the displayParams so the query is properly formatted
+				scope.displayParams.lonMin = -180;
+				scope.displayParams.lonMax = 180;
+				scope.displayParams.latMin = -90;
+				scope.displayParams.latMax = 90;
+				scope.displayParams.start = "1980-01-01";
+				scope.displayParams.end = "2030-01-01";
+
+				// The expected URL string that the frontend generates given this example set
+				var urlString = "http://localhost:9876/rcmes/run/?" + 
+					"callback=JSON_CALLBACK&" + 
+					"endTime=2030-01-01%2000%3A00%3A00&" +
+					"filelist=%2Fusr%2Flocal%2Frcmes%2FmodelsForUI%2Fprec.HRM3.ncep.monavg.nc&" +
+					"latMax=90&" +
+					"latMin=-90&" +
+					"lonMax=180&" +
+					"lonMin=-180&" +
+					"metricOption=bias&" +
+					"modelLatVarName=lat&" +
+					"modelLonVarName=lon&" +
+					"modelTimeVarName=time&" +
+					"modelVarName=prec&" +
+					"obsDatasetId=3&" +
+					"obsParameterId=36&" +
+					"regridOption=model&" +
+					"startTime=1980-01-01%2000%3A00%3A00&" +
+					"timeRegridOption=monthly";
+
+				// Example dataset configuration for the test.
+				scope.datasets = [
+					{
+						"isObs"         : 1,
+						"id"            : "3",
+						"name"          : "Tropical Rainfall Measuring Mission Dataset",
+						"param"         : "36",
+						"paramName"     : "TRMM v.6 Monthly Precipitation",
+						"latlonVals"    : {"latMin" : -90, "latMax" : 90, "lonMin" : -180, "lonMax" : 180},
+						"lat"           : "N/A",
+						"lon"           : "N/A",
+						"timeVals"      : {"start" : "1998-01-01 00:00:00",
+						"end"           : "2010-01-01 00:00:00"},
+						"time"          : "N/A",
+						"shouldDisplay" : true,
+						"regrid"        : false
+				    },{
+						"isObs"         : 0,
+						"id"            : "/usr/local/rcmes/modelsForUI/prec.HRM3.ncep.monavg.nc",
+						"name"          : "prec.HRM3.ncep.monavg.nc",
+						"param"         : "prec",
+						"paramName"     : "prec",
+						"lat"           : "lat",
+						"lon"           : "lon",
+						"latlonVals"    : {"latMin" : "15.25",
+						"latMax"        : "75.25",
+						"lonMin"        : "-159.75",
+						"lonMax"        : "-29.75"},
+						"time"          : "time",
+						"timeVals"      : {"start":"1980-01-01 00:00:00",
+						"end"           : "2004-12-01 00:00:00"},
+						"shouldDisplay" : true,
+						"regrid"        : false
+					}
+				];
+
+				// Mock return URLs that the frontend will parse
+				$httpBackend.expectJSONP(urlString).respond(200, 
+						{'comparisonPath': '/fake/path1', 
+						 'modelPath': '/fake/path2', 
+						 'obsPath': '/fake/path3'});
+
+
+				scope.runEvaluation();
+				$httpBackend.flush();
+
+				expect($rootScope.evalResults.comparisonPath).toBe('path1');
+				expect($rootScope.evalResults.modelPath).toBe('path2');
+				expect($rootScope.evalResults.obsPath).toBe('path3');
+			});
+		});
 	});
 });
