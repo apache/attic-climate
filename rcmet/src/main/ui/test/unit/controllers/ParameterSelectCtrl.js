@@ -85,5 +85,19 @@ describe('OCW Controllers', function() {
 				expect(scope.lonSliderVal).toBe(2);
 			});
 		});
+
+		it('should initialize the control disable function', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				expect(scope.shouldDisableControls()).toBe(true);
+				// Add to dummy values to datasets to make sure the disable function
+				// triggers properly.
+				scope.datasets.push(1);
+				scope.datasets.push(2);
+				expect(scope.shouldDisableControls()).toBe(false);
+			});
+		});
 	});
 });
