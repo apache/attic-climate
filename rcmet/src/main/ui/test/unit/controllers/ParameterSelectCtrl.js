@@ -46,5 +46,17 @@ describe('OCW Controllers', function() {
 				expect(Object.keys(scope.displayParams).length).toBe(7);
 			});
 		});
+
+		it('should initialize misc. values properly', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+				
+				expect(scope.runningEval).toBe(false);
+				expect(scope.areInUserRegridState).toBe(false);
+				expect(scope.latSliderVal).toBe(0);
+				expect(scope.lonSliderVal).toBe(0);
+			});
+		});
 	});
 });
