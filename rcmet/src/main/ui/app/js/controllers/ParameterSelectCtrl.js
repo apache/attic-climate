@@ -52,7 +52,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 		min: 0.25,
 		max: 180,
 		slide: function(event, ui) {
-			updateLatSliderDisplayValue(ui.value);
+			$scope.updateLatSliderDisplayValue(ui.value);
 		},
 	});
 
@@ -62,19 +62,19 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 		min: 0.25,
 		max: 360,
 		slide: function(event, ui) {
-			updateLonSliderDisplayValue(ui.value);
+			$scope.updateLonSliderDisplayValue(ui.value);
 		},
 	});
 
-	var updateLatSliderDisplayValue = function(value) {
+	$scope.updateLatSliderDisplayValue = function(value) {
 		$scope.latSliderVal = value;
 		$scope.$apply();
-	}
+	};
 
-	var updateLonSliderDisplayValue = function(value) {
+	$scope.updateLonSliderDisplayValue = function(value) {
 		$scope.lonSliderVal = value;
 		$scope.$apply();
-	}
+	};
 
 	// Settings for jQuery datepicker directives!
 	$scope.datepickerSettings = {
