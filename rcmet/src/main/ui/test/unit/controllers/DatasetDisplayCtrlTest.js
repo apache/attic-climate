@@ -40,5 +40,26 @@ describe('OCW Controllers', function() {
 				expect(scope.datasets[0]).toBe(2);
 			});
 		});
+
+		it('should initialize the setRegridBase function', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("DatasetDisplayCtrl", {$scope: scope});
+
+				scope.datasets.push({regrid: false});
+				scope.datasets.push({regrid: true});
+				scope.datasets.push({regrid: true});
+				scope.datasets.push({regrid: false});
+
+				expect(scope.datasets[1].regrid).toBe(true);
+				expect(scope.datasets[2].regrid).toBe(true);
+				
+				// setRegridBase should set all indices to 'false' if if it's not the passed index
+			    scope.setRegridBase(2);
+
+				expect(scope.datasets[1].regrid).toBe(false);
+				expect(scope.datasets[2].regrid).toBe(true);
+			});
+		});
 	});
 });
