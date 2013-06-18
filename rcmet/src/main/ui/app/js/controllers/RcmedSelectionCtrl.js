@@ -93,7 +93,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 		// Clear the user selections by requery-ing RCMED. This is really hacky, but it works for now...
 		$scope.availableObs = [];
 		$scope.retrievedObsParams = [];
-		getObservations();
+		$scope.getObservations();
 
 		// Display a confirmation message for a little bit
 		$scope.fileAdded = true;
