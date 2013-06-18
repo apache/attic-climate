@@ -33,5 +33,18 @@ describe('OCW Controllers', function() {
 				expect(Object.keys(scope.datasets).length).toBe(0);
 			});
 		});
+
+		it('should grab the default region select param object from the regionSelectParams service', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				// The default display values aren't going to be changing any time soon. This test 
+				// is a bit of a duplicate since this is really testing functionality of the service.
+				// Can't hurt to make sure that we're getting results though!
+				expect(typeof scope.displayParams).toBe('object');
+				expect(Object.keys(scope.displayParams).length).toBe(7);
+			});
+		});
 	});
 });
