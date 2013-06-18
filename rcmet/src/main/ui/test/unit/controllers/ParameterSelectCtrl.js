@@ -111,5 +111,20 @@ describe('OCW Controllers', function() {
 				expect(scope.shouldDisableClearButton()).toBe(false);
 			});
 		});
+
+		it('should initialize the disable results view function', function() {
+			inject(function($rootScope, $controller) {
+				$rootScope.evalResults = "";
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$rootScope: $rootScope, $scope: scope});
+
+				expect(scope.shouldDisableResultsView()).toBe(true);
+
+				// Set evalResults to something other than the default value
+				$rootScope.evalResults = "this is not an empty string";
+
+				expect(scope.shouldDisableResultsView()).toBe(false);
+			});
+		});
 	});
 });
