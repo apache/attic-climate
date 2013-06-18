@@ -71,5 +71,19 @@ describe('OCW Controllers', function() {
 				expect(scope.datepickerSettings.changeYear).toBe(true);
 			});
 		});
+
+		it('should define the slide "slide" callback functions', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				expect(scope.latSliderVal).toBe(0);
+				expect(scope.lonSliderVal).toBe(0);
+				scope.updateLatSliderDisplayValue(1);
+				scope.updateLonSliderDisplayValue(2);
+				expect(scope.latSliderVal).toBe(1);
+				expect(scope.lonSliderVal).toBe(2);
+			});
+		});
 	});
 });
