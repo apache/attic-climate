@@ -205,7 +205,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 		$rootScope.$broadcast('redrawOverlays', []);
 	}
 
-	$scope.$watch('datasets', 
+	$scope.unwatchDatasets = $scope.$watch('datasets', 
 		function() { 
 			var numDatasets = $scope.datasets.length;
 			$scope.displayParams.areValid = false;
