@@ -40,5 +40,31 @@ describe('OCW Controllers', function() {
 				expect(scope.availableObs[1]).toEqual({longname: 1});
 			});
 		});
+
+		it('should initialize the getObservations function', function() {
+			inject(function($rootScope, $controller, $httpBackend) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+					respond(200, [{longname: 1}, {longname: 2}]);
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("RcmedSelectionCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				expect(scope.availableObs.length).toBe(3);
+				expect(scope.availableObs[0]).toEqual({longname: "Please select an option"});
+				expect(scope.availableObs[1]).toEqual({longname: 1});
+
+				// Set up a failed query
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+					respond(404);
+				scope.getObservations();
+				$httpBackend.flush();
+
+				expect(scope.availableObs.length).toBe(1);
+				expect(scope.availableObs[0]).toEqual('Unable to query RCMED');
+
+			});
+		});
 	});
 });
