@@ -138,5 +138,33 @@ describe('OCW Controllers', function() {
 				expect(scope.datasets.length).toBe(0);
 			});
 		});
+
+		it('should initialize the check parameters function', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				// Set the displayParams values to be "out of bounds" values so checkParams 
+				// adjusts them properly.
+				scope.displayParams.latMin = "-95";
+				scope.displayParams.latMax = "95";
+				scope.displayParams.lonMin = "-185";
+				scope.displayParams.lonMax = "185";
+				scope.displayParams.start = "1980-00-00 00:00:00";
+				scope.displayParams.end = "2031-01-01 00:00:00";
+
+				// If we don't remove the watch on datasets we end up with displayParam values 
+				// all being undefined (but only during testing, which is odd...)
+				scope.unwatchDatasets();
+				scope.checkParameters();
+
+				expect(scope.displayParams.latMin).toBe(-90);
+				expect(scope.displayParams.latMax).toBe(90);
+				expect(scope.displayParams.lonMin).toBe(-180);
+				expect(scope.displayParams.lonMax).toBe(180);
+				expect(scope.displayParams.start).toBe('1980-01-01 00:00:00');
+				expect(scope.displayParams.end).toBe('2030-01-01 00:00:00');
+			});
+		});
 	});
 });
