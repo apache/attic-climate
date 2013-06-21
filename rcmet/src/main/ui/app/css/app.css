@@ -42,3 +42,20 @@ ul
 {
 	list-style-type: none;
 }
+
+/** 
+  * Timeline 
+  */ 
+div#OCWtimeline {
+	padding-bottom: 20px;
+}
+div.timeline-event {
+	border: none;
+	background: none;
+}
+div.timeline-event-content {
+	margin: 0;
+}
+div.ocw-bar {
+	height: 5px;
+}
