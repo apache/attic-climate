@@ -894,7 +894,7 @@ def extract_sub_time_selection(allTimes, subTimes, data):
     i = 0     # counter for allTimes
     subi = 0  # counter for subTimes
     for t in allTimes:
-        if(np.setmember1d(allTimes, subTimes)):
+        if(np.in1d(allTimes, subTimes)):
             subdata[subi, :, :] = data[i, :, :]
             subi += 1
         i += 1
