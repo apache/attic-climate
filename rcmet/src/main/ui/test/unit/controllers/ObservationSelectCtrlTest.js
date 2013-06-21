@@ -84,6 +84,53 @@ describe('OCW Controllers', function() {
 			});
 		});
 
+		it('should initialize the uploadLocalFile function', function() {
+			inject(function($httpBackend, $rootScope, $controller) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getPathLeader/?callback=JSON_CALLBACK').
+					respond(200, {'leader': '/usr/local/rcmes'});
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ObservationSelectCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				$httpBackend.expectJSONP($rootScope.baseURL + '/list/vars/"/usr/local/rcmesundefined"?callback=JSON_CALLBACK').
+					respond(200, {"variables": ["lat", "lon", "prec", "time" ]});
+				$httpBackend.expectJSONP($rootScope.baseURL + '/list/latlon/"/usr/local/rcmesundefined"?callback=JSON_CALLBACK').
+					respond(200, {'latMax': '75.25', 'success': 1, 'latname': 'lat', 'lonMax': '-29.75', 'lonMin': '-159.75', 'lonname': 'lon', 'latMin': '15.25'});
+				$httpBackend.expectJSONP($rootScope.baseURL + '/list/time/"/usr/local/rcmesundefined"?callback=JSON_CALLBACK').
+					respond(200, {"start_time": "1980-01-01 00:00:00", "timename": "time", "success": 1, "end_time": "2004-12-01 00:00:00"});
+
+				scope.uploadLocalFile();
+				$httpBackend.flush();
+
+				expect(scope.latsSelect).toEqual("lat");
+				expect(scope.lonsSelect).toEqual("lon");
+				expect(scope.timeSelect).toEqual("time");
+				expect(scope.paramSelect).toEqual("prec");
+
+				// Simulate failure on one of the backend calls. Should
+				$httpBackend.expectJSONP($rootScope.baseURL + '/list/vars/"/usr/local/rcmesundefined"?callback=JSON_CALLBACK').
+					respond(200, {});
+				$httpBackend.expectJSONP($rootScope.baseURL + '/list/latlon/"/usr/local/rcmesundefined"?callback=JSON_CALLBACK').
+					respond(404, {});
+				$httpBackend.expectJSONP($rootScope.baseURL + '/list/time/"/usr/local/rcmesundefined"?callback=JSON_CALLBACK').
+					respond(200, {});
+
+				scope.uploadLocalFile();
+				$httpBackend.flush();
+
+				expect(scope.paramSelect).toEqual("Unable to load variable(s)");
+				expect(scope.params.length).toEqual(1);
+				expect(scope.latsSelect).toEqual("Unable to load variable(s)");
+				expect(scope.lats.length).toEqual(1);
+				expect(scope.lonsSelect).toEqual("Unable to load variable(s)");
+				expect(scope.lons.length).toEqual(1);
+				expect(scope.timeSelect).toEqual("Unable to load variable(s)");
+				expect(scope.times.length).toEqual(1);
+			});
+		});
+
 		it('should initialize the addDatasets function', function() {
 			inject(function($httpBackend, $rootScope, $controller) {
 				$rootScope.baseURL = "http://localhost:8082"
