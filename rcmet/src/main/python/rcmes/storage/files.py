@@ -349,7 +349,7 @@ def findTimeVariable(filename):
             variableNameList - list of variable names from the input filename
     """
     try:
-        f = netCDF4.dtaset(filename, mode='r')
+        f = netCDF4.Dataset(filename, mode='r')
     except:
         print("Unable to open '%s' to try and read the Time variable" % filename)
         raise
