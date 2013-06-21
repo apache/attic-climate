@@ -61,5 +61,27 @@ describe('OCW Controllers', function() {
 				expect(scope.times[0]).toEqual("Please select a file above");
 			});
 		});
+
+		it('should initialize scope attributes properly', function() {
+			inject(function($httpBackend, $rootScope, $controller) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getPathLeader/?callback=JSON_CALLBACK').
+					respond(200, {'leader': '/usr/local/rcmes'});
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ObservationSelectCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				expect(scope.pathLeader).toEqual('/usr/local/rcmes');
+				expect(scope.loadingFile).toBe(false);
+				expect(scope.fileAdded).toBe(false);
+				expect(typeof scope.latLonVals).toEqual('object');
+				expect(scope.latLonVals.length).toBe(0);
+				expect(typeof scope.timeVals).toEqual('object');
+				expect(scope.timeVals.length).toEqual(0);
+				expect(typeof scope.localSelectForm).toEqual('object');
+				expect(Object.keys(scope.localSelectForm).length).toEqual(0);
+			});
+		});
 	});
 });
