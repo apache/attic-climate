@@ -83,5 +83,22 @@ describe('OCW Controllers', function() {
 				expect(Object.keys(scope.localSelectForm).length).toEqual(0);
 			});
 		});
+
+		it('should initialize the addDatasets function', function() {
+			inject(function($httpBackend, $rootScope, $controller) {
+				$rootScope.baseURL = "http://localhost:8082"
+				$httpBackend.expectJSONP($rootScope.baseURL + '/getPathLeader/?callback=JSON_CALLBACK').
+					respond(200, {'leader': '/usr/local/rcmes'});
+
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ObservationSelectCtrl", {$scope: scope});
+				$httpBackend.flush();
+
+				// Add a bunch of bogus data as a dataset
+				scope.addDataSet();
+
+				expect(scope.datasetCount.length).toBe(1);
+			});
+		});
 	});
 });
