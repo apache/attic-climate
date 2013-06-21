@@ -1,15 +1,117 @@
 Apache Open Climate Workbench Change Log
 ============================================
 
-Incubating 0.1 - Current Development
---------------------------------------------
 
-* CLIMATE-3 Purge Unnecessary JPL Internal Development Files/Folders (goodale)
-* CLIMATE-6 Add the Interactive Mode back into rcmet.py (goodale)
-* CLIMATE-5 Fixed a bad import in misc.py (goodale)
-* CLIMATE-4 Add back in extra JPL commits to the CLIMATE trunk (goodale)
+Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
 
-* CLIMATE-1 Rename parameters dict key 'longName' to 'longname' (goodale)
+** Sub-task
+    * [CLIMATE-11] - Move region-select parameters to a service
+    * [CLIMATE-35] - Update dataset additions to include new display attribute
+    * [CLIMATE-36] - Add checkbox to dataset display panels for toggling display attribute state
+    * [CLIMATE-37] - Update map drawing routine to make drawing dataset overlays optional
+    * [CLIMATE-40] - Add new re-gridding field when adding a dataset using the selectedDatasetInformation service
+    * [CLIMATE-41] - Add re-gridding logic to the DatasetDisplayCtrl
+    * [CLIMATE-42] - Add sliders for selecting lat/lon degree steps
+    * [CLIMATE-46] - Add temporal re-grid to evaluation settings modal
+    * [CLIMATE-48] - Update runEvaluation to use temporal re-grid option
+    * [CLIMATE-57] - Add service for sharing evaluation settings
+    * [CLIMATE-59] - Add modal for evaluation settings
+    * [CLIMATE-60] - Add and wire-in SettingsCtrl
+    * [CLIMATE-61] - Use new evaluation settings in runEvaluation
+    * [CLIMATE-62] - Add checkbox for selecting re-grid options
+    * [CLIMATE-63] - Add jQuery UI
+    * [CLIMATE-65] - Add temporal regridding options to evaluationSettings service
+    * [CLIMATE-69] - Add AngularUI date directive support
+    * [CLIMATE-70] - Add new start and end datepickers
+    * [CLIMATE-76] - Add parameter checks when user adjusts values in ParameterSelectCtrl
+    * [CLIMATE-78] - WorldMapCtrl should allow for overlay redraw to be triggered via an event
+    * [CLIMATE-80] - Trigger redraw of map overlays when user is finished typing.
+    * [CLIMATE-81] - Don't watch region parameter changes to trigger map redraws
+    * [CLIMATE-83] - Change ParameterSelectCtrl layout
+    * [CLIMATE-84] - Hide UI control buttons instead of disabling them
+    * [CLIMATE-85] - Evaluation button doesn't display properly when running an evaluation
+    * [CLIMATE-94] - Move services in app.js to services.js
+    * [CLIMATE-95] - Split up controllers.js
+    * [CLIMATE-96] - Split up directives.js
+    * [CLIMATE-98] - Remove filters.js
+    * [CLIMATE-99] - Split up services.js
+    * [CLIMATE-102] - Move services over to separate module
+    * [CLIMATE-103] - Move directives over to a separate module
+    * [CLIMATE-104] - Move controllers over to new module
+    * [CLIMATE-109] - Get rid of useless boilerplate files
+    * [CLIMATE-115] - Remove controllersSpec.js
+    * [CLIMATE-116] - Add tests for ParameterSelectCtrl
+    * [CLIMATE-120] - Make run/rcmes endpoint JSONP compatible
+    * [CLIMATE-121] - Add tests for SettingsCtrl
+    * [CLIMATE-122] - Add tests for DatasetDisplayCtrl
+    * [CLIMATE-123] - Add tests for RcmedSelectionCtrl
+
+** Bug
+    * [CLIMATE-1] - Replace longName with longname to match the new JPL Webservice
+    * [CLIMATE-5] - misc.py tried to import SubRegion when rcmet.py already has
+    * [CLIMATE-14] - directory_helpers.py should prevent users from accessing arbitrary directories
+    * [CLIMATE-18] - Easy-RCMET installs incorrect binary versions
+    * [CLIMATE-21] - RCMES UI is unable to communicate with backend properly when directory access is limited
+    * [CLIMATE-25] - bootstrap-modal keyboard escape doesn't work when an element isn't in focus
+    * [CLIMATE-51] - Add style guide and information for new users
+    * [CLIMATE-52] - Disable Parameter input boxes when the user hasn't selected a valid number of datasets
+    * [CLIMATE-53] - db.extractData function should not change dir
+    * [CLIMATE-58] - bootstrapModalOpen directive doesn't handle attributes correctly
+    * [CLIMATE-64] - User is unable to uncheck regrid box
+    * [CLIMATE-71] - Adding model dataset doesn't handle time values correctly
+    * [CLIMATE-77] - User selected region is redrawn as the user types
+    * [CLIMATE-79] - regionParameter changes cause a race condition when drawing map overlays
+    * [CLIMATE-82] - checkParameters doesn't properly handle value comparisons
+    * [CLIMATE-86] - Website - Update the Wiki link under Documentation 
+    * [CLIMATE-87] - Easy-RCMET pulls repo from JPL instead of ASF
+    * [CLIMATE-111] - Switch tests over to Karma
+    * [CLIMATE-112] - Unit tests no longer work
+    * [CLIMATE-118] - Update ParameterSelectCtrl datasets $watch to prevent call to undefined variable
+
+** Improvement
+    * [CLIMATE-9] - Move rootScope datasets object over to a service
+    * [CLIMATE-10] - Move map-specific code to WorldMapCtrl
+    * [CLIMATE-13] - Parameter selection in selectObservation.html needs to use proper databinding.
+    * [CLIMATE-15] - Show upload confirmation when user submits local file to UI.
+    * [CLIMATE-16] - Provide feedback when a dataset is submitted by the user
+    * [CLIMATE-17] - Update bootstrap-modal directive to allow for animated open/closing
+    * [CLIMATE-23] - bootstrap-modal and bootstrap-modal-open need refactored
+    * [CLIMATE-24] - Mouse scroll needs to be disabled on the UI map
+    * [CLIMATE-26] - Display the number of datasets currently queued for evaluation when the user is selecting datasets.
+    * [CLIMATE-27] - Filter out invalid variable options in selectObservation
+    * [CLIMATE-28] - Adjust how variable selection drop down boxes are displayed to the user depending on number of options
+    * [CLIMATE-29] - Provide reasonable default options for drop downs to user when pulling datasets from RCMED
+    * [CLIMATE-32] - Factor out host component of URLs for backend calls 
+    * [CLIMATE-66] - Clean up ParameterSelectCtrl
+    * [CLIMATE-68] - Switch Start and End field over to jQuery UI DatePicker
+    * [CLIMATE-72] - Adjust input parameter boxes display properties
+    * [CLIMATE-73] - Remove Update button from ParameterSelectCtrl
+    * [CLIMATE-74] - Add on-blur directive
+    * [CLIMATE-75] - Parameter select input boxes need to reject invalid input
+    * [CLIMATE-88] - Performance improvements for metrics.py
+    * [CLIMATE-92] - Overhaul to plots.py
+    * [CLIMATE-93] - Split up UI files for a more manageable code base
+    * [CLIMATE-97] - Rename Leaflet Map directive
+    * [CLIMATE-100] - Clean up JavaScript folder and imports
+    * [CLIMATE-101] - Define controllers, directives, and services under separate modules
+    * [CLIMATE-105] - Remove RCMES references in UI code
+    * [CLIMATE-107] - All source files need ASF licence text
+    * [CLIMATE-117] - updates to regridding
+    * [CLIMATE-119] - Make ParameterSelectCtrl runEvaluation use Angular HTTP instead of jQuery
+    * [CLIMATE-124] - Define RcmedSelectionCtrl.getObservations on scope instead of locally
+    * [CLIMATE-125] - Define RcmedSelectionCtrl.getObservationTimeRange on scope
+
+** New Feature
+    * [CLIMATE-33] - Add modal for metric selection
+    * [CLIMATE-34] - Add ability to toggle dataset overlays
+    * [CLIMATE-45] - Add ability for user to select temporal re-gridding options
+
+** Task
+    * [CLIMATE-3] - Purge Unnecessary JPL Internal Development Files/Folders
+    * [CLIMATE-4] - Push latest code changes from JPL svn to Apache
+    * [CLIMATE-6] - Add the Interactive Mode back into rcmet.py
+    * [CLIMATE-108] - Clean up UI CSS files
+    * [CLIMATE-129] - Create a KEYS files for GPG Code Signatures in trunk
 
 
 
