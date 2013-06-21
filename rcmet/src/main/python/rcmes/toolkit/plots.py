@@ -22,6 +22,7 @@
 from math import floor, log
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
+import matplotlib as mpl
 import numpy as np
 import os
 
@@ -95,7 +96,7 @@ def calc_nice_color_bar_values(mymin, mymax, target_nlevs):
     
     return newmin, newmax, new_nlevs
 
-def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'png', cMap = plt.cm.jet):
+def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'png', cMap = None):
     '''
     Purpose::
         Plots a filled contour map.
@@ -115,6 +116,9 @@ def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'p
         TODO: Let user specify map projection, whether to mask bodies of water??
         
     '''
+    if cMap is None:
+        cMap = plt.cm.jet
+        
     # Set up the figure
     fig = plt.figure()
     ax = fig.gca()
@@ -176,7 +180,7 @@ def draw_time_series_plot(data, times, myfilename, myworkdir, data2='', mytitle=
     ax = fig.gca()
 
     if year_labels == False:
-        xfmt = matplotlib.dates.DateFormatter('%b')
+        xfmt = mpl.dates.DateFormatter('%b')
         ax.xaxis.set_major_formatter(xfmt)
 
     # x-axis title
