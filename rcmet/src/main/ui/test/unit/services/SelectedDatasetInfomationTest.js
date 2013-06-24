@@ -49,6 +49,13 @@ describe('OCW Services', function() {
 				expect(selectedDatasetInformation.getDatasetCount()).toEqual(1);
 			});
 		});
+
+		it('should set the shouldDisplay attribute when adding a dataset', function() {
+			inject(function(selectedDatasetInformation) {
+				selectedDatasetInformation.addDataset({});
+				expect(selectedDatasetInformation.getDatasets()[0].shouldDisplay).toBe(true);
+			});
+		});
 	});
 });
 
