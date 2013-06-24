@@ -86,10 +86,6 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 		return (selectedDatasetInformation.getDatasetCount() < 2);
 	}
 
-	$scope.shouldDisableClearButton = function() {
-		return (selectedDatasetInformation.getDatasetCount() == 0);
-	}
-
 	$scope.shouldDisableEvaluateButton = function() {
 		return ($scope.shouldDisableControls() || $scope.runningEval);
 	}
@@ -101,10 +97,6 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			res = true;
 
 		return res;
-	}
-
-	$scope.clearDatasets = function() {
-		selectedDatasetInformation.clearDatasets();
 	}
 
 	$scope.runEvaluation = function() {

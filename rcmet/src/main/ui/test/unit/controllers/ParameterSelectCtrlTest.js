@@ -119,18 +119,6 @@ describe('OCW Controllers', function() {
 			});
 		});
 
-		it('should initialize the disable clear button function', function() {
-			inject(function($rootScope, $controller) {
-				var scope = $rootScope.$new();
-				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
-
-				expect(scope.shouldDisableClearButton()).toBe(true);
-				scope.datasets.push(1);
-				scope.datasets.push(2);
-				expect(scope.shouldDisableClearButton()).toBe(false);
-			});
-		});
-
 		it('should initialize the disable evaluation button function', function() {
 			inject(function($rootScope, $controller) {
 				var scope = $rootScope.$new();
@@ -158,18 +146,6 @@ describe('OCW Controllers', function() {
 				$rootScope.evalResults = "this is not an empty string";
 
 				expect(scope.shouldDisableResultsView()).toBe(false);
-			});
-		});
-
-		it('should initialize the clear datasets function', function() {
-			inject(function($rootScope, $controller) {
-				var scope = $rootScope.$new();
-				var ctrl = $controller("ParameterSelectCtrl", {$rootScope: $rootScope, $scope: scope});
-
-				scope.datasets.push(1);
-				expect(scope.datasets.length).toBe(1);
-				scope.clearDatasets();
-				expect(scope.datasets.length).toBe(0);
 			});
 		});
 
