@@ -33,6 +33,7 @@ files = [
   'app/js/controllers/*.js',
   'app/js/directives/*.js',
   'app/js/services/*.js',
+  'app/js/filters/*.js',
   'test/unit/**/*.js'
 ];
 

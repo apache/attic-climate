@@ -56,5 +56,12 @@ describe('OCW Filters', function() {
 				expect(filter('2012-234T234')).toEqual('2012-234T234')
 			});
 		});
+
+		it('should do nothing when the date format has no hyphens', function() {
+			inject(function($filter) {
+				var filter = $filter('ISODateToMiddleEndian');
+				expect(filter('2012234T234')).toEqual('2012234T234')
+			});
+		});
 	});
 });
