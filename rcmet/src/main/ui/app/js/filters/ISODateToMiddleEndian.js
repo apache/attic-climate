@@ -26,7 +26,7 @@ App.Filters.filter('ISODateToMiddleEndian', function() {
 		var original = input;
 
 		// Strip whitespace from the start and end of the string
-		input = input.replace(/(^\s+|\s+$)/g,' ');
+		input = input.replace(/(^\s+|\s+$)/g, '');
 
 		// ISO Standard says time is separated from Date with a 'T'. Our timestamps
 		// slightly modify that and use a space. We'll check for both here and prefer
