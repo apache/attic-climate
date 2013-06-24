@@ -100,6 +100,9 @@
     <div ng-controller="DatasetSelectCtrl">
       <div class="row span6">
         <div class="span2">
+          <button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear</button>
+        </div>
+        <div class="span2">
           <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select</button>
         </div>
       </div>
@@ -185,9 +188,6 @@
             <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span2" />
           </form>
         </div>
-        <!--<div class="span1">-->
-          <!--<button ng-click="clearDatasets()" ng-hide="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear</button>-->
-        <!--</div>-->
         <!--<div class="span1">-->
           <!--<button class="btn btn-block btn-primary" ng-hide="shouldDisableResultsView()" bootstrap-modal-open="evaluationResults">Results</button>-->
         <!--</div>-->
