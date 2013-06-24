@@ -96,12 +96,13 @@
 
 <div class="row">
   <div class="span6">
+    <!--Dataset Select Controls-->
+    <div ng-controller="DatasetSelectCtrl">
+      <div class="row span6"><hr /></div>
+    </div>
     <!--Dataset display-->
     <div ng-controller="DatasetDisplayCtrl">
       <div ng-repeat="dataset in datasets">
-      <div class="row displayRow">
-          <div class="span4 "><hr /></div>
-      </div>
       <div class="row displayRow">
       <div class="span4 ">
         <input class="span4 text-center" type="text" value="{{dataset.name}}" />
@@ -260,6 +261,7 @@
   <script src="js/controllers/RcmedSelectionCtrl.js"></script>
   <script src="js/controllers/SettingsCtrl.js"></script>
   <script src="js/controllers/TimelineCtrl.js"></script>
+  <script src="js/controllers/DatasetSelectCtrl.js"></script>
 
   <!--Directives-->
   <script src="js/directives/LeafletMap.js"></script>
