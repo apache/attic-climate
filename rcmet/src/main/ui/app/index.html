@@ -226,7 +226,12 @@
       </div>
       <div class="row">
         <div class="span1 offset3">
-          <button class="btn btn-block" background="false" bootstrap-modal-open="evaluationSettings"><i class="icon-cogs"></i></button>
+          <button class="btn btn-block btn-link no-color-link" background="false" bootstrap-modal-open="evaluationSettings">
+            <span class="icon-stack pull-right">
+              <i class="icon-check-empty icon-stack-base"></i>
+              <i class="icon-cogs"></i>
+            </span>
+          </button>
         </div>
         <div class="span2">
           <button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluateButton()" class="btn btn-block btn-primary">
