@@ -23,4 +23,8 @@ function($scope, selectedDatasetInformation) {
 	$scope.shouldDisableClearButton = function() {
 		return (selectedDatasetInformation.getDatasetCount() == 0);
 	}
+
+	$scope.clearDatasets = function() {
+		selectedDatasetInformation.clearDatasets();
+	}
 }]);
