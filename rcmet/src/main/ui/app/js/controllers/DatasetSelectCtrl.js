@@ -20,5 +20,4 @@
 // Controller for dataset selection/modification
 App.Controllers.controller('DatasetSelectCtrl', ['$scope', 'selectedDatasetInformation',
 function($scope, selectedDatasetInformation) {
-	$scope.datasets = selectedDatasetInformation.getDatasets();
 }]);
