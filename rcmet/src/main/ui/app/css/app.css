@@ -40,10 +40,12 @@ ul
 .btn-link.no-color-link:hover {color:#000000; text-decoration: none;}     
 .btn-link.no-color-link:visited {color:#000000;}     
 .btn-link.no-color-link:active {color:#000000;}     
+
 /** 
   * Timeline 
   */ 
 div#OCWtimeline {
+	margin-top: 20px;
 	padding-bottom: 20px;
 }
 div.timeline-event {
