@@ -17,6 +17,12 @@
  * under the License.
 **/
 
+body 
+{
+	margin-left: 3%;
+	margin-top: 3%;
+}
+
 #map 
 {
 	height: 500px;
