@@ -36,6 +36,12 @@ describe('OCW Services', function() {
 				expect(selectedDatasetInformation.getDatasets()).not.toEqual(null);
 			});
 		});
+
+		it('should provide the getDatasetCount function', function() {
+			inject(function(selectedDatasetInformation) {
+				expect(selectedDatasetInformation.getDatasetCount()).toEqual(0);
+			});
+		});
 	});
 });
 
