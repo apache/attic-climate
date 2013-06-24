@@ -35,5 +35,17 @@ describe('OCW Controllers', function() {
 				expect(scope.shouldDisableClearButton()).toBe(false);
 			});
 		});
+
+		it('should initialize the clear datasets function', function() {
+			inject(function($rootScope, $controller, selectedDatasetInformation) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller('DatasetSelectCtrl', {$rootScope: $rootScope, $scope: scope});
+
+				selectedDatasetInformation.addDataset({});
+				expect(selectedDatasetInformation.getDatasetCount()).toBe(1);
+				scope.clearDatasets();
+				expect(selectedDatasetInformation.getDatasetCount()).toBe(0);
+			});
+		});
 	});
 });
