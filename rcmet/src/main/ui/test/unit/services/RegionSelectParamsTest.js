@@ -30,6 +30,12 @@ describe('OCW Services', function() {
 				expect(regionSelectParams).not.toEqual(null);
 			});
 		});
+
+		it('should provide the getParameters function', function() {
+			inject(function(regionSelectParams) {
+				expect(regionSelectParams.getParameters()).not.toEqual(null);
+			});
+		});
 	});
 });
 
