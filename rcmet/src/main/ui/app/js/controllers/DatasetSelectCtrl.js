@@ -20,4 +20,7 @@
 // Controller for dataset selection/modification
 App.Controllers.controller('DatasetSelectCtrl', ['$scope', 'selectedDatasetInformation',
 function($scope, selectedDatasetInformation) {
+	$scope.shouldDisableClearButton = function() {
+		return (selectedDatasetInformation.getDatasetCount() == 0);
+	}
 }]);
