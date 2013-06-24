@@ -35,5 +35,12 @@ describe('OCW Filters', function() {
 				expect(filter('2012-01-02 00:00:00')).toEqual('01/02/2012');
 			});
 		});
+
+		it('should replace the ISO Date/Time stamp', function() {
+			inject(function($filter) {
+				var filter = $filter('ISODateToMiddleEndian');
+				expect(filter('2012-01-02')).toEqual('01/02/2012');
+			});
+		});
 	});
 });
