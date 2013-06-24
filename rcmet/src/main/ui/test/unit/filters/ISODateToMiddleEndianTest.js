@@ -49,5 +49,12 @@ describe('OCW Filters', function() {
 				expect(filter('      2012-01-02T00:00:00    ')).toEqual('01/02/2012');
 			});
 		});
+
+		it('should do nothing when the date format has the incorrect number of hyphens', function() {
+			inject(function($filter) {
+				var filter = $filter('ISODateToMiddleEndian');
+				expect(filter('2012-234T234')).toEqual('2012-234T234')
+			});
+		});
 	});
 });
