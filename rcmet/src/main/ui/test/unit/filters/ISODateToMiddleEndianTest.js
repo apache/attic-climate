@@ -29,17 +29,24 @@ describe('OCW Filters', function() {
 			});
 		});
 
-		it('should replace the ISO Date/Time stamp', function() {
+		it('should replace the modified ISO Date/Time stamp', function() {
 			inject(function($filter) {
 				var filter = $filter('ISODateToMiddleEndian');
 				expect(filter('2012-01-02 00:00:00')).toEqual('01/02/2012');
 			});
 		});
 
-		it('should replace the ISO Date/Time stamp', function() {
+		it('should replace the ISO Date stamp', function() {
 			inject(function($filter) {
 				var filter = $filter('ISODateToMiddleEndian');
 				expect(filter('2012-01-02')).toEqual('01/02/2012');
+			});
+		});
+
+		it('should replace leading and trailing whitespace', function() {
+			inject(function($filter) {
+				var filter = $filter('ISODateToMiddleEndian');
+				expect(filter('      2012-01-02T00:00:00    ')).toEqual('01/02/2012');
 			});
 		});
 	});
