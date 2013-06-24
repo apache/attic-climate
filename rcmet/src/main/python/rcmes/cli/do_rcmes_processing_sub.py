@@ -22,17 +22,17 @@
     script.
 """
 
-import sys
+import os, sys
 import datetime
 import numpy
 import numpy.ma as ma 
 import toolkit.plots as plots
-
+import mpl_toolkits.basemap as bm
+import matplotlib.pyplot as plt
 import storage.db as db
 import storage.files as files
 import toolkit.process as process
 import toolkit.metrics as metrics
-
 
 def do_rcmes(settings, params, model, mask, options):
     '''
@@ -119,14 +119,17 @@ def do_rcmes(settings, params, model, mask, options):
     # Deal with some precipitation specific options
     #      i.e. adjust units of model data and set plot color bars suitable for precip
     ###########################################################################
-    colorbar = 'rainbow'
+    # AG 06/12/1013: Need to revise how we select colormaps in the future
+    colorbar = None
     if options['precip'] == True:
         modelData['data'] = modelData['data']*86400.  # convert from kgm-2s-1 into mm/day
-        colorbar = 'precip2_17lev'
+        colorbar = bm.cm.s3pcpn
 
     # set color bar suitable for MODIS cloud data
     if params['obsParamId'] == 31:
-        colorbar = 'gsdtol'
+        colorbar = plt.cm.gist_gray
+    
+    diffcolorbar = bm.cm.GMT_polar
 
     ##################################################################################################################
     # Extract sub-selection of model data for required time range.
@@ -257,6 +260,7 @@ def do_rcmes(settings, params, model, mask, options):
         # Construct lats, lons from grid parameters
 
         # Create 1d lat and lon arrays
+        # AG 06/21/2013: These variables are undefined, where are they generated from?
         lat = numpy.arange(nLats)*dLat+Lat0
         lon = numpy.arange(nLons)*dLon+Lon0
 
@@ -380,8 +384,8 @@ def do_rcmes(settings, params, model, mask, options):
     if options['seasonalCycle'] == True:
         print 'Compositing data to calculate seasonal cycle'
 
-        modelData['data'] = metrics.calc_annual_cycle_means(modelData['data'], modelData['times'])
-        rcmedData['data'] = metrics.calc_annual_cycle_means(rcmedData['data'], modelData['times'])
+        modelData['data'] = metrics.calcAnnualCycleMeans(modelData['data'])
+        rcmedData['data'] = metrics.calcAnnualCycleMeans(rcmedData['data'])
 
     ##################################################################################################################
     # Part 7: metric calculation
@@ -398,40 +402,33 @@ def do_rcmes(settings, params, model, mask, options):
     ##################################################################################################################
 
     if options['metric'] == 'bias':
-        metricData = metrics.calc_bias(modelData['data'], rcmedData['data'])
+        metricData = metrics.calcBias(modelData['data'], rcmedData['data'])
         metricTitle = 'Bias'
 
     if options['metric'] == 'mae':
-        metricData = metrics.calc_mae(modelData['data'], rcmedData['data'])
+        metricData = metrics.calcBiasAveragedOverTime(modelData['data'], rcmedData['data'], 'abs')
         metricTitle = 'Mean Absolute Error'
 
     if options['metric'] == 'rms':
-        metricData = metrics.calc_rms(modelData['data'], rcmedData['data'])
+        metricData = metrics.calcRootMeanSquaredDifferenceAveragedOverTime(modelData['data'], rcmedData['data'])
         metricTitle = 'RMS error'
  
-    if options['metric'] == 'difference':
-        metricData = metrics.calc_difference(modelData['data'], rcmedData['data'])
-        metricTitle = 'Difference'
-
     #if options['metric'] == 'patcor':
         #metricData = metrics.calc_pat_cor2D(modelData['data'], rcmedData['data'])
         #metricTitle = 'Pattern Correlation'
 
-    if options['metric'] == 'nacc':
-        metricData = metrics.calc_anom_corn(modelData['data'], rcmedData['data'])
-        metricTitle = 'Anomaly Correlation'
 
     if options['metric'] == 'pdf':
-        metricData = metrics.calc_pdf(modelData['data'], rcmedData['data'])
+        metricData = metrics.calcPdf(modelData['data'], rcmedData['data'])
         metricTitle = 'Probability Distribution Function'
 
     if options['metric'] == 'coe':
-        metricData = metrics.calc_nash_sutcliff(modelData['data'], rcmedData['data'])
+        metricData = metrics.calcNashSutcliff(modelData['data'], rcmedData['data'])
         metricTitle = 'Coefficient of Efficiency'
 
     if options['metric'] == 'stddev':
-        metricData = metrics.calc_stdev(modelData['data'])
-        data2 = metrics.calc_stdev(rcmedData['data'])
+        metricData = metrics.calcTemporalStdev(modelData['data'])
+        data2 = metrics.calcTemporalStdev(rcmedData['data'])
         metricTitle = 'Standard Deviation'
 
     ##################################################################################################################
@@ -572,18 +569,18 @@ def do_rcmes(settings, params, model, mask, options):
         ###########################################################################################
         mytitle = 'Model data: mean between %s and %s' % ( modelData['times'][0].strftime(timeFormat), 
                                                            modelData['times'][-1].strftime(timeFormat) )
-        plots.draw_map_color_filled(modelDataMean, lats, lons, options['plotFilename']+'model',
-                                                   settings['workDir'], mytitle=mytitle, rangeMax=mymax,
-                                                   rangeMin=mymin, colorTable=colorbar, niceValues=True)
+        myfname = os.path.join(options['workDir'], options['plotFilename']+'model')
+
+        plots.draw_cntr_map_single(modelDataMean, lats, lons, mymin, mymax, mytitle, myfname, cMap = colorbar)
 
         ###########################################################################################
         # Plot obs data
         ###########################################################################################
         mytitle = 'Obs data: mean between %s and %s' % ( rcmedData['times'][0].strftime(timeFormat), 
                                                         rcmedData['times'][-1].strftime(timeFormat) )
-        plots.draw_map_color_filled(obsDataMean, lats, lons, options['plotFilename']+'obs',
-                                                   settings['workDir'], mytitle=mytitle, rangeMax=mymax, 
-                                                   rangeMin=mymin, colorTable=colorbar, niceValues=True)
+        myfname = os.path.join(options['workDir'], options['plotFilename']+'obs')
+        plots.draw_cntr_map_single(obsDataMean, lats, lons, mymin, mymax, mytitle, myfname, cMap = colorbar)
+
 
         ###########################################################################################
         # Plot metric
@@ -596,11 +593,8 @@ def do_rcmes(settings, params, model, mask, options):
         if options['plotTitle'] == 'default':
             mytitle = metricTitle+' model v obs %s to %s' % ( rcmedData['times'][0].strftime(timeFormat),
                                                                 rcmedData['times'][-1].strftime(timeFormat) )
-
-        plots.draw_map_color_filled(metricData, lats, lons, options['plotFilename'],
-                                                   settings['workDir'], mytitle=mytitle, 
-                                                   rangeMax=mymax, rangeMin=mymin, diff=True, 
-                                                   niceValues=True, nsteps=24)
+        myfname = os.path.join(options['workDir'], options['plotFilename'])
+        plots.draw_cntr_map_single(metricData, lats, lons, mymin, mymax, mytitle, myfname, cMap = diffcolorbar)
 
     ###############################################################################################
     # 3 dimensional data, e.g. sequence of maps
@@ -624,37 +618,31 @@ def do_rcmes(settings, params, model, mask, options):
             # Plot model data
             #######################################################################################
             mytitle = 'Model data: mean '+timeTitle
-            plots.draw_map_color_filled(modelData['data'][t, :, :], lats, lons, 
-                                                       options['plotFilename']+'model'+str(t),
-                                                       settings['workDir'], mytitle=mytitle, 
-                                                       rangeMax=colorRangeMax, rangeMin=colorRangeMin,
-                                                       colorTable=colorbar, niceValues=True)
+            myfname = os.path.join(settings['workDir'], options['plotFilename']+'model'+str(t))
+            plots.draw_cntr_map_single(modelData['data'][t, :, :], lats, lons, colorRangeMin, colorRangeMax, 
+                                       mytitle, myfname, cMap = colorbar)
 
             #######################################################################################
             # Plot obs data
             #######################################################################################
             mytitle = 'Obs data: mean '+timeTitle
-            plots.draw_map_color_filled(rcmedData['data'][t, :, :], lats, lons, 
-                                                       options['plotFilename']+'obs'+str(t),
-                                                       settings['workDir'], mytitle=mytitle, 
-                                                       rangeMax=colorRangeMax, rangeMin=colorRangeMin,
-                                                       colorTable=colorbar, niceValues=True)
+            myfname = os.path.join(settings['workDir'], options['plotFilename']+'obs'+str(t))
+            plots.draw_cntr_map_single(rcmedData['data'][t, :, :], lats, lons, colorRangeMin, colorRangeMax, 
+                                       mytitle, myfname, cMap = colorbar)
 
             #######################################################################################
             # Plot metric
             #######################################################################################
             mytitle = options['plotTitle']
+            myfname = os.path.join(settings['workDir'], options['plotFilename']+str(t))
 
             if options['plotTitle'] == 'default':
                 mytitle = metricTitle +' model v obs : '+timeTitle
 
             colorRangeMax = metricData.max()
             colorRangeMin = metricData.min()
-
-            plots.draw_map_color_filled(metricData[t, :, :], lats, lons, 
-                                                       options['plotFilename']+str(t), settings['workDir'], 
-                                                       mytitle=mytitle, rangeMax=colorRangeMax, rangeMin=colorRangeMin, diff=True,
-                                                       niceValues=True, nsteps=24)
+            plots.draw_cntr_map_single(metricData['data'][t, :, :], lats, lons, colorRangeMin, colorRangeMax, 
+                                       mytitle, myfname, cMap = diffcolorbar)
 
 
 def getDataFromRCMED( params, settings, options ):
