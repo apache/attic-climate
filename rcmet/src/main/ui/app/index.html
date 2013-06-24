@@ -102,18 +102,15 @@
   <div ng-controller="DatasetDisplayCtrl">
     <div ng-repeat="dataset in datasets">
 	  <div class="row displayRow">
-        <!--<div class="span4 offset2"><hr /></div>-->
   	    <div class="span4 "><hr /></div>
 	  </div>
 	  <div class="row displayRow">
-		<!--<div class="span4 offset2">-->
 		<div class="span4 ">
 		  <input class="span4 text-center" type="text" value="{{dataset.name}}" />
 		</div>
 	  </div>
 	  <!--Time Values!-->
     <div class="row displayRow">
-      <!--<div class="span1 offset2 text-center">Start Date:</div>-->
       <div class="span1 text-center">Start Date:</div>
       <div class="span1">
         <input class="span1 text-center" type="text" value="{{dataset.timeVals.start}}" readonly/>
@@ -129,7 +126,6 @@
     </div>
 	  <!--Lat/Long Values!-->
     <div class="row displayRow">
-      <!--<div class="span1 offset2 text-center">North:</div>-->
       <div class="span1 text-center">North:</div>
       <div class="span1">
         <input class="span1 text-center" type="text" value="{{dataset.latlonVals.latMax}}" readonly/>
@@ -143,7 +139,6 @@
       </div>
 	  </div>
     <div class="row displayRow">
-      <!--<div class="span1 offset2 text-center">South:</div>-->
       <div class="span1 text-center">South:</div>
       <div class="span1">
         <input class="span1 text-center" type="text" value="{{dataset.latlonVals.latMin}}" readonly/>
@@ -181,7 +176,6 @@
   <div class="row span6">
   <div ng-controller="ParameterSelectCtrl">
     <div class="row">
-      <!--<div class="span1 offset2 text-center">Start Date:</div>-->
       <div class="span1 text-center">Start Date:</div>
       <div class="span1">
         <form>
@@ -214,7 +208,6 @@
       <!--</div>-->
     </div>
     <div class="row">
-      <!--<div class="span1 offset2 text-center">North:</div>-->
       <div class="span1 text-center">North:</div>
       <div class="span1">
         <form action="">
@@ -236,7 +229,6 @@
       <!--</div>-->
     </div>
     <div class="row">
-      <!--<div class="span1 offset2 text-center">East:</div>-->
       <div class="span1 text-center">East:</div>
       <div class="span1">
         <form>
