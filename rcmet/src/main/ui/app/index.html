@@ -179,9 +179,6 @@
             <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span1" />
           </form>
         </div>
-        <div class="span1">
-          <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select</button>
-        </div>
         <!--<div class="span1">-->
           <!--<button ng-click="clearDatasets()" ng-hide="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear</button>-->
         <!--</div>-->
@@ -224,6 +221,11 @@
           <form>
             <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span1 text-center" />
           </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span2">
+          <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select</button>
         </div>
       </div>
     </div>
