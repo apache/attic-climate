@@ -168,15 +168,15 @@
     <div class="row span6" ng-controller="ParameterSelectCtrl">
       <div class="row">
         <div class="span1 text-center">Start Date:</div>
-        <div class="span1">
+        <div class="span2">
           <form>
-            <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span1" />
+            <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span2" />
           </form>
         </div>
         <div class="span1 text-center">End Date:</div>
-        <div class="span1">
+        <div class="span2">
           <form>
-            <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span1" />
+            <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span2" />
           </form>
         </div>
         <!--<div class="span1">-->
@@ -194,29 +194,29 @@
       </div>
       <div class="row">
         <div class="span1 text-center">North:</div>
-        <div class="span1">
+        <div class="span2">
           <form action="">
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span1 text-center" />
+            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span2 text-center" />
           </form>
         </div>
         <div class="span1 text-center">South:</div>
         <div class="span1">
           <form action="">
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span1 text-center" />
+            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span2 text-center" />
           </form>
         </div>
       </div>
       <div class="row">
         <div class="span1 text-center">East:</div>
-        <div class="span1">
+        <div class="span2">
           <form>
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span1 text-center" />
+            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span2 text-center" />
           </form>
         </div>
         <div class="span1 text-center">West:</div>
-        <div class="span1">
+        <div class="span2">
           <form>
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span1 text-center" />
+            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span2 text-center" />
           </form>
         </div>
       </div>
