@@ -131,6 +131,21 @@ describe('OCW Controllers', function() {
 			});
 		});
 
+		it('should initialize the disable evaluation button function', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("ParameterSelectCtrl", {$scope: scope});
+
+				expect(scope.shouldDisableEvaluateButton()).toBe(true);
+				scope.datasets.push(1);
+				expect(scope.shouldDisableEvaluateButton()).toBe(true);
+				scope.datasets.push(2);
+				expect(scope.shouldDisableEvaluateButton()).toBe(false);
+				scope.runningEval = true;
+				expect(scope.shouldDisableEvaluateButton()).toBe(true);
+			});
+		});
+
 		it('should initialize the disable results view function', function() {
 			inject(function($rootScope, $controller) {
 				$rootScope.evalResults = "";
