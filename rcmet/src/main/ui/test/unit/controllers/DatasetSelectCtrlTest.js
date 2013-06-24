@@ -24,9 +24,16 @@ describe('OCW Controllers', function() {
 	beforeEach(module('ocw.controllers'));
 	beforeEach(module('ocw.services'));
 
-
 	describe('DatasetSelectCtrl', function() {
-		it('', function() {
+		it('should initialize the disable clear button function', function() {
+			inject(function($rootScope, $controller, selectedDatasetInformation) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller('DatasetSelectCtrl', {$scope: scope});
+
+				expect(scope.shouldDisableClearButton()).toBe(true);
+				selectedDatasetInformation.addDataset({});
+				expect(scope.shouldDisableClearButton()).toBe(false);
+			});
 		});
 	});
 });
