@@ -30,5 +30,11 @@ describe('OCW Services', function() {
 				expect(evaluationSettings).not.toEqual(null);
 			});
 		});
+
+		it('should provide a getSettings function', function() {
+			inject(function(evaluationSettings) {
+				expect(evaluationSettings.getSettings()).not.toEqual(null);
+			})
+		})
 	});
 });
