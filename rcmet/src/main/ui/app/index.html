@@ -95,6 +95,10 @@
   </bootstrap-modal>
 
 <div class="row">
+  <div class="row span12">
+    <h2>Apache Open Climate Workbench UI</h2>
+    <hr />
+  </div>
   <div class="span6">
     <!--Dataset Select Controls-->
     <div ng-controller="DatasetSelectCtrl">
@@ -120,11 +124,11 @@
       <div class="row displayRow">
         <div class="span1 text-center">Start Date:</div>
         <div class="span1">
-          <input class="span1 text-center" type="text" value="{{dataset.timeVals.start}}" readonly/>
+          <div class="div1 text-center">{{dataset.timeVals.start | ISODateToMiddleEndian}}</div>
         </div>
         <div class="span1 text-center">End Date:</div>
         <div class="span1">
-          <input class="span1 text-center" type="text" value="{{dataset.timeVals.end}}" readonly/>
+          <div class="div1 text-center">{{dataset.timeVals.end | ISODateToMiddleEndian}}</div>
         </div>
         <div class="span1">
           <a class="btn btn-block" ng-click="removeDataset($index)">Remove</a>
@@ -272,5 +276,8 @@
   <script src="js/directives/PredictiveFileBrowserInput.js"></script>
   <script src="js/directives/OnBlur.js"></script>
   <script src="js/directives/Timeline.js"></script>
+
+  <!--Filters-->
+  <script src="js/filters/ISODateToMiddleEndian.js"></script>
 </body>
 </html>
