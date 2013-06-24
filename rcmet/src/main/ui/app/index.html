@@ -103,11 +103,11 @@
     <!--Dataset Select Controls-->
     <div ng-controller="DatasetSelectCtrl">
       <div class="row span6">
-        <div class="span2">
-          <button ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()" class="btn btn-block btn-warning">Clear</button>
-        </div>
-        <div class="span2">
+        <div class="span1 pull-right">
           <button class="btn btn-block btn-success" bootstrap-modal-open="datasetSelect">Select</button>
+        </div>
+        <div class="span1 pull-right">
+          <button class="btn btn-block btn-warning" ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()">Clear</button>
         </div>
       </div>
       <div class="row span6"><hr /></div>
