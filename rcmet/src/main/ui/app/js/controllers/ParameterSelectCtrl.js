@@ -90,6 +90,10 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 		return (selectedDatasetInformation.getDatasetCount() == 0);
 	}
 
+	$scope.shouldDisableEvaluateButton = function() {
+		return ($scope.shouldDisableControls() || $scope.runningEval);
+	}
+
 	$scope.shouldDisableResultsView = function() {
 		var res = false;
 
