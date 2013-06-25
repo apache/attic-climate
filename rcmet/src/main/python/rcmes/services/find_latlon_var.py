@@ -49,7 +49,7 @@
 """
 
 import sys
-import Nio
+import netCDF4
 import bottle
 from bottle import request
 import json
@@ -60,11 +60,11 @@ import json
 def find_latlon(filename):
   success = 0
   filename = filename.strip('"')
-  f = Nio.open_file(filename)
-  var_name_list = f.variables.keys()
+  f = netCDF4.Dataset(filename, mode='r')
 
   # convert all variable names into lower case
-  var_name_list_lower = [x.lower() for x in var_name_list]
+  var_name_list_lower = [key.encode().lower() for key in f.variables.keys()]
+  var_name_list = var_name_list_lower
 
   # create a "set" from this list of names
   varset = set(var_name_list_lower)

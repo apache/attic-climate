@@ -22,7 +22,6 @@
 from bottle import request, route
 
 import requests
-import Nio
 
 @route('/getObsDatasets')
 def getObservationDatasetData():

@@ -476,7 +476,7 @@ def read_trmm_3b42_files(filelist, latMin, latMax, lonMin, lonMax):
     for ifile in filelist:
         print 'Loading data from file: ', filelist[i]
         f = netCDF4.Dataset(ifile, mode='r')
-        t2raw = f.variables['hrf']
+        t2raw = ma.array(f.variables['hrf'][:])
         
         # Read time from filename (NB. 'time' variable in netCDF always set to zero)
         filename = os.path.basename(ifile)  # strip off the filepath
@@ -571,7 +571,7 @@ def read_airs_lev3_files(filelist, myvar, latMin, latMax, lonMin, lonMax):
     for ifile in filelist:
         print 'Loading data from file: ', filelist[i]
         f = netCDF4.open_file(ifile, mode='r')
-        t2raw = f.variables[myvar]
+        t2raw = ma.array(f.variables[myvar][:])
         
         # Read time from filename (NB. 'time' variable in netCDF always set to zero)
         filename = os.path.basename(ifile)  # strip off the filepath
@@ -818,7 +818,7 @@ def read_eraint_surf_files(filelist, myvar, latMin, latMax, lonMin, lonMax):
     for ifile in filelist:
         print 'Loading data from file: ', filelist[i]
         f = netCDF4.Dataset(ifile, mode='r')
-        data = f.variables[myvar][:]
+        data = ma.array(f.variables[myvar][:])
         scale = f.variables[myvar].scale_factor
         offset = f.variables[myvar].add_offset
         data = data * scale + offset

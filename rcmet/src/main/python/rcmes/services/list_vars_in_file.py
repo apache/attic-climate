@@ -40,7 +40,7 @@
 """
 
 import sys
-import Nio
+import netCDF4
 import bottle
 from bottle import request
 import json
@@ -53,13 +53,13 @@ def list_vars(filename):
     filename = filename.strip('"')
     print filename + ' is filename variable'
     try:
-      f = Nio.open_file(filename)
+      f = netCDF4.Dataset(filename, mode='r')
       success = 1
     except:
       print 'Error_reading_file '+filename
     
     if success:  #make some json
-      var_name_list = json.dumps({'variables':f.variables.keys() }, \
+      var_name_list = json.dumps({'variables':f.variables.keys().encode() }, \
                                  sort_keys=True, indent=2)
       if (request.query.callback):
           return "%s(%s)" % (request.query.callback, var_name_list)

@@ -104,9 +104,9 @@ def decode_model_times(filelist,timeVarName):
    import string
    import math
    import numpy
-   import Nio
+   import netCDF4
 
-   f = Nio.open_file(filelist[0])
+   f = netCDF4.Dataset(filelist[0], mode='r')
    xtimes = f.variables[timeVarName]
    timeFormat = xtimes.units
 

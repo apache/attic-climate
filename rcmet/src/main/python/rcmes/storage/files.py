@@ -161,11 +161,11 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     #      as no assumption made that same number of times in each file...
 
 
-    for ifile in filelist:
+    for i,ifile in enumerate(filelist):
 
         #print 'Loading data from file: ',filelist[i]
         f = netCDF4.Dataset(ifile, mode='r')
-        t2raw = f.variables[myvar][:]
+        t2raw = ma.array(f.variables[myvar][:])
         timesraw = f.variables[timeVarName]
         time = timesraw[:]
         ntimes = len(time)
@@ -189,7 +189,6 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
         timestore[timesaccu + np.arange(ntimes)] = time
         timesaccu = timesaccu + ntimes
         f.close()
-        i += 1 
       
     print 'Data read in successfully with dimensions: ', t2store.shape
     
@@ -329,11 +328,10 @@ def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
         varUnit = f.variables[myvar].units.encode().upper()
     except:
         varUnit = raw_input('Enter the model variable unit: \n> ').upper()
-    t2raw = f.variables[myvar][:]
+    t2raw = ma.array(f.variables[myvar][:])
     t2tmp = t2raw.squeeze()
     if t2tmp.ndim == 2:
         t2tmp = np.expand_dims(t2tmp, 0)
-    t2tmp = t2tmp
     f.close()
     print '  success read_data_from_one_file: VarName=', myvar, ' Shape(Full)= ', t2tmp.shape, ' Unit= ', varUnit
     timestore = process.decode_model_timesK(ifile, timeVarName, file_type)
@@ -484,7 +482,7 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     for ifile in filelist:
         #print 'Loading data from file: ',filelist[i]
         f = netCDF4.Dataset(ifile, mode='r')
-        t2raw = f.variables[myvar][:]
+        t2raw = ma.array(f.variables[myvar][:])
         timesraw = f.variables[timeVarName]
         time = timesraw[0:ntimes]
         #ntimes=len(time)

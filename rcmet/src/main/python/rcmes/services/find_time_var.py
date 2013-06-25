@@ -45,7 +45,7 @@
 import sys
 import bottle
 from bottle import request
-import Nio
+import netCDF4
 import json
 import decode_model_times as dmt
 
@@ -57,10 +57,10 @@ import decode_model_times as dmt
 def list_time(filename):
     filename = filename.strip('"')
     success = 0
-    f = Nio.open_file(filename)
-    var_name_list = f.variables.keys()
+    f = netCDF4.Dataset(filename, mode='r')
     # convert all variable names into lower case
-    var_name_list_lower = [x.lower() for x in var_name_list]
+    var_name_list_lower = [key.encode().lower() for key in f.variables.keys()]
+    var_name_list = var_name_list_lower
     # create a "set" from this list of names
     varset = set(var_name_list_lower)
     # Use "set" types for finding common variable name from in the file and from the list of possibilities

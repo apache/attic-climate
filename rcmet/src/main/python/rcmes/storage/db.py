@@ -178,7 +178,7 @@ def read_netcdf(netCD_fileName):
     longitudes = netcdf.variables['lon'][:]
     levels = netcdf.variables['lev'][:]
     hours = netcdf.variables['time'][:]
-    values = netcdf.variables['value'][:]
+    values = ma.array(netcdf.variables['value'][:])
     
     # To get the base date
     time_unit=netcdf.variables['time'].units.encode()
