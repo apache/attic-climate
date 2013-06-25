@@ -45,6 +45,17 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-121] - Add tests for SettingsCtrl
     * [CLIMATE-122] - Add tests for DatasetDisplayCtrl
     * [CLIMATE-123] - Add tests for RcmedSelectionCtrl
+    * [CLIMATE-130] - Add tests for ObservationSelectCtrl
+    * [CLIMATE-131] - Add tests for WorldMapCtrl
+    * [CLIMATE-133] - Remove unneeded timeline files
+    * [CLIMATE-134] - Move timeline css file into appropriate lib folder
+    * [CLIMATE-145] - Remove serviceSpec.js
+    * [CLIMATE-146] - Add tests for EvaluationSettings service
+    * [CLIMATE-147] - Add tests for RegionSelectParams service
+    * [CLIMATE-148] - Add tests for SelectedDatasetInformation
+    * [CLIMATE-150] - Remove directivesSpec.js
+    * [CLIMATE-151] - Update BootstrapModal directive tests
+    * [CLIMATE-154] - Remove filtersSpec.js
 
 ** Bug
     * [CLIMATE-1] - Replace longName with longname to match the new JPL Webservice
@@ -67,6 +78,11 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-111] - Switch tests over to Karma
     * [CLIMATE-112] - Unit tests no longer work
     * [CLIMATE-118] - Update ParameterSelectCtrl datasets $watch to prevent call to undefined variable
+    * [CLIMATE-126] - deprecated function is used in process.py
+    * [CLIMATE-135] - zlib not installed to /usr/local
+    * [CLIMATE-138] - calc_bias is undefined in metrics
+    * [CLIMATE-141] - matplotlib is not imported in plots
+    * [CLIMATE-156] - regridding function gives incorrect results for arrays with masked elements
 
 ** Improvement
     * [CLIMATE-9] - Move rootScope datasets object over to a service
@@ -96,15 +112,21 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-101] - Define controllers, directives, and services under separate modules
     * [CLIMATE-105] - Remove RCMES references in UI code
     * [CLIMATE-107] - All source files need ASF licence text
+    * [CLIMATE-114] - Update unit tests for controllers
     * [CLIMATE-117] - updates to regridding
     * [CLIMATE-119] - Make ParameterSelectCtrl runEvaluation use Angular HTTP instead of jQuery
     * [CLIMATE-124] - Define RcmedSelectionCtrl.getObservations on scope instead of locally
     * [CLIMATE-125] - Define RcmedSelectionCtrl.getObservationTimeRange on scope
+    * [CLIMATE-132] - Move JavaScript libs into appropriate folder
+    * [CLIMATE-143] - Replace current regridding functions with wrapper to basemap.interp()
+    * [CLIMATE-144] - Update unit tests for services
+    * [CLIMATE-153] - Add filter for converting ISO dates to US dates
 
 ** New Feature
     * [CLIMATE-33] - Add modal for metric selection
     * [CLIMATE-34] - Add ability to toggle dataset overlays
     * [CLIMATE-45] - Add ability for user to select temporal re-gridding options
+    * [CLIMATE-89] - Implement a timeline widget 
 
 ** Task
     * [CLIMATE-3] - Purge Unnecessary JPL Internal Development Files/Folders
@@ -112,7 +134,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-6] - Add the Interactive Mode back into rcmet.py
     * [CLIMATE-108] - Clean up UI CSS files
     * [CLIMATE-129] - Create a KEYS files for GPG Code Signatures in trunk
-
+    * [CLIMATE-155] - Update FontAwesome
 
 
 Regional Climate Model Evaluation System
