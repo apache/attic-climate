@@ -641,7 +641,7 @@ def do_rcmes(settings, params, model, mask, options):
 
             colorRangeMax = metricData.max()
             colorRangeMin = metricData.min()
-            plots.draw_cntr_map_single(metricData['data'][t, :, :], lats, lons, colorRangeMin, colorRangeMax, 
+            plots.draw_cntr_map_single(metricData[t, :, :], lats, lons, colorRangeMin, colorRangeMax, 
                                        mytitle, myfname, cMap = diffcolorbar)
 
 
