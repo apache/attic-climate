@@ -96,15 +96,15 @@ def calc_nice_color_bar_values(mymin, mymax, target_nlevs):
     
     return newmin, newmax, new_nlevs
 
-def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'png', cMap = None):
+def draw_cntr_map_single(pVar, lats, lons, mnLvl, mxLvl, pTitle, pName, pType = 'png', cMap = None):
     '''
     Purpose::
         Plots a filled contour map.
        
     Input::
         pVar - 2d array of the field to be plotted with shape (nLon, nLat)
-        lon - 1d array of longitudes 
-        lat = latitude  (1-d)
+        lon - array of longitudes 
+        lat - array of latitudes
         mnLvl - an integer specifying the minimum contour level
         mxLvl - an integer specifying the maximum contour level
         pTitle - a string specifying plot title
@@ -124,10 +124,10 @@ def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'p
     ax = fig.gca()
 
     # Determine the map boundaries and construct a Basemap object
-    lonMin = lon.min()
-    lonMax = lon.max()
-    latMin = lat.min()
-    latMax = lat.max()
+    lonMin = lons.min()
+    lonMax = lons.max()
+    latMin = lats.min()
+    latMax = lats.max()
     m = Basemap(projection = 'cyl', llcrnrlat = latMin, urcrnrlat = latMax,
             llcrnrlon = lonMin, urcrnrlon = lonMax, resolution = 'l', ax = ax)
 
@@ -140,7 +140,8 @@ def draw_cntr_map_single(pVar, lon, lat, mnLvl, mxLvl, pTitle, pName, pType = 'p
     m.drawparallels(np.linspace(latMin, latMax, 5), labels = [1, 0, 0, 1])
 
     # Convert lats and lons to projection coordinates
-    lons, lats = np.meshgrid(lon, lat)
+    if lats.ndim == 1 and lons.ndim == 1:
+        lons, lats = np.meshgrid(lons, lats)
     x, y = m(lons, lats)
 
     # Plot data with filled contours
