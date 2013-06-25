@@ -27,7 +27,7 @@ import datetime
 import numpy
 import numpy.ma as ma 
 import toolkit.plots as plots
-import mpl_toolkits.basemap as bm
+import mpl_toolkits.basemap.cm as cm
 import matplotlib.pyplot as plt
 import storage.db as db
 import storage.files as files
@@ -123,13 +123,13 @@ def do_rcmes(settings, params, model, mask, options):
     colorbar = None
     if options['precip'] == True:
         modelData['data'] = modelData['data']*86400.  # convert from kgm-2s-1 into mm/day
-        colorbar = bm.cm.s3pcpn
+        colorbar = cm.s3pcpn
 
     # set color bar suitable for MODIS cloud data
     if params['obsParamId'] == 31:
         colorbar = plt.cm.gist_gray
     
-    diffcolorbar = bm.cm.GMT_polar
+    diffcolorbar = cm.GMT_polar
 
     ##################################################################################################################
     # Extract sub-selection of model data for required time range.
