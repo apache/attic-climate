@@ -115,12 +115,12 @@
       <div class="row span6"><hr /></div>
     </div>
     <!--Dataset display-->
-    <div ng-controller="DatasetDisplayCtrl">
+    <div ng-controller="DatasetDisplayCtrl" id="datasetDiv">
       <div ng-repeat="dataset in datasets">
-      <div class="row displayRow">
-      <div class="span4 ">
-        <input class="span4 text-center" type="text" value="{{dataset.name}}" />
-      </div>
+      <div class="row">
+        <div class="span4 ">
+          <input class="span4 text-center" type="text" value="{{dataset.name}}" />
+        </div>
       </div>
       <!--Time Values!-->
       <div class="row displayRow">

@@ -21,6 +21,18 @@ body
 {
 	margin-left: 3%;
 	margin-top: 3%;
+
+	/* The max width that bootstrap can handle. Prevents weird resizing issues*/
+	max-width: 1170px;
+}
+
+#datasetDiv
+{
+	height: 750px;
+	width: 100%;
+	margin-left: 30px;
+	padding-left: 10px;
+	overflow: auto;
 }
 
 #map 
