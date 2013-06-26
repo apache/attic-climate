@@ -59,8 +59,8 @@ def list_vars(filename):
       print 'Error_reading_file '+filename
     
     if success:  #make some json
-      var_name_list = json.dumps({'variables':f.variables.keys().encode() }, \
-                                 sort_keys=True, indent=2)
+      var_name_list = json.dumps({'variables': f.variables.keys()}, 
+                                  sort_keys=True, indent=2)
       if (request.query.callback):
           return "%s(%s)" % (request.query.callback, var_name_list)
       return var_name_list
