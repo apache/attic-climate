@@ -121,6 +121,9 @@
         <div class="span4 muted">
           {{dataset.name}}
         </div>
+        <div class="span1">
+          <a class="btn btn-link no-color-link" ng-click="removeDataset($index)">Remove</a>
+        </div>
       </div>
       <!--Time Values!-->
       <div class="row displayRow">
@@ -131,9 +134,6 @@
         <div class="span1 text-center">End Date:</div>
         <div class="span1">
           <div class="div1 text-center">{{dataset.timeVals.end | ISODateToMiddleEndian}}</div>
-        </div>
-        <div class="span1">
-          <a class="btn btn-block" ng-click="removeDataset($index)">Remove</a>
         </div>
         <div class="span1" style="background-color: {{fillColors[$index]}}; height: 28px; width: 28px;"></div>
       </div>
