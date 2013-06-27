@@ -33,7 +33,7 @@ App.Services.service('selectedDatasetInformation', function() {
 		addDataset: function(dataset) {
 			// All datasets need a shouldDisplay attribute that is used when rendering
 			// the overlays on the map!
-			dataset.shouldDisplay = true;
+			dataset.shouldDisplay = false;
 			// The regrid attribute indicates which dataset should be used for spatial regridding
 			dataset.regrid = false;
 
