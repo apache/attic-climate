@@ -94,154 +94,186 @@
   </div>
   </bootstrap-modal>
 
-<div class="row">
-  <div class="row span12">
-    <h2>Apache Open Climate Workbench UI</h2>
-    <hr />
-  </div>
-  <div class="span6">
-    <!--Dataset Select Controls-->
-    <div ng-controller="DatasetSelectCtrl">
-      <div class="row span6">
-        <div class="span2 pull-right">
-          <button class="btn btn-link no-color-link pull-right" bootstrap-modal-open="datasetSelect">
-            <i class="icon-plus icon-2x"></i>
-          </button>
-          <button class="btn btn-link no-color-link pull-right" ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()">
-            <i class="icon-trash icon-2x"></i>
-          </button>
-        </div>
-      </div>
-      <div class="row span6"><hr /></div>
-    </div>
-    <!--Dataset display-->
-    <div ng-controller="DatasetDisplayCtrl" id="datasetDiv">
-      <div ng-repeat="dataset in datasets">
-      <div class="row">
-        <div class="span4 muted">
-          {{dataset.name}}
-        </div>
-        <div class="span1">
-          <a class="no-color-link" href="#" ng-click="removeDataset($index)">
-            <i class="icon-remove"></i>
-          </a>
-        </div>
-      </div>
-      <!--Time Values!-->
-      <div class="row displayRow">
-        <div class="span1 text-center">Start Date:</div>
-        <div class="span1">
-          <div class="div1 text-center">{{dataset.timeVals.start | ISODateToMiddleEndian}}</div>
-        </div>
-        <div class="span1 text-center">End Date:</div>
-        <div class="span1">
-          <div class="div1 text-center">{{dataset.timeVals.end | ISODateToMiddleEndian}}</div>
-        </div>
-        <div class="span1 colorSquare" style="background-color: {{fillColors[$index]}};"></div>
-      </div>
-      <!--Lat/Long Values!-->
-      <div class="row displayRow">
-        <div class="span1 text-center">North:</div>
-        <div class="span1 text-center">
-          {{dataset.latlonVals.latMax}}
-        </div>
-        <div class="span1 text-center">East:</div>
-        <div class="span1 text-center">
-          {{dataset.latlonVals.lonMax}}
-        </div>
-        <div class="span1">
-          <label><input type="checkbox" ng-model="dataset.shouldDisplay" /> Overlay</label>
-        </div>
-      </div>
-      <div class="row displayRow">
-        <div class="span1 text-center">South:</div>
-        <div class="span1 text-center">
-          {{dataset.latlonVals.latMin}}
-        </div>
-        <div class="span1 text-center">West:</div>
-        <div class="span1 text-center">
-          {{dataset.latlonVals.lonMin}}
-        </div>
-        <div class="span1">
-          <label>
-            <input type="checkbox" ng-model="dataset.regrid" ng-click="setRegridBase($index)"/> 
-            Regrid 
-          </label>
-        </div>
-      </div>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+    <div class="row-fluid">
+      <div class="span12 text-center">
+        <h2>Apache Open Climate Workbench UI</h2>
       </div>
     </div>
-  </div>
-  <div class="span6">
-    <div class="row span6" ng-controller="WorldMapCtrl">
-      <leaflet-map id="map"></leaflet-map>
+    <div class="row-fluid">
+      <hr />
     </div>
-    
-    <!-- Timeline -->
-    <div class="row span6" ng-controller="TimelineCtrl">
-      <div class="timeline"></div>
-    </div>
-    
-    <div class="row span6" ng-controller="ParameterSelectCtrl">
-      <div class="row">
-        <div class="span1 text-center">Start Date:</div>
-        <div class="span2">
-          <form>
-            <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span2" />
-          </form>
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="row-fluid">
+          <div class="span6">
+            <!--Dataset Select Controls-->
+            <div ng-controller="DatasetSelectCtrl">
+              <div class="row-fluid">
+                <div class="span2 offset10">
+                  <button class="btn btn-link no-color-link" ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()">
+                    <i class="icon-trash icon-2x"></i>
+                  </button>
+                  <button class="btn btn-link no-color-link" bootstrap-modal-open="datasetSelect">
+                    <i class="icon-plus icon-2x"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span12">
+                  <hr />
+                </div>
+              </div>
+            </div>
+            <!--Dataset display-->
+            <div ng-controller="DatasetDisplayCtrl" id="datasetDiv">
+              <div ng-repeat="dataset in datasets">
+                <div class="row-fluid">
+                  <div class="span8 muted">
+                    {{dataset.name}}
+                  </div>
+                  <div class="span2 offset1">
+                    <a class="no-color-link pull-right" href="#" ng-click="removeDataset($index)">
+                      <i class="icon-remove"></i>
+                    </a>
+                  </div>
+                </div>
+                <!--Time Values!-->
+                <div class="row-fluid">
+                  <div class="span2 text-center">Start Date:</div>
+                  <div class="span2">
+                    <div class="span2 text-center">{{dataset.timeVals.start | ISODateToMiddleEndian}}</div>
+                  </div>
+                  <div class="span2 text-center">End Date:</div>
+                  <div class="span2">
+                    <div class="span2 text-center">{{dataset.timeVals.end | ISODateToMiddleEndian}}</div>
+                  </div>
+                  <div class="span2">
+                    <div class="colorSquare" style="background-color: {{fillColors[$index]}};"></div>
+                  </div>
+                </div>
+                <!--Lat/Long Values!-->
+                <div class="row-fluid">
+                  <div class="span2 text-center">North:</div>
+                  <div class="span2 text-center">
+                    {{dataset.latlonVals.latMax}}
+                  </div>
+                  <div class="span2 text-center">East:</div>
+                  <div class="span2 text-center">
+                    {{dataset.latlonVals.lonMax}}
+                  </div>
+                  <div class="span2">
+                    <label><input type="checkbox" ng-model="dataset.shouldDisplay" /> Overlay</label>
+                  </div>
+                </div>
+                <div class="row-fluid">
+                  <div class="span2 text-center">South:</div>
+                  <div class="span2 text-center">
+                    {{dataset.latlonVals.latMin}}
+                  </div>
+                  <div class="span2 text-center">West:</div>
+                  <div class="span2 text-center">
+                    {{dataset.latlonVals.lonMin}}
+                  </div>
+                  <div class="span2">
+                    <label>
+                      <input type="checkbox" ng-model="dataset.regrid" ng-click="setRegridBase($index)"/> 
+                      Regrid 
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
-        <div class="span1 text-center">End Date:</div>
-        <div class="span2">
-          <form>
-            <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span2" />
-          </form>
-        </div>
-        <!--<div class="span1">-->
-          <!--<button class="btn btn-block btn-primary" ng-hide="shouldDisableResultsView()" bootstrap-modal-open="evaluationResults">Results</button>-->
-        <!--</div>-->
-      </div>
-      <div class="row">
-        <div class="span1 text-center">North:</div>
-        <div class="span2">
-          <form action="">
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span2 text-center" />
-          </form>
-        </div>
-        <div class="span1 text-center">South:</div>
-        <div class="span1">
-          <form action="">
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span2 text-center" />
-          </form>
-        </div>
-      </div>
-      <div class="row">
-        <div class="span1 text-center">East:</div>
-        <div class="span2">
-          <form>
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span2 text-center" />
-          </form>
-        </div>
-        <div class="span1 text-center">West:</div>
-        <div class="span2">
-          <form>
-            <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span2 text-center" />
-          </form>
-        </div>
-      </div>
-      <div class="row">
-        <div class="span1 offset3">
-          <button class="btn btn-block btn-link no-color-link" background="false" bootstrap-modal-open="evaluationSettings">
-            <span class="icon-stack pull-right">
-              <i class="icon-check-empty icon-stack-base"></i>
-              <i class="icon-cogs"></i>
-            </span>
-          </button>
-        </div>
-        <div class="span2">
-          <button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluateButton()" class="btn btn-block btn-primary">
-            <div ng-hide="runningEval">Evaluate</div>
-            <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
-          </button>
+        <div class="span6">
+          <!--Map-->
+          <div class="row-fluid"  ng-controller="WorldMapCtrl">
+            <div class="span12">
+              <leaflet-map id="map"></leaflet-map>
+            </div>
+          </div>
+          
+          <!--Timeline-->
+          <div class="row-fluid">
+            <div class="span12" ng-controller="TimelineCtrl">
+              <div class="timeline"></div>
+            </div>
+          </div>
+          
+          <div class="row-fluid">
+            <div class="span12" ng-controller="ParameterSelectCtrl">
+              <div class="row-fluid">
+                <div class="span2 text-center">Start Date:</div>
+                <div class="span4">
+                  <form>
+                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
+                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
+                    <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span4" style="width:100%" />
+                  </form>
+                </div>
+                <div class="span2 text-center">End Date:</div>
+                <div class="span4">
+                  <form>
+                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
+                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
+                    <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span4" style="width:100%"/>
+                  </form>
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span2 text-center">North:</div>
+                <div class="span4">
+                  <form action="">
+                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span4 text-center" style="width:100%"/>
+                  </form>
+                </div>
+                <div class="span2 text-center">South:</div>
+                <div class="span4">
+                  <form action="">
+                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
+                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
+                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span4 text-center" style="width:100%"/>
+                  </form>
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span2 text-center">East:</div>
+                <div class="span4">
+                  <form>
+                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
+                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
+                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span4 text-center" style="width:100%"/>
+                  </form>
+                </div>
+                <div class="span2 text-center">West:</div>
+                <div class="span4">
+                  <form>
+                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
+                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
+                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span4 text-center" style="width:100%"/>
+                  </form>
+                </div>
+              </div>
+              <div class="row-fluid">
+                <div class="span2 offset6">
+                  <button class="btn btn-block btn-link no-color-link" background="false" bootstrap-modal-open="evaluationSettings">
+                    <span class="icon-stack pull-right">
+                      <i class="icon-check-empty icon-stack-base"></i>
+                      <i class="icon-cogs"></i>
+                    </span>
+                  </button>
+                </div>
+                <div class="span4">
+                  <button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluateButton()" class="btn btn-block btn-primary">
+                    <div ng-hide="runningEval">Evaluate</div>
+                    <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
