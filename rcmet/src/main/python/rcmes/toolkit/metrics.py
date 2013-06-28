@@ -25,6 +25,7 @@ import datetime
 import numpy as np
 import numpy.ma as ma
 import scipy.stats as stats
+import matplotlib.pyplot as plt
 from toolkit import plots, process
 from utils import misc
 from storage import files 
@@ -44,7 +45,7 @@ def calcAnnualCycleMeans(dataset1):
      '''
     data = misc.reshapeMonthlyData(dataset1)
     means = data.mean(axis = 0)
-    return means
+    return data, means
 
 def calcClimYear(dataset1):
     '''
@@ -342,7 +343,7 @@ def calcTemporalCorrelation(evaluationData, referenceData):
                     temporalCorrelation[iy,ix], sigLev[iy,ix]=stats.pearsonr(t1[(t1.mask==False) & (t2.mask==False)],
                                                   t2[(t1.mask==False) & (t2.mask==False)])
                     sigLev[iy,ix]=1-sigLev[iy,ix]  # p-value => confidence level
-    
+                    
     temporalCorrelation=ma.masked_equal(temporalCorrelation.data, -100.)        
     sigLev=ma.masked_equal(sigLev.data, -100.)    
     
@@ -709,13 +710,13 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             # first determine the temporal properties to be evaluated
             print ''
             timeOption = misc.select_timOpt()
-            print ''
+            print 'timeOption=',timeOption
             if timeOption == 1:
                 timeScale = 'Annual'
                 # compute the annual-mean time series and climatology. 
                 # mTser=ma.zeros((nYR,ngrdY,ngrdX)), mClim = ma.zeros((ngrdY,ngrdX))
-                mTser, mClim = calcClimYear(nYR, mdlData[mdlSelect, :, :, :])
-                oTser, oClim = calcClimYear(nYR, obsData[obsSelect, :, :, :])
+                mTser, mClim = calcClimYear(mdlData[mdlSelect, :, :, :])
+                oTser, oClim = calcClimYear(obsData[obsSelect, :, :, :])
             elif timeOption == 2:
                 timeScale = 'Seasonal'
                 # select the timeseries and climatology for a season specifiec by a user
@@ -732,7 +733,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 #   mTser = ma.zeros((nYR,12,ngrdY,ngrdX)) & mClim = ma.zeros((12,ngrdY,ngrdX))
                 # Also same for oTser = ma.zeros((nYR,12,ngrdY,ngrdX)) &,oClim = ma.zeros((12,ngrdY,ngrdX))
                 mTser, mClim = calcAnnualCycleMeans(mdlData[mdlSelect, :, :, :])
-                oTser, oClim = calcAnnualCycleMeans(obsData[mdlSelect, :, :, :])
+                oTser, oClim = calcAnnualCycleMeans(obsData[obsSelect, :, :, :])
             else:
                 # undefined process options. exit
                 print 'The desired temporal scale is not available this time. END the job'
@@ -751,12 +752,13 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 metricDat, sigLev = calcBiasAveragedOverTimeAndSigLev(mTser, oTser)
                 oStdv = calcTemporalStdev(oTser)
             elif metricOption == 'MAE':
-                metricDat, sigLev = calcBiasAveragedOverTime(mTser, oTser, 'abs')
+                metricDat= calcBiasAveragedOverTime(mTser, oTser, 'abs')
             # metrics below yields 1-d time series
             elif metricOption == 'PCt':
                 metricDat, sigLev = calcPatternCorrelationEachTime(mTser, oTser)
             # metrics below yields 2-d array, i.e., metricDat = ma.array((ngrdY,ngrdX))
             elif metricOption == 'TC':
+                
                 metricDat, sigLev = calcTemporalCorrelation(mTser, oTser)
             # metrics below yields a scalar values
             elif metricOption == 'PCC':
@@ -780,7 +782,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 plotTitle = metricOption + '_' + varName
                 # Data-specific plot options: i.e. adjust model data units & set plot color bars
                 #cMap = 'rainbow'
-                cMap = 'BlRe'
+                cMap = plt.cm.RdBu_r
                 #cMap = 'BlWhRe'
                 #cMap = 'BlueRed'
                 #cMap = 'GreyWhiteGrey'
@@ -804,10 +806,10 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 if ans == 'y':
                     mymin = float(raw_input('Enter the minimum plot scale \n> '))
                     mymax = float(raw_input('Enter the maximum plot scale \n> '))
-                wksType = 'ps'
+                wksType = 'png'
                 # TODO This shouldn't return anything. Handle a "status" the proper way
-                _ = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, 
-                                                      plotTitle, plotFileName, cMap, wksType)
+                _ = plots.draw_cntr_map_single(plotDat, lats, lons, mymin, mymax, 
+                                                      plotTitle, plotFileName, cMap=cMap)
                 # if bias, plot also normalzied values and means: first, normalized by mean
                 if metricOption == 'BIAS':
                     print ''
@@ -834,8 +836,8 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                             subprocess.call(cmnd, shell = True)
                         plotTitle = 'Bias (% MEAN)'
                         # TODO Again, this shouldn't return a status
-                        _ = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, 
-                                                              plotTitle, plotFileName, cMap, wksType)
+                        _ = plots.draw_cntr_map_single(plotDat, lats, lons, mymin, mymax, 
+                                                              plotTitle, plotFileName, wksType, cMap)
                 # normalized by sigma
                 makePlot = raw_input('Plot bias in terms of % of interann sigma? [y/n]\n> ').lower()
                 if makePlot == 'y':
@@ -858,15 +860,15 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                         subprocess.call(cmnd, shell = True)
                     plotTitle = 'Bias (% SIGMA_time)'
                     # TODO Hay look! A todo re. status returns!
-                    _ = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, 
-                                                          plotTitle, plotFileName, cMap, wksType)
+                    _ = plots.draw_cntr_map_single(plotDat, lats, lons, mymin, mymax, 
+                                                          plotTitle, plotFileName, wksType, cMap)
                 # obs climatology
                 makePlot = raw_input('Plot observation? [y/n]\n> ').lower()
                 if makePlot == 'y':
                     if varName == 'pr':
-                        cMap = 'precip2_17lev'
+                        cMap = plt.cm.jet
                     else:
-                        cMap = 'BlRe'
+                        cMap = plt.cm.jet
                     plotDat = oClim
                     mymax = plotDat.max()
                     mymin = plotDat.min()
@@ -881,8 +883,8 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                         subprocess.call(cmnd, shell=True)
                     plotTitle = 'OBS (mm/day)'
                     # TODO Yep
-                    _ = plots.draw_cntr_map_single(plotDat, lons, lats, mymin, mymax, 
-                                                          plotTitle, plotFileName, cMap, wksType)
+                    _ = plots.draw_cntr_map_single(plotDat, lats, lons, mymin, mymax, 
+                                                          plotTitle, plotFileName, wksType, cMap)
 
                 # Repeat for another metric
                 print ''
@@ -904,10 +906,10 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             mData = mdlRgn[mdlSelect, rgnSelect, :]
 
             # compute the monthly-mean climatology to construct the annual cycle
-            obsAnnCyc = calcAnnualCycleMeans(oData)
-            mdlAnnCyc = calcAnnualCycleMeans(mData)
-            print 'obsAnnCyc= ', obsAnnCyc
-            print 'mdlAnnCyc= ', mdlAnnCyc
+            obsTseries, obsAnnualCycle = calcAnnualCycleMeans(oData)
+            mdlTseries, mdlAnnualCycle = calcAnnualCycleMeans(mData)
+            print 'obsAnnCyc= ', obsAnnualCycle
+            print 'mdlAnnCyc= ', mdlAnnualCycle
 
             #--------------------------------
             # (mp.008) Select performance metric
@@ -916,8 +918,9 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             # Temporarily, compute the RMSE and pattern correlation for the simulated 
             # and observed annual cycle based on monthly means
             # TODO This aren't used. Missing something here???
-            tempRMS = calcRootMeanSquaredDifferenceAveragedOverTime(mdlAnnCyc, obsAnnCyc)
-            tempCOR = calcPatternCorrelationEachTime(mdlAnnCyc, obsAnnCyc)
+            
+            tempRMS = calcRootMeanSquaredDifferenceAveragedOverTime(mdlAnnualCycle, obsAnnualCycle)
+            tempCOR, tempSIG = stats.pearsonr(mdlAnnualCycle, obsAnnualCycle)
 
             #--------------------------------
             # (mp.009) Plot results
@@ -925,7 +928,7 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
             # Data-specific plot options: i.e. adjust model data units & set plot color bars
             colorbar = 'rainbow'
             if varName == 'pr':                      # set color bar for prcp
-                colorbar = 'precip2_17lev'
+                colorbar = plt.cm.jet
 
             # 1-d data, e.g. Time series plots
             plotFileName = 'anncyc_' + varName + '_' + subRgnName[rgnSelect][0:3]
@@ -940,8 +943,8 @@ def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons,
                 times.append(datetime.datetime(2000, m + 1, 1, 0, 0, 0, 0))
             #for i in np.arange(12):
             #  times.append(i+1)
-            _ = plots.draw_time_series_plot(mdlAnnCyc, times, plotFileName, workdir, 
-                                                   data2 = obsAnnCyc, mytitle = mytitle, ytitle = 'Y', 
+            _ = plots.draw_time_series_plot(mdlAnnualCycle, times, plotFileName, workdir, 
+                                                   data2 = obsAnnualCycle, mytitle = mytitle, ytitle = 'Y', 
                                                    xtitle = 'MONTH', year_labels = year_labels)
 
             # Repeat for another metric
