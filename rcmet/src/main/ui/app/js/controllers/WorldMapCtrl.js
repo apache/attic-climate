@@ -79,6 +79,26 @@ function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
  			// Add rectangle Group to map
  			$rootScope.rectangleGroup.addTo($rootScope.map);
  		}
+
+		// Calculate the overlap region and set the map to show the new overlap
+		var latMin = -90,
+			latMax = 90,
+			lonMin = -180,
+			lonMax = 180;
+
+		// Get the valid lat/lon range in the selected datasets.
+		for (var i = 0; i < selectedDatasetInformation.getDatasetCount(); i++) {
+			var curDataset = $scope.datasets[i];
+
+			latMin = (curDataset['latlonVals']['latMin'] > latMin) ? curDataset['latlonVals']['latMin'] : latMin;
+			latMax = (curDataset['latlonVals']['latMax'] < latMax) ? curDataset['latlonVals']['latMax'] : latMax;
+			lonMin = (curDataset['latlonVals']['lonMin'] > lonMin) ? curDataset['latlonVals']['lonMin'] : lonMin;
+			lonMax = (curDataset['latlonVals']['lonMax'] < lonMax) ? curDataset['latlonVals']['lonMax'] : lonMax;
+		}
+
+		var overlapBounds = [[latMax, lonMin], [latMin, lonMax]];
+		$rootScope.map.fitBounds(overlapBounds, {padding: [5, 5]});
+
 	};
 
 	$scope.$on('redrawOverlays', function(event, parameters) {

@@ -29,10 +29,9 @@ App.Directives.directive('leafletMap', function($rootScope) {
 				zoom: 2,
 				scrollWheelZoom: false,
 			});
+
 			//create a CloudMade tile layer and add it to the map
-			L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {
-				maxZoom: 4, minZoom: 2,
-			}).addTo($rootScope.map);
+			L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {}).addTo($rootScope.map);
 		}
 	};
 });
