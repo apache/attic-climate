@@ -48,6 +48,31 @@ def getDirectoryInfo(dirPath):
     else:
         return returnJSON
 
+WORK_DIR = "/tmp/rcmet"
+
+@route('/getResultDirInfo')
+def getResultDirInfo():
+    dirPath = WORK_DIR
+    dirPath = dirPath.replace('/../', '/')
+    dirPath = dirPath.replace('/./', '/')
+
+    if os.path.isdir(dirPath):
+        listing = os.listdir(dirPath)
+        listingNoHidden = [f for f in listing if f[0] != '.']
+        joinedPaths = [os.path.join(dirPath, f) for f in listingNoHidden]
+        joinedPaths = [f + "/" if os.path.isdir(f) else f for f in joinedPaths]
+        finalPaths = [p.replace(WORK_DIR, '') for p in joinedPaths]
+        sorted(finalPaths, key=lambda s: s.lower())
+        returnJSON = finalPaths
+    else:
+        returnJSON = []
+
+    returnJSON = json.dumps(returnJSON)
+    if request.query.callback:
+        return "%s(%s)" % (request.query.callback, returnJSON)
+    else:
+        return returnJSON
+
 @route('/getPathLeader/')
 def getPathLeader():
     returnJSON = {"leader": PATH_LEADER}
