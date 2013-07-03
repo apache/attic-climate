@@ -163,7 +163,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			$scope.runningEval = false;
 
 			$timeout(function() {
-				$('#evaluationResults').trigger('modalOpen', true, true);
+				window.location = "/app/results.html";
 			}, 100);
 		}).error(function() {
 			$scope.runningEval = false;
