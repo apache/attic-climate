@@ -195,8 +195,9 @@ def parseSubRegions(subRegionConfig):
     """
     subRegions = []
     try:
-        if os.path.exists(subRegionConfig['subRegionFile']):
-            subRegions = readSubRegionsFile(subRegionConfig['subRegionFile'])
+        subRegionFile = os.path.abspath(subRegionConfig['subRegionFile'])
+        if os.path.exists(subRegionFile):
+            subRegions = readSubRegionsFile(subRegionFile)
             
         else:
             print "SubRegion Filepath: [%s] does not exist.  Check your configuration file, or comment out the SUB_REGION Section." % (subRegionConfig['subRegionFile'],)
