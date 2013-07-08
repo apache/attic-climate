@@ -35,7 +35,8 @@ describe('OCW Controllers', function() {
 				// Don't try to add the user defined region since we don't have one
 				scope.regionParams.areValid = false;
 				// We need to fake the map object. The only thing we care about is faking the "addLayer" function
-				$rootScope.map = {addLayer: function(){}};
+				// and the "fitBounds" functions which our map controllers makes use of.
+				$rootScope.map = {addLayer: function(){}, fitBounds: function(){}};
 				$rootScope.fillColors = ['#ff0000'];
 
 				expect("rectangleGroup" in $rootScope).toBe(false);
