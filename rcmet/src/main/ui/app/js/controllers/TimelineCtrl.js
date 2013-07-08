@@ -72,9 +72,9 @@ function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
 		}
 		
 		var options = {
-				'minHeight': "200px",
-				'width':  "100%",
-				'zoomable': false
+				"width": "100%",
+				"showCurrentTime": false,
+				"zoomable": false,
 		};
 		
 		// Draw timeline with data (DataTable) and options (a name-value map) 

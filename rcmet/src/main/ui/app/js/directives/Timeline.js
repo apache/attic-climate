@@ -29,6 +29,14 @@ App.Directives.directive('timeline', function($rootScope) {
 	    	function initTimeline() {
 	            // Instantiate timeline object.
 	            $rootScope.timeline = new links.Timeline(document.getElementById('OCWtimeline'));
+
+				var options = {
+						"width": "100%",
+						"showCurrentTime": false,
+						'zoomable': false
+				};
+
+				$rootScope.timeline.draw([], options);
 	        }
 		}
 	}
