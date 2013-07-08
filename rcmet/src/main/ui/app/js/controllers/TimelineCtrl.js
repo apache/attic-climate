@@ -37,30 +37,22 @@ function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
 		data.addColumn('datetime', 'end');
 		data.addColumn('string', 'content');
 
-		// Loop through datasets and add data to timeline 
-		var i = -1;
-		angular.forEach($scope.datasets, function(dataset) {
+		// Loop through datasets and find the overlapping start/end time range
+		var start = $scope.datasets[0].timeVals.start;
+		var end = $scope.datasets[0].timeVals.end;
+		for (var i = 0; i < $scope.datasets.length; i++) {
+			var possibleNewStart = $scope.datasets[i].timeVals.start;
+			var possibleNewEnd = $scope.datasets[i].timeVals.end;
 
-			// Keep track of dataset count for displaying colors
-			i++;
-			
-			/* TODO should "disable overlay" also disable timeline? */
+			start = (possibleNewStart > start) ? possibleNewStart : start;
+			end = (possibleNewEnd < end) ? possibleNewEnd : end;
+		}
 
-			// Get time bounds from dataset 
-			var start = dataset.timeVals.start;
-			var end	= dataset.timeVals.end;
-
-			// Add different color to each bar
-			var style = 'background-color:' + $rootScope.fillColors[i] +
-						'; border-color:' + $rootScope.surroundColors[i] + ';';
-			var ocwBar = '<div class="ocw-bar timeline-event-range" style="' + style + '"></div>';
-	
-			// Add row to DataTable: object with start and end date
-			// note: subtract one from month since indexes from 0 to 11
-			data.addRow([new Date(start.substr(0,4), start.substr(5,2)-1, start.substr(8,2)), 
-						new Date(end.substr(0,4), end.substr(5,2)-1, end.substr(8,2)),
-						ocwBar ]);
-		});
+		// Set the timeline extent to the overlapping time range
+		//
+		// NOTE: The month value substring is expected to be 0-based (hence the -1)
+		$rootScope.timeline.setVisibleChartRange(new Date(start.substr(0, 4), start.substr(5, 2) - 1, start.substr(8, 2)),
+												 new Date(end.substr(0, 4), end.substr(5, 2) - 1, end.substr(8, 2)));
 
 		// Add user selected bounds to timeline
 		if ($scope.regionParams.areValid) {
@@ -81,7 +73,7 @@ function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
 		
 		var options = {
 				'minHeight': "200px",
-				'width':  "99.8%",
+				'width':  "100%",
 				'zoomable': false
 		};
 		
