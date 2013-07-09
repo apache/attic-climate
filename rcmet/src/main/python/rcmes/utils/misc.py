@@ -1205,6 +1205,7 @@ def getSpatialGrid():
         return False
     else:
         return spatialGrid
+
 def askUserForVariableName(variableNames, targetName):
     if targetName == "analysis":
         print("Select the variable you want to use for analysis/metrics:")
@@ -1351,9 +1352,9 @@ def select_metrics():
     print 'Metric options'
     print '[0] Bias: mean bias across full time range'
     print '[1] Mean Absolute Error: across full time range'
-    print '[2] Spatial Pattern Correlation: results in a time series of spatial correlation coeff'
+    print '[2] TODO: Spatial Pattern Correlation: results in a time series of spatial correlation coeff'
     print '[3] Temporal Correlation: results in 2-d array of temporal correlation coefficient'
-    print '[4] Spatial Pattern Correlation between averaged fields: results in a single correlation coeff'
+    print '[4] TODO: Spatial Pattern Correlation between averaged fields: results in a single correlation coeff'
     print '[5] RMSE in time: results in a 2-d array of RMSE over two time series'
     print '[6] TODO: Probability Distribution Function similarity score'
     choice = int(raw_input('Please make a selection from the options above\n> '))
@@ -1362,16 +1363,19 @@ def select_metrics():
         metricOption = 'BIAS'
     elif choice == 1:
         metricOption = 'MAE'
-    elif choice == 2:
-        metricOption = 'PCt'
+    #elif choice == 2:
+    #    metricOption = 'PCt'
     elif choice == 3:
         metricOption = 'TC'
-    elif choice == 4:
-        metricOption = 'PCC'
+    #elif choice == 4:
+    #    metricOption = 'PCC'
     elif choice == 5:
         metricOption = 'RMSt'
-    elif choice == 6:
-        metricOption = 'pdfSkillScore'
-    print 'in subroutine metricOption = ', metricOption
+    #elif choice == 6:
+    #    metricOption = 'pdfSkillScore'
+    else:
+        print("Your selection: %s is invalid, please try again\n" % choice)
+        metricOption = select_metrics()
+    
     return metricOption
 
