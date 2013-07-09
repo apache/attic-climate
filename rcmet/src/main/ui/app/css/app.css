@@ -54,6 +54,16 @@ ul
 .no-color-link:visited {color:#000000;}     
 .no-color-link:active {color:#000000;}     
 
+/* Remove the grayed out close button in modal headers */
+.modal-header .close {
+	opacity: 1;
+}
+
+/* Remove the grayed out close button in modal footers */
+.modal-footer .close {
+	opacity: 1;
+}
+
 /** 
   * Timeline 
   */ 
