@@ -56,8 +56,8 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-150] - Remove directivesSpec.js
     * [CLIMATE-151] - Update BootstrapModal directive tests
     * [CLIMATE-154] - Remove filtersSpec.js
-    * [CLIMATE-173] - Add service to return list of figures in work directory
     * [CLIMATE-172] - Display evaluation results in a separate view
+    * [CLIMATE-173] - Add service to return list of figures in work directory
 
 ** Bug
     * [CLIMATE-1] - Replace longName with longname to match the new JPL Webservice
@@ -77,6 +77,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-82] - checkParameters doesn't properly handle value comparisons
     * [CLIMATE-86] - Website - Update the Wiki link under Documentation 
     * [CLIMATE-87] - Easy-RCMET pulls repo from JPL instead of ASF
+    * [CLIMATE-106] - requests module not installed by easy_rcmet
     * [CLIMATE-111] - Switch tests over to Karma
     * [CLIMATE-112] - Unit tests no longer work
     * [CLIMATE-118] - Update ParameterSelectCtrl datasets $watch to prevent call to undefined variable
@@ -84,7 +85,15 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-135] - zlib not installed to /usr/local
     * [CLIMATE-138] - calc_bias is undefined in metrics
     * [CLIMATE-141] - matplotlib is not imported in plots
-    * [CLIMATE-156] - regridding function gives incorrect results for arrays with masked elements
+    * [CLIMATE-158] - Basemap.cm is imported incorrectly in do_rcmes_processing_sub.py
+    * [CLIMATE-159] - do_rcmes_procressing_sub breaks when graphing
+    * [CLIMATE-167] - NetCDF4 change breaks list_vars service
+    * [CLIMATE-168] - Refactored Functions in metrics.py return a different number of variables
+    * [CLIMATE-169] - critical bugs in metrics.py and plots.py
+    * [CLIMATE-170] - VM image does not work on AMD CPU based PC
+    * [CLIMATE-175] - WorldMapCtrlTest is broken after addition of zooming map
+    * [CLIMATE-177] - Update misc.select_metrics function to prevent user selection of incomplete metrics
+    * [CLIMATE-181] - Timeline options don't work
 
 ** Improvement
     * [CLIMATE-9] - Move rootScope datasets object over to a service
@@ -100,6 +109,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-28] - Adjust how variable selection drop down boxes are displayed to the user depending on number of options
     * [CLIMATE-29] - Provide reasonable default options for drop downs to user when pulling datasets from RCMED
     * [CLIMATE-32] - Factor out host component of URLs for backend calls 
+    * [CLIMATE-55] - Updating any modules using PyNgl and PyNio
     * [CLIMATE-66] - Clean up ParameterSelectCtrl
     * [CLIMATE-68] - Switch Start and End field over to jQuery UI DatePicker
     * [CLIMATE-72] - Adjust input parameter boxes display properties
@@ -120,9 +130,12 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-124] - Define RcmedSelectionCtrl.getObservations on scope instead of locally
     * [CLIMATE-125] - Define RcmedSelectionCtrl.getObservationTimeRange on scope
     * [CLIMATE-132] - Move JavaScript libs into appropriate folder
-    * [CLIMATE-143] - Replace current regridding functions with wrapper to basemap.interp()
     * [CLIMATE-144] - Update unit tests for services
     * [CLIMATE-153] - Add filter for converting ISO dates to US dates
+    * [CLIMATE-174] - Map should zoom to the overlap region of selected datasets
+    * [CLIMATE-176] - Fix WorldMapCtrl indentation
+    * [CLIMATE-178] - Fix TimelineCtrl indentation
+    * [CLIMATE-180] - Timeline changes for new UI design
 
 ** New Feature
     * [CLIMATE-33] - Add modal for metric selection
