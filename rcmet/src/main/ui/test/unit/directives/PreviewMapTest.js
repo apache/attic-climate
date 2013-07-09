@@ -33,5 +33,16 @@ describe('directives', function() {
 				expect(element.hasClass("preview-map")).toBeTruthy();
 			});
 		});
+
+		it('should set the id of the template to the name of the dataset', function() {
+			inject(function($compile, $rootScope) {
+				$rootScope.dataset = {latlonVals: {latMax: 90, lonMax: 90, latMin: -90, lonMin: -90}, name: "TRMM"};
+				$rootScope.$digest();
+
+				var element = $compile('<div preview-map="dataset"></div>')($rootScope);
+
+				expect(element.attr('id')).toEqual("{{dataset.name}}");
+			});
+		});
 	});
 });
