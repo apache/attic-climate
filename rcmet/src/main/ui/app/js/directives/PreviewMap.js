@@ -6,7 +6,7 @@ App.Directives.directive('previewMap', function($rootScope) {
 		template: '<div id="{{dataset.name}}" class="preview-map"></div>',
 		link: function(scope, element, attrs) {
 			var map = L.map(attrs.id, {
-				center: [40, 0],
+				//center: [40, 0],
 				zoom: 0,
 				scrollWheelZoom: false,
 				zoomControl: false,
@@ -15,6 +15,10 @@ App.Directives.directive('previewMap', function($rootScope) {
 
 			//create a CloudMade tile layer and add it to the map
 			L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {}).addTo(map);
+
+			var overlapBounds = [[scope.dataset.latlonVals.latMax, scope.dataset.latlonVals.lonMin], 
+								 [scope.dataset.latlonVals.latMin, scope.dataset.latlonVals.lonMax]];
+			map.fitBounds(overlapBounds, {});
 		}
 	};
 });
