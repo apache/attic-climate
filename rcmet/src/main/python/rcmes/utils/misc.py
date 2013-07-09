@@ -1186,7 +1186,11 @@ def getSpatialGrid():
     options = ['obs', 'model', 'user']
     print("Please select one of the following Spatial Grid Options:\n")
     for key, option in enumerate(options):
-        print("[%s] - %s" % (key, option))
+        # PER CLIMATE-179 a temporary print statement has been put in place
+        if option == 'obs':
+            print("[%s] - TODO: %s" % (key, option))
+        else:
+            print("[%s] - %s" % (key, option))
 
     choice = int(raw_input(">>>"))
     try:
@@ -1194,8 +1198,13 @@ def getSpatialGrid():
     except IndexError:
         getSpatialGrid()
 
-    return spatialGrid
-
+    # PER CLIMATE-179 a temporary guard has also been put in place
+    if spatialGrid == 'obs':
+        print 'Using an observational grid for Spatial regridding is not currently supported.'
+        print 'If you know the grid size and spacing you could use the user option instead\n'
+        return False
+    else:
+        return spatialGrid
 def askUserForVariableName(variableNames, targetName):
     if targetName == "analysis":
         print("Select the variable you want to use for analysis/metrics:")

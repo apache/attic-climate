@@ -50,6 +50,11 @@ def rcmetUI():
     workDir, cacheDir = misc.getDirSettings()
     temporalGrid = misc.getTemporalGrid()
     spatialGrid = misc.getSpatialGrid()
+    
+    # PER CLIMATE-179 - Guard against a bad spatialGrid Selection
+    while spatialGrid == False:
+        spatialGrid = misc.getSpatialGrid()
+        
     jobProperties = JobProperties(workDir, cacheDir, spatialGrid, temporalGrid)
     
     # Section 1a: Enter model file/s
