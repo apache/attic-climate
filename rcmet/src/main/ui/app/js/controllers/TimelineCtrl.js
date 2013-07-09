@@ -74,6 +74,7 @@ function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
 		var options = {
 				"width": "100%",
 				"showCurrentTime": false,
+				"moveable": false,
 				"zoomable": false,
 		};
 		

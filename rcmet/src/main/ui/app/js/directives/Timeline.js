@@ -33,6 +33,7 @@ App.Directives.directive('timeline', function($rootScope) {
 				var options = {
 						"width": "100%",
 						"showCurrentTime": false,
+						"moveable": false,
 						'zoomable': false
 				};
 
