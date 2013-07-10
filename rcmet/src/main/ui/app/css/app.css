@@ -32,6 +32,7 @@
 /* Small preview map that is displayed alongside dataset information */
 .preview-map {
 	height: 100px;
+	width: 100px;
 }
 
 .small-alert 
