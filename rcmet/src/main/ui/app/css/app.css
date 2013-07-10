@@ -29,6 +29,11 @@
 	height: 500px;
 }
 
+/* Small preview map that is displayed alongside dataset information */
+.preview-map {
+	height: 100px;
+}
+
 .small-alert 
 {
 	font-size: 12px;
