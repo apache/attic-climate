@@ -85,10 +85,12 @@
             <!--Dataset Select Controls-->
             <div ng-controller="DatasetSelectCtrl">
               <div class="row-fluid">
-                <div class="span2 offset10">
+                <div class="span1 offset10">
                   <button class="btn btn-link no-color-link" ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()">
                     <i class="icon-trash icon-2x"></i>
                   </button>
+                </div>
+                <div class="span1">
                   <button class="btn btn-link no-color-link" bootstrap-modal-open="datasetSelect">
                     <i class="icon-plus icon-2x"></i>
                   </button>
