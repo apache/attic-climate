@@ -21,7 +21,7 @@ App.Directives.directive('previewMap', function($rootScope) {
 	return {
 		restrict: 'A',
 		replace: true,
-		scope: {dataset: '=previewMap'},
+		scope: {dataset: '=previewMap', index: '=index'},
 		template: '<div id="{{dataset.name}}" class="preview-map"></div>',
 		replace: true,
 		link: function(scope, element, attrs) {
@@ -31,7 +31,6 @@ App.Directives.directive('previewMap', function($rootScope) {
 			// has yet to run to evaluate it! We can't run a $digest in the middle of compilation,
 			// so using an $observe (or $watch) is the best way to get the values.
 			attrs.$observe('id', function(newId) {
-				//var map = L.map(scope.dataset.name, {
 				var map = L.map(attrs.id, {
 					zoom: 0,
 					scrollWheelZoom: false,
@@ -53,7 +52,7 @@ App.Directives.directive('previewMap', function($rootScope) {
 
 				var polygon = L.rectangle(bounds,{
 					stroke: false,
-					fillColor: $rootScope.fillColors[i],
+					fillColor: $rootScope.fillColors[scope.index],
 					fillOpacity: 0.6
 				});
 
