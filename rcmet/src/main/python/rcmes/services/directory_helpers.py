@@ -60,8 +60,8 @@ def getResultDirInfo():
         listing = os.listdir(dirPath)
         listingNoHidden = [f for f in listing if f[0] != '.']
         joinedPaths = [os.path.join(dirPath, f) for f in listingNoHidden]
-        joinedPaths = [f + "/" if os.path.isdir(f) else f for f in joinedPaths]
-        finalPaths = [p.replace(WORK_DIR, '') for p in joinedPaths]
+        onlyFilesNoDirs = [f for f in joinedPaths if os.path.isfile(f)]
+        finalPaths = [p.replace(WORK_DIR, '') for p in onlyFilesNoDirs]
         sorted(finalPaths, key=lambda s: s.lower())
         returnJSON = finalPaths
     else:
