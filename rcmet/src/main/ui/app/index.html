@@ -166,7 +166,14 @@
                   </div>
                   <!--Preview Map Section-->
                   <div class="span3">
-                    <div preview-map="dataset" index="$index"></div>
+                    <!--If the dataset is global we show a picture of a globe instead of the actual map-->
+                    <div ng-hide="dataset.latlonVals.lonMin == -180 && dataset.latlonVals.lonMax == 180 &&
+                                  dataset.latlonVals.latMin == -90 && dataset.latlonVals.latMax == 90" 
+                                  preview-map="dataset" index="$index"></div>
+                    <div ng-show="dataset.latlonVals.lonMin == -180 && dataset.latlonVals.lonMax == 180 &&
+                                  dataset.latlonVals.latMin == -90 && dataset.latlonVals.latMax == 90">
+                      <img src="/app/img/globe.png" class="preview-map">
+                    </div>
                   </div>
                 </div>
                 <div class="row-fluid">
