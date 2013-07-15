@@ -28,6 +28,7 @@ App.Directives.directive('leafletMap', function($rootScope) {
 				center: [40, 0],
 				zoom: 2,
 				scrollWheelZoom: false,
+				attributionControl: false,
 			});
 
 			//create a CloudMade tile layer and add it to the map
