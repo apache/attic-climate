@@ -16,7 +16,7 @@
 //
 
 // Directive for dealing with the Leaflet map
-App.Directives.directive('timeline', function($rootScope) {
+App.Directives.directive('timeline', function($rootScope, $window) {
 	return {
 		restrict: 'C',
 		replace: true,
@@ -29,6 +29,11 @@ App.Directives.directive('timeline', function($rootScope) {
 	    	function initTimeline() {
 	            // Instantiate timeline object.
 	            $rootScope.timeline = new links.Timeline(document.getElementById('OCWtimeline'));
+
+				// Redraw the timeline whenever the window is resized
+				angular.element($window).bind('resize', function() {
+					$rootScope.timeline.checkResize();
+				});
 
 				var options = {
 						"width": "100%",
