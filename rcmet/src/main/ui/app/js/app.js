@@ -28,7 +28,7 @@ App.Directives = angular.module('ocw.directives', []);
 App.Controllers = angular.module('ocw.controllers', []);
 App.Filters = angular.module('ocw.filters', []);
 
-angular.module('ocw', ['ocw.services', 'ocw.directives', 'ocw.controllers', 'ocw.filters', 'ui.date']).
+angular.module('ocw', ['ocw.services', 'ocw.directives', 'ocw.controllers', 'ocw.filters', 'ui.date', 'ui.bootstrap']).
 	config(['$routeProvider', function($routeProvider) {
 		$routeProvider.
 			when('/obs', {templateUrl: 'partials/selectObservation.html', controller: 'ObservationSelectCtrl'}).

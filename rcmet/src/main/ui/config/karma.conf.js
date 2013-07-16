@@ -26,6 +26,7 @@ files = [
   'app/js/lib/bootstrap/bootstrap.js',
   'app/js/lib/angular/angular.js',
   'app/js/lib/angular/angular-*.js',
+  'app/js/lib/angular-ui/*.js',
   'test/lib/angular/angular-mocks.js',
   'app/js/lib/jquery/jquery-ui/datepicker-wrapper/date.js',
   'app/js/lib/leaflet/leaflet-0.5.js',
