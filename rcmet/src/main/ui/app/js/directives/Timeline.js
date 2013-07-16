@@ -39,7 +39,7 @@ App.Directives.directive('timeline', function($rootScope, $window) {
 						"width": "100%",
 						"showCurrentTime": false,
 						"moveable": false,
-						'zoomable': false
+						"zoomable": false
 				};
 
 				$rootScope.timeline.draw([], options);
