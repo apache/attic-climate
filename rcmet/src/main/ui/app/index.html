@@ -87,12 +87,16 @@
               <div class="row-fluid">
                 <div class="span1 offset10">
                   <button class="btn btn-link no-color-link" ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()">
-                    <i class="icon-trash icon-2x"></i>
+                    <span tooltip-placement="left" tooltip-popup-delay="700" tooltip="Clear Datasets">
+                      <i class="icon-trash icon-2x"></i>
+                    </span>
                   </button>
                 </div>
                 <div class="span1">
                   <button class="btn btn-link no-color-link" bootstrap-modal-open="datasetSelect">
-                    <i class="icon-plus icon-2x"></i>
+                    <span tooltip-placement="left" tooltip-popup-delay="700" tooltip="Add Dataset">
+                      <i class="icon-plus icon-2x"></i>
+                    </span>
                   </button>
                 </div>
               </div>
