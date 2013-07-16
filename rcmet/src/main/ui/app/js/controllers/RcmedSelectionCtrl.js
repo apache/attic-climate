@@ -76,8 +76,10 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 		// Save the parameter id (the important part) and name (for display purposes)
 		newDataset['param'] = $scope.parameterSelection['parameter_id'];
 		newDataset['paramName'] = $scope.parameterSelection['longname'];
-		// Save the (fake) lat/lon information. Our datasets cover the entire globe (I think...)
-		newDataset['latlonVals'] = {"latMin": -90, "latMax": 90, "lonMin": -180, "lonMax": 180};
+		// Save the (fake) lat/lon information. We test with the TRMM dataset. RCMED currently
+		// doesn't return bounding information. This functionality is being added soon. When that
+		// is the case these hard coded values should be removed.
+		newDataset['latlonVals'] = {"latMin": -49.875, "latMax": 49.875, "lonMin": -179.875, "lonMax": 179.875};
 		// Set some defaults for lat/lon variable names. This just helps us display stuff later.
 		newDataset['lat'] = "N/A";
 		newDataset['lon'] = "N/A";
