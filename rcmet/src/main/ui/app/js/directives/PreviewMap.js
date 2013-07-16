@@ -36,6 +36,7 @@ App.Directives.directive('previewMap', function($rootScope) {
 					scrollWheelZoom: false,
 					zoomControl: false,
 					attributionControl: false,
+					worldCopyJump: true,
 				});
 
 				//create a CloudMade tile layer and add it to the map
