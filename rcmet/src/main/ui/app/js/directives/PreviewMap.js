@@ -53,7 +53,7 @@ App.Directives.directive('previewMap', function($rootScope) {
 
 				var polygon = L.rectangle(bounds,{
 					stroke: false,
-					fillColor: $rootScope.fillColors[scope.index],
+					fillColor: $rootScope.fillColors[1],
 					fillOpacity: 0.6
 				});
 
