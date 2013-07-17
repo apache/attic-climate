@@ -17,7 +17,8 @@
  * under the License.
 **/
 
-App.Controllers.controller('SettingsCtrl', ['$scope', 'evaluationSettings',
-function($scope, evaluationSettings) {
+App.Controllers.controller('SettingsCtrl', ['$scope', 'evaluationSettings', 'selectedDatasetInformation',
+function($scope, evaluationSettings, selectedDatasetInformation) {
 	$scope.settings = evaluationSettings.getSettings();
+	$scope.datasets = selectedDatasetInformation.getDatasets();
 }]);
