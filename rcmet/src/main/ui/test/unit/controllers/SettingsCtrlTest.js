@@ -33,5 +33,15 @@ describe('OCW Controllers', function() {
 				expect(Object.keys(scope.settings)).toEqual(["metrics", "temporal", "spatialSelect"]);
 			});
 		});
+
+		it('should pull the dataset information', function() {
+			inject(function($rootScope, $controller) {
+				var scope = $rootScope.$new();
+				var ctrl = $controller("SettingsCtrl", {$scope: scope});
+
+				expect(typeof scope.datasets).toBe('object');
+				expect(Object.keys(scope.datasets).length).toBe(0);
+			});
+		});
 	});
 });
