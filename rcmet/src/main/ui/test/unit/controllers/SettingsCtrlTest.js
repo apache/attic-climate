@@ -30,7 +30,7 @@ describe('OCW Controllers', function() {
 				var scope = $rootScope.$new();
 				var ctrl = $controller("SettingsCtrl", {$scope: scope});
 
-				expect(Object.keys(scope.settings)).toEqual(["metrics", "temporal"]);
+				expect(Object.keys(scope.settings)).toEqual(["metrics", "temporal", "spatialSelect"]);
 			});
 		});
 	});
