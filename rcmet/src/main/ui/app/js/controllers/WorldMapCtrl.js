@@ -87,6 +87,8 @@ function($rootScope, $scope, selectedDatasetInformation, regionSelectParams) {
 			color: '#000000',
 			opacity: 1.0,
 			fill: false,
+			weight: 2,
+			dashArray: "10 10",
 		});
 
 		$rootScope.rectangleGroup.addLayer(overlapBorder);
