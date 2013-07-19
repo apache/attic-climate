@@ -146,7 +146,11 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
     if regridOption == 'model':
         ifile = mdlList[0]
         typeF = 'nc'
-        lats, lons, mTimes = files.read_lolaT_from_file(ifile, modelLatVarName, modelLonVarName, modelTimeVarName, typeF)
+        lats, lons, mTimes = files.read_data_from_one_file(ifile, modelVarName, 
+                                                           modelLatVarName, 
+                                                           modelLonVarName, 
+                                                           modelTimeVarName, 
+                                                           typeF)[:3]
         modelObject = modelList[0]
         latMin = modelObject.latMin
         latMax = modelObject.latMax
@@ -261,7 +265,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
 
 
     ## Part 2: load in and regrid model data from file(s)
-    ## NOTE: tthe wo parameters, numMDLs and numMOmx are defined to represent the number of models (w/ all 240 mos) &
+    ## NOTE: the two parameters, numMDLs and numMOmx are defined to represent the number of models (w/ all 240 mos) &
     ##       the total number of months, respectively, in later multi-model calculations.
 
     typeF = 'nc'
@@ -284,8 +288,12 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         # read model grid info, then model data
         ifile = mdlList[n]
         print 'ifile= ', ifile
-        modelLats, modelLons, mTimes = files.read_lolaT_from_file(ifile, modelLatVarName, modelLonVarName, modelTimeVarName, typeF)
-        mTime, mdlDat, mvUnit = files.read_data_from_one_file(ifile, modelVarName, modelTimeVarName, modelLats, typeF)
+        modelLats, modelLons, mTimes, mdlDat, mvUnit = files.read_data_from_one_file(ifile, 
+                                                                                     modelVarName,
+                                                                                     modelLatVarName,
+                                                                                     modelLonVarName,
+                                                                                     modelTimeVarName, 
+                                                                                     typeF)
         mdlT = []
         mStep = len(mTimes)
 

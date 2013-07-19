@@ -61,7 +61,6 @@ def getVariableByType(filename, variableType):
     try:
         f = netCDF4.Dataset(filename, mode='r')
     except:
-        #print 'PyNio had an issue opening the filename (%s) you provided' % filename
         print "netCDF4Error:", sys.exc_info()[0]
         raise
     
@@ -134,10 +133,6 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     tmp = netCDF4.Dataset(filename, mode='r')
     latsraw = tmp.variables[latVarName][:]
     lonsraw = tmp.variables[lonVarName][:]
-    lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
-
-    """TODO:  Guard against case where latsraw and lonsraw are not the same dim?"""
-   
     if(latsraw.ndim == 1):
         lon, lat = np.meshgrid(lonsraw, latsraw)
     if(latsraw.ndim == 2):
@@ -161,7 +156,7 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     #      as no assumption made that same number of times in each file...
 
 
-    for i,ifile in enumerate(filelist):
+    for i, ifile in enumerate(filelist):
 
         #print 'Loading data from file: ',filelist[i]
         f = netCDF4.Dataset(ifile, mode='r')
@@ -187,9 +182,9 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
 
         t2store[timesaccu + np.arange(ntimes), :, :] = t2tmp[:, :, :]
         timestore[timesaccu + np.arange(ntimes)] = time
-        timesaccu = timesaccu + ntimes
+        timesaccu += ntimes
         f.close()
-      
+        
     print 'Data read in successfully with dimensions: ', t2store.shape
     
     # TODO: search for duplicated entries (same time) and remove duplicates.
@@ -201,12 +196,10 @@ def read_data_from_file_list(filelist, myvar, timeVarName, latVarName, lonVarNam
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
     timestore, _ = process.getModelTimes(filename, timeVarName)
     
-    data_dict = {}
-    data_dict['lats'] = lat
-    data_dict['lons'] = lon
-    data_dict['times'] = timestore
-    data_dict['data'] = t2store
-    #return lat, lon, timestore, t2store
+    # Make sure latlon grid is monotonically increasing and that the domains
+    # are correct
+    lat, lon, t2store = checkLatLon(lat, lon, t2store)
+    data_dict = {'lats': lat, 'lons': lon, 'times': timestore, 'data': t2store}
     return data_dict
 
 def select_var_from_file(myfile, fmt='not set'):
@@ -215,7 +208,7 @@ def select_var_from_file(myfile, fmt='not set'):
      
       Input:
          myfile - filename
-         fmt - (optional) specify fileformat for PyNIO if filename suffix is non-standard
+         fmt - (optional) specify fileformat for netCDF4 if filename suffix is non-standard
     
       Output:
          myvar - variable name in file
@@ -275,54 +268,24 @@ def select_var_from_wrf_file(myfile):
     
     return mywrfvar
 
-def read_lolaT_from_file(filename, latVarName, lonVarName, timeVarName, file_type):
+def read_data_from_one_file(ifile, myvar, latVarName, lonVarName, timeVarName, file_type):
     """
-    Function that will return lat, lon, and time arrays
+    Purpose::
+        Read in data from one file at a time
     
-    Input::
-        filename - the file to inspect
-        latVarName - name of the Latitude Variable
+    Input::   
+        filelist - list of filenames (including path)
+        myvar - string containing name of variable to load in (as it appears in file)s
         lonVarName - name of the Longitude Variable
         timeVarName - name of the Time Variable
-        fileType = type of file we are trying to parse
-    
-    Output::
-        lat - MESH GRID of Latitude values with shape (nx, ny)
-        lon - MESH GRID of Longitude values with shape (nx, ny)
-        timestore - Python list of Datetime objects
+        fileType - type of file we are trying to parse
         
-        MESHGRID docs: http://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html
-        
-    """
-
-    tmp = netCDF4.Dataset(filename, mode='r', format=file_type)
-    lonsraw = tmp.variables[lonVarName][:]
-    latsraw = tmp.variables[latVarName][:]
-    lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
-    if(latsraw.ndim == 1):
-        lon, lat = np.meshgrid(lonsraw, latsraw)
-    if(latsraw.ndim == 2):
-        lon = lonsraw
-        lat = latsraw
-    timestore, _ = process.getModelTimes(filename, timeVarName)
-    print '  read_lolaT_from_file: Lats, lons and times read in for the model domain'
-    return lat, lon, timestore
-
-def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
-    ##################################################################################
-    # Read in data from one file at a time
-    # Input:   filelist - list of filenames (including path)
-    #          myvar    - string containing name of variable to load in (as it appears in file)
-    # Output:  lat, lon - 2D array of latitude and longitude values
-    #          times    - list of times
-    #          t2store  - numpy array containing data from all files    
-    # Modified from read_data_from_file_list to read data from multiple models into a 4-D array
-    # 1. The code now processes model data that completely covers the 20-yr period. Thus,
-    #    all model data must have the same time levels (ntimes). Unlike in the oroginal, ntimes
-    #    is fixed here.
-    # 2. Because one of the model data exceeds 240 mos (243 mos), the model data must be
-    #    truncated to the 240 mons using the ntimes determined from the first file.
-    ##################################################################################
+     Output::  
+        lat, lon - 2D arrays of latitude and longitude values
+        times - list of times
+        t2store - numpy array containing data from the file for the requested variable
+        varUnit - units for the variable given by t2store  
+    """           
     f = netCDF4.Dataset(ifile, mode='r')
     try:
         varUnit = f.variables[myvar].units.encode().upper()
@@ -332,10 +295,23 @@ def read_data_from_one_file(ifile, myvar, timeVarName, lat, file_type):
     t2tmp = t2raw.squeeze()
     if t2tmp.ndim == 2:
         t2tmp = np.expand_dims(t2tmp, 0)
+        
+    lonsraw = f.variables[lonVarName][:]
+    latsraw = f.variables[latVarName][:]
+    if(latsraw.ndim == 1):
+        lon, lat = np.meshgrid(lonsraw, latsraw)
+    if(latsraw.ndim == 2):
+        lon = lonsraw
+        lat = latsraw
+    
     f.close()
     print '  success read_data_from_one_file: VarName=', myvar, ' Shape(Full)= ', t2tmp.shape, ' Unit= ', varUnit
     timestore = process.decode_model_timesK(ifile, timeVarName, file_type)
-    return timestore, t2tmp, varUnit
+    
+    # Make sure latlon grid is monotonically increasing and that the domains
+    # are correct
+    lat, lon, t2store = checkLatLon(lat, lon, t2tmp)
+    return lat, lon, timestore, t2store, varUnit
 
 def findTimeVariable(filename):
     """
@@ -456,13 +432,14 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     tmp = netCDF4.Dataset(filelist[0], mode='r', format=file_type)
     latsraw = tmp.variables[latVarName][:]
     lonsraw = tmp.variables[lonVarName][:]
-    lonsraw[lonsraw > 180] = lonsraw[lonsraw > 180] - 360.  # convert to -180,180 if necessary
+    timesraw = tmp.variables[timeVarName]
+    
     if(latsraw.ndim == 1):
         lon, lat = np.meshgrid(lonsraw, latsraw)
-    if(latsraw.ndim == 2):
-        lon = lonsraw; lat = latsraw
-    
-    timesraw = tmp.variables[timeVarName]
+        
+    elif(latsraw.ndim == 2):
+        lon = lonsraw
+        lat = latsraw
     ntimes = len(timesraw); nygrd = len(lat[:, 0]); nxgrd = len(lon[0, :])
     
     print 'Lats and lons read in for first file in filelist'
@@ -478,13 +455,11 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
     #  NB. this method allows for missing times in data files 
     #      as no assumption made that same number of times in each file...
 
-    i = 0
-    for ifile in filelist:
+    for i, ifile in enumerate(filelist):
         #print 'Loading data from file: ',filelist[i]
         f = netCDF4.Dataset(ifile, mode='r')
         t2raw = ma.array(f.variables[myvar][:])
         timesraw = f.variables[timeVarName]
-        time = timesraw[0:ntimes]
         #ntimes=len(time)
         #print 'file= ',i,'ntimes= ',ntimes,filelist[i]
         ## Flatten dimensions which needn't exist, i.e. level 
@@ -500,14 +475,16 @@ def read_data_from_file_list_K(filelist, myvar, timeVarName, latVarName, lonVarN
         #timestore[timesaccu+np.arange(ntimes)]=time
         #timesaccu=timesaccu+ntimes
         f.close()
-        i += 1 
 
     print 'Data read in successfully with dimensions: ', t2store.shape
     
     # Decode model times into python datetime objects. Note: timestore becomes a list (no more an array) here
     ifile = filelist[0]
     timestore, _ = process.getModelTimes(ifile, timeVarName)
-    
+
+    # Make sure latlon grid is monotonically increasing and that the domains
+    # are correct
+    lat, lon, t2store = checkLatLon(lat, lon, t2store)
     return lat, lon, timestore, t2store
 
 def find_latlon_ranges(filelist, lat_var_name, lon_var_name):
@@ -696,3 +673,107 @@ def loadDataIntoNetCDF(fileObject, datasets, dataArray, dataType):
         fileObject.variables[datasetName].varAttName = 'Obseration time series: entire domain'
         print 'Loading values into %s' % datasetName
         fileObject.variables[datasetName][:] = dataArray[datasetCount,:,:,:]
+
+def checkLatLon(latsin, lonsin, datain):
+    """
+    Purpose::
+        Checks whether latitudes and longitudes are monotonically increasing
+        within the domains [-90, 90) and [-180, 180) respectively, and rearranges the input data
+        accordingly if they are not.
+    
+    Input::
+        latsin - Array of latitudes read from a raw netcdf file
+        lonsin - Array of longitudes read from a raw netcdf file
+        datain  - Array of data values read from a raw netcdf file.
+                   The shape is assumed to be (..., nLat, nLon).
+        
+    Output::
+        latsout - 2D array of (rearranged) latitudes
+        lonsout - 2D array of (rearranged) longitudes
+        dataout - Array of (rearranged) data
+    """    
+    # Make sure lats and lons are monotonically increasing
+    latsDecreasing = np.diff(latsin[:, 0]) < 0
+    lonsDecreasing = np.diff(lonsin[0]) < 0
+    
+    # If all values are decreasing then they just need to be reversed
+    latsReversed, lonsReversed = latsDecreasing.all(), lonsDecreasing.all()
+    
+    # If the lat values are unsorted then raise an exception
+    if not latsReversed and latsDecreasing.any():
+        raise ValueError('Latitudes must be monotonically increasing.')
+    
+    # Perform same checks now for lons
+    if not lonsReversed and lonsDecreasing.any():
+        raise ValueError('Longitudes must be monotonically increasing.')
+    
+    # Also check if lons go from [0, 360), and convert to [-180, 180)
+    # if necessary
+    lonsShifted = lonsin.max() > 180
+    latsout, lonsout, dataout = latsin[:], lonsin[:], datain[:]
+    # Now correct data if latlon grid needs to be shifted    
+    if latsReversed:
+        latsout = latsout[::-1]
+        dataout = dataout[..., ::-1, :]
+        
+    if lonsReversed:
+        lonsout = lonsout[..., ::-1]
+        dataout = dataout[..., ::-1]
+        
+    if lonsShifted:
+        lat1d = latsout[:, 0]
+        dataout, lon1d = shiftgrid(180, dataout, lonsout[0], start=False)
+        lonsout, latsout = np.meshgrid(lon1d, lat1d) 
+        
+    return latsout, lonsout, dataout
+    
+def shiftgrid(lon0, datain, lonsin, start= True, cyclic=360.0):
+    """
+    Purpose::
+        Shift global lat/lon grid east or west. This function is taken directly
+        from the (unreleased) basemap 1.0.7 source code as version 1.0.6 does not
+        currently support arrays with more than two dimensions.
+        https://github.com/matplotlib/basemap
+        
+    Input::
+        lon0 - starting longitude for shifted grid (ending longitude if start=False). 
+               lon0 must be on input grid (within the range of lonsin).
+        datain - original data with longitude the right-most dimension.
+        lonsin - original longitudes.
+        start  - if True, lon0 represents the starting longitude of the new grid. 
+                 if False, lon0 is the ending longitude. Default True.
+        cyclic - width of periodic domain (default 360)
+
+    Output:: 
+        dataout - data on shifted grid
+        lonsout - lons on shifted grid
+    """
+    if np.fabs(lonsin[-1]-lonsin[0]-cyclic) > 1.e-4:
+        # Use all data instead of raise ValueError, 'cyclic point not included'
+        start_idx = 0
+    else:
+        # If cyclic, remove the duplicate point
+        start_idx = 1
+    if lon0 < lonsin[0] or lon0 > lonsin[-1]:
+        raise ValueError('lon0 outside of range of lonsin')
+    i0 = np.argmin(np.fabs(lonsin-lon0))
+    i0_shift = len(lonsin)-i0
+    if ma.isMA(datain):
+        dataout  = ma.zeros(datain.shape,datain.dtype)
+    else:
+        dataout  = np.zeros(datain.shape,datain.dtype)
+    if ma.isMA(lonsin):
+        lonsout = ma.zeros(lonsin.shape,lonsin.dtype)
+    else:
+        lonsout = np.zeros(lonsin.shape,lonsin.dtype)
+    if start:
+        lonsout[0:i0_shift] = lonsin[i0:]
+    else:
+        lonsout[0:i0_shift] = lonsin[i0:]-cyclic
+    dataout[...,0:i0_shift] = datain[...,i0:]
+    if start:
+        lonsout[i0_shift:] = lonsin[start_idx:i0+start_idx]+cyclic
+    else:
+        lonsout[i0_shift:] = lonsin[start_idx:i0+start_idx]
+    dataout[...,i0_shift:] = datain[...,start_idx:i0+start_idx]
+    return dataout,lonsout
