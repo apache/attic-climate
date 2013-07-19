@@ -174,9 +174,9 @@ virtualenvwrapper please look to the following websites for documentation.
     http://www.virtualenv.org/en/latest/
     http://virtualenvwrapper.readthedocs.org/en/latest/
 
-Additonally, you should set your PYTHON_PATH environment variable to point to the
+Additonally, you should set your PYTHONPATH environment variable to point to the
 RCMET code base that was downloaded into ./src/rcmes. For example:
     
-    export PYTHON_PATH=/path/to/this/script/src/rcmes:$PYTHON_PATH
+    export PYTHONPATH=/path/to/this/script/src/rcmes:$PYTHONPATH
 
 OUTRO
