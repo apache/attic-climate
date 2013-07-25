@@ -38,12 +38,14 @@
 	<div class="row-fluid">
 	  <div class="row span12 text-center">
 	    <h2>Apache Open Climate Workbench UI - Results</h2>
-	    <hr />
+	  </div>
+	  <div class="row-fluid">
+      	<hr />
 	  </div>
 	  <div class="row-fluid text-center">
 	  <ul>
 	  	<li ng-repeat="figure in figures">
-	  	<img src="{{baseURL}}/static/evalResults{{figure}}" alt="" />
+	  	<img class="result-figures" ng-src="{{baseURL}}/static/evalResults{{figure}}" alt="" />
 	  	</li>
 	  </ul>
 	  </div>
