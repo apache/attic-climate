@@ -142,6 +142,8 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-178] - Fix TimelineCtrl indentation
     * [CLIMATE-180] - Timeline changes for new UI design
     * [CLIMATE-203] - Deprecate read_lolaT_from_file() in files.py
+    * [CLIMATE-222] - Update PredictiveFileBrowserInput.js to handle more then one case
+	* [CLIMATE-223] - Update results.html to follow index.html style 
 
 ** New Feature
     * [CLIMATE-33] - Add modal for metric selection
