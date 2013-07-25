@@ -424,8 +424,16 @@ def calcNashSutcliff(evaluationData, referenceData):
                (((data2 - meanData2) ** 2).sum(axis = 1)))
     return nashcor
 
+def getPdfInputValues():
+    print '****PDF input values from user required **** \n'
+    nbins = int (raw_input('Please enter the number of bins to use. \n'))
+    minEdge = float(raw_input('Please enter the minimum value to use for the edge. \n'))
+    maxEdge = float(raw_input('Please enter the maximum value to use for the edge. \n'))
+    
+    return nbins, minEdge, maxEdge
 
-def calcPdf(evaluationData, referenceData):
+
+def calcPdf(evaluationData, referenceData, settings=None):
     '''
     Routine to calculate a normalized Probability Distribution Function with 
     bins set according to data range.
@@ -435,16 +443,22 @@ def calcPdf(evaluationData, referenceData):
         called in do_rcmes_processing_sub.py
          
     Inputs::
-        2 arrays of data
-        t1 is the modelData and t2 is 3D obsdata - time,lat, lon NB, time here 
-        is the number of time values eg for time period 199001010000 - 199201010000 
+        evaluationData (3D numpy array): array shape (time, lat, lon)
+        referenceData (3D numpy array): array shape (time, lat, lon)
+        settings (tuple): [optional] format (binCount, minEdge, maxEdge)
+            binCount (int): number of bins to use
+            minEdge (int|float): minimum edge
+            maxEdge (int|float): maximum edge
         
-        if annual means-opt 1, was chosen, then t2.shape = (2,lat,lon)
+        NB, time here is the number of time values eg for time period
+         199001010000 - 199201010000 
         
-        if monthly means - opt 2, was choosen, then t2.shape = (24,lat,lon)
+    Assumptions::
+        If annual means-opt 1, was chosen, then referenceData.shape = (YearsCount,lat,lon)
         
-    User inputs: number of bins to use and edges (min and max)
-    Output:
+        If monthly means - opt 2, was choosen, then referenceData.shape = (MonthsCount,lat,lon)
+        
+    Output::
 
         one float which represents the PDF for the year
 
@@ -459,20 +473,17 @@ def calcPdf(evaluationData, referenceData):
         PDF for the year
 
     '''
-    # float to store the final PDF similarity score
     similarityScore = 0.0
-
     print 'min modelData', evaluationData[:, :, :].min()
     print 'max modelData', evaluationData[:, :, :].max()
     print 'min obsData', referenceData[:, :, :].min()
     print 'max obsData', referenceData[:, :, :].max()
-    # find a distribution for the entire dataset
-    #prompt the user to enter the min, max and number of bin values. 
-    # The max, min info above is to help guide the user with these choises
-    print '****PDF input values from user required **** \n'
-    nbins = int (raw_input('Please enter the number of bins to use. \n'))
-    minEdge = float(raw_input('Please enter the minimum value to use for the edge. \n'))
-    maxEdge = float(raw_input('Please enter the maximum value to use for the edge. \n'))
+
+    if settings == None:
+        nbins, minEdge, maxEdge = getPdfInputValues()
+    else:
+        nbins, minEdge, maxEdge = settings
+
     
     mybins = np.linspace(minEdge, maxEdge, nbins)
     print 'nbins is', nbins, 'mybins are', mybins
