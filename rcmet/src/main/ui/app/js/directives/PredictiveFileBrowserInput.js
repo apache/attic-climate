@@ -22,13 +22,15 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 	var link = function($scope, $elem, $attrs) {
 		$scope.autocomplete = [];
 		
+		// Set id to use this directive correctly in multiple places
+		$scope.id = 'autoCompletePath'+ $elem.context.id
 		/*
 		 * We need a place to dump our auto-completion options
 		 */
-		$($elem).parent().append('<ul id="autoCompletePath"><ul>');
+		$($elem).parent().append('<ul id="' + $scope.id +'"><ul>');
 
 		// Handle user clicks on auto-complete path options
-		$(document).on('click', '#autoCompletePath li span', function(e) {
+		$(document).on('click', '#' +$scope.id+ ' li span', function(e) {
 			// Set the input text box's value to that of the user selected path
 			var val = $(e.target).text();
 			$($elem).val(val);
@@ -38,7 +40,7 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 				$scope.fetchFiles($($elem).val());
 			// Otherwise, remove the auto-complete options...
 			} else {
-				$('#autoCompletePath li').remove();
+				$('#' +$scope.id+ ' li').remove();
 			}
 		});
 
@@ -174,7 +176,7 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 			// If the user deletes everything in the input box all we need to do
 			// is make sure that the auto-complete options aren't displayed.
 			if (curInputVal.length === 0) {
-				$('#autoCompletePath li').remove();
+				$('#' +$scope.id+ ' li').remove();
 				return;
 			}
 
@@ -197,7 +199,7 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 				} else {
 					// Delete the old auto-complete information in the case where the user
 					// completely removed path information.
-					$('#autoCompletePath li').remove();
+					$('#' +$scope.id+ ' li').remove();
 				}
 			} else {
 				// Otherwise, we just need to filter results based on the remaining input.
@@ -277,7 +279,7 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 		 */
 		$scope.updateAutoComplete = function() {
 			// Remove all the existing options
-			$('#autoCompletePath li').remove();
+			$('#' +$scope.id+ ' li').remove();
 
 			// We don't need to show anything if the user has completely selected
 			// the only existing option available.
@@ -289,7 +291,7 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 
 			// Display all the possible completes
 			$.each($scope.possibleCompletes, function(i, v) {
-				$('#autoCompletePath').append($('<li>').html($('<span>').text(v)));
+				$('#' +$scope.id+ '').append($('<li>').html($('<span>').text(v)));
 			});
 		};
 	};
