@@ -691,7 +691,11 @@ def checkLatLon(latsin, lonsin, datain):
         latsout - 2D array of (rearranged) latitudes
         lonsout - 2D array of (rearranged) longitudes
         dataout - Array of (rearranged) data
-    """    
+    """
+    # Avoid unnecessary shifting if all lons are higher than 180
+    if lonsin.min() > 180:
+        lonsin -= 360
+        
     # Make sure lats and lons are monotonically increasing
     latsDecreasing = np.diff(latsin[:, 0]) < 0
     lonsDecreasing = np.diff(lonsin[0]) < 0
