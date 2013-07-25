@@ -78,6 +78,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-86] - Website - Update the Wiki link under Documentation 
     * [CLIMATE-87] - Easy-RCMET pulls repo from JPL instead of ASF
     * [CLIMATE-106] - requests module not installed by easy_rcmet
+    * [CLIMATE-110] - Pull the 'raw_input' functions out of the metrics.calcPdf function
     * [CLIMATE-111] - Switch tests over to Karma
     * [CLIMATE-112] - Unit tests no longer work
     * [CLIMATE-118] - Update ParameterSelectCtrl datasets $watch to prevent call to undefined variable
@@ -94,6 +95,10 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-175] - WorldMapCtrlTest is broken after addition of zooming map
     * [CLIMATE-177] - Update misc.select_metrics function to prevent user selection of incomplete metrics
     * [CLIMATE-181] - Timeline options don't work
+    * [CLIMATE-186] - RCMES cannot handle NCEP reanalysis and GCM data 
+
+** Documentation
+    * [CLIMATE-157] - Replace PYTHON_PATH with PYTHONPATH in Easy-RCMET docs
 
 ** Improvement
     * [CLIMATE-9] - Move rootScope datasets object over to a service
@@ -136,11 +141,13 @@ Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
     * [CLIMATE-176] - Fix WorldMapCtrl indentation
     * [CLIMATE-178] - Fix TimelineCtrl indentation
     * [CLIMATE-180] - Timeline changes for new UI design
+    * [CLIMATE-203] - Deprecate read_lolaT_from_file() in files.py
 
 ** New Feature
     * [CLIMATE-33] - Add modal for metric selection
     * [CLIMATE-34] - Add ability to toggle dataset overlays
     * [CLIMATE-45] - Add ability for user to select temporal re-gridding options
+    * [CLIMATE-67] - Add functionality to ingest locally stored hourly infrared temperature satellite data
     * [CLIMATE-89] - Implement a timeline widget 
 
 ** Task
