@@ -163,7 +163,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			$scope.runningEval = false;
 
 			$timeout(function() {
-				window.location = "/app/results.html";
+				window.location = "results.html";
 			}, 100);
 		}).error(function() {
 			$scope.runningEval = false;
