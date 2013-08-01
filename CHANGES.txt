@@ -2,6 +2,57 @@ Apache Open Climate Workbench Change Log
 ============================================
 
 
+Release Notes - Apache Open Climate Workbench - Version 0.2-incubating
+
+** Sub-task
+    * [CLIMATE-139] - OCW dataset.py code
+    * [CLIMATE-142] - OCW local.py code
+    * [CLIMATE-185] - test_dataset.py
+
+** Bug
+    * [CLIMATE-140] - creating new "ocw"  directory in trunk
+    * [CLIMATE-189] - PreviewMap directive assigns incorrect color to maps
+    * [CLIMATE-191] - getResultDirInfo returns improper options
+    * [CLIMATE-199] - Globe image import breaks on deploy
+    * [CLIMATE-200] - Result.html needs to include angular-ui
+    * [CLIMATE-201] - LeafletMap overlays aren't duplicated when the user scrolls the map
+    * [CLIMATE-202] - Leaflet overlays aren't duplicated when user scrolls PreviewMaps
+    * [CLIMATE-204] - Remove overlay display in the World Map
+    * [CLIMATE-221] - checkLatLon in files.py doesn't work if lons are in the domain (180, 360)
+    * [CLIMATE-226] - radmax parameter in __init__ is broken in utils.taylor.TaylorDiagram
+    * [CLIMATE-229] - Formatting issue for monthly time series plots
+    * [CLIMATE-232] - evaluation does not redirect to correct path
+
+** Improvement
+    * [CLIMATE-182] - Remove gray-ing of buttons in modal headers/footers
+    * [CLIMATE-183] - Remove scrolling capability from timeline
+    * [CLIMATE-184] - Add directive for adding thumbnail maps to dataset
+    * [CLIMATE-187] - Add thumbnail map to dataset display
+    * [CLIMATE-188] - Draw overlap border and user selected region on map
+    * [CLIMATE-193] - Don't display dataset preview map when dataset is global
+    * [CLIMATE-194] - Uncompiled Angular templating code is briefly present when page loads
+    * [CLIMATE-195] - Timeline doesn't redraw when the window is resized
+    * [CLIMATE-196] - "Powered by Leaflet" attribute on main map overlaps jQuery datepicker
+    * [CLIMATE-197] - Add Angular-UI
+    * [CLIMATE-198] - Add tooltips to UI buttons
+    * [CLIMATE-205] - Improve user selected region display
+    * [CLIMATE-206] - Add tooltip to dataset remove button
+    * [CLIMATE-207] - Add background to settings modal
+    * [CLIMATE-208] - Remove overlay color box from Dataset Display
+    * [CLIMATE-209] - Set all PreviewMap overlays to the same color
+    * [CLIMATE-210] - Move dataset re-grid option to Settings modal
+    * [CLIMATE-211] - Clean up dataset display
+    * [CLIMATE-222] - Update PredictiveFileBrowserInput.js to handle more then one case
+    * [CLIMATE-223] - Update result.html to follow index.html style
+    * [CLIMATE-234] - Make plotting functions consisted with new API documentation
+
+** New Feature
+    * [CLIMATE-128] - Adding Taylor Diagram support to plots
+    * [CLIMATE-192] - creating new 'tests' directory under /trunk/ocw 
+    * [CLIMATE-216] - Add new plotting functions to repository
+    * [CLIMATE-231] - Add ability for plotter to process generic plotting functions
+
+
 Release Notes - Apache Open Climate Workbench - Version 0.1-incubating
 
 ** Sub-task
