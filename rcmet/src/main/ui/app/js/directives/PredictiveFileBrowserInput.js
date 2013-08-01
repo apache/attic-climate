@@ -34,7 +34,9 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 			// Set the input text box's value to that of the user selected path
 			var val = $(e.target).text();
 			$($elem).val(val);
-
+			// Need to trigger the input box's "input" event so Angular updates the model!
+			$elem.trigger('input'); 
+			
 			// If the user selected a directory, find more results..
 			if (val[val.length - 1] == '/') {
 				$scope.fetchFiles($($elem).val());
