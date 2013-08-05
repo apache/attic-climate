@@ -48,6 +48,10 @@ def rcmes_go():
     print "**********\nBEGIN RCMES2.0_RUN\n**********"
     print 'cachedir', cachedir
     print 'workdir', workdir
+    evalWorkDir = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    evalPath = os.path.join( workdir, evalWorkDir )
+    os.makedirs(evalPath)
+    print 'evalPath', evalPath
     
     try:
         if not os.path.exists(cachedir):
@@ -102,7 +106,7 @@ def rcmes_go():
     metricOption = str(request.query.get('metricOption', '').strip())
     print 'metricOption', metricOption    
     
-    settings = {"cacheDir": cachedir, "workDir": workdir, "fileList": filelist}
+    settings = {"cacheDir": cachedir, "workDir": evalPath, "fileList": filelist}
     params = {"obsDatasetId": obsDatasetId, "obsParamId": obsParameterId, 
               "startTime": startTime, "endTime": endTime, "latMin": latMin, 
               "latMax": latMax, "lonMin": lonMin, "lonMax": lonMax}
@@ -116,13 +120,14 @@ def rcmes_go():
     
     awesome.do_rcmes(settings, params, model, mask, options)
     
-    model_path = os.path.join(workdir, plotFileNameOption + "model.png")
-    obs_path = os.path.join(workdir, plotFileNameOption + "obs.png")
-    comp_path = os.path.join(workdir, plotFileNameOption + ".png")
+    model_path = os.path.join(evalPath, plotFileNameOption + "model.png")
+    obs_path = os.path.join(evalPath, plotFileNameOption + "obs.png")
+    comp_path = os.path.join(evalPath, plotFileNameOption + ".png")
 
     product_dict = {'modelPath':model_path,
                     'obsPath': obs_path,
-                    'comparisonPath':comp_path}
+                    'comparisonPath':comp_path,
+                    'evalWorkDir':evalWorkDir}
     
     #Extra Code in case bottle has an issue with my Dictionary
     #json_output = json.dumps(product_dict, sort_keys=True, indent=4)
