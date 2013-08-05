@@ -74,6 +74,29 @@ def getResultDirInfo():
     else:
         return returnJSON
 
+@route('/getResults/<dirPath:path>')
+def getResults(dirPath):
+    dirPath = WORK_DIR + dirPath
+    dirPath = dirPath.replace('/../', '/')
+    dirPath = dirPath.replace('/./', '/')
+
+    if os.path.isdir(dirPath):
+        listing = os.listdir(dirPath)
+        listingNoHidden = [f for f in listing if f[0] != '.']
+        joinedPaths = [os.path.join(dirPath, f) for f in listingNoHidden]
+        onlyFilesNoDirs = [f for f in joinedPaths if os.path.isfile(f)]
+        finalPaths = [p.replace(WORK_DIR, '') for p in onlyFilesNoDirs]
+        sorted(finalPaths, key=lambda s: s.lower())
+        returnJSON = finalPaths
+    else:
+        returnJSON = []
+
+    returnJSON = json.dumps(returnJSON)
+    if request.query.callback:
+        return "%s(%s)" % (request.query.callback, returnJSON)
+    else:
+        return returnJSON
+
 @route('/getPathLeader/')
 def getPathLeader():
     returnJSON = {"leader": PATH_LEADER}
