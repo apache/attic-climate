@@ -383,7 +383,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         # i0mdl=0
         # i1mdl=numMDLs
         numMDLs=numMDLs+1
-        mdlList.append('ENS-MODEL')
+        mdlName.append('ENS-MODEL')
         print 'Eval mdl-mean timeseries for the obs periods: modelData.shape= ',modelData.shape
     # GOODALE:  This ensemble code should be refactored into process.py module since it's purpose is data processing
 
