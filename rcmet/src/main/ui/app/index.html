@@ -35,248 +35,36 @@
   <link rel="stylesheet" href="css/app.css"/>
 </head>
 <body ng-cloak>
-  <bootstrap-modal modal-id="datasetSelect">
-	<div class="modal-header">
-		<button class="close">&times;</button>
-		<h3>Dataset Select</h3>
-	</div>
-	<div class="modal-body">
-		<div ng-view></div>
-	</div>
-	<div class="modal-footer">
-		<a href="#" class="btn btn-primary close">Close</a>
-	</div>
-  </bootstrap-modal>
-
-  <bootstrap-modal modal-id="evaluationSettings">
-  <div class="modal-header">
-  	<button class="close">&times;</button>
-  	<h3>Settings</h3>
-  </div>
-  <div class="modal-body" ng-controller="SettingsCtrl">
-    <h4>Select the metrics you would like to run.</h4>
-    <div ng-repeat="metric in settings.metrics">
-      <label><input type="checkbox" ng-model="metric.select"> {{metric.name}}</label>
-    </div>
-    <hr />
-    <h4>Select how you would like to temporally re-grid the datasets.</h4>
-    <select ng-model="settings.temporal.selected" ng-options="opt for opt in settings.temporal.options"></select>
-    <hr />
-    <h4>Select which dataset to use as the grid base.</h4>
-    <select ng-model="settings.spatialSelect" ng-options="dataset.name for dataset in datasets"></select>
-    <hr />
-    <h4>Select a file which will define the bounds of subregions.</h4>
-    <form class="form-inline" autocomplete="off">
-		<input id="subregionFileInput" predictive-file-browser-input ng-model="filePathInput" type="text" class="input-xlarge" autocomplete="off" />
-	</form>
-  </div>
-  <div class="modal-footer">
-	  <a href="#" class="btn btn-primary close">Close</a>
-  </div>
-  </bootstrap-modal>
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
-    <div class="row-fluid">
-      <div class="span12 text-center">
-        <h2>Apache Open Climate Workbench UI</h2>
-      </div>
-    </div>
-    <div class="row-fluid">
-      <hr />
-    </div>
-    <div class="row-fluid">
-      <div class="span12">
-        <div class="row-fluid">
-          <div class="span6">
-            <!--Dataset Select Controls-->
-            <div ng-controller="DatasetSelectCtrl">
-              <div class="row-fluid">
-                <div class="span1 offset10">
-                  <button class="btn btn-link no-color-link" ng-click="clearDatasets()" ng-disabled="shouldDisableClearButton()">
-                    <span tooltip-placement="left" tooltip-popup-delay="700" tooltip="Clear Datasets">
-                      <i class="icon-trash icon-2x"></i>
-                    </span>
-                  </button>
-                </div>
-                <div class="span1">
-                  <button class="btn btn-link no-color-link" bootstrap-modal-open="datasetSelect">
-                    <span tooltip-placement="left" tooltip-popup-delay="700" tooltip="Add Dataset">
-                      <i class="icon-plus icon-2x"></i>
-                    </span>
-                  </button>
-                </div>
-              </div>
-              <div class="row-fluid">
-                <div class="span12">
-                  <hr />
-                </div>
-              </div>
-            </div>
-            <!--Dataset display-->
-            <div ng-controller="DatasetDisplayCtrl" id="datasetDiv">
-              <div ng-repeat="dataset in datasets">
-                <div class="row-fluid">
-                  <!--Data section-->
-                  <div class="span8 offset1 muted">
-                    {{dataset.name}}
-                  </div>
-                  <div class="span1 offset2">
-                    <span tooltip-placement="left" tooltip-popup-delay="700" tooltip="Remove Dataset">  
-                      <a class="no-color-link" href="#" ng-click="removeDataset($index)">
-                        <i class="icon-remove"></i>
-                      </a>
-                    </span>
-                  </div>
-                </div>
-                <!--Time Values!-->
-                <div class="row-fluid">
-                  <!--Dataset Info Section-->
-                  <div class="span9">
-                    <div class="row-fluid">
-                      <div class="span2 offset1 text-center">Start:</div>
-                      <div class="span2">
-                        <div class="span2 text-center">{{dataset.timeVals.start | ISODateToMiddleEndian}}</div>
-                      </div>
-                      <div class="span2 text-center">End:</div>
-                      <div class="span2">
-                        <div class="span2 text-center">{{dataset.timeVals.end | ISODateToMiddleEndian}}</div>
-                      </div>
-                    </div>
-                    <!--Lat/Long Values!-->
-                    <div class="row-fluid">
-                      <div class="span2 offset1 text-center">North:</div>
-                      <div class="span2 text-center">
-                        {{dataset.latlonVals.latMax}}
-                      </div>
-                      <div class="span2 text-center">East:</div>
-                      <div class="span2 text-center">
-                        {{dataset.latlonVals.lonMax}}
-                      </div>
-                    </div>
-                    <div class="row-fluid">
-                      <div class="span2 offset1 text-center">South:</div>
-                      <div class="span2 text-center">
-                        {{dataset.latlonVals.latMin}}
-                      </div>
-                      <div class="span2 text-center">West:</div>
-                      <div class="span2 text-center">
-                        {{dataset.latlonVals.lonMin}}
-                      </div>
-                    </div>
-                  </div>
-                  <!--Preview Map Section-->
-                  <div class="span3">
-                    <!--If the dataset is global we show a picture of a globe instead of the actual map-->
-                    <div ng-hide="dataset.latlonVals.lonMin == -180 && dataset.latlonVals.lonMax == 180 && 
-                                  dataset.latlonVals.latMin == -90 && dataset.latlonVals.latMax == 90" 
-                                  preview-map="dataset" index="$index"></div>
-                    <div ng-show="dataset.latlonVals.lonMin == -180 && dataset.latlonVals.lonMax == 180 &&
-                                  dataset.latlonVals.latMin == -90 && dataset.latlonVals.latMax == 90">
-                      <img src="img/globe.png" class="preview-map">
-                    </div>
-                  </div>
-                </div>
-                <div class="row-fluid">
-                  <div class="span6 offset3"><hr /></div>
-                </div>
-              </div>
-            </div>
-        </div>
-        <div class="span6">
-          <!--Map-->
-          <div class="row-fluid"  ng-controller="WorldMapCtrl">
-            <div class="span12">
-              <leaflet-map id="map"></leaflet-map>
-            </div>
-          </div>
-          
-          <!--Timeline-->
-          <div class="row-fluid">
-            <div class="span12" ng-controller="TimelineCtrl">
-              <div class="timeline"></div>
-            </div>
-          </div>
-          
-          <div class="row-fluid">
-            <div class="span12" ng-controller="ParameterSelectCtrl">
-              <div class="row-fluid">
-                <div class="span2 text-center">Start Date:</div>
-                <div class="span4">
-                  <form>
-                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
-                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
-                    <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.start" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span4" style="width:100%" />
-                  </form>
-                </div>
-                <div class="span2 text-center">End Date:</div>
-                <div class="span4">
-                  <form>
-                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
-                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
-                    <input ng-disabled="shouldDisableControls()" on-blur="checkParameters();" ng-model="displayParams.end" ui-date="datepickerSettings" ui-date-format="yy-mm-dd" type="text" class="text-center span4" style="width:100%"/>
-                  </form>
-                </div>
-              </div>
-              <div class="row-fluid">
-                <div class="span2 text-center">North:</div>
-                <div class="span4">
-                  <form action="">
-                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMax"  on-blur="checkParameters();" type="text" class="span4 text-center" style="width:100%"/>
-                  </form>
-                </div>
-                <div class="span2 text-center">South:</div>
-                <div class="span4">
-                  <form action="">
-                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
-                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
-                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.latMin" on-blur="checkParameters();" type="text" class="span4 text-center" style="width:100%"/>
-                  </form>
-                </div>
-              </div>
-              <div class="row-fluid">
-                <div class="span2 text-center">East:</div>
-                <div class="span4">
-                  <form>
-                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
-                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
-                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMax" on-blur="checkParameters();" type="text" class="span4 text-center" style="width:100%"/>
-                  </form>
-                </div>
-                <div class="span2 text-center">West:</div>
-                <div class="span4">
-                  <form>
-                    <!--This styling HAD to be done inline. Using a class wouldn't work and for some -->
-                    <!--reason the input boxes refused to be 100% wide when their span size was set.-->
-                    <input ng-disabled="shouldDisableControls()" ng-model="displayParams.lonMin" on-blur="checkParameters();"; type="text" class="span4 text-center" style="width:100%"/>
-                  </form>
-                </div>
-              </div>
-              <div class="row-fluid">
-                <div class="span2 offset6">
-                  <button class="btn btn-link no-color-link pull-right" bootstrap-modal-open="evaluationSettings">
-                    <span tooltip-placement="left" tooltip-popup-delay="700" tooltip="Settings">
-                      <span class="icon-stack">
-                        <i class="icon-check-empty icon-stack-base"></i>
-                        <i class="icon-cogs"></i>
-                      </span>
-                    </span>
-                  </button>
-                </div>
-                <div class="span4">
-                  <button ng-click="runEvaluation()" ng-disabled="shouldDisableEvaluateButton()" class="btn btn-block btn-primary">
-                    <div ng-hide="runningEval">Evaluate</div>
-                    <div ng-show="runningEval"><i class="icon-spinner icon-spin"></i></div>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+	    <!-- Title -->
+	    <div class="row-fluid">
+	      <div class="span12 text-center">
+	      <br><br>
+	        <h2>Apache Open Climate Workbench UI</h2>
+	      </div>
+	    </div>
+	    <!-- Navigation bar -->
+	    <div class="row-fluid">
+			<div class="navbar navbar-fixed-top">
+			  <div class="navbar-inner">
+				  <div class="container">
+				    <a class="brand" href="#">A.OCW</a>
+				    <ul class="nav">
+				      <li ng-class="{ active: $state.includes('main') }"><a href="#">Evaluate</a></li>
+				      <li ng-class="{ active: $state.includes('results') }"><a href="#/results">Results</a></li>
+				    </ul>
+				  </div>
+			  </div>
+			</div>
+	      	<hr />
+	    </div>
+	</div>
   </div>
+  <!-- Main Content -->
+  <div class="container" style="margin-top:60px" ui-view ng-animate="{enter:'fade-enter'}"></div>
 </div>
 
   <!--Libraries-->
@@ -289,6 +77,8 @@
   <script src="js/lib/leaflet/leaflet-0.5.js"></script>
   <script src="http://www.google.com/jsapi"></script>
   <script src="js/lib/timeline/timeline.js"></script>
+  <script src="js/lib/angular-ui/angular-ui-router.min.js"></script>
+  <script src="js/lib/angular-ui/ui-bootstrap-tpls-0.5.0.min.js"></script>
   <!--Timeline refuses to initialize nicely so we're doing this as a workaround-->
   <script type="text/javascript">google.load("visualization", "1");</script>
   
@@ -309,6 +99,8 @@
   <script src="js/controllers/SettingsCtrl.js"></script>
   <script src="js/controllers/TimelineCtrl.js"></script>
   <script src="js/controllers/DatasetSelectCtrl.js"></script>
+  <script src="js/controllers/ResultCtrl.js"></script>
+  <script src="js/controllers/ResultDetailCtrl.js"></script>
 
   <!--Directives-->
   <script src="js/directives/LeafletMap.js"></script>
