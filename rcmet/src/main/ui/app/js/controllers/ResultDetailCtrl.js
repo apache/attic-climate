@@ -18,17 +18,21 @@
 **/
 
 // Controller for result page
-App.Controllers.controller('ResultCtrl', ['$rootScope', '$scope', '$http',
-function($rootScope, $scope, $http) {
+App.Controllers.controller('ResultDetailCtrl', ['$rootScope', '$scope', '$http', '$stateParams',
+function($rootScope, $scope, $http, $stateParams) {
 
-    $scope.results = [];
-
-    // Get all evaluation directories
-    $http.jsonp($rootScope.baseURL + '/getResultDirInfo?callback=JSON_CALLBACK')
-    .success(function(data) {
-      var removeItem = "/cache";
-      data.splice( $.inArray(removeItem,data) ,1 );
-      $scope.results = data.sort().reverse();
-    });
+	// Grab all figures 
+	$scope.result = $stateParams.resultId;
+	
+	$http.jsonp($rootScope.baseURL + '/getResults//' + $scope.result + '?callback=JSON_CALLBACK')
+	.success(function(data) {
+	  if (data.length < 1){
+		$scope.figures = null;
+		$scope.alertMessage = "No results found.";
+		$scope.alertClass = "alert alert-danger";
+	  } else {
+		$scope.figures = data;
+	  }
+	});
 
 }]);
