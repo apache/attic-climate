@@ -154,6 +154,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			var comp = data['comparisonPath'].split('/');
 			var model = data['modelPath'].split('/');
 			var obs = data['obsPath'].split('/');
+			var evalWorkDir = data['evalWorkDir'];
 
 			$rootScope.evalResults = {};
 			$rootScope.evalResults.comparisonPath = comp[comp.length - 1];
@@ -163,7 +164,11 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			$scope.runningEval = false;
 
 			$timeout(function() {
-				window.location = "results.html";
+				if (evalWorkDir !== undefined) {
+					window.location = "#/results/"+evalWorkDir;
+				} else {
+					window.location = "#/results";
+				}
 			}, 100);
 		}).error(function() {
 			$scope.runningEval = false;
