@@ -28,6 +28,9 @@ def decodeTimeFromString(time_string):
     '''
     import time
     import datetime
+    
+    # If present, drop the ".0" from the end of the time string before testing
+    time_string = time_string.split('.')[0] + '0' if "." in time_string else time_string
 
     try:
         mytime = time.strptime(time_string, '%Y-%m-%d %H:%M:%S')
