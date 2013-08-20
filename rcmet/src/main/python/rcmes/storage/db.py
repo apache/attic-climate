@@ -295,12 +295,15 @@ def extractData ( datasetID, paramID, latMin, latMax, lonMin, lonMax, userStartT
     name.append(version)
     
     # Check to see whether the folder is already created for netCDF or not, then it will be created
+    temp_path = cachedir
     for n in name:
-        path = os.path.join(cachedir, n)
+        path = os.path.join(temp_path, n)
         if os.path.exists(path):
+            temp_path = path
             pass
         else:
             os.mkdir(path)
+            temp_path = path
 
     processing_level = 'L3'
     processing_version = "processing_version"  # the processing version is still unknown and can be added later
@@ -323,9 +326,9 @@ def extractData ( datasetID, paramID, latMin, latMax, lonMin, lonMax, userStartT
         #To get the beginning of next month
         userStartTime= endOfMonth + timedelta(days=1)
 
-    print 'Starting retrieval data (this may take several minutes) ...... ' 
+    
     # To loop over all months and return data
-    for date in date_list:
+    for i, date in enumerate(date_list):
         netCDF_name = variable + '_' + project + '_' + processing_level + '_' + processing_version + '_' + str(latMin) + '_' + str(latMax) + '_' + str(lonMin) + '_' + str(lonMax) + '_' + str("%04d" % date[0].year) + str("%02d" % date[0].month) + '.nc'
         
         # To check if netCDF file  exists, then use it
@@ -335,6 +338,7 @@ def extractData ( datasetID, paramID, latMin, latMax, lonMin, lonMax, userStartT
         # If the netCDF file does not exist, then create one and read it.
         else:            
             # To just query for one year of data
+            print "%s of %s Database Download(s) Complete" % (i, len(date_list))  
             url = RCMED.jplUrl(datasetID, paramID, latMin, latMax, lonMin, lonMax, date[0], date[1], cachedir, timestep)
             
             # To get data from DB
