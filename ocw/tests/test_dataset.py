@@ -48,6 +48,42 @@ class TestDatasetAttributes(unittest.TestCase):
     def test_variable(self):
         self.assertEqual(self.test_dataset.variable, self.variable)
 
+class TestInvalidDatasetInit(unittest.TestCase):
+    def setUp(self):
+        self.lat = np.array([10, 12, 14, 16, 18])
+        self.lon = np.array([100, 102, 104, 106, 108])
+        self.time = np.array([dt.datetime(2000, x, 1) for x in range(1, 13)])
+        flat_array = np.array(range(300))
+        self.value = flat_array.reshape(12, 5, 5)
+
+    def test_bad_lat_shape(self):
+        self.lat = np.array([[1, 2], [3, 4]])
+        with self.assertRaises(ValueError):
+            Dataset(self.lat, self.lon, self.time, self.value, 'prec')
+
+    def test_bad_lon_shape(self):
+        self.lon = np.array([[1, 2], [3, 4]])
+        with self.assertRaises(ValueError):
+            Dataset(self.lat, self.lon, self.time, self.value, 'prec')
+
+    def test_bad_times_shape(self):
+        self.time = np.array([[1, 2], [3, 4]])
+        with self.assertRaises(ValueError):
+            Dataset(self.lat, self.lon, self.time, self.value, 'prec')
+
+    def test_bad_values_shape(self):
+        self.value = np.array([[1, 2], [2, 3], [3, 4], [4, 5]])
+        with self.assertRaises(ValueError):
+            Dataset(self.lat, self.lon, self.time, self.value, 'prec')
+
+    def test_values_shape_mismatch(self):
+        # If we change lats to this the shape of value will not match
+        # up with the length of the lats array.
+        self.lat = self.lat[:-2]
+        with self.assertRaises(ValueError):
+            Dataset(self.lat, self.lon, self.time, self.value, 'prec')
+
+
 
 class TestDatasetFunctions(unittest.TestCase):
     def setUp(self):
