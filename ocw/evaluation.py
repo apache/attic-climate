@@ -23,7 +23,7 @@ Classes:
 import logging
 from metrics import Metric
 from dataset import Dataset, Bounds
-import dataset_processor as DSP
+import ocw.dataset_processor as DSP
 
 class Evaluation(object):
     '''Container for running an evaluation
