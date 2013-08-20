@@ -21,7 +21,7 @@ import numpy.ma as ma
 import os
 import netCDF4
 import datetime
-from data_source.local import *
+from ocw.data_source.local import *
 
 
 class test_load_file(unittest.TestCase):

@@ -17,7 +17,7 @@
 
 import re
 import netCDF4
-from dataset import Dataset
+from ocw.dataset import Dataset
 import numpy
 import numpy.ma as ma
 from datetime import timedelta ,datetime
