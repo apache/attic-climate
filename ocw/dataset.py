@@ -46,7 +46,13 @@ class Dataset:
         :type variable: string
         :param name: An optional string name for the Dataset.
         :type variable: string
+
+        :raises: ValueError
         '''
+        if self._inputs_are_invalid(lats, lons, times, values):
+            err = "Dataset given improperly shaped array during initialization."
+            raise ValueError(err)
+
         self.lats = lats
         self.lons = lons
         self.times = times
@@ -130,6 +136,22 @@ class Dataset:
             raise ValueError(error)
 
         return time_resolution
+
+    def _inputs_are_invalid(self, lats, lons, times, values):
+        '''Check if Dataset input values are expected shape.
+        
+        :returns: True if the values are invalid, False otherwise.
+        '''
+        lats_shape = lats.shape
+        lons_shape = lons.shape
+        times_shape = times.shape
+        values_shape = values.shape
+
+        return (
+            len(lats_shape) != 1 or len(lons_shape) != 1 or 
+            len(times_shape) != 1 or len(values_shape) != 3 or
+            values_shape != (times_shape[0], lats_shape[0], lons_shape[0])
+        )
 
 
 class Bounds(object):
