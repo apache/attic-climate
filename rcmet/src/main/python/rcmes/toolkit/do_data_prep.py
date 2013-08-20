@@ -76,8 +76,8 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
      Processes both single and multiple files of obs and mdl or combinations in a general way.
            i)    retrieve observations from the database
            ii)   load in model data
-           iii)  temporal regridding
-           iv)   spatial regridding
+           iii)  spatial regridding
+           iv)   temporal regridding
            v)    area-averaging
            Input:
                    cachedir 	- string describing directory path
@@ -138,8 +138,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         print 'No input observation data file. EXIT'
         sys.exit()
 
-    ## Part 1: retrieve observation data from the database and regrid them
-    ##       NB. automatically uses local cache if already retrieved.
+    ## Part 0: Setup the regrid variables based on the regridOption given
 
     # preparation for spatial re-gridding: define the size of horizontal array of the target interpolation grid system (ngrdX and ngrdY)
     print 'regridOption in prep_data= ', regridOption
@@ -180,6 +179,11 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
 
     regObsData = []
     
+    
+    
+    ## Part 1: retrieve observation data from the database and regrid them
+    ##       NB. automatically uses local cache if already retrieved.
+    
     for n in np.arange(numOBSs):
         # spatial regridding
         oLats, oLons, _, oTimes, oData = db.extractData(obsDatasetId[n],
@@ -201,6 +205,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         
         print 'tmpOBS shape = ', tmpOBS.shape
         
+        # OBS SPATIAL REGRIDING 
         for t in np.arange(nstOBSs):
             tmpOBS[t, :, :] = process.do_regrid(oData[t, :, :], oLats, oLons, lats, lons)
             
@@ -210,7 +215,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         oLats = 0.0
         oLons = 0.0       # release the memory occupied by the temporary variables oLats and oLons.
         
-        # temporally regrid the spatially regridded obs data
+        # OBS TEMPORAL REGRIDING
         oData, newObsTimes = process.calc_average_on_new_time_unit_K(tmpOBS, oTimes, unit=timeRegridOption)
 
         tmpOBS = 0.0
@@ -239,29 +244,14 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
 
     obsData = ma.array(regObsData)
     obsTimes = newObsTimes
-    regObsData = 0
-    oldObsTimes = 0
-    nT = len(obsTimes)
 
-    # TODO:  Refactor this into a function within the toolkit module
     # compute the simple multi-obs ensemble if multiple obs are used
     if numOBSs > 1:
-        print 'numOBSs = ', numOBSs
-        oData = obsData
-        print 'oData shape = ', oData.shape
-        obsData = ma.zeros((numOBSs + 1, nT, ngrdY, ngrdX))
-        print 'obsData shape = ', obsData.shape
-        avg = ma.zeros((nT, ngrdY, ngrdX))
-        
-        for i in np.arange(numOBSs):
-            obsData[i, :, :, :] = oData[i, :, :, :]
-            avg[:, :, :] = avg[:, :, :] + oData[i, :, :, :]
-
-        avg = avg / float(numOBSs)
-        obsData[numOBSs, :, :, :] = avg[:, :, :]     # store the model-ensemble data
-        numOBSs = numOBSs + 1                     # update the number of obs data to include the model ensemble
+        ensemble = np.mean(regObsData, axis=0)
+        regObsData.append(ensemble)
+        numOBSs = len(regObsData)
         obsList.append('ENS-OBS')
-    print 'OBS regridded: ', obsData.shape
+        obsData = ma.array(regObsData) # Cast to a masked array
 
 
     ## Part 2: load in and regrid model data from file(s)
@@ -306,11 +296,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
    
         # determine the dimension size from the model time and latitude data.
         nT = len(modelTimes)
-        
-        # UNUSED VARIABLES - WILL DELETE AFTER TESTING
-        # nmdlY=modelLats.shape[0]
-        # nmdlX=modelLats.shape[1]
-        #print 'nT, ngrdY, ngrdX = ',nT,ngrdY, ngrdX,min(modelTimes),max(modelTimes)
+
         print '  The shape of model data to be processed= ', mData.shape, ' for the period ', min(modelTimes), max(modelTimes)
         # spatial regridding of the modl data
         tmpMDL = ma.zeros((nT, ngrdY, ngrdX))
@@ -340,10 +326,7 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         regridMdlData.append(mData)
 
     modelData = ma.array(regridMdlData)
-    modelTimes = newMdlTimes
-    regridMdlData = 0
-    oldMdlTimes = 0
-    newMdlTimes = 0
+
     if (precipFlag == True) & (mvUnit == 'KG M-2 S-1'):
         print 'convert model variable unit from mm/s to mm/day'
         modelData = 86400.*modelData
@@ -365,24 +348,14 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
 
     print 'Reading and regridding model data are completed'
     print 'numMDLs, modelData.shape= ', numMDLs, modelData.shape
-    
-    # TODO: Do we need to make this a user supplied flag, or do we just create an ensemble ALWAYS
-    # TODO: Add in Kyo's code here as well
+
     # TODO:  Commented out until I can talk with Jinwon about this
     # compute the simple multi-model ensemble if multiple models are evaluated
     if numMDLs > 1:
-        mdlData=modelData
-        modelData=ma.zeros((numMDLs+1,nT,ngrdY,ngrdX))
-        avg=ma.zeros((nT,ngrdY,ngrdX))
-        for i in np.arange(numMDLs):
-            modelData[i,:,:,:]=mdlData[i,:,:,:]
-            avg[:,:,:]=avg[:,:,:]+mdlData[i,:,:,:]
-        avg=avg/float(numMDLs)
-        modelData[numMDLs,:,:,:]=avg[:,:,:]     # store the model-ensemble data
-        # THESE ARE NOT USED.  WILL DELETE AFTER TESTING
-        # i0mdl=0
-        # i1mdl=numMDLs
-        numMDLs=numMDLs+1
+        model_ensemble = np.mean(regridMdlData, axis=0)
+        regridMdlData.append(model_ensemble)
+        numMDLs = len(regridMdlData)
+        modelData = ma.array(regridMdlData)
         mdlName.append('ENS-MODEL')
         print 'Eval mdl-mean timeseries for the obs periods: modelData.shape= ',modelData.shape
     # GOODALE:  This ensemble code should be refactored into process.py module since it's purpose is data processing

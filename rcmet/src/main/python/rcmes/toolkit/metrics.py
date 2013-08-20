@@ -47,6 +47,24 @@ def calcAnnualCycleMeans(dataset1):
     means = data.mean(axis = 0)
     return data, means
 
+def calcAnnualCycleMeansSubRegion(dataset1):
+    '''
+    Purpose:: 
+        Calculate annual cycle in terms of monthly means at every sub-region.
+
+    Input::
+        dataset1 - 2d numpy array of data in (region, t)
+        
+    Output:: 
+        means - (region, # of months)
+
+     '''
+    nregion, nT = dataset1.shape
+    data = dataset1.reshape[nregion, nT/12, 12]
+    means = data.mean(axis = 1)
+    return data, means
+
+
 def calcClimYear(dataset1):
     '''
     Purpose:: 
@@ -99,6 +117,39 @@ def calcClimSeason(monthBegin, monthEnd, dataset1):
     means = tSeries.mean(axis = 0)        
     return tSeries, means
 
+def calcClimSeasonSubRegion(monthBegin, monthEnd, dataset1):
+    '''
+    Purpose :: 
+       Calculate seasonal mean montheries and climatology for both 3-D and point time series.
+       For example, to calculate DJF mean time series, monthBegin = 12, monthEnd =2 
+       This can handle monthBegin=monthEnd i.e. for climatology of a specific month
+
+    Input::
+        monthBegin - an integer for the beginning month (Jan =1)
+        monthEnd - an integer for the ending month (Jan = 1)
+        dataset1 - 3d numpy array of data in (region, t) or 1d numpy array montheries
+
+    Output:: 
+        tSeries - (region, number of years/number of years -1 if monthBegin > monthEnd,lat,lon),
+        means - (region)
+    '''
+    nregion, nT = dataset1.shape
+    nYR = nT/12
+    if monthBegin > monthEnd:
+        # Offset the original array so that the the first month
+        # becomes monthBegin, note that this cuts off the first year of data
+        offset = slice(monthBegin - 1, monthBegin - 13)
+        data = dataset1[:,offset].reshape([nregion,nYR-1, 12])
+        monthIndex = slice(0, 13 - monthBegin + monthEnd)
+    else:
+        # Since monthBegin <= monthEnd, just take a slice containing those months
+        data = dataset1.reshape([nregion,nYR,12])
+        monthIndex =  slice(monthBegin - 1, monthEnd)
+        
+    tSeries = data[:, :, monthIndex].mean(axis = 2)
+    means = tSeries.mean(axis = 1)        
+    return tSeries, means
+
 def calcAnnualCycleStdev(dataset1):
     '''
      Purpose:: 
@@ -114,7 +165,21 @@ def calcAnnualCycleStdev(dataset1):
     stds = data.std(axis = 0, ddof = 1)
     return stds
 
+def calcAnnualCycleStdevSubRegion(dataset1):
+    '''
+     Purpose:: 
+        Calculate monthly standard deviations for every sub-region
+     
+     Input::
+        dataset1 - 2d numpy array of data in (nregion, 12* number of years) 
 
+     Output:: 
+        stds - (nregion, 12)
+    '''
+    nregion, nT = data1.shape
+    data = dataset1.reshape([nregion, nT/12, 12])
+    stds = data.std(axis = 1, ddof = 1)
+    return stds
 
 def calcAnnualCycleDomainMeans(dataset1):
     '''
@@ -136,6 +201,22 @@ def calcAnnualCycleDomainMeans(dataset1):
         
     return means
 
+def calcSpatialStdevRatio(evaluationData, referenceData):
+    '''
+    Purpose ::
+        Calculate the ratio of spatial standard deviation (model standard deviation)/(observed standard deviation)
+
+    Input ::
+        evaluationData - model data array (lat, lon)
+        referenceData- observation data array (lat,lon)
+
+    Output::
+        ratio of standard deviation (a scholar) 
+    
+    '''
+    stdevRatio = evaluationData[(evaluationData.mask==False) & (referenceData.mask==False)].std()/ \
+                 referenceData[(evaluationData.mask==False) & (referenceData.mask==False)].std()  
+    return stdevRatio
 
 def calcTemporalStdev(dataset1):
     '''
@@ -321,8 +402,42 @@ def calcTemporalCorrelation(evaluationData, referenceData):
         referenceData- observation data array of any shape
             
     Output::
-        temporalCorelation - A 2-D array of temporal correlation coefficients at each grid point.
+        temporalCorelation - A 2-D array of temporal correlation coefficients at each subregion
         sigLev - A 2-D array of confidence levels related to temporalCorelation 
+    
+    REF: 277-281 in Stat methods in atmos sci by Wilks, 1995, Academic Press, 467pp.
+    sigLev: the correlation between model and observation is significant at sigLev * 100 %
+    '''
+    evaluationDataMask = process.create_mask_using_threshold(evaluationData, threshold = 0.75)
+    referenceDataMask = process.create_mask_using_threshold(referenceData, threshold = 0.75)
+    
+    nregion = evaluationData.shape[0]
+    temporalCorrelation = ma.zeros([nregion])-100.
+    sigLev = ma.zeros([nregion])-100.
+    for iregion in np.arange(nregion):
+        temporalCorrelation[iregion], sigLev[iregion] = stats.pearsonr(evaluationData[iregion,:], referenceData[iregion,:])
+        sigLev[iregion] = 1 - sigLev[iregion]
+                    
+    temporalCorrelation=ma.masked_equal(temporalCorrelation.data, -100.)        
+    sigLev=ma.masked_equal(sigLev.data, -100.)    
+    
+    return temporalCorrelation, sigLev
+
+def calcTemporalCorrelationSubRegion(evaluationData, referenceData):
+    '''
+    Purpose ::
+        Calculate the temporal correlation.
+    
+    Assumption(s) ::
+        both evaluation and reference data are subregion averaged time series
+    
+    Input ::
+        evaluationData - model data array [region,t]
+        referenceData- observation data [region, t]
+            
+    Output::
+        temporalCorelation - A 1-D array of temporal correlation coefficients at each grid point.
+        sigLev - A 1-D array of confidence levels related to temporalCorelation 
     
     REF: 277-281 in Stat methods in atmos sci by Wilks, 1995, Academic Press, 467pp.
     sigLev: the correlation between model and observation is significant at sigLev * 100 %
