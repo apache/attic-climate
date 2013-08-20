@@ -19,7 +19,7 @@ import unittest
 import datetime
 import numpy
 import pickle
-import data_source.rcmed as rcmed
+import ocw.data_source.rcmed as rcmed
 
 
 class test_rcmed(unittest.TestCase):

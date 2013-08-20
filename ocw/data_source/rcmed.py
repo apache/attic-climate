@@ -27,7 +27,7 @@ import numpy as np
 import numpy.ma as ma
 from datetime import datetime
 import calendar
-from dataset import Dataset
+from ocw.dataset import Dataset
 
 
 URL = 'http://rcmes.jpl.nasa.gov/query-api/query.php?'
