@@ -21,7 +21,7 @@ import numpy.ma as ma
 import os
 import netCDF4
 import datetime
-from ocw.data_source.local import *
+from data_source.local import *
 
 
 class test_load_file(unittest.TestCase):
@@ -43,10 +43,10 @@ class test_load_file(unittest.TestCase):
         levels = netCDF_file.createVariable('level', 'd', ('level_dim',))
         values = netCDF_file.createVariable('value', 'd', ('level_dim', 'time_dim', 'lat_dim', 'lon_dim'))
         #To latitudes and longitudes for five values
-        self.latitudes = [i for i in range(0,5)]
-        self.longitudes = [i for i in range(200,205)]
+        self.latitudes = range(0,5)
+        self.longitudes = range(200,205)
         #Three months of data
-        self.times = [month for month in range(3)]
+        self.times = range(3)
         #Two levels
         self.levels = [100, 200]
         #Create 150 values
@@ -74,42 +74,6 @@ class test_load_file(unittest.TestCase):
         os.remove(self.file_path)
 
 
-    def test_function_get_lat_name(self):
-        '''To test get_lat_name function'''
-        self.assertItemsEqual(get_lat_name(self.variable_name_list), self.variable_name_list[0])
-
-
-    def test_function_get_lon_name(self):
-        '''To test get_lon_name function'''
-        self.assertItemsEqual(get_lon_name(self.variable_name_list), self.variable_name_list[1])
-
-
-    def test_function_get_time_name(self):
-        '''To test get_time_name function'''
-        self.assertItemsEqual(get_time_name(self.variable_name_list), self.variable_name_list[2])
-
-
-    def test_function_get_level_name(self):
-        '''To test get_level_name function'''
-        self.assertItemsEqual(get_level_name(self.variable_name_list), self.variable_name_list[3])
-
-
-    def test_function_get_time_step(self):
-        '''To test get_time_step function'''
-        self.assertItemsEqual(get_time_step(self.netCDF_file, self.variable_name_list[2]), ('months', 'months since 2001-01-01 00:00:00', 12))
-
-
-    def test_function_get_time_base(self):
-        '''To test get_time_base function'''
-        self.assertEqual(get_time_base('months since 2001-01-01 00:00:00', 12), datetime(2001,01,01))
-
-
-    def test_function_calculate_time(self):
-        '''To test calculate_time function'''
-        newTimes = datetime(2001,01,01), datetime(2001,02,01), datetime(2001,03,01)
-        self.assertItemsEqual(calculate_time(self.netCDF_file, self.times, self.variable_name_list[2]), newTimes)
-
-
     def test_function_load_file_lats(self):
         '''To test load_file function for latitudes'''
         self.assertItemsEqual(load_file(self.file_path, None).lats, self.latitudes)
@@ -128,7 +92,8 @@ class test_load_file(unittest.TestCase):
 
     def test_function_load_file_values(self):
         '''To test load_file function for values'''
-        self.assertTrue(numpy.allclose(load_file(self.file_path, None).values, self.values))
+        new_values = self.values[0,:,:,:]
+        self.assertTrue(numpy.allclose(load_file(self.file_path, None).values, new_values))
 
 
 if __name__ == '__main__':
