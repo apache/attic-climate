@@ -21,7 +21,7 @@ import numpy.ma as ma
 import os
 import netCDF4
 import datetime
-from data_source.local import *
+import ocw.data_source.local as local
 
 
 class test_load_file(unittest.TestCase):
@@ -76,24 +76,24 @@ class test_load_file(unittest.TestCase):
 
     def test_function_load_file_lats(self):
         '''To test load_file function for latitudes'''
-        self.assertItemsEqual(load_file(self.file_path, None).lats, self.latitudes)
+        self.assertItemsEqual(local.load_file(self.file_path, None).lats, self.latitudes)
 
 
     def test_function_load_file_lons(self):
         '''To test load_file function for longitudes'''
-        self.assertItemsEqual(load_file(self.file_path, None).lons, self.longitudes)
+        self.assertItemsEqual(local.load_file(self.file_path, None).lons, self.longitudes)
 
 
     def test_function_load_file_times(self):
         '''To test load_file function for times'''
-        newTimes = datetime(2001,01,01), datetime(2001,02,01), datetime(2001,03,01)
-        self.assertItemsEqual(load_file(self.file_path, None).times, newTimes)
+        newTimes = datetime.datetime(2001,01,01), datetime.datetime(2001,02,01), datetime.datetime(2001,03,01)
+        self.assertItemsEqual(local.load_file(self.file_path, None).times, newTimes)
 
 
     def test_function_load_file_values(self):
         '''To test load_file function for values'''
         new_values = self.values[0,:,:,:]
-        self.assertTrue(numpy.allclose(load_file(self.file_path, None).values, new_values))
+        self.assertTrue(numpy.allclose(local.load_file(self.file_path, None).values, new_values))
 
 
 if __name__ == '__main__':
