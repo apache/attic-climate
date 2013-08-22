@@ -23,27 +23,22 @@ App.Directives.directive('timeline', function($rootScope, $window) {
 		transclude: true,
 		template: '<div id="OCWtimeline"></div>',
 		link: function(scope, element, attrs) {
-			
-	    	google.setOnLoadCallback(initTimeline);
-	        
-	    	function initTimeline() {
-	            // Instantiate timeline object.
-	            $rootScope.timeline = new links.Timeline(document.getElementById('OCWtimeline'));
+			// Instantiate timeline object.
+			$rootScope.timeline = new links.Timeline(document.getElementById('OCWtimeline'));
 
-				// Redraw the timeline whenever the window is resized
-				angular.element($window).bind('resize', function() {
-					$rootScope.timeline.checkResize();
-				});
+			// Redraw the timeline whenever the window is resized
+			angular.element($window).bind('resize', function() {
+				$rootScope.timeline.checkResize();
+			});
 
-				var options = {
-						"width": "100%",
-						"showCurrentTime": false,
-						"moveable": false,
-						"zoomable": false
-				};
+			var options = {
+				"width": "100%",
+				"showCurrentTime": false,
+				"moveable": false,
+				"zoomable": false
+			};
 
-				$rootScope.timeline.draw([], options);
-	        }
+			$rootScope.timeline.draw([], options);
 		}
 	}
 });

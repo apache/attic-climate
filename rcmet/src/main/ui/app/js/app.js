@@ -28,6 +28,12 @@ App.Directives = angular.module('ocw.directives', []);
 App.Controllers = angular.module('ocw.controllers', []);
 App.Filters = angular.module('ocw.filters', []);
 
+/*We need to manually start angular as we need to wait for 
+ * the google charting libs to be ready*/
+google.setOnLoadCallback(function () {
+  angular.bootstrap(document.body, ['ocw']);
+});
+
 angular.module('ocw', ['ocw.services', 'ocw.directives', 'ocw.controllers', 'ocw.filters', 'ui.date', 'ui.bootstrap', 'ui.compat', 'ui.state'])
 .config(
     [        '$stateProvider', '$routeProvider', '$urlRouterProvider',
