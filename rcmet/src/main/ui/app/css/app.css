@@ -16,6 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
 **/
+  
+body {
+}
+
+#header-img {
+}
+
+#header-title {
+}
+
+#OCW-powered {
+	
+}
+
+#main-container {
+	margin-top:80px;
+	min-height:400px;
+	height:auto !important;
+	height:400px; 
+}
 
 #datasetDiv
 {
