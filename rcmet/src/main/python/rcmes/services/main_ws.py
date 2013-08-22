@@ -39,9 +39,9 @@ def hello():
 def api_status():
     return {'status':'online', 'key':'value'}
 
-@route('/static/evalResults/<filename>')
-def get_eval_result_image(filename):
-    return static_file(filename, root="/tmp/rcmet")
+@route('/static/evalResults/<filepath:path>')
+def get_eval_result_image(filepath):
+    return static_file(filepath, root="/tmp/rcmet")
 
 @hook('after_request')
 def enable_cors():
