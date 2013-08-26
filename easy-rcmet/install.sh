@@ -25,7 +25,7 @@ help()
 {
 cat << ENDHELP
 
-Easy RCMET assists with the building of the RCMES Toolkit and its dependencies
+Easy OCW assists with the building of the Apache Open Climate Workbench and its dependencies
 
 Flags:
     -h  Display this help message.
@@ -79,7 +79,7 @@ done
 ###
 echo
 echo "---------------------------------------------------------------------------" 
-echo "                         Welcome to Easy RCMET"
+echo "                         Welcome to Easy OCW"
 echo "---------------------------------------------------------------------------" 
 echo
 
@@ -134,14 +134,14 @@ then
     virtualEnvLoc=`which virtualenv`
     source "${virtualEnvLoc}wrapper.sh"
 
-    # Create a new environment for RCMES work
-    mkvirtualenv rcmes
-    workon rcmes
+    # Create a new environment for OCW work
+    mkvirtualenv ocw
+    workon ocw
 fi
 
-### Install the latest RCMET code for development!
-header "Grabbing RCMET code"
-svn co https://svn.apache.org/repos/asf/incubator/climate/trunk/rcmet/src/main/python/rcmes/ src/rcmes
+### Install the latest OCW code for development!
+header "Grabbing OCW code"
+svn co https://svn.apache.org/repos/asf/incubator/climate/trunk/rcmet/src/main/python/rcmes/ src/ocw
 
 ### Build
 header "Begin Buildout"
@@ -149,7 +149,7 @@ python bootstrap.py -d
 ./bin/buildout -vvvvv
 
 ### Outro
-header "Easy RCMET installation complete."
+header "Easy OCW installation complete."
 
 cat << OUTRO
 If this installed virtualenv for you, make sure you set the following values in
@@ -159,14 +159,14 @@ your shell's RC file.
     source /usr/local/bin/virtualenvwrapper.sh
 
 Similarly, the default virtualenv environment that this script creates for you
-to use during RCMES work is called "rcmes". Whenever you want to work on RCMES
+to use during OCW work is called "ocw". Whenever you want to work on OCW
 tasks be sure to run
 
-    workon rcmes
+    workon ocw
 
-This will activate the RCMES environment. When you're done, run
+This will activate the OCW environment. When you're done, run
 
-    deactivate rcmes
+    deactivate ocw
 
 If you would like to read more about how to use virtualenv and 
 virtualenvwrapper please look to the following websites for documentation.
@@ -175,8 +175,8 @@ virtualenvwrapper please look to the following websites for documentation.
     http://virtualenvwrapper.readthedocs.org/en/latest/
 
 Additonally, you should set your PYTHONPATH environment variable to point to the
-RCMET code base that was downloaded into ./src/rcmes. For example:
+OCW code base that was downloaded into ./src/ocw For example:
     
-    export PYTHONPATH=/path/to/this/script/src/rcmes:$PYTHONPATH
+    export PYTHONPATH=/path/to/this/script/src/ocw:$PYTHONPATH
 
 OUTRO
