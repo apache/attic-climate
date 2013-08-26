@@ -49,9 +49,7 @@ class Dataset:
 
         :raises: ValueError
         '''
-        if self._inputs_are_invalid(lats, lons, times, values):
-            err = "Dataset given improperly shaped array during initialization."
-            raise ValueError(err)
+        self._validate_inputs(lats, lons, times, values)
 
         self.lats = lats
         self.lons = lons
@@ -137,21 +135,40 @@ class Dataset:
 
         return time_resolution
 
-    def _inputs_are_invalid(self, lats, lons, times, values):
-        '''Check if Dataset input values are expected shape.
+    def _validate_inputs(self, lats, lons, times, values):
+        """Check that Dataset inputs are valid.
         
-        :returns: True if the values are invalid, False otherwise.
-        '''
-        lats_shape = lats.shape
-        lons_shape = lons.shape
-        times_shape = times.shape
-        values_shape = values.shape
-
-        return (
-            len(lats_shape) != 1 or len(lons_shape) != 1 or 
-            len(times_shape) != 1 or len(values_shape) != 3 or
-            values_shape != (times_shape[0], lats_shape[0], lons_shape[0])
-        )
+        :raises: ValueError
+        """
+        err_msg = None
+        #Setup and Check parameter dimensionality is correct
+        lat_dim = len(lats.shape)
+        lon_dim = len(lons.shape)
+        time_dim = len(times.shape)
+        value_dim = len(values.shape)
+        lat_count = lats.shape[0]
+        lon_count = lons.shape[0]
+        time_count = times.shape[0]
+        
+        if lat_dim != 1:
+            err_msg = "Latitude Array should be 1 dimensional.  %s dimensions found." % lat_dim
+        elif lon_dim != 1:
+            err_msg = "Longitude Array should be 1 dimensional. %s dimensions found." % lon_dim
+        elif time_dim != 1:
+            err_msg = "Time Array should be 1 dimensional.  %s dimensions found." % time_dim
+        elif value_dim != 3:
+            err_msg = "Value Array should be 3 dimensional.  %s dimensions found." % value_dim
+        # Finally check that the Values array conforms to the proper shape
+        elif values.shape != (time_count, lat_count, lon_count):
+            err_msg = """Value Array must be of shape (times, lats, lons).
+Expected shape (%s, %s, %s) but received (%s, %s, %s)""" % (time_count,
+                                                            lat_count,
+                                                            lon_count,
+                                                            values.shape[0],
+                                                            values.shape[1],
+                                                            values.shape[2])
+        if err_msg:
+            raise ValueError(err_msg)
 
 
 class Bounds(object):

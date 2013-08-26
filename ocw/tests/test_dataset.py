@@ -55,6 +55,7 @@ class TestInvalidDatasetInit(unittest.TestCase):
         self.time = np.array([dt.datetime(2000, x, 1) for x in range(1, 13)])
         flat_array = np.array(range(300))
         self.value = flat_array.reshape(12, 5, 5)
+        self.values_in_wrong_order = flat_array.reshape(5, 5, 12)
 
     def test_bad_lat_shape(self):
         self.lat = np.array([[1, 2], [3, 4]])
@@ -82,6 +83,10 @@ class TestInvalidDatasetInit(unittest.TestCase):
         self.lat = self.lat[:-2]
         with self.assertRaises(ValueError):
             Dataset(self.lat, self.lon, self.time, self.value, 'prec')
+    
+    def test_values_given_in_wrong_order(self):
+#         with self.assertRaises(ValueError):
+            Dataset(self.lat, self.lon, self.time, self.values_in_wrong_order)
 
 
 
