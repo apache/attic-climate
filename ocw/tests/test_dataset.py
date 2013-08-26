@@ -85,7 +85,7 @@ class TestInvalidDatasetInit(unittest.TestCase):
             Dataset(self.lat, self.lon, self.time, self.value, 'prec')
     
     def test_values_given_in_wrong_order(self):
-#         with self.assertRaises(ValueError):
+         with self.assertRaises(ValueError):
             Dataset(self.lat, self.lon, self.time, self.values_in_wrong_order)
 
 
