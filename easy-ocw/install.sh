@@ -152,13 +152,29 @@ python bootstrap.py -d
 header "Easy OCW installation complete."
 
 cat << OUTRO
-If this installed virtualenv for you, make sure you set the following values in
+If this installed virtualenv for you, make sure you set the following in
 your shell's RC file.
 
     export WORKON_HOME=$HOME/.virtualenvs
+
+Additionally, you need to source the virtualenvwrapper script in your shell's
+RC file. Run the following to find the location of the file.
+
+	which virtualenv
+
+Take the output from the above, add "wrapper.sh" to the end and place it in your
+shell's RC file. As an example, if the result of 'which virtualenv' gives you
+'/usr/local/bin' then you place the following in your shell's RC file:
+
     source /usr/local/bin/virtualenvwrapper.sh
 
-Similarly, the default virtualenv environment that this script creates for you
+If you have a hard time finding the location of the virtualenvwrapper script 
+with the above method you can also run the following. Be aware that this could
+take a while to finish.
+
+	find / -name "virtualenvwrapper.sh"
+
+The default virtualenv environment that this script creates for you
 to use during OCW work is called "ocw". Whenever you want to work on OCW
 tasks be sure to run
 
