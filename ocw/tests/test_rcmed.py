@@ -21,8 +21,13 @@ import numpy
 import pickle
 import ocw.data_source.rcmed as rcmed
 
+class CustomAssertions:
+    # Custom Assertions to handle Numpy Arrays
+    def assert1DArraysEqual(self, array1, array2):
+        self.assertSequenceEqual(tuple(array1), tuple(array2))
 
-class test_rcmed(unittest.TestCase):
+
+class test_rcmed(unittest.TestCase, CustomAssertions):
 
 
     def setUp(self):
@@ -41,9 +46,10 @@ class test_rcmed(unittest.TestCase):
         self.lats=numpy.arange(50.5, 70, 1)
         self.lons=numpy.arange(1.5, 15, 1)
         #In this parameter, two days of 10/20 and 10/21 have been missed.
-        self.times=[datetime.datetime(2002, 8, 31) + datetime.timedelta(days=x) for x in range(0, 62)]
-        self.times.remove(datetime.datetime(2002, 10, 20))
-        self.times.remove(datetime.datetime(2002, 10, 21))
+        self.times_list=[datetime.datetime(2002, 8, 31) + datetime.timedelta(days=x) for x in range(0, 62)]
+        self.times_list.remove(datetime.datetime(2002, 10, 20))
+        self.times_list.remove(datetime.datetime(2002, 10, 21))
+        self.times = numpy.array(self.times_list)
         self.values = pickle.load( open( "parameters_values.p", "rb" ) )
         self.param_metadata_output = pickle.load( open( "parameters_metadata_output.p", "rb" ) ) 
 
@@ -65,22 +71,22 @@ class test_rcmed(unittest.TestCase):
 
     def test_function_parameter_dataset_lats(self):
         rcmed.urllib2.urlopen = self.return_text
-        self.assertTrue(numpy.allclose(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).lats, self.lats))
+        self.assert1DArraysEqual(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).lats, self.lats)
 
 
     def test_function_parameter_dataset_lons(self):
         rcmed.urllib2.urlopen = self.return_text
-        self.assertTrue(numpy.allclose(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).lons, self.lons))
+        self.assert1DArraysEqual(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).lons, self.lons)
 
 
     def test_function_parameter_dataset_times(self):
         rcmed.urllib2.urlopen = self.return_text
-        self.assertEqual(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).times, self.times)
+        self.assert1DArraysEqual(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).times, self.times)
 
 
     def test_function_parameter_dataset_values(self):
         rcmed.urllib2.urlopen = self.return_text
-        self.assertTrue(numpy.allclose(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).values, self.values))
+        self.assert1DArraysEqual(rcmed.parameter_dataset(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time, self.end_time).values.flatten(), self.values.flatten())
 
 
 if __name__ == '__main__':

@@ -84,7 +84,7 @@ def _reshape_values(values, unique_values):
 
     :param values: Raw values data
     :type values: numpy array
-    :param unique_values: Tuple of unique latitudes, longitudes, levels and times data.
+    :param unique_values: Tuple of unique latitudes, longitudes and times data.
     :type unique_values: Tuple 
     
     :returns: Reshaped values data
@@ -93,10 +93,9 @@ def _reshape_values(values, unique_values):
 
     lats_len = len(unique_values[0])
     lons_len = len(unique_values[1])
-    levels_len = len(unique_values[2])
-    times_len = len(unique_values[3])
+    times_len = len(unique_values[2])
 
-    values = values.reshape(levels_len, times_len, lats_len, lons_len)
+    values = values.reshape(times_len, lats_len, lons_len)
 
     return values
 
@@ -110,11 +109,11 @@ def _calculate_time(unique_times, time_step):
     :type time_step: String
 
     :returns: Unique datetime objects of time data
-    :rtype: List
+    :rtype: Numpy array
     '''
 
     time_format = "%Y-%m-%d %H:%M:%S"
-    unique_times = [datetime.strptime(time, time_format) for time in unique_times]
+    unique_times = np.array([datetime.strptime(time, time_format) for time in unique_times])
     #There is no need to sort time.
     #This function may required still in RCMES
     #unique_times.sort()
@@ -123,28 +122,25 @@ def _calculate_time(unique_times, time_step):
     return unique_times
 
 
-def _make_unique(lats, lons, levels, times):
+def _make_unique(lats, lons, times):
     '''Find the unique values of input data.
 
     :param lats: lats
     :type lats: Numpy array
     :param lons: lons
     :type lons: Numpy array
-    :param levels: levels
-    :type levels: Numpy array
     :param times: times
     :type times: Numpy array
 
-    :returns: Unique numpy arrays of latitudes, longitudes, levels and times
+    :returns: Unique numpy arrays of latitudes, longitudes and times
     :rtype: Tuple
     '''
 
     unique_lats = np.unique(lats)
     unique_lons = np.unique(lons)
-    unique_levels = np.unique(levels)
     unique_times = np.unique(times)
 
-    return (unique_lats, unique_lons, unique_levels, unique_times)
+    return (unique_lats, unique_lons, unique_times)
 
 
 def _get_data(url):
@@ -153,8 +149,8 @@ def _get_data(url):
     :param url: url to query from database
     :type url: String
 
-    :returns: Latitudes, longitudes, levels, times and values data
-    :rtype: (list, list, list, list, list)
+    :returns: Latitudes, longitudes, times and values data
+    :rtype: (Numpy array, Numpy array, Numpy array, Numpy array)
     '''
 
     string = urllib2.urlopen(url)
@@ -165,7 +161,7 @@ def _get_data(url):
 
     lats = []
     lons = []
-    levels = []
+    #levels = []
     values = []
     times = []
 
@@ -173,11 +169,17 @@ def _get_data(url):
         row = data[i].split(',')
         lats.append(np.float32(row[0]))
         lons.append(np.float32(row[1]))
-        levels.append(np.float32(row[2]))
+        # Level is not currently supported in Dataset class.
+        #levels.append(np.float32(row[2]))
         times.append(row[3])
         values.append(np.float32(row[4]))
+    
+    lats = np.array(lats)
+    lons = np.array(lons)
+    times = np.array(times)
+    values = np.array(values)
 
-    return lats, lons, levels, times, values
+    return lats, lons, times, values
 
 
 def _beginning_of_date(time, time_step):
@@ -331,16 +333,11 @@ def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_l
     parameters_metadata = get_parameters_metadata()
     parameter_name, time_step, _, _, _, _, _= _get_parameter_info(parameters_metadata, parameter_id)
     url = _generate_query_url(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_lon, start_time, end_time, time_step)
-    lats, lons, levels, times, values = _get_data(url)
+    lats, lons, times, values = _get_data(url)
 
-    lats = np.array(lats)
-    lons = np.array(lons)
-    times = np.array(times)
-    values = np.array(values)
-
-    unique_lats_lons_levels_times = _make_unique(lats, lons, levels, times)
-    unique_times = _calculate_time(unique_lats_lons_levels_times[3], time_step)
-    values = _reshape_values(values, unique_lats_lons_levels_times)
+    unique_lats_lons_times = _make_unique(lats, lons, times)
+    unique_times = _calculate_time(unique_lats_lons_times[2], time_step)
+    values = _reshape_values(values, unique_lats_lons_times)
     values = _make_mask_array(values, parameter_id, parameters_metadata)
     
-    return Dataset(unique_lats_lons_levels_times[0], unique_lats_lons_levels_times[1], unique_times, values, parameter_name)
+    return Dataset(unique_lats_lons_times[0], unique_lats_lons_times[1], unique_times, values, parameter_name)
