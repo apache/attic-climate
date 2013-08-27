@@ -167,40 +167,13 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi=-999999999):
     return q2
 
 def create_mask_using_threshold(masked_array, threshold=0.5):
-    '''
-     Routine to create a mask, depending on the proportion of times with missing data.
-     For each pixel, calculate proportion of times that are missing data,
-     **if** the proportion is above a specified threshold value,
-     then mark the pixel as missing data.
+    """ 
+    This function has been moved to the ocw/dataset_processor module
+    """
+    from ocw import dataset_processor
+    mask = dataset_processor._rcmes_create_mask_using_threshold(masked_array, threshold)
 
-     Input::
-         masked_array - a numpy masked array of data (assumes time on axis 0, and space on axes 1 and 2).
-         threshold    - (optional) threshold proportion above which a pixel is marked as 'missing data'.
-         NB. default threshold = 50%
-
-     Output::
-         mymask       - a numpy array describing the mask. NB. not a masked array, just the mask itself.
-
-    '''
-
-
-    # try, except used as some model files don't have a full mask, but a single bool
-    #  the except catches this situation and deals with it appropriately.
-    try:
-        nT = masked_array.mask.shape[0]
-
-        # For each pixel, count how many times are masked.
-        nMasked = masked_array.mask[:, :, :].sum(axis=0)
-
-        # Define new mask as when a pixel has over a defined threshold ratio of masked data
-        #   e.g. if the threshold is 75%, and there are 10 times,
-        #        then a pixel will be masked if more than 5 times are masked.
-        mymask = nMasked > (nT * threshold)
-
-    except:
-        mymask = np.zeros_like(masked_array.data[0, :, :])
-
-    return mymask
+    return mask
 
 def calc_average_on_new_time_unit(data, dateList, unit='monthly'):
     '''
