@@ -16,7 +16,6 @@
 #
 
 from ocw import dataset as ds
-from toolkit import process
 
 import datetime
 import numpy as np
@@ -283,6 +282,41 @@ def _rcmes_spatial_regrid(spatial_values, lat, lon, lat2, lon2, order=1):
 
     return regridded_values
 
+def _rcmes_create_mask_using_threshold(masked_array, threshold=0.5):
+    '''Mask an array if percent of values missing data is above a threshold.
+
+    For each value along an axis, if the proportion of steps that are missing
+    data is above ``threshold`` then the value is marked as missing data.
+
+    ..note: The 0th axis is currently always used.
+
+    :param masked_array: Masked array of data
+    :type masked_array: Numpy Masked Array
+    :param threshold: (optional) Threshold proportion above which a value is
+        marked as missing data.
+    :type threshold: Float
+
+    :returns: A Numpy array describing the mask for masked_array.
+    '''
+
+    # try, except used as some model files don't have a full mask, but a single bool
+    #  the except catches this situation and deals with it appropriately.
+    try:
+        nT = masked_array.mask.shape[0]
+
+        # For each pixel, count how many times are masked.
+        nMasked = masked_array.mask[:, :, :].sum(axis=0)
+
+        # Define new mask as when a pixel has over a defined threshold ratio of masked data
+        #   e.g. if the threshold is 75%, and there are 10 times,
+        #        then a pixel will be masked if more than 5 times are masked.
+        mymask = nMasked > (nT * threshold)
+
+    except:
+        mymask = np.zeros_like(masked_array.data[0, :, :])
+
+    return mymask
+
 
 def _rcmes_calc_average_on_new_time_unit_K(data, dates, unit):
     """ Rebin 3d array and list of dates using the provided unit parameter
@@ -377,7 +411,7 @@ def _rcmes_calc_average_on_new_time_unit_K(data, dates, unit):
                 mask[timeunits!=myunit,:,:] = 1.0
                 # Calculate missing data mask within each time unit...
                 datamask_at_this_timeunit = np.zeros_like(data)
-                datamask_at_this_timeunit[:]= process.create_mask_using_threshold(data[timeunits==myunit,:,:],threshold=0.75)
+                datamask_at_this_timeunit[:]= _rcmes_create_mask_using_threshold(data[timeunits==myunit,:,:],threshold=0.75)
                 # Store results for masking later
                 datamask_store.append(datamask_at_this_timeunit[0])
                 # Calculate means for each pixel in this time unit, ignoring missing data (using masked array).
