@@ -168,7 +168,8 @@ def do_regrid(q, lat, lon, lat2, lon2, order=1, mdi=-999999999):
 
 def create_mask_using_threshold(masked_array, threshold=0.5):
     """ 
-    This function has been moved to the ocw/dataset_processor module
+    .. deprecated:: 0.3-incubating
+       Use :func:`ocw.dataset_processor._rcmes_create_mask_using_threshold` instead.
     """
     from ocw import dataset_processor
     mask = dataset_processor._rcmes_create_mask_using_threshold(masked_array, threshold)
