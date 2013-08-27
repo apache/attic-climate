@@ -288,7 +288,7 @@ def _rcmes_create_mask_using_threshold(masked_array, threshold=0.5):
     For each value along an axis, if the proportion of steps that are missing
     data is above ``threshold`` then the value is marked as missing data.
 
-    ..note: The 0th axis is currently always used.
+    ..note:: The 0th axis is currently always used.
 
     :param masked_array: Masked array of data
     :type masked_array: Numpy Masked Array
