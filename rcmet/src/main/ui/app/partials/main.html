@@ -23,9 +23,10 @@
     </form>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn btn-primary close">Close</a>
+    <a href="#" class="btn btn-warning close">Close</a>
   </div>
   </bootstrap-modal>
+<!-- END - Modal for evaluation settings -->
 
   <div class="row-fluid">
     <div class="span12">
@@ -66,6 +67,7 @@
                 <button class="btn btn-warning cancel" ng-click="close()">Close</button>
               </div>
             </div>
+            <!-- END - Modal for dataset selection -->
             <div class="row-fluid">
               <div class="span12">
               <hr />
@@ -108,9 +110,9 @@
                       <div class="span2 text-center">
                         {{dataset.latlonVals.latMax}}
                       </div>
-                      <div class="span2 text-center">East:</div>
+                      <div class="span2 text-center">West:</div>
                       <div class="span2 text-center">
-                        {{dataset.latlonVals.lonMax}}
+                        {{dataset.latlonVals.lonMin}}
                       </div>
                     </div>
                     <div class="row-fluid">
@@ -118,9 +120,9 @@
                       <div class="span2 text-center">
                         {{dataset.latlonVals.latMin}}
                       </div>
-                      <div class="span2 text-center">West:</div>
+                      <div class="span2 text-center">East:</div>
                       <div class="span2 text-center">
-                        {{dataset.latlonVals.lonMin}}
+                        {{dataset.latlonVals.lonMax}}
                       </div>
                     </div>
                   </div>

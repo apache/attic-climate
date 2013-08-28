@@ -39,32 +39,32 @@
 <div class="container">
   <div class="row-fluid">
     <div class="span12">
-	    <!-- Title -->
-	    <div class="row-fluid">
-	      <div class="span12">
-	      <br><br>
-	      <div id="header">
-	        <img id="header-img" src=""/>
-	        <h3 id="header-title">Project Name</h3>
-	        <h5 id="OCW-powered">Powered by Apache Open Climate Workbench</h5>
-	      </div>
-	      </div>
-	    </div>
-	    <!-- Navigation bar -->
-	    <div class="row-fluid">
-			<div class="navbar navbar-fixed-top">
-			  <div class="navbar-inner">
-				  <div class="container">
-				    <a class="brand" href="#">OCW UI</a>
-				    <ul class="nav">
-				      <li ng-class="{ active: $state.includes('main') }"><a href="#">Evaluate</a></li>
-				      <li ng-class="{ active: $state.includes('results') }"><a href="#/results">Results</a></li>
-				    </ul>
-				  </div>
-			  </div>
-			</div>
-	    </div>
-	</div>
+      <!-- Title -->
+      <div class="row-fluid">
+        <div class="span12">
+        <br><br>
+        <div id="header">
+          <img id="header-img" src=""/>
+          <h3 id="header-title">Project Name</h3>
+          <h5 id="OCW-powered">Powered by Apache Open Climate Workbench</h5>
+        </div>
+        </div>
+      </div>
+      <!-- Navigation bar -->
+      <div class="row-fluid">
+      <div class="navbar navbar-fixed-top">
+       <div class="navbar-inner">
+         <div class="container">
+           <a class="brand" href="#">OCW UI</a>
+           <ul class="nav">
+             <li ng-class="{ active: $state.includes('main') }"><a href="#">Evaluate</a></li>
+             <li ng-class="{ active: $state.includes('results') }"><a href="#/results">Results</a></li>
+           </ul>
+         </div>
+       </div>
+      </div>
+      </div>
+    </div>
   </div>
   <!-- Main Content -->
   <div id="main-container" class="container" ui-view ng-animate="{enter:'fade-enter'}"></div>
@@ -117,9 +117,9 @@
   <!--Filters-->
   <script src="js/filters/ISODateToMiddleEndian.js"></script>
 </body>
-<footer class="container well well-small" style="margin-top:10px">
-<div class="span4 offset1">
-<h6>Powered by Apache Open Climate Workbench</h6>
-</div>
+<footer class="container well well-small" style="margin-top: 40px">
+  <div class="span4 offset1">
+    <h6>Powered by Apache Open Climate Workbench</h6>
+  </div>
 </footer>
 </html>

@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
 **/
-  
 body {
+	
 }
 
 #header-img {
+	
 }
 
 #header-title {
+	
 }
 
 #OCW-powered {
@@ -31,23 +33,19 @@ body {
 }
 
 #main-container {
-	margin-top:80px;
-	min-height:400px;
-	height:auto !important;
-	height:400px; 
+	margin-top: 80px;
+	min-height: 400px;
+	height: auto !important;
+	height: 400px;
 }
 
-#datasetDiv
-{
+#datasetDiv {
 	height: 750px;
 	overflow-y: auto;
 	overflow-x: hidden;
 }
 
-#map 
-{
-	height: 500px;
-}
+#map { height: 500px; }
 
 /* Small preview map that is displayed alongside dataset information */
 .preview-map {
@@ -55,55 +53,56 @@ body {
 	width: 100px;
 }
 
-.small-alert 
-{
+.small-alert {
 	font-size: 12px;
 	color: green;
 	margin-top: 4px;
 	margin-left: 10px;
 }
 
-.colorSquare
-{
+.colorSquare {
 	margin-top: 3px;
-	height: 10px; 
+	height: 10px;
 	width: 10px;
 }
 
-ul 
-{
-	list-style-type: none;
-}
+ul { list-style-type: none; }
 
-.no-color-link {color:#000000;}
-.no-color-link:hover {color:#000000; text-decoration: none;}     
-.no-color-link:visited {color:#000000;}     
-.no-color-link:active {color:#000000;}     
+.no-color-link { color: #000000; }
+.no-color-link:hover { color: #000000; text-decoration: none; }
+.no-color-link:visited { color: #000000; }
+.no-color-link:active { color: #000000; }
 
 /* Remove the grayed out close button in modal headers */
-.modal-header .close {
-	opacity: 1;
-}
+.modal-header .close { opacity: 1; }
 
 /* Remove the grayed out close button in modal footers */
-.modal-footer .close {
-	opacity: 1;
-}
+.modal-footer .close { opacity: 1; }
 
 /** 
   * Timeline 
-  */ 
+  */
 div#OCWtimeline {
 	margin-top: 20px;
 	padding-bottom: 20px;
 }
+
 div.timeline-event {
 	border: none;
 	background: none;
 }
-div.timeline-event-content {
-	margin: 0;
+
+div.timeline-event-content { margin: 0; }
+
+div.ocw-bar { height: 5px; }
+
+/**
+  * Results
+  */
+#results-sidebar {
+	min-height: 400px;
+	height: auto !important;
+	height: 400px;
 }
-div.ocw-bar {
-	height: 5px;
-}
+
+#results-sidebar-header { font-size: 14px; }
