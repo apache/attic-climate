@@ -117,6 +117,13 @@ class TestEvaluation(unittest.TestCase):
         self.assertEqual(len(self.eval.metrics), 0)
         self.eval.add_metrics([Bias(), Bias()])
         self.assertEqual(len(self.eval.metrics), 2)
+    
+    def test_bias_output_shape(self):
+        bias_eval = Evaluation(self.test_dataset, [self.another_test_dataset], [Bias()])
+        bias_eval.run()
+        input_shape = tuple(self.test_dataset.values.shape)
+        bias_results_shape = tuple(bias_eval.results[0][0].shape)
+        self.assertEqual(input_shape, bias_results_shape)
 
 if __name__  == '__main__':
     unittest.main()

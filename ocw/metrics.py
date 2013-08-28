@@ -46,8 +46,8 @@ class Metric():
                 binary, then datasets[0] contains the reference dataset and \
                 datasets[1] contains the target dataset.
         :type datasets: Tuple
-        :returns: A list containing the results of running the metric.
-        :trype: List
+        :returns: An Array containing the results of running the metric.
+        :trype: Numpy Array
         '''
 
 
@@ -72,11 +72,11 @@ class Bias(Metric):
                 reference dataset is given in datasets[0] and the target \
                 dataset is given in datasets[1].
         :type datasets: Tuple
-        :returns: A list containing the difference between the reference \
+        :returns: An array containing the difference between the reference \
                 dataset and the target dataset.
-        :rtype: List
+        :rtype: Numpy Array
         '''
-        return [datasets[0].values - datasets[1].values]
+        return datasets[0].values - datasets[1].values
 
 
 class TemporalStdDev(Metric):
@@ -99,7 +99,7 @@ class TemporalStdDev(Metric):
         :param datasets: The datasets on which to calculate the temporal \
                 std. dev. in datasets[0].
         :type datasets: Tuple
-        :returns: A list containing the temporal std. dev.
-        :rtype: List
+        :returns: An array containing the temporal std. dev.
+        :rtype: Numpy Array
         '''
         return datasets[0].values.std(axi=0, ddof=1)

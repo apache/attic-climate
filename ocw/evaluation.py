@@ -222,14 +222,14 @@ class Evaluation(object):
             logging.warning(error)
             return
 
-        if _should_run_regular_metrics():
+        if self._should_run_regular_metrics():
             if self.subregions:
-                self.results = _run_subregion_evaluation()
+                self.results = self._run_subregion_evaluation()
             else:
-                self.results = _run_no_subregion_evaluation()
+                self.results = self._run_no_subregion_evaluation()
 
-        if _should_run_unary_metrics():
-            self.unary_results = _run_unary_metric_evaluation()
+        if self._should_run_unary_metrics():
+            self.unary_results = self._run_unary_metric_evaluation()
 
     def _evaluation_is_valid(self):
         '''Check if the evaluation is well-formed.
@@ -240,8 +240,8 @@ class Evaluation(object):
         * If there is a regular metric there must be a reference dataset and
             at least one target dataset.
         '''
-        run_reg = _should_run_regular_metrics()
-        run_unary = _should_run_unary_metrics()
+        run_reg = self._should_run_regular_metrics()
+        run_unary = self._should_run_unary_metrics()
         reg_valid = self.ref_dataset != None and len(self.target_datasets) > 0
         unary_valid = self.ref_dataset != None or len(self.target_datasets) > 0
 
@@ -254,13 +254,13 @@ class Evaluation(object):
         else:
             return false
 
-    def _should_run_regular_metrics():
+    def _should_run_regular_metrics(self):
         return len(self.metrics) > 0
 
-    def _should_run_unary_metrics():
+    def _should_run_unary_metrics(self):
         return len(self.unary_metrics) > 0
 
-    def _run_subregion_evaluation():
+    def _run_subregion_evaluation(self):
         results = []
         for target in self.target_datasets:
             results.append([])
@@ -276,16 +276,17 @@ class Evaluation(object):
                     results[-1][-1].append(run_result)
         return results
 
-    def _run_no_subregion_evaluation():
+    def _run_no_subregion_evaluation(self):
         results = []
         for target in self.target_datasets:
             results.append([])
             for metric in self.metrics:
-                run_result = [metric.run(self.ref_dataset, target)]
+                datasets = (self.ref_dataset, target)
+                run_result = metric.run(datasets)
                 results[-1].append(run_result)
         return results
 
-    def _run_unary_metric_evaluation():
+    def _run_unary_metric_evaluation(self):
         unary_results = []
         for metric in self.unary_metrics:
             unary_results.append([])
