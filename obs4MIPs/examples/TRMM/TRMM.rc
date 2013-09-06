@@ -1,0 +1,42 @@
+#
+# TRMM resource file for CMIP5 conversion
+#
+
+# Program will loop on years and substiute in template.
+# Here we are creating decadal files using a grads ctl file
+#
+years=1998
+file_template        = "v7/TRMM_%s.lst"
+
+experiment_id        = 'obs'
+institution          = 'NASA Goddard Space Flight Center, Greenbelt MD, USA'
+calendar             = 'gregorian'
+institute_id         = 'NASA-GSFC'
+model_id             = 'Obs-TRMM'
+source               = 'Global Precipitation Climatology Project (TRMM)'
+contact              = "George Huffman george.j.huffman@nasa.gov"
+references           = 'http://science.nasa.gov/missions/trmm/'
+instrument           = 'TRMM'
+processing_version   = '7'
+processing_level     = 'L3'
+mip_specs            = 'CMIP5'
+data_structure       = 'grid'
+source_type          = 'satellite_retrieval_and_gauge_analysis'
+# used for filename (up to _)
+source_fn            = ''
+source_id            = 'TRMM'
+realm                = 'atmos'
+obs_project          = 'TRMM'
+inpath               = "Tables"
+table                = 'CMIP5_Amon_obs'
+cmor_var             = '[\pr\]'      
+level                = '[\\]'
+equation             = '[\(data*2.78e-4)\]'
+inpath               = 'Tables'
+original_var         = '[\pcp\]'
+original_units       = '[\kg m-2 s-1\]'
+OutputTimeUnits      = "months since 1900-1-1"
+InputTimeUnits       = "internal"
+SetGlbAttributes     = "[(\global\,rc[\product\]),(\processing_version\,rc[\processing_version\]),(\title\,\obs-TRMM output prepared for obs4MIPs NASA-GSFC observations\)]"
+DelGlbAttributes     = "[\realization\,\experiment\,\physics_version\,\initialization_method\]"	
+

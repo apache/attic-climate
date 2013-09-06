@@ -1,0 +1,20 @@
+
+-----------
+About
+-----------
+obs4MIPs.py, is a front end to an existing free software package, CMOR2 (Climate Model Output Rewriter), written by Lawrence Livermore National Laboratory (LLNL), and reads in a multitude of standard data formats, such as netcdf3, netcdf4, Grads control files, Matlab data files or a list of netcdf files, and converts the data into the CMIP5 data format to allow publication on the Earth System Grid Federation (ESGF) data node.
+
+---------------
+Examples
+--------------
+Convert trmm data to CMIP5 format 
+obs4MIPs.py -r trmm.rc
+
+Convert trmm data to CMIP5 format using excel spreadsheet 
+obs4MIPs.py -r ecmwf.rc
+
+--------------
+Installation 
+---------------
+Installation and documentation is provided in the INSTALLATION file.
+

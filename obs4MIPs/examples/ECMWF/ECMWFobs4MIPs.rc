@@ -1,0 +1,45 @@
+#
+# ECMWF resource file for CMIP5 conversion
+#
+# source_fn = 'SYNOPTIC'  will be replaced by 00z or 12z for ECMWF ERA-iterim files
+#
+# Program will loop on years and substiute in template.
+#
+years='2013'
+file_template        = "Y{0}/ecint_prs_{0}.nc"
+
+experiment_id        = 'obs'
+institution          = 'European Centre for Medium-Range Weather Forecasts'
+calendar             = 'gregorian'
+institute_id         = 'ECMWF'
+model_id             = 'Obs-IFS-Cy31r2'
+source               = 'ERA Interim, Synoptic Monthly Means, Full Resolution'
+contact              = "ECMWF: Dick Dee (dick.dee@ecmwf.int)"
+references           = 'http://www.ecmwf.int'
+mip_specs            = 'CMIP5'
+data_structure       = 'grid'
+source_type          = 'reanalysis'
+# used for filename (up to _)
+source_fn            = 'ECMWF'
+source_id            = 'ERA-interim'
+realm                = 'atmos'
+inpath               = "Tables"
+table                = 'CMIP5_Amon_obs'
+excel_file           = 'ecmwf_table_obs4MIPs.xls'
+
+# ------------------------------------
+# Used to create direcgtory structure
+# ------------------------------------
+obs_project          = 'obs4MIPs'
+instrument           = 'assimilation'
+processing_version   = '1.0'
+processing_level     = 'level-4'
+
+# --------------------------------------
+# Post-processing
+# --------------------------------------
+DelGlbAttributes     = "[\realization\,\experiment\,\physics_version\,\initialization_method\,\experiment_id\,\modeling_realm\,\instrument\,\processing_version\,\processing_level\,\obs_project\]"	
+SetGlbAttributes     = "[(\title\,\ECMWF Reanalysis output prepared for obs4MIPs \)]"
+InputTimeUnits       = "internal"
+OutputTimeUnits      = "months since 1900-01-01"
+

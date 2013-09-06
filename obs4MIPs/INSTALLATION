@@ -1,0 +1,275 @@
+INSTALLATION
+============
+
+Pre-requisite
+==============
+
+Python Magic
+-------------
+This package is used to identify the input file type.
+https://pypi.python.org/pypi/python-magic/
+ python setup.py install --prefix=/whatever/directory/
+
+cdat_lite, full CDAT or UVCDAT installation
+--------------------------------------------
+This package is mainly used to read grads CTL files.
+https://pypi.python.org/pypi/cdat-lite
+
+    Download cdat_lite
+    -------------------
+    http://ndg.nerc.ac.uk/dist/
+
+http://uv-cdat.org
+
+
+cmor2
+-----
+Main package used to convert data into CMIP5 file format using Python.
+
+http://www2-pcmdi.llnl.gov/cmor/download/python setup.py install --prefix=/whatever/directory/
+
+Download the required libraries following the installation procedure.
+--------------------------------------------
+http://www2-pcmdi.llnl.gov/cmor/installation
+
+The CMOR2 requires external libraries: the zlib, netCDF-4.0 , HDF5 and UDUNITS-2 packages to be installed first.
+
+        zlilb
+        HDF5 library
+        netCDF4 library
+        Unidata units library - version 2
+        uuid library
+
+xlrd
+----
+Needed to read Excel Spreadsheet .xls format 97 or 95.
+https://pypi.python.org/pypi/xlrd
+
+NetCDF4-Python
+--------------
+NetCDF4 package from google-code. 
+http://code.google.com/p/netcdf4-python/
+
+ 
+
+RESSOURCE file documentation
+=============================
+
+In order to run osb4MIPs, the first thing to do is to create a resource file giving information about your original data. The resource files contain all Global Attributes and information needed to convert a variable to a CMIP5 variable.  
+
+Please refer to the section “Example of TRMM data obs4MIPs resource file” to follow this example
+
+The parameters “file_template” and “years” are used to find files that you want to process. The program will understand matab/grads/netCDF file format as well as a filelist containing files in these specified formats.
+
+Here is an example to convert TRMM data using a filelist:
+
+TRMM.rc
+…
+years=199,200,201
+file_template        = "v7/TRMM_%sx.lst"
+…
+
+The program will first look for files that match the file template:
+v7/TRMM_199x.lst
+v7/TRMM_200x.lst
+v7/TRMM_201x.lst
+
+Each file include a “filelist” that will be read and aggregated in time.
+In this case we want 1 decade per CMIP5 variable.
+
+i.e.
+cat v7/TRMM_199x.lst
+v7/3B43.19980101.7.nc
+v7/3B43.19980201.7.nc
+….
+v7/3B43.19991201.7.nc
+
+
+
+The resource files specifies all Global Attributes that need to be added to the netCDF Files.
+
+The CMIP5 table has to be in the directory set by the key “inpath”.
+The CMIP5 table name is set using the key “Table”.
+
+If the original file has internal time units, you can set the “InputTimeUnits” to “internal”.  You can also set it to any time units that correspond to your input file.
+
+The key “OutputTimeUnits” will be used to convert the time to the request unit.  ESGF requires different time values for a specific experiment, so make sure that you have unique time values in all your files.  It is not appropriate to start all the time values at “0” and change the time units for each file. ESGF use the file time values, so there will be confusion in the system.
+
+DelGlbAttributes is used to remove global attributes that are present in the original files that you no longer need in the final files. 
+
+SetGlbAttributes is used to add new global attributes needed in the final files.  To add a new global attribute, you need first to create a parameter and assign this attribute using this new parameter in form of a Python list.
+
+i.e  
+processing_version   = '7'
+SetGlbAttributes     = "[(\processing_version\,rc[\processing_version\])]”
+
+The program will ingest all the resources into a Python dictionary named “rc”, so rc[“processing_version”] will correspond to the value ‘7’.   
+NOTE:  Quotes in the resource files are replace by a ‘\’ character in the Python list.   A parser will replace all the ‘\’ for the corresponding ‘“’ character and create a global attributes which will follow the (key,value) pair.  In this case, Python will create a netCDF attribute that will correspond to:  
+
+:processing_version = "7"
+
+
+Example of TRMM data obs4MIPs resource file
+============================================
+#
+# TRMM resource file for CMIP5 conversion
+#
+
+# Program will loop on years and substitute in template.
+# Here we are creating decadal files using netcdf files
+#
+years=199,200,201
+#
+# Can be a grads, matlab, netCDF or a list of files.
+#
+file_template        = "v7/TRMM_%sx.lst"
+#
+# CMIP5 experiment ID that match the Amon Table. 
+# for obs4MIPs, all experiment_id are set to “obs”
+#
+experiment_id        = 'obs'
+institution          = 'NASA Goddard Space Flight Center, Greenbelt MD, USA'
+#
+# Calendar is used by CMOR2
+#
+calendar             = 'gregorian'
+institute_id         = 'NASA-GSFC'
+model_id             = 'Obs-TRMM'
+source               = 'Global Precipitation Climatology Project (TRMM)'
+contact              = "George Huffman george.j.huffman@nasa.gov"
+references           = 'http://science.nasa.gov/missions/trmm/'
+instrument           = 'TRMM'
+processing_version   = '7'
+processing_level     = 'L3'
+mip_specs            = 'CMIP5'
+data_structure       = 'grid'
+source_type          = 'satellite_retrieval_and_gauge_analysis'
+#
+# source_fn will be add to the filename (up to first _ character)
+# source_fn can be set to “SYNOPTIC”, to fetch the synoptic time
+# from the filename. The program will extract 2 characters before
+# “z.”  i.e.  (TRMM_1990_03z.nc) rc[“SYNOPTIC”] = ‘03’
+source_fn            = ''
+source_id            = 'TRMM'
+#
+# CMOR2 table realm
+#
+realm                = 'atmos'
+obs_project          = 'TRMM'
+#
+# CMOR2 table path
+#
+inpath               = "Tables"
+#
+# CMOR2 table.
+#
+table                = 'CMIP5_Amon_obs'
+#
+# CMOR variable
+#
+cmor_var             = '[\pr\]'
+#
+# If we have 4D data (time, level, lat, lon )
+#
+level                = '[\\]'
+#
+# Python will evaluate this equation to convert the units to kg m-2 s-1
+#
+equation             = '[\(data*2.78e-4)\]'
+#
+# Original variable to read
+#
+original_var         = '[\pcp\]'
+#
+# Since we have an equation, we can say that the original units are now # the same as the CMIP5 units.
+#
+original_units       = '[\kg m-2 s-1\]'
+#
+# Time will be converted to these new time units.
+# The output file will contain these new units in the time variable.
+#
+OutputTimeUnits      = "months since 1900-1-1"
+#
+# Use internal time units found in the file
+#
+InputTimeUnits       = "internal"
+#
+# Define all new Global Attributes as a Python list of tuple. 
+# The \ character will be replaced internally by “.
+#   :global=rc[“product”] (found in the Amon table)
+#   :processing_version=rc[“processing_version”]
+#   :title=”obs-TRMM output prepared for obs4MIPs 
+#           NASA-GSFC observations”
+# 
+SetGlbAttributes     = "[(\global\,rc[\product\]),(\processing_version\,rc[\processing_version\]),(\title\,\obs-TRMM output prepared for obs4MIPs NASA-GSFC observations\)]"
+#
+# Delete the following Global Attributes found in the original files
+# and that are no longer valid for obs4MIPs.
+#
+DelGlbAttributes     = "[\realization\,\experiment\,\physics_version\,\initialization_method\]"
+
+
+Create variables match using Excel spreadsheet
+----------------------------------------------
+It is possible to create a excel spreadsheet to create matching variable from the original file to CMIP5.
+
+Add the parameter “excel_file” in the resource file and point it to your Excel spreadsheet file.  Your excel file will replace the parameters: cmor_var, original_var, origina_units, level and equation.  So you should not have those in your resource file if you use “excel_file” parameter.  This was developped in order to make the process of creating many variables at once more readable.
+
+The Excel spreadsheet needs to be saved in “xls” format “97” or “95” which are understood by the Python package ‘xlrd’.  The program looks 
+for the sheet named “Variables”
+
+Column 0 corresponds to “cmor_var”
+Column 1 corresponds to “original_var”
+Column 2 corresponds to “original_units”
+Column 3 corresponds to “level”
+Column 6 corresponds to “equation”
+
+ 
+
+Here is an example of a “Variables” excel sheet.
+
+obs4MIPs ECMWF
+CMOR Variable Name	User Variable Name 	User Units	Height
+Var.name	Positive Up/Down	Relative Path to Data	equation
+ta	t	K	levelist			data
+ua	u	m s-1	levelist			data
+va	v	m s-1	levelist			data
+hur	r	%	levelist			data
+hus	q	%	levelist			data
+
+
+How to run obs4MIPs.py
+========================
+
+Set you PYTHONPATH to your corresponding Python package.
+
+./obs4MIPS_process.py [-h] -r resource
+   resource:   File containing Global attributes
+
+
+i.e. ./obs4MIPs_process.py –r TRMM.rc
+Working on variable pcp 
+reading v7/3B43.19980201.7.nc
+reading v7/3B43.19980301.7.nc
+reading v7/3B43.19980401.7.nc
+reading v7/3B43.19980501.7.nc
+reading v7/3B43.19980601.7.nc
+reading v7/3B43.19980701.7.nc
+…
+obs4MIPs/observations/NASA-GSFC/Obs-TRMM/obs/mon/atmos/pr/r1i1p1/pr_Amon_obs_Obs-TRMM_obs_r1i1p1_199801-199912.nc
+Deleting attribute: realization
+Deleting attribute: experiment
+Deleting attribute: physics_version
+Deleting attribute: initialization_method
+Assigning attribute (global,observations)
+Assigning attribute (processing_version,7)
+Assigning attribute (title,obs-TRMM output prepared for obs4MIPs NASA-GSFC observations)
+obs4MIPs/observations/NASA-GSFC/Obs-TRMM/obs/mon/atmos/pr/r1i1p1/pr_Amon_obs_Obs-TRMM_obs_r1i1p1_199801-199912.nc
+NASA-GSFC/TRMM/obs4MIPs/observations/atmos/pr/mon/grid/NASA-GSFC/TRMM/V7/pr_TRMM-L3_v7_199801-199912.nc
+
+
+
+
+
+
+
