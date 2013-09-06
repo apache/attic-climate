@@ -176,6 +176,10 @@ def draw_taylor_diagram(results, names, refname, fname, fmt='png',
     fig.dpi = 300
     for i, data in enumerate(results):
         rect = gridshape + (i + 1,)
+        # Convert rect to string form as expected by TaylorDiagram constructor
+        rect = str(rect[0]) + str(rect[1]) + str(rect[2])
+
+        # Create Taylor Diagram object
         dia = TaylorDiagram(1, fig=fig, rect=rect, label=refname, radmax=radmax)
         for i, (stddev, corrcoef) in enumerate(data):
             dia.add_sample(stddev, corrcoef, marker='$%d$' % (i + 1), ms=6, 

@@ -102,17 +102,28 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 	$scope.runEvaluation = function() {
 		$scope.runningEval = true;
 
-		// TODO
-		// Currently this has the 1 model, 1 observation format hard coded in. This shouldn't
-		// be the long-term case! This needs to be changed!!!!!!!!
-		var obsIndex = -1,
-			modelIndex = -1;
+        // Containers for dataset information
+		var obsDatasetIds = [],
+		    obsDatasetParameterIds = [],
+			modelDatasetIds = [],
+			modelDatasetParameterIds = [],
+			modelDatasetTimes = [],
+			modelDatasetLats = [],
+			modelDatasetLons = [];
 
+        // Populate containers with information for each selected dataset
 		for (var i = 0; i < $scope.datasets.length; i++) {
-			if ($scope.datasets[i]['isObs'] == 1)
-				obsIndex = i;
-			else
-				modelIndex = i;
+		    console.log($scope.datasets[i].id)
+			if ($scope.datasets[i]['isObs'] == 1) {
+				obsDatasetIds.push($scope.datasets[i].datasetId)
+				obsDatasetParameterIds.push($scope.datasets[i].id)
+			} else {
+				modelDatasetIds.push($scope.datasets[i].id)
+				modelDatasetParameterIds.push($scope.datasets[i].param)
+				modelDatasetTimes.push($scope.datasets[i].time)
+				modelDatasetLats.push($scope.datasets[i].lat)
+				modelDatasetLons.push($scope.datasets[i].lon)
+			}
 		}
 
 		// TODO At the moment we aren't running all the metrics that the user selected. We're only
@@ -129,37 +140,35 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			}
 		};
 
+        // Prepare information to send to backend service
 		var data = {params: { 
-			'obsDatasetId'     : $scope.datasets[obsIndex]['id'],
-			'obsParameterId'   : $scope.datasets[obsIndex]['param'],
+			'obsDatasetIds'    : obsDatasetIds,
+			'obsParameterIds'  : obsDatasetParameterIds,
+			
 			'startTime'        : $scope.displayParams.start + " 00:00:00",
 			'endTime'          : $scope.displayParams.end + " 00:00:00",
 			'latMin'           : $scope.displayParams.latMin,
 			'latMax'           : $scope.displayParams.latMax,
 			'lonMin'           : $scope.displayParams.lonMin,
 			'lonMax'           : $scope.displayParams.lonMax,
-			'filelist'         : $scope.datasets[modelIndex]['id'],
-			'modelVarName'     : $scope.datasets[modelIndex]['param'],
-			'modelTimeVarName' : $scope.datasets[modelIndex]['time'],
-			'modelLatVarName'  : $scope.datasets[modelIndex]['lat'],
-			'modelLonVarName'  : $scope.datasets[modelIndex]['lon'],
-			'regridOption'     : 'model',
+			
+			'filelist'         : modelDatasetIds,
+			'modelVarName'     : modelDatasetParameterIds,
+			'modelTimeVarName' : modelDatasetTimes,
+			'modelLatVarName'  : modelDatasetLats,
+			'modelLonVarName'  : modelDatasetLons,
+			
+			'regridOption'     : ((evaluationSettings.getSettings().spatialSelect.isObs) ? 'obs' : 'model'),
+			'regridBasis'      : evaluationSettings.getSettings().spatialSelect.id,
 			'timeRegridOption' : evaluationSettings.getSettings().temporal.selected,
-			'metricOption'     : metricToRun,
+			'metricOption'     : metricToRun,   // Should be a list of metrics to run
+			'subregionFile'    : evaluationSettings.getSettings().subregionFile,
 			'callback'         : 'JSON_CALLBACK',
 		}};
 
 		$http.jsonp($rootScope.baseURL + '/rcmes/run/', data).
 		success(function(data) {
-			var comp = data['comparisonPath'].split('/');
-			var model = data['modelPath'].split('/');
-			var obs = data['obsPath'].split('/');
 			var evalWorkDir = data['evalWorkDir'];
-
-			$rootScope.evalResults = {};
-			$rootScope.evalResults.comparisonPath = comp[comp.length - 1];
-			$rootScope.evalResults.modelPath = model[model.length - 1];
-			$rootScope.evalResults.obsPath = obs[obs.length - 1];
 
 			$scope.runningEval = false;
 
@@ -170,6 +179,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 					window.location = "#/results";
 				}
 			}, 100);
+			
 		}).error(function() {
 			$scope.runningEval = false;
 		});

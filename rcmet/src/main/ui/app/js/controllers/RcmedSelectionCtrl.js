@@ -71,9 +71,10 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 
 		newDataset['isObs'] = 1;
 		// Save the dataset id (the important part) and name (for display purposes)
-		newDataset['id'] = $scope.datasetSelection['dataset_id'];
+		newDataset['datasetId'] = $scope.datasetSelection['dataset_id'];
 		newDataset['name'] = $scope.datasetSelection['longname'];
 		// Save the parameter id (the important part) and name (for display purposes)
+		newDataset['id']    = $scope.parameterSelection['parameter_id'];
 		newDataset['param'] = $scope.parameterSelection['parameter_id'];
 		newDataset['paramName'] = $scope.parameterSelection['longname'];
 		// Save the (fake) lat/lon information. We test with the TRMM dataset. RCMED currently

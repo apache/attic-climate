@@ -325,7 +325,8 @@ def prep_data(settings, obsDatasetList, gridBox, modelList):
         # if everything's fine, append the spatially and temporally regridded data in the obs data array (obsData)
         regridMdlData.append(mData)
 
-    modelData = ma.array(regridMdlData)
+    modelData  = ma.array(regridMdlData)
+    modelTimes = newMdlTimes
 
     if (precipFlag == True) & (mvUnit == 'KG M-2 S-1'):
         print 'convert model variable unit from mm/s to mm/day'

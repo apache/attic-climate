@@ -15,11 +15,11 @@
     <select ng-model="settings.temporal.selected" ng-options="opt for opt in settings.temporal.options"></select>
     <hr />
     <h4>Select which dataset to use as the grid base.</h4>
-    <select ng-model="settings.spatialSelect" ng-options="dataset.name for dataset in datasets"></select>
+    <select ng-model="settings.spatialSelect" ng-options="dataset as dataset.name for dataset in datasets"></select>
     <hr />
     <h4>Select a file which will define the bounds of subregions.</h4>
     <form class="form-inline" autocomplete="off">
-      <input id="subregionFileInput" predictive-file-browser-input ng-model="filePathInput" type="text" class="input-xlarge" autocomplete="off" />
+      <input id="subregionFileInput" predictive-file-browser-input ng-model="settings.subregionFile" type="text" class="input-xlarge" autocomplete="off" />
     </form>
   </div>
   <div class="modal-footer">

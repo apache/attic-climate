@@ -1002,39 +1002,45 @@ def make_list_of_era_surf_files(firstTime, lastTime):
     return filenamelist
 
 
-#
-
 def assign_subRgns_from_a_text_file(infile):
-    # Read pre-fabricated sugregion information from a text file
-    # Note: python indexing includes the beginning point but excludes the ending point
-    f = open(infile, 'r')
-    for i in np.arange(8):
-        string = f.readline()
-        print 'Line ', i, ': Content ', string
-    string = f.readline()
-    numSubRgn = int(string[20:22])
-    print 'numSubRgn = ', numSubRgn
-    for i in np.arange(3):
-        string = f.readline()
-    # Read input string and extract subRegion info (name, longs, lats) from the string
+    '''
+    Extract subregion definitions from a text file
+    
+    Input: 
+        infile - string representing the path to the subregion definition config file
+        
+    Output:
+        numSubRgn - the number of subregion definitions extracted from the input file
+        subRgnName - a Numpy masked array of subregion names
+        subRgnLon0 - a Numpy masked array of subregion "Degrees East" values
+        subRgnLon1 - a Numpy masked array of subregion "Degrees West" values
+        subRgnLat0 - a Numpy masked array of subregion "Degrees North" values
+        subRgnLat1 - a Numpy masked array of subregion "Degrees South" values
+    '''
+    
+    # Parse subregions from provided file
+    subregions = readSubRegionsFile(infile)
+    numSubRgn  = len(subregions)
+    
+    print subregions
+    
+    # Define Numpy masked arrays to hold the subregion definition data
     subRgnName = []
     subRgnLon0 = ma.zeros((numSubRgn))
     subRgnLon1 = ma.zeros((numSubRgn))
     subRgnLat0 = ma.zeros((numSubRgn))
     subRgnLat1 = ma.zeros((numSubRgn))
+    
+    # Populate the arrays with the data extracted from the file
     for i in np.arange(numSubRgn):
-        string = f.readline()
-        subRgnName.append(string[0:19])
-        subRgnLon0[i] = float(string[30:37])
-        subRgnLon1[i] = float(string[40:47])
-        subRgnLat0[i] = float(string[50:55])
-        subRgnLat1[i] = float(string[60:65])
-    f.close()
-    print 'subRgnName: ', subRgnName
-    print 'subRgnLon0: ', subRgnLon0
-    print 'subRgnLon1: ', subRgnLon1
-    print 'subRgnLat0: ', subRgnLat0
-    print 'subRgnLat1: ', subRgnLat1
+        parts = region_parts[i]
+        subRgnName.append(parts[0].strip('"'))
+        subRgnLon0[i] = float(parts[1])
+        subRgnLon1[i] = float(parts[2])
+        subRgnLat0[i] = float(parts[3])
+        subRgnLat1[i] = float(parts[4])
+    
+    # Return the computed arrays
     return numSubRgn, subRgnName, subRgnLon0, subRgnLon1, subRgnLat0, subRgnLat1
 
 def createSubRegionObjectInteractively():
@@ -1379,3 +1385,29 @@ def select_metrics():
     
     return metricOption
 
+
+def msg(key=None, val=None, indent=0, returnResult=False):
+    ''' Output messages to stdout, with support for indentation 
+       and formatted printing of lists and dicts
+    '''
+    if key == None:
+        message = ' '*indent
+    else:
+        message = ' '*indent + (key if val == None else key + ':\t')
+    if isinstance(val, dict):
+        values = ['{0}: {1}'.format(' '*(indent+2) + str(k),
+            msg(val=v, indent=indent+2, returnResult=True))
+            for k,v in val.items()]
+        message += '\n' + '\n'.join(values)
+    elif isinstance(val, (list, tuple)):
+        values = [' '*(indent+2) +
+            msg(val=v, indent=indent+2, returnResult=True) 
+            for v in val]
+        message += '\n' + '\n'.join(values)
+    else:
+        if val != None:
+            message += str(val)
+    if returnResult:
+        return message
+    else:
+        print message
