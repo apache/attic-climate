@@ -4,7 +4,7 @@ import numpy as np
 
 import ocw.data_source.local as local
 import ocw.dataset_processor as dsp
-import ocw.evaluation as eval
+import ocw.evaluation as evaluation
 import ocw.metrics as metrics
 import ocw.plotter as plotter
 
@@ -64,7 +64,7 @@ bias = metrics.Bias()
 # Evaluation can take in multiple targets and metrics, so we need to convert
 # our examples into Python lists.  Evaluation will iterate over the lists
 print("Making the Evaluation definition")
-bias_evaluation = eval.Evaluation(knmi_dataset, [wrf_dataset], [bias])
+bias_evaluation = evaluation.Evaluation(knmi_dataset, [wrf_dataset], [bias])
 print("Executing the Evaluation using the object's run() method")
 bias_evaluation.run()
 
