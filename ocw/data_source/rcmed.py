@@ -74,6 +74,12 @@ def _make_mask_array(values, parameter_id, parameters_metadata):
         if each['parameter_id'].encode() == str(parameter_id):
             missing_values = each['missingdataflag'].encode()
             break
+    # Need to encode the string to proper dtype so the mask is applied
+    if 'float' in str(values.dtype):
+        missing_values = float(missing_values)
+    if 'int' in str(values.dtype):
+        missing_values = int(missing_values)
+
     values = ma.masked_array(values, mask=(values == missing_values))
 
     return values
