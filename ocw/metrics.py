@@ -51,6 +51,24 @@ class Metric():
         '''
 
 
+class UnaryMetric():
+    '''Abstract Base Class from which all unary metrics inherit.'''
+    __metaclass__ = ABCMeta
+
+    def __init__(self):
+        pass
+
+    @abstactmethod
+    def run(self, target_dataset):
+        '''Run the metric for a given target dataset.
+
+        :param target_dataset: The dataset on which the current metric will
+            be run.
+
+        :returns: The result of evaluating the metric on the target_dataset.
+        '''
+
+
 class Bias(Metric):
     '''Calculate the bias between a reference and target dataset.'''
 
