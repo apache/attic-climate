@@ -55,10 +55,7 @@ class UnaryMetric():
     '''Abstract Base Class from which all unary metrics inherit.'''
     __metaclass__ = ABCMeta
 
-    def __init__(self):
-        pass
-
-    @abstactmethod
+    @abstractmethod
     def run(self, target_dataset):
         '''Run the metric for a given target dataset.
 
@@ -66,6 +63,25 @@ class UnaryMetric():
             be run.
 
         :returns: The result of evaluating the metric on the target_dataset.
+        '''
+
+
+class BinaryMetric():
+    '''Abstract Base Class from which all binary metrics inherit.'''
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def run(self, ref_dataset, target_dataset):
+        '''Run the metric for the given reference and target datasets.
+
+        :param ref_dataset: The Dataset to use as the reference dataset when
+            running the evaluation.
+        :type ref_dataset: Dataset
+        :param target_dataset: The Dataset to use as the target dataset when
+            running the evaluation.
+
+        :returns: The result of evaluation the metric on the reference and 
+            target dataset.
         '''
 
 
