@@ -25,7 +25,8 @@ print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" % (knmi_dataset.v
 """ Step 2: Fetch an OCW Dataset Object from the data_source.rcmed module """
 print("Working with the rcmed interface to get CRU3.1 Daily-Max Temp")
 metadata = rcmed.get_parameters_metadata()
-cru_31 = [m for m in metadata if m['longname'] == "CRU3.1 Daily-Maximum Temperature"][0]
+
+cru_31 = [m for m in metadata if m['parameter_id'] == "39"][0]
 
 """ The RCMED API uses the following function to query, subset and return the 
 raw data from the database:
