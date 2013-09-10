@@ -272,7 +272,7 @@ class Evaluation(object):
                     new_ref = DSP.subset(subregion, self.ref_dataset)
                     new_tar = DSP.subset(subregion, target)
 
-                    run_result = [metric.run(new_ref, new_tar)]
+                    run_result = metric.run(new_ref, new_tar)
                     results[-1][-1].append(run_result)
         return results
 
