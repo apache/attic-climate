@@ -22,7 +22,12 @@ Classes:
 
 from abc import ABCMeta, abstractmethod
 
-class UnaryMetric():
+class Metric(object):
+    '''Base Metric Class'''
+    __metaclass__ = ABCMeta
+
+
+class UnaryMetric(Metric):
     '''Abstract Base Class from which all unary metrics inherit.'''
     __metaclass__ = ABCMeta
 
@@ -37,7 +42,7 @@ class UnaryMetric():
         '''
 
 
-class BinaryMetric():
+class BinaryMetric(Metric):
     '''Abstract Base Class from which all binary metrics inherit.'''
     __metaclass__ = ABCMeta
 
