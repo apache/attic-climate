@@ -29,8 +29,8 @@ class Metric():
     def __init__(self, unary=False):
         '''Default constructor for a Metric.
 
-        :param unary: Flag marking if the metric expects one or two operands. \
-                A "unary" metric processes only a single dataset at a time. \
+        :param unary: Flag marking if the metric expects one or two operands.
+                A "unary" metric processes only a single dataset at a time.
                 By default a metric is expected to take two datasets.
         :type unary: Bool
         '''
@@ -40,10 +40,10 @@ class Metric():
     def run(self, datasets):
         '''Run the metric for some given dataset(s)
 
-        :param datasets: The dataset(s) to be used in the current metric \
-                run. If this is a "unary" metric then datasets[0] contains \
-                the dataset to be used in the current run. If the metric is \
-                binary, then datasets[0] contains the reference dataset and \
+        :param datasets: The dataset(s) to be used in the current metric 
+                run. If this is a "unary" metric then datasets[0] contains 
+                the dataset to be used in the current run. If the metric is 
+                binary, then datasets[0] contains the reference dataset and 
                 datasets[1] contains the target dataset.
         :type datasets: Tuple
         :returns: An Array containing the results of running the metric.
@@ -68,11 +68,11 @@ class Bias(Metric):
         .. note::
            Overrides Metric.run()
 
-        :param datasets: The datasets to use in the current run. The \
-                reference dataset is given in datasets[0] and the target \
+        :param datasets: The datasets to use in the current run. The 
+                reference dataset is given in datasets[0] and the target 
                 dataset is given in datasets[1].
         :type datasets: Tuple
-        :returns: An array containing the difference between the reference \
+        :returns: An array containing the difference between the reference 
                 dataset and the target dataset.
         :rtype: Numpy Array
         '''
@@ -96,7 +96,7 @@ class TemporalStdDev(Metric):
         .. note::
            Overrides Metric.run()
 
-        :param datasets: The datasets on which to calculate the temporal \
+        :param datasets: The datasets on which to calculate the temporal
                 std. dev. in datasets[0].
         :type datasets: Tuple
         :returns: An array containing the temporal std. dev.
