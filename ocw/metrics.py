@@ -93,4 +93,4 @@ class TemporalStdDev(UnaryMetric):
         :returns: The temporal standard deviation of the target dataset
         :rtype: Numpy Array
         '''
-        return datasets[0].values.std(axi=0, ddof=1)
+        return target_dataset.values.std(axi=0, ddof=1)
