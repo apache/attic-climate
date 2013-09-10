@@ -21,7 +21,7 @@ Classes:
 '''
 
 import logging
-from metrics import Metric
+from metrics import Metric, UnaryMetric, BinaryMetric
 from dataset import Dataset, Bounds
 import ocw.dataset_processor as DSP
 
@@ -181,7 +181,7 @@ class Evaluation(object):
             logging.error(error)
             raise TypeError(error)
 
-        if metric.is_unary:
+        if isinstance(metric, UnaryMetric):
             self.unary_metrics.append(metric)
         else:
             self.metrics.append(metric)
