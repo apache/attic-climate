@@ -56,32 +56,25 @@ class BinaryMetric():
         '''
 
 
-class Bias(Metric):
+class Bias(BinaryMetric):
     '''Calculate the bias between a reference and target dataset.'''
 
-    def __init__(self):
-        '''Default constructor.
-
-        .. note::
-           Overrides Metric.__init__()
-        '''
-        self.is_unary = False
-
-    def run(self, datasets):
+    def run(self, ref_dataset, target_dataset):
         '''Calculate the bias between a reference and target dataset.
 
         .. note::
-           Overrides Metric.run()
+           Overrides BinaryMetric.run()
 
-        :param datasets: The datasets to use in the current run. The 
-                reference dataset is given in datasets[0] and the target 
-                dataset is given in datasets[1].
-        :type datasets: Tuple
-        :returns: An array containing the difference between the reference 
-                dataset and the target dataset.
+        :param ref_dataset: The reference dataset to use in this metric run.
+        :type ref_dataset: Dataset.
+        :param target_dataset: The target dataset to evaluate against the
+            reference dataset in this metric run.
+        :type target_dataset: Dataset.
+
+        :returns: The difference between the reference and target datasets.
         :rtype: Numpy Array
         '''
-        return datasets[0].values - datasets[1].values
+        return ref_dataset.values - target_dataset.values
 
 
 class TemporalStdDev(Metric):
