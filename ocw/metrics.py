@@ -77,27 +77,20 @@ class Bias(BinaryMetric):
         return ref_dataset.values - target_dataset.values
 
 
-class TemporalStdDev(Metric):
+class TemporalStdDev(UnaryMetric):
     '''Calculate the standard deviation over the time.'''
 
-    def __init__(self):
-        '''Default constructor.
-
-        .. note::
-           Overrides Metric.__init__()
-        '''
-        self.is_unary = True
-
-    def run(self, datasets):
+    def run(self, target_dataset):
         '''Calculate the temporal std. dev. for a datasets.
 
         .. note::
-           Overrides Metric.run()
+           Overrides UnaryMetric.run()
 
-        :param datasets: The datasets on which to calculate the temporal
-                std. dev. in datasets[0].
-        :type datasets: Tuple
-        :returns: An array containing the temporal std. dev.
+        :param target_dataset: The target_dataset on which to calculate the 
+            temporal standard deviation.
+        :type target_dataset: Dataset
+
+        :returns: The temporal standard deviation of the target dataset
         :rtype: Numpy Array
         '''
         return datasets[0].values.std(axi=0, ddof=1)
