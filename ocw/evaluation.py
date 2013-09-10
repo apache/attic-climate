@@ -281,8 +281,7 @@ class Evaluation(object):
         for target in self.target_datasets:
             results.append([])
             for metric in self.metrics:
-                datasets = (self.ref_dataset, target)
-                run_result = metric.run(datasets)
+                run_result = metric.run(self.ref_dataset, target)
                 results[-1].append(run_result)
         return results
 
