@@ -22,35 +22,6 @@ Classes:
 
 from abc import ABCMeta, abstractmethod
 
-class Metric():
-    '''Abstrace Base Class from which all metrics must inherit.'''
-    __metaclass__ = ABCMeta
-
-    def __init__(self, unary=False):
-        '''Default constructor for a Metric.
-
-        :param unary: Flag marking if the metric expects one or two operands.
-                A "unary" metric processes only a single dataset at a time.
-                By default a metric is expected to take two datasets.
-        :type unary: Bool
-        '''
-        self.is_unary = unary
-
-    @abstractmethod
-    def run(self, datasets):
-        '''Run the metric for some given dataset(s)
-
-        :param datasets: The dataset(s) to be used in the current metric 
-                run. If this is a "unary" metric then datasets[0] contains 
-                the dataset to be used in the current run. If the metric is 
-                binary, then datasets[0] contains the reference dataset and 
-                datasets[1] contains the target dataset.
-        :type datasets: Tuple
-        :returns: An Array containing the results of running the metric.
-        :trype: Numpy Array
-        '''
-
-
 class UnaryMetric():
     '''Abstract Base Class from which all unary metrics inherit.'''
     __metaclass__ = ABCMeta
