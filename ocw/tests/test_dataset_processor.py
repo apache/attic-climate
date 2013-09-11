@@ -2,7 +2,7 @@
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
 #  this work for additional information regarding copyright ownership.
-#  The ASF licenses this file to You under the Apache License, Version 2.0
+#  The ASF licenses this file to You under the Apache License, Version 2.0 
 #  (the "License"); you may not use this file except in compliance with
 #  the License.  You may obtain a copy of the License at
 #
@@ -145,6 +145,23 @@ class TestSpatialRegrid(unittest.TestCase, CustomAssertions):
         expected_data_shape = (len(self.input_dataset.times), len(self.new_lats), len(self.new_lons))
         self.assertSequenceEqual(regridded_data_shape, expected_data_shape)
 
+class TestNormalizeDatasetDatetimes(unittest.TestCase):
+    def setUp(self):
+        self.monthly_dataset = ten_year_monthly_15th_dataset()
+        self.daily_dataset = two_year_daily_2hr_dataset()
+
+    def test_daily(self):
+        new_ds = dp.normalize_dataset_datetimes(self.monthly_dataset, 'daily')
+
+        # Check that all the days have been shifted to the first of the month
+        self.assertTrue(all(x.hour == 0 for x in new_ds.times))
+
+    def test_montly(self):
+        new_ds = dp.normalize_dataset_datetimes(self.monthly_dataset, 'monthly')
+
+        # Check that all the days have been shifted to the first of the month
+        self.assertTrue(all(x.day == 1 for x in new_ds.times))
+
 class TestSubset(unittest.TestCase):
     def setUp(self):
         self.target_dataset = ten_year_monthly_dataset()
@@ -218,10 +235,27 @@ def ten_year_monthly_dataset():
     input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name")
     return input_dataset
 
+def ten_year_monthly_15th_dataset():
+    lats = np.array(range(-89, 90, 2))
+    lons = np.array(range(-179, 180, 2))
+    # Ten Years of monthly data
+    times = np.array([datetime.datetime(year, month, 15) for year in range(2000, 2010) for month in range(1, 13)])
+    values = np.ones([len(times), len(lats), len(lons)])
+    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name")
+    return input_dataset
+
 def two_year_daily_dataset():
     lats = np.array(range(-89, 90, 2))
     lons = np.array(range(-179, 180, 2))
     times = np.array([datetime.datetime(2001, 1, 1) + datetime.timedelta(days=d) for d in range(730)])
+    values = np.ones([len(times), len(lats), len(lons)])
+    dataset = ds.Dataset(lats, lons, times, values, variable='random data')
+    return dataset    
+
+def two_year_daily_2hr_dataset():
+    lats = np.array(range(-89, 90, 2))
+    lons = np.array(range(-179, 180, 2))
+    times = np.array([datetime.datetime(2001, 1, 1) + datetime.timedelta(days=d, hours=2) for d in range(730)])
     values = np.ones([len(times), len(lats), len(lons)])
     dataset = ds.Dataset(lats, lons, times, values, variable='random data')
     return dataset    
