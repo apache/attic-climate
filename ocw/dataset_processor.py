@@ -180,6 +180,64 @@ def subset(subregion, target_dataset):
         target_dataset.name
     )
 
+def normalize_dataset_datetimes(dataset, timestep):
+    ''' Normalize Dataset datetime values.
+
+    Force daily to an hour time value of 00:00:00.
+    Force monthly data to the first of the month at midnight.
+
+    :param dataset: The Dataset which will have its' time value normalized.
+    :type dataset: Dataset
+    :param timestep: The timestep of the Dataset's values. Either 'daily' or
+        'monthly'.
+    :type timestep: String
+
+    :returns: A new Dataset with normalized datetimes.
+    '''
+    new_times = _rcmes_normalize_datetimes(dataset.times, timestep)
+    return ds.Dataset(
+        dataset.lats,
+        dataset.lons,
+        np.array(new_times),
+        dataset.values,
+        dataset.variable,
+        dataset.name
+    )
+
+def _rcmes_normalize_datetimes(datetimes, timestep):
+    """ Normalize Dataset datetime values.
+
+    Force daily to an hour time value of 00:00:00.
+    Force monthly data to the first of the month at midnight.
+
+    :param datetimes: The datetimes to normalize.
+    :type datetimes: List of `datetime` values.
+    :param timestep: The flag for how to normalize the datetimes.
+    :type timestep: String
+    """
+    normalDatetimes = []
+    if timestep.lower() == 'monthly':
+        for inputDatetime in datetimes:
+            if inputDatetime.day != 1:
+                # Clean the inputDatetime
+                inputDatetimeString = inputDatetime.strftime('%Y%m%d')
+                normalInputDatetimeString = inputDatetimeString[:6] + '01'
+                inputDatetime = datetime.datetime.strptime(normalInputDatetimeString, '%Y%m%d')
+
+            normalDatetimes.append(inputDatetime)
+
+    elif timestep.lower() == 'daily':
+        for inputDatetime in datetimes:
+            if inputDatetime.hour != 0 or inputDatetime.minute != 0 or inputDatetime.second != 0:
+                datetimeString = inputDatetime.strftime('%Y%m%d%H%M%S')
+                normalDatetimeString = datetimeString[:8] + '000000'
+                inputDatetime = datetime.datetime.strptime(normalDatetimeString, '%Y%m%d%H%M%S')
+
+            normalDatetimes.append(inputDatetime)
+
+
+    return normalDatetimes
+
 def _rcmes_spatial_regrid(spatial_values, lat, lon, lat2, lon2, order=1):
     '''
     Spatial regrid from one set of lat,lon values onto a new set (lat2,lon2)

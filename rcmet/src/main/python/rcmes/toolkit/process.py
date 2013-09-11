@@ -434,39 +434,9 @@ def ignore_boundaries(data, rim=10):
     return data
 
 def normalizeDatetimes(datetimes, timestep):
-    """
-    Input::
-        datetimes - list of datetime objects that need to be normalized
-        timestep - string of value ('daily' | 'monthly')
-    Output::
-        normalDatetimes - list of datetime objects that have been normalized
-
-    Normalization Rules::
-        Daily data will be forced to an hour value of 00:00:00
-        Monthly data will be forced to the first of the month at midnight
-    """
-    normalDatetimes = []
-    if timestep.lower() == 'monthly':
-        for inputDatetime in datetimes:
-            if inputDatetime.day != 1:
-                # Clean the inputDatetime
-                inputDatetimeString = inputDatetime.strftime('%Y%m%d')
-                normalInputDatetimeString = inputDatetimeString[:6] + '01'
-                inputDatetime = datetime.datetime.strptime(normalInputDatetimeString, '%Y%m%d')
-
-            normalDatetimes.append(inputDatetime)
-
-    elif timestep.lower() == 'daily':
-        for inputDatetime in datetimes:
-            if inputDatetime.hour != 0 or inputDatetime.minute != 0 or inputDatetime.second != 0:
-                datetimeString = inputDatetime.strftime('%Y%m%d%H%M%S')
-                normalDatetimeString = datetimeString[:8] + '000000'
-                inputDatetime = datetime.datetime.strptime(normalDatetimeString, '%Y%m%d%H%M%S')
-
-            normalDatetimes.append(inputDatetime)
-
-
-    return normalDatetimes
+    """ This function has been moved to the ocw/dataset_processor module """
+    from ocw import dataset_processor as dsp
+    return dsp._rcmes_normalize_datetimes(datetimes, timestep)
 
 def getModelTimes(modelFile, timeVarName):
     '''
