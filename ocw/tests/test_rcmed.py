@@ -19,6 +19,9 @@ import unittest
 import datetime
 import numpy
 import pickle
+import inspect
+import os
+import test_rcmed # Import test_rcmed so we can use inspect to get the path
 import ocw.data_source.rcmed as rcmed
 
 class CustomAssertions:
@@ -50,16 +53,27 @@ class test_rcmed(unittest.TestCase, CustomAssertions):
         self.times_list.remove(datetime.datetime(2002, 10, 20))
         self.times_list.remove(datetime.datetime(2002, 10, 21))
         self.times = numpy.array(self.times_list)
-        self.values = pickle.load( open( "parameters_values.p", "rb" ) )
-        self.param_metadata_output = pickle.load( open( "parameters_metadata_output.p", "rb" ) ) 
+
+        # Get the full path to test_rcmed
+        self.file_path = os.path.abspath(inspect.getfile(test_rcmed))
+        # Remove the end of our path so we're left with the directory in which
+        # test_rcmed.py is stored.
+        self.file_path = self.file_path.split('test_rcmed')[0]
+
+        # Grab the parameter values file
+        params_file = open(os.path.join(self.file_path, "parameters_values.p"), "rb")
+        self.values = pickle.load(params_file)
+        # Grab the parameter metadata file
+        meta_file = open(os.path.join(self.file_path, "parameters_metadata_output.p"), "rb")
+        self.param_metadata_output = pickle.load(meta_file)
 
 
     def return_text(self, url):
         if url == self.url + "datasetId={0}&parameterId={1}&latMin={2}&latMax={3}&lonMin={4}&lonMax={5}&timeStart=20020801T0000Z&timeEnd=20021031T0000Z"\
                 .format(self.dataset_id, self.parameter_id, self.min_lat, self.max_lat, self.min_lon, self.max_lon, self.start_time_for_url, self.end_time_for_url):
-            return open("parameter_dataset_text.txt")
+            return open(os.path.join(self.file_path, "parameter_dataset_text.txt"))
         elif url == self.url + "&param_info=yes":
-            return open("parameters_metadata_text.txt")
+            return open(os.path.join(self.file_path, "parameters_metadata_text.txt"))
         else:
             raise Exception ("The URL is not acceptable.")
 
