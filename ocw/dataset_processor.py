@@ -26,6 +26,8 @@ from scipy.ndimage import map_coordinates
 
 import logging
 
+logger = logging.getLogger(__name__)
+
 def temporal_rebin(target_dataset, temporal_resolution):
     """ Rebin a Dataset to a new temporal resolution
     
@@ -154,7 +156,7 @@ def subset(subregion, target_dataset):
             "dataset_processor.subset received a subregion that is not "
             "completely within the bounds of the target dataset."
         )
-        logging.error(error)
+        logger.error(error)
         raise ValueError(error)
 
     # Get subregion indices into subregion data

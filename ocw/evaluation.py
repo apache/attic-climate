@@ -25,6 +25,8 @@ from metrics import Metric, UnaryMetric, BinaryMetric
 from dataset import Dataset, Bounds
 import ocw.dataset_processor as DSP
 
+logger = logging.getLogger(__name__)
+
 class Evaluation(object):
     '''Container for running an evaluation
 
@@ -145,7 +147,7 @@ class Evaluation(object):
                 "Cannot add a dataset that isn't an instance of Dataset. "
                 "Please consult the documentation for additional help."
             )
-            logging.error(error)
+            logger.error(error)
             raise TypeError(error)
 
         self.target_datasets.append(target_dataset)
@@ -178,7 +180,7 @@ class Evaluation(object):
                 "Cannot add a metric that doesn't inherit from Metric. "
                 "Please consult the documentation for additional help."
             )
-            logging.error(error)
+            logger.error(error)
             raise TypeError(error)
 
         if isinstance(metric, UnaryMetric):
@@ -219,7 +221,7 @@ class Evaluation(object):
         '''
         if not self._evaluation_is_valid():
             error = "The evaluation is invalid. Check the docs for help."
-            logging.warning(error)
+            logger.warning(error)
             return
 
         if self._should_run_regular_metrics():

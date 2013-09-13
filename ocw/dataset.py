@@ -26,6 +26,8 @@ import numpy
 import logging
 import datetime as dt
 
+logger = logging.getLogger(__name__)
+
 class Dataset:
     '''Container for a dataset's attributes and data.'''
 
@@ -130,7 +132,7 @@ class Dataset:
                 "an unexpected value: " + str(num_days)
             )
 
-            logging.error(error)
+            logger.error(error)
             raise ValueError(error)
 
         return time_resolution
