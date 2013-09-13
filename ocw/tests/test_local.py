@@ -21,6 +21,8 @@ import numpy.ma as ma
 import os
 import netCDF4
 import datetime
+import inspect
+import test_local # Import test_local so we can use inspect to get the path 
 import ocw.data_source.local as local
 
 
@@ -62,8 +64,11 @@ class test_load_file(unittest.TestCase):
         self.assertTrue(numpy.allclose(local.load_file(self.file_path, "value").values, new_values))
 
 class test_get_netcdf_variable_names(unittest.TestCase):
+    path_leader = inspect.getfile(test_local).split('ocw/')
+
     def setUp(self):
-        self.netcdf_path = os.path.abspath("../../examples/AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc")
+        file_path = os.path.join(self.path_leader[0], "examples/AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc")
+        self.netcdf_path = os.path.abspath(file_path)
         self.invalid_netcdf_path = create_invalid_dimensions_netcdf_object()
         self.netcdf = netCDF4.Dataset(self.netcdf_path, mode='r')
 
