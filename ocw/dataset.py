@@ -170,6 +170,7 @@ Expected shape (%s, %s, %s) but received (%s, %s, %s)""" % (time_count,
                                                             values.shape[1],
                                                             values.shape[2])
         if err_msg:
+            logger.error(err_msg)
             raise ValueError(err_msg)
 
 
