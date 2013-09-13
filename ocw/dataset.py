@@ -226,7 +226,7 @@ class Bounds(object):
     @lat_min.setter
     def lat_min(self, value):
         if not (-90 <= value <= 90 and value < self._lat_max):
-            error = "Attempted to set lat_min to invalid value: %d" % (value)
+            error = "Attempted to set lat_min to invalid value: %s" % (value)
             logger.error(error)
             raise ValueError(error)
 
@@ -239,7 +239,7 @@ class Bounds(object):
     @lat_max.setter
     def lat_max(self, value):
         if not (-90 <= value <= 90 and value > self._lat_min):
-            error = "Attempted to set lat_max to invalid value: %d" % (value)
+            error = "Attempted to set lat_max to invalid value: %s" % (value)
             logger.error(error)
             raise ValueError(error)
 
@@ -252,7 +252,7 @@ class Bounds(object):
     @lon_min.setter
     def lon_min(self, value):
         if not (-180 <= value <= 180 and value < self._lon_max):
-            error = "Attempted to set lon_min to invalid value: %d" % (value)
+            error = "Attempted to set lon_min to invalid value: %s" % (value)
             logger.error(error)
             raise ValueError(error)
 
@@ -265,7 +265,7 @@ class Bounds(object):
     @lon_max.setter
     def lon_max(self, value):
         if not (-180 <= value <= 180 and value > self._lon_min):
-            error = "Attempter to set lon_max to invalid value: %d" % (value)
+            error = "Attempter to set lon_max to invalid value: %s" % (value)
             logger.error(error)
             raise ValueError(error)
 
@@ -278,7 +278,7 @@ class Bounds(object):
     @start.setter
     def start(self, value):
         if not (type(value) is dt.datetime and value < self._end):
-            error = "Attempted to set start to invalid value: %d" % (value)
+            error = "Attempted to set start to invalid value: %s" % (value)
             logger.error(error)
             raise ValueError(error)
 
@@ -291,7 +291,7 @@ class Bounds(object):
     @end.setter
     def end(self, value):
         if not (type(value) is dt.datetime and value > self._start):
-            error = "Attempted to set end to invalid value: %d" % (value)
+            error = "Attempted to set end to invalid value: %s" % (value)
             logger.error(error)
             raise ValueError(error)
 
