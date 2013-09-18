@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -19,13 +17,14 @@
 
 from distutils.core import setup
 
-setup(name='obs4MIPS',
-      version='1.0',
-      description='Convert observation data to CMIP5s',
-      author='Denis Nadeau',
-      author_email='denis.nadeau@nasa.gov',
-      url='http://nccs.nasa.gov',
-      py_modules=['obs4MIPs_process'],
-      packages=['','factory', 'Toolbox'],
-      package_data={'': ['Tables/*','examples/ECMWF/Y2013/*','examples/TRMM/v7/*']},
-     )
+setup(
+    name='Apache Open CLimate Workbench obs4MIPS',
+    version='1.0',
+    description='Convert observation data to CMIP5s',
+    author='Apache Open Climate Workbench',
+    author_email='dev@climate.incubator.apache.org',
+    url='http://climate.incubator.apache.org/index.html',
+    py_modules=['obs4MIPs_process'],
+    packages=['','factory', 'Toolbox'],
+    package_data={'': ['Tables/*','examples/ECMWF/Y2013/*','examples/TRMM/v7/*']},
+)
