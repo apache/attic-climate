@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 #
-# -------------------------------------------------------------------------
-# Copyright @ 2012-2013 United States Government as represented by
-# the Administrator of the National Aeronautics and Space Administration.
-# All Other Rights Reserved.
-# 
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -21,8 +16,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-# -------------------------------------------------------------------------
-
+#
 
 import cdms2
 import cdtime
