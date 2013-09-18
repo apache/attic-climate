@@ -4,29 +4,22 @@
 # the Administrator of the National Aeronautics and Space Administration.
 # All Other Rights Reserved.
 # 
-# NASA OPEN SOURCE AGREEMENT VERSION 1.3
-# 
-# THIS OPEN  SOURCE  AGREEMENT  ("AGREEMENT") DEFINES  THE  RIGHTS  OF USE,
-# REPRODUCTION,  DISTRIBUTION,  MODIFICATION AND REDISTRIBUTION OF CERTAIN
-# COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT AS
-# REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
-# THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
-# INTENDED  THIRD-PARTY  BENEFICIARY  OF  ALL  SUBSEQUENT DISTRIBUTIONS OR
-# REDISTRIBUTIONS  OF THE  SUBJECT  SOFTWARE.  ANYONE WHO USES, REPRODUCES,
-# DISTRIBUTES, MODIFIES  OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
-# HEREIN, OR ANY PART THEREOF,  IS,  BY THAT ACTION, ACCEPTING IN FULL THE
-# RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
-# 
-# Government Agency: National Aeronautics and Space Administration
-# Government Agency Original Software Designation: GSC-16848-1
-# Government Agency Original Software Title: Obs4MIPS.py
-# 
-# User Registration Requested. Please visit: http://opensource.gsfc.nasa.gov
-# 
-# Government Agency Point of Contact for Original Software:
-# Enidia Santiago-Arce,
-# SRA Assistant,
-# (301) 286-8497
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
 # -------------------------------------------------------------------------
 
 # from: http://www.eol.ucar.edu/projects/ceop/dm/documents/refdata_report/eqns.html
