@@ -1,6 +1,103 @@
 Apache Open Climate Workbench Change Log
 ============================================
 
+Release Notes - Apache Open Climate Workbench - Version 0.3-incubating
+
+** Sub-task
+    * [CLIMATE-190] - test_local.py
+    * [CLIMATE-227] - OCW rcmed.py code
+    * [CLIMATE-228] - test_rcmed.py
+    * [CLIMATE-235] - Migrate Temporal Binning Functionality to dataset_processor module
+    * [CLIMATE-236] - Add Dataset Ensemble Support to the ocw.dataset_processor module
+    * [CLIMATE-237] - Add Subset Generation function to dataset_processor module
+    * [CLIMATE-263] - Create local netCDF to local netCDF Evaluation Example using OCW Core API
+    * [CLIMATE-264] - Local NetCDF File to RCMED Evaluation (temporal and spatial regridding of data)
+    * [CLIMATE-266] - local.py and associated tests import code one level below the ocw folder
+    * [CLIMATE-268] - local.py returns a Dataset Object with a 4-D Array for the Dataset.values
+    * [CLIMATE-280] - Add OnBlur directive tests
+    * [CLIMATE-281] - Evaluation Class methods need 'self' added to them
+    * [CLIMATE-285] - Create UnaryMetric base class
+    * [CLIMATE-286] - Create BinaryMetric base class
+    * [CLIMATE-287] - Remove Metric Base Class
+    * [CLIMATE-289] - Update Bias to use BinaryMetric
+    * [CLIMATE-290] - Update TemporalStdDev to use UnaryMetric
+    * [CLIMATE-291] - Update Metric handling in Evaluation
+    * [CLIMATE-294] - Move existing normalization code over from RCMES toolkit
+
+** Bug
+    * [CLIMATE-19] - Easy-RCMET fails on on copying py modules
+    * [CLIMATE-225] - Add subplot functionality to draw_taylor_diagram
+    * [CLIMATE-233] - Update UI to allow user to select file for subregions
+    * [CLIMATE-240] - PredictiveFileBrowserInput doesn't update ng-model when user selects autocomplete option
+    * [CLIMATE-250] - Variable Name error means 'ENS-MODEL' is not a choice within the rcmet/cli code
+    * [CLIMATE-251] - Fix dataset selector pop up
+    * [CLIMATE-252] - Redirect user to correct result page
+    * [CLIMATE-253] - Easy_OCW tells the user to source an incorrect file
+    * [CLIMATE-254] - Add Subregion Object to OCW
+    * [CLIMATE-260] - decode_model_times chokes if time representation contains .0 after seconds
+    * [CLIMATE-267] - Dataset doesn't validate input parameters on init
+    * [CLIMATE-269] - Evaluation improperly imports other ocw package modules
+    * [CLIMATE-272] - Local Cache in RCMES doesn't work properly
+    * [CLIMATE-273] - test_local uses invalid import for data_source.local
+    * [CLIMATE-275] - Timeline is not working with the new UI routing
+    * [CLIMATE-277] - service '/static/evalResults/' should take a path 
+    * [CLIMATE-278] - clean up UI 
+    * [CLIMATE-283] - data_source.rcmed module doesn't properly mask data from the database
+    * [CLIMATE-292] - Subregion Evaluation encloses results in an extra list
+    * [CLIMATE-293] - Dataset processor needs to handle normalizing Dataset time values
+    * [CLIMATE-299] - test_rcmed breaks if run outside of the tests directory
+
+** Improvement
+    * [CLIMATE-12] - Update map drawing routine to draw dataset's actual bounds
+    * [CLIMATE-31] - New RCMES Command line interface 
+    * [CLIMATE-113] - Improve unit test coverage
+    * [CLIMATE-149] - Update unit tests for directives
+    * [CLIMATE-152] - New UI layout
+    * [CLIMATE-214] - Add evaluation.py to OCW
+    * [CLIMATE-238] - Allow users to set strings for colormaps in plotting functions
+    * [CLIMATE-245] - Service to return list of images 
+    * [CLIMATE-247] - Make the AngularJS UI easily skinnable
+    * [CLIMATE-255] - Use Bounds object in dataset_processor.subset
+    * [CLIMATE-256] - Use Bounds object in Evaluation
+    * [CLIMATE-257] - Add Property for Evaluation.ref_dataset
+    * [CLIMATE-258] - Improve Evaluation documentation
+    * [CLIMATE-274] - Make the exception that the Dataset class throws more descriptive
+    * [CLIMATE-276] - Refactor the dataset_processor.py code to no depend on toolkit.process
+    * [CLIMATE-279] - rcmed.py returns a Dataset Object with a 4-D Array for the Dataset.values 
+    * [CLIMATE-282] - Merge changes from CLIMATE-259 (RefactorPlots branch) into trunk
+    * [CLIMATE-284] - Create separate Base Classes for metric.py
+    * [CLIMATE-288] - Use parameter_id instead of logname to select observation in knmi_to_cru31_full_bias.py
+    * [CLIMATE-295] - Change loggers so they don't use the root logger
+    * [CLIMATE-296] - Log exception raises in dataset module
+    * [CLIMATE-297] - test_local breaks if run outside of the tests directory
+    * [CLIMATE-300] - Setup packaging
+
+** New Feature
+    * [CLIMATE-215] - Create new Plotter class for OCW refactoring
+    * [CLIMATE-224] - Update the OCW UI with the AngularUI UI-Router
+    * [CLIMATE-242] - Update run_rcmes_processing to support history
+    * [CLIMATE-243] - Add capability to return a list of evaluation directories 
+    * [CLIMATE-244] - Service to return list of images
+    * [CLIMATE-249] - Add results/history page
+
+** Task
+    * [CLIMATE-20] - Easy-RCMET install requests JPL username / password for software dist
+    * [CLIMATE-136] - Remove RCMET references from Easy-RCMET
+    * [CLIMATE-213] - Create the dataset_processor.py module within the ocw folder
+    * [CLIMATE-217] - Add metrics.py for OCW refactoring
+    * [CLIMATE-218] - Update metric handling in Evaluation to coincide with new Metric definition
+    * [CLIMATE-219] - Add name attribute to Dataset
+    * [CLIMATE-239] - Remove Plotter class from plotter.py
+    * [CLIMATE-301] - Fix licenses in obs4MIPs code
+    * [CLIMATE-302] - Move obs4MIPs copyright headers
+    * [CLIMATE-303] - Integrate obs4MIPs into OCW
+    * [CLIMATE-304] - Add obs4MIPs JIRA component
+    * [CLIMATE-305] - Update obs4MIPs setup.py with OCW related information
+
+** Test
+    * [CLIMATE-220] - implement unit tests for plotter.py
+
+
 
 Release Notes - Apache Open Climate Workbench - Version 0.2-incubating
 
