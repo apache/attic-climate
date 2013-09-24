@@ -19,6 +19,7 @@ import unittest
 import numpy
 import numpy.ma as ma
 import os
+import urllib
 import netCDF4
 import datetime
 import inspect
@@ -64,16 +65,17 @@ class test_load_file(unittest.TestCase):
         self.assertTrue(numpy.allclose(local.load_file(self.file_path, "value").values, new_values))
 
 class test_get_netcdf_variable_names(unittest.TestCase):
-    path_leader = inspect.getfile(test_local).split('ocw/')
+    file_path = "http://zipper.jpl.nasa.gov/dist/"
+    test_model = "AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc"
 
     def setUp(self):
-        file_path = os.path.join(self.path_leader[0], "examples/AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc")
-        self.netcdf_path = os.path.abspath(file_path)
+        urllib.urlretrieve(self.file_path + self.test_model, self.test_model)
         self.invalid_netcdf_path = create_invalid_dimensions_netcdf_object()
-        self.netcdf = netCDF4.Dataset(self.netcdf_path, mode='r')
+        self.netcdf = netCDF4.Dataset(self.test_model, mode='r')
 
     def tearDown(self):
         os.remove(self.invalid_netcdf_path)
+        os.remove(self.test_model)
 
     def test_valid_latitude(self):
         self.lat = local._get_netcdf_variable_name(
