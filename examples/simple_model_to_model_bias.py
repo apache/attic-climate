@@ -1,6 +1,7 @@
 import datetime
 
 import numpy as np
+import urllib
 
 import ocw.data_source.local as local
 import ocw.dataset_processor as dsp
@@ -8,11 +9,17 @@ import ocw.evaluation as evaluation
 import ocw.metrics as metrics
 import ocw.plotter as plotter
 
+# File URL leader
+FILE_LEADER = "http://zipper.jpl.nasa.gov/dist/"
 # Two Local Model Files 
 FILE_1 = "AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc"
 FILE_2 = "AFRICA_UC-WRF311_CTL_ERAINT_MM_50km-rg_1989-2008_tasmax.nc"
 # Filename for the output image/plot (without file extension)
 OUTPUT_PLOT = "wrf_bias_compared_to_knmi"
+
+# Download necessary NetCDF files
+urllib.urlretrieve(FILE_LEADER + FILE_1, FILE_1)
+urllib.urlretrieve(FILE_LEADER + FILE_2, FILE_2)
 
 """ Step 1: Load Local NetCDF Files into OCW Dataset Objects """
 print("Loading %s into an OCW Dataset Object" % (FILE_1,))

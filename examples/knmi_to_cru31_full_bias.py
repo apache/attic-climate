@@ -1,6 +1,7 @@
 import datetime
 
 import numpy as np
+import urllib
 
 import ocw.data_source.local as local
 import ocw.data_source.rcmed as rcmed
@@ -10,12 +11,17 @@ import ocw.evaluation as evaluation
 import ocw.metrics as metrics
 import ocw.plotter as plotter
 
+# File URL leader
+FILE_LEADER = "http://zipper.jpl.nasa.gov/dist/"
 # This way we can easily adjust the time span of the retrievals
 YEARS = 3
 # Two Local Model Files 
 MODEL = "AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc"
 # Filename for the output image/plot (without file extension)
 OUTPUT_PLOT = "cru_31_tmax_knmi_africa_bias_full"
+
+# Download necessary NetCDF file
+urllib.urlretrieve(FILE_LEADER + MODEL, MODEL)
 
 """ Step 1: Load Local NetCDF File into OCW Dataset Objects """
 print("Loading %s into an OCW Dataset Object" % (MODEL,))
