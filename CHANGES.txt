@@ -1,6 +1,8 @@
 Apache Open Climate Workbench Change Log
 ============================================
 
+
+
 Release Notes - Apache Open Climate Workbench - Version 0.3-incubating
 
 ** Sub-task
@@ -23,6 +25,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.3-incubating
     * [CLIMATE-290] - Update TemporalStdDev to use UnaryMetric
     * [CLIMATE-291] - Update Metric handling in Evaluation
     * [CLIMATE-294] - Move existing normalization code over from RCMES toolkit
+    * [CLIMATE-307] - Update OCW example runs to pull NC files from external source
 
 ** Bug
     * [CLIMATE-19] - Easy-RCMET fails on on copying py modules
@@ -46,6 +49,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.3-incubating
     * [CLIMATE-292] - Subregion Evaluation encloses results in an extra list
     * [CLIMATE-293] - Dataset processor needs to handle normalizing Dataset time values
     * [CLIMATE-299] - test_rcmed breaks if run outside of the tests directory
+    * [CLIMATE-308] - test_local depends on NetCDF file in examples folder
 
 ** Improvement
     * [CLIMATE-12] - Update map drawing routine to draw dataset's actual bounds
@@ -71,6 +75,7 @@ Release Notes - Apache Open Climate Workbench - Version 0.3-incubating
     * [CLIMATE-296] - Log exception raises in dataset module
     * [CLIMATE-297] - test_local breaks if run outside of the tests directory
     * [CLIMATE-300] - Setup packaging
+    * [CLIMATE-306] - Remove large OCW example NetCDF files
 
 ** New Feature
     * [CLIMATE-215] - Create new Plotter class for OCW refactoring
@@ -93,7 +98,6 @@ Release Notes - Apache Open Climate Workbench - Version 0.3-incubating
     * [CLIMATE-303] - Integrate obs4MIPs into OCW
     * [CLIMATE-304] - Add obs4MIPs JIRA component
     * [CLIMATE-305] - Update obs4MIPs setup.py with OCW related information
-
 ** Test
     * [CLIMATE-220] - implement unit tests for plotter.py
 
