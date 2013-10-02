@@ -16,22 +16,18 @@
 # under the License.
 
 import pydap
+import requests
 
-def load(url, variable_name, lat_name=None, lon_name=None, time_name=None, data_slice=None):
+def load(url, variable, data_slice=None):
     '''Load a Dataset from an OpenDAP URL
 
     :param url: The OpenDAP URL for the dataset of interest.
     :type url: String
-    :param variable_name: The name of the variable to read from the dataset.
-    :type variable_name: String
-    :param lat_name: The latitude variable name in the dataset
-    :type lat_name: (Optional) String
-    :param lon_name: The longitude variable name in the dataset
-    :type lon_name: (Optional) String
-    :param time_name: The time variable name in the dataset
-    :type time_name: (Optional) String
+    :param variable: The name of the variable to read from the dataset.
+    :type variable: String
     :param data_slice: A list of slice objects to apply to the variable data
         and lat, lon, and time index lists. If you want to slice one index of
         the data you need to provide valid slices for every index.
     :type data_slice: (Optional) List of slice objects
     '''
+    pass
