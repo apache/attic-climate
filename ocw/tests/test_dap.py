@@ -18,10 +18,10 @@
 import unittest
 import ocw.data_source.dap as dap
 from ocw.dataset import Dataset
+import datetime as dt
 
 class test_dap(unittest.TestCase):
-    def setUp(self):
-        self.dataset = dap.load('http://test.opendap.org/dap/data/nc/sst.mnmean.nc.gz', 'sst')
+    dataset = dap.load('http://test.opendap.org/dap/data/nc/sst.mnmean.nc.gz', 'sst')
 
     def test_dataset_is_returned(self):
         self.assertTrue(isinstance(self.dataset, Dataset))
@@ -34,6 +34,10 @@ class test_dap(unittest.TestCase):
 
     def test_correct_time_shape(self):
         self.assertEquals(len(self.dataset.times), 1857)
+
+    def test_valid_date_conversion(self):
+        start = dt.datetime(1854, 1, 1)
+        self.assertTrue(start == self.dataset.times[0])
 
 if __name__ == '__main__':
     unittest.main()
