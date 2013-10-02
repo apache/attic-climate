@@ -26,5 +26,14 @@ class test_dap(unittest.TestCase):
     def test_dataset_is_returned(self):
         self.assertTrue(isinstance(self.dataset, Dataset))
 
+    def test_correct_lat_shape(self):
+        self.assertEquals(len(self.dataset.lats), 89)
+
+    def test_correct_lon_shape(self):
+        self.assertEquals(len(self.dataset.lons), 180)
+
+    def test_correct_time_shape(self):
+        self.assertEquals(len(self.dataset.times), 1857)
+
 if __name__ == '__main__':
     unittest.main()
