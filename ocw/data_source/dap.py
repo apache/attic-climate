@@ -15,8 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import pydap
+from pydap.client import open_url
 import requests
+import ocw.dataset.Dataset as Dataset
 
 def load(url, variable, data_slice=None):
     '''Load a Dataset from an OpenDAP URL
@@ -29,5 +30,42 @@ def load(url, variable, data_slice=None):
         and lat, lon, and time index lists. If you want to slice one index of
         the data you need to provide valid slices for every index.
     :type data_slice: (Optional) List of slice objects
+
+    :returns: A Dataset object containing the dataset pointed to by the 
+        OpenDAP URL.
+
+    :raises: ServerError
     '''
-    pass
+    # Grab the dataset information and pull the appropriate variable
+    d = open_url(url)
+    dataset = d[variable]
+
+    # Grab the lat, lon, and time variable names.
+    # We assume the variable order is (time, lat, lon)
+    dataset_dimensions = dataset.dimensions
+    time = dataset_dimensions[0]
+    lat = dataset_dimensions[1]
+    lon = dataset_dimensions[2]
+
+    # Time is given to us in some units since an epoch. We need to convert
+    # these values to datetime objects.
+    times = _convert_times_to_datetime(dataset[time])
+
+    lats = dataset[lat][:]
+    lons = dataset[lon][:]
+    values = dataset[:]
+
+    return Dataset(lats, lons, times, values, variable)
+
+def _convert_times_to_datetime(time):
+    '''Convert the OpenDAP time object's values to datetime objects
+
+    The time values are stores as some unit since an epoch. These need to be 
+    converted into datetime objects for the OCW Dataset object.
+
+    :param time: The time object's values to convert
+    :type time: pydap.model.BaseType
+
+    :returns: list of converted time values as datetime objects
+    '''
+    return time
