@@ -19,17 +19,13 @@ from pydap.client import open_url
 import requests
 import ocw.dataset.Dataset as Dataset
 
-def load(url, variable, data_slice=None):
+def load(url, variable):
     '''Load a Dataset from an OpenDAP URL
 
     :param url: The OpenDAP URL for the dataset of interest.
     :type url: String
     :param variable: The name of the variable to read from the dataset.
     :type variable: String
-    :param data_slice: A list of slice objects to apply to the variable data
-        and lat, lon, and time index lists. If you want to slice one index of
-        the data you need to provide valid slices for every index.
-    :type data_slice: (Optional) List of slice objects
 
     :returns: A Dataset object containing the dataset pointed to by the 
         OpenDAP URL.
