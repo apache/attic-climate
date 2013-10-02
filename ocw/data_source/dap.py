@@ -16,6 +16,7 @@
 # under the License.
 
 from pydap.client import open_url
+from netcdftime import utime
 import requests
 import ocw.dataset.Dataset as Dataset
 
@@ -44,8 +45,10 @@ def load(url, variable):
     lon = dataset_dimensions[2]
 
     # Time is given to us in some units since an epoch. We need to convert
-    # these values to datetime objects.
-    times = _convert_times_to_datetime(dataset[time])
+    # these values to datetime objects. Note that we use the main object's
+    # time object and not the dataset specific reference to it. We need to 
+    # grab the 'units' from it and it fails on the dataset specific object.
+    times = _convert_times_to_datetime(d[time])
 
     lats = dataset[lat][:]
     lons = dataset[lon][:]
@@ -64,4 +67,9 @@ def _convert_times_to_datetime(time):
 
     :returns: list of converted time values as datetime objects
     '''
-    return time
+    units = time.units
+    # parse the time units string into a useful object.
+    # NOTE: This assumes a 'standard' calendar. It's possible (likely?) that
+    #   users will want to customize this in the future.
+    parsed_time = utime(units)
+    return [parsed_time.num2date(x) for x in time[:]]
