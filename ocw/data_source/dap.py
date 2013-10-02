@@ -18,7 +18,8 @@
 from pydap.client import open_url
 from netcdftime import utime
 import requests
-import ocw.dataset.Dataset as Dataset
+import numpy as np
+from ocw.dataset import Dataset
 
 def load(url, variable):
     '''Load a Dataset from an OpenDAP URL
@@ -48,11 +49,11 @@ def load(url, variable):
     # these values to datetime objects. Note that we use the main object's
     # time object and not the dataset specific reference to it. We need to 
     # grab the 'units' from it and it fails on the dataset specific object.
-    times = _convert_times_to_datetime(d[time])
+    times = np.array(_convert_times_to_datetime(d[time]))
 
-    lats = dataset[lat][:]
-    lons = dataset[lon][:]
-    values = dataset[:]
+    lats = np.array(dataset[lat][:])
+    lons = np.array(dataset[lon][:])
+    values = np.array(dataset[:])
 
     return Dataset(lats, lons, times, values, variable)
 
