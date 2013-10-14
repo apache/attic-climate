@@ -19,7 +19,7 @@ from distutils.core import setup
 
 setup(
     name='Apache Open Climate Workbench',
-    version='0.3-incubating-dev',
+    version='0.4-incubating',
     url='http://climate.incubator.apache.org/index.html',
     author='Apache Open Climate Workbench',
     author_email='dev@climate.incubator.apache.org',
