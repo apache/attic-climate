@@ -13,6 +13,7 @@ Contents:
 
    ocw/dataset
    ocw/dataset_processor
+   ocw/evaluation
 
 
 Indices and tables
