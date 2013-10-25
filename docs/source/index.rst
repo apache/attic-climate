@@ -14,6 +14,7 @@ Contents:
    ocw/dataset
    ocw/dataset_processor
    ocw/evaluation
+   ocw/metrics
 
 
 Indices and tables
