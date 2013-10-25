@@ -9,8 +9,9 @@ Welcome to Apache Open Climate Workbench's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
+   ocw/dataset
 
 
 Indices and tables
