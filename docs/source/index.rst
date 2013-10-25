@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 4
 
    ocw/dataset
+   ocw/dataset_processor
 
 
 Indices and tables
