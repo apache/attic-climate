@@ -254,3 +254,11 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+# Autodoc config
+#
+# Select which content is inserted into the main body of an autoclass directive
+# "class" - Only the class' docstring
+# "both"  - The class' and __init__ method's docstring
+# "init"  - Only __init__'s docstring
+autoclass_content = "both"
