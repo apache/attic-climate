@@ -16,6 +16,7 @@ Contents:
    ocw/evaluation
    ocw/metrics
    ocw/plotter
+   data_source/data_sources
 
 
 Indices and tables

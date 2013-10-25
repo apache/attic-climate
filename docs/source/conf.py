@@ -20,6 +20,7 @@ import sys, os
 #
 # Assuming a fresh checkout of trunk, this will point us to the OCW package
 sys.path.insert(0, os.path.abspath('../../ocw'))
+sys.path.insert(0, os.path.abspath('../../ocw/data_source'))
 
 
 # -- General configuration -----------------------------------------------------
