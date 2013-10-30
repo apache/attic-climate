@@ -635,11 +635,11 @@ def calculate_metrics_and_make_plots(varName, workdir, lons, lats, obsData, mdlD
         obsData[0, :, :, :] = obsData[0, :, :, :] - 273.15
         if subRegions:
             obsRgn[0, :, :] = obsRgn[0, :, :] - 273.15
-    if varName == 'prec':
-        obsData[0, :, :, :] = obsData[0, :, :, :]*86400.
+    if varName == 'prec' and obsData.max() > mdlData.max()*1000.:
+        mdlData[:, :, :, :] = mdlData[:, :, :, :]*86400.
         if subRegions:
-            obsRgn[0, :, :] = obsRgn[0, :, :]*86400.
-    ###    
+            mdlRgn[:, :, :] = mdlRgn[:, :, :]*86400.
+        
     oTser, oClim = calcClimYear( obsData[0, :, :, :])
     bias_of_overall_average = ma.zeros([nmodel, ny, nx])
     spatial_stdev_ratio = np.zeros([nmodel])
@@ -662,7 +662,7 @@ def calculate_metrics_and_make_plots(varName, workdir, lons, lats, obsData, mdlD
     # X X 
     # X
     #
-    fig_return = plotter.draw_contour_map(bias_of_overall_average, lats, lons, workdir+'/bias_of_climatology_'+varName, fmt='png', gridshape=(4, 2),
+    fig_return = plotter.draw_contour_map(bias_of_overall_average, lats, lons, workdir+'/bias_of_climatology_'+varName, fmt='png', gridshape=(6, 2),
                    clabel='', ptitle='', subtitles=mdlList, cmap=None, 
                    clevs=None, nlevs=10, parallels=None, meridians=None,
                    extend='neither')

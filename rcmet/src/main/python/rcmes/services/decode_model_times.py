@@ -33,6 +33,14 @@ def decodeTimeFromString(time_string):
     time_string = time_string.split('.')[0] + '0' if "." in time_string else time_string
 
     try:
+        mytime = time.strptime(time_string, '%Y-%m-%d')
+        mytime = datetime.datetime(*mytime[0:6])
+        return mytime
+
+    except ValueError:
+        pass 
+
+    try:
         mytime = time.strptime(time_string, '%Y-%m-%d %H:%M:%S')
         mytime = datetime.datetime(*mytime[0:6])
         return mytime
