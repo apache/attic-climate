@@ -697,11 +697,11 @@ def _get_subregion_slice_indices(subregion, target_dataset):
 
     :returns: The indices to slice the Datasets arrays as a Dictionary.
     '''
-    latStart = np.nonzero(target_dataset.lats == subregion.lat_min)[0][0]
-    latEnd = np.nonzero(target_dataset.lats == subregion.lat_max)[0][0]
+    latStart = min(np.nonzero(target_dataset.lats >= subregion.lat_min)[0])
+    latEnd = max(np.nonzero(target_dataset.lats <= subregion.lat_max)[0])
 
-    lonStart = np.nonzero(target_dataset.lons == subregion.lon_min)[0][0]
-    lonEnd = np.nonzero(target_dataset.lons == subregion.lon_max)[0][0]
+    lonStart = min(np.nonzero(target_dataset.lons >= subregion.lon_min)[0])
+    lonEnd = max(np.nonzero(target_dataset.lons <= subregion.lon_max)[0])
 
     timeStart = np.nonzero(target_dataset.times == subregion.start)[0][0]
     timeEnd = np.nonzero(target_dataset.times == subregion.end)[0][0]
