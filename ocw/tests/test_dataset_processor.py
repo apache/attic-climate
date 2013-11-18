@@ -172,11 +172,17 @@ class TestSubset(unittest.TestCase):
             datetime.datetime(2001, 1, 1), 
             datetime.datetime(2004, 1, 1)
         )
-        self.non_exact_subregion = ds.Bounds(
+        self.non_exact_spatial_subregion = ds.Bounds(
             -80.25, 80.5, 
             -160.25, 160.5, 
             datetime.datetime(2001, 1, 1), 
             datetime.datetime(2004, 1, 1)
+        )
+        self.non_exact_temporal_subregion = ds.Bounds(
+            -80.25, 80.5, 
+            -160.25, 160.5,
+            datetime.datetime(2001, 1, 15), 
+            datetime.datetime(2004, 2, 15)
         )
 
     def test_subset(self):
@@ -189,13 +195,23 @@ class TestSubset(unittest.TestCase):
         self.assertEqual(subset.values.shape, (37, 82, 162))
     
     def test_subset_using_non_exact_spatial_bounds(self):
-        index_slices = dp._get_subregion_slice_indices(self.non_exact_subregion,  self.target_dataset)
+        index_slices = dp._get_subregion_slice_indices(self.non_exact_spatial_subregion,  self.target_dataset)
         control_index_slices = {"lat_start"  : 5,
                                 "lat_end"    : 84,
                                 "lon_start"  : 10,
                                 "lon_end"    : 169,
                                 "time_start" : 12, 
                                 "time_end"   : 48}
+        self.assertDictEqual(index_slices, control_index_slices)
+
+    def test_subset_using_non_exact_temporal_bounds(self):
+        index_slices = dp._get_subregion_slice_indices(self.non_exact_temporal_subregion,  self.target_dataset)
+        control_index_slices = {"lat_start"  : 5,
+                                "lat_end"    : 84,
+                                "lon_start"  : 10,
+                                "lon_end"    : 169,
+                                "time_start" : 13, 
+                                "time_end"   : 49}
         self.assertDictEqual(index_slices, control_index_slices)
 
 class TestFailingSubset(unittest.TestCase):

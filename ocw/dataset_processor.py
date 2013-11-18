@@ -703,8 +703,9 @@ def _get_subregion_slice_indices(subregion, target_dataset):
     lonStart = min(np.nonzero(target_dataset.lons >= subregion.lon_min)[0])
     lonEnd = max(np.nonzero(target_dataset.lons <= subregion.lon_max)[0])
 
-    timeStart = np.nonzero(target_dataset.times == subregion.start)[0][0]
-    timeEnd = np.nonzero(target_dataset.times == subregion.end)[0][0]
+
+    timeStart = min(np.nonzero(target_dataset.times >= subregion.start)[0])
+    timeEnd = max(np.nonzero(target_dataset.times <= subregion.end)[0])
 
     return {
         "lat_start"  : latStart,
