@@ -83,5 +83,20 @@ class TestLatLonExtraction(unittest.TestCase):
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
 
+class TestTimeExtraction(unittest.TestCase):
+    def test_successful_time_extract(self):
+        expected_return = {
+            "success": True,
+            "time_name": "time",
+            "start_time": "1988-06-10 00:00:00",
+            "end_time": "2008-01-27 00:00:00"
+        }
+
+        file_location = os.path.abspath('tests/example_data/lat_lon_time.nc')
+
+        response = test_app.get('/lfme/list_time/' + file_location)
+
+        self.assertDictEqual(expected_return, response.json)
+
 if __name__ == '__main__':
     unittest.main()
