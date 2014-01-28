@@ -21,15 +21,23 @@ import sys
 import datetime as dt
 
 def decode_time_values(dataset, time_var_name):
-    ''''''
-    # Grab the time data and time unit info
+    ''' Decode NetCDF time values into Python datetime objects.
+
+    :param dataset: The dataset from which time values should be extracted.
+    :type dataset: netCDF4.Dataset
+    :param time_var_name: The name of the time variable in dataset.
+    :type time_var_name: String
+
+    :returns: The list of converted datetime values.
+
+    :raises ValueError: If the time units value couldn't be parsed, if the
+        base time value couldn't be parsed, or if the time_var_name could not
+        be found in the dataset.
+    '''
     time_data = dataset.variables[time_var_name]
     time_format = time_data.units
 
-    # NOTE: Could raise ValueError
     time_units = parse_time_units(time_format)
-
-    # NOTE: Could raise ValueError
     time_base = parse_time_base(time_format)
 
     times = []
@@ -48,7 +56,21 @@ def decode_time_values(dataset, time_var_name):
     return times
 
 def parse_time_units(time_format):
-    ''''''
+    ''' Parse units value from time units string.
+
+    The only units that are supported are: seconds, minutes, hours, days, 
+        months, or years. 
+
+    :param time_format: The time data units string from the dataset
+        being processed. The string should be of the format
+        '<units> since <base time date>'
+    :type time_format: String
+
+    :returns: The unit substring from the time units string
+
+    :raises ValueError: If the units present in the time units string doesn't
+        match one of the supported unit value.
+    '''
     for unit in ['seconds', 'minutes', 'hours', 'days', 'months', 'years']:
         if unit in time_format:
             return unit
