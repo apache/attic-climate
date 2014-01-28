@@ -62,8 +62,19 @@ def parse_time_units(time_format):
         raise ValueError(err)
 
 def parse_time_base(time_format):
-    ''''''
-    # NOTE: This could raise an exception. Check below for info on which
+    ''' Parse time base object from the time units string.
+
+    :param time_format: The time data units string from the dataset
+        being processed. The string should be of the format
+        '<units> since <base time date>'
+    :type time_format: String
+
+    :returns: The base time as a datetime object.
+
+    :raises ValueError: When the base time string couldn't be parsed from the
+        units time_format string or if the date string didn't match any of the
+        expected formats.
+    '''
     base_time_string = parse_base_time_string(time_format)
 
     time_format = time_format.strip()
@@ -78,6 +89,7 @@ def parse_time_base(time_format):
         '%Y:%m:%d', '%Y%m%d'
     ]
 
+    # Attempt to match the base time string with a possible format parsing string.
     for time_format in possible_time_formats:
         try:
             stripped_time = dt.datetime.strptime(base_time_string, time_format)
@@ -86,6 +98,8 @@ def parse_time_base(time_format):
             # This exception means that the time format attempted was incorrect.
             # No need to report or raise this, simply try the next one!
             pass
+    # If we got through the entire loop without a break, we couldn't parse the
+    # date string with our known formats.
     else:
         cur_frame = sys._getframe().f_code
         err = "{}.{}: Unable to parse valid date from {}".format(
