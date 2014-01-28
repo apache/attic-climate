@@ -14,37 +14,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-#!/usr/local/bin/python
-"""
- Small command line utility to list the variables contained within a model file.
-
-  This script should be run from the command line (i.e. not called from within python)
-
-       Input: 
-               -filename
-
-       Output: 
-               -list of variable names in file
-
-       (NB. all printed to standar output)
-
-       Peter Lean   February 2011
-
- WEBSERVICE PLAN
-
-    URL:  localhost:9999/list_vars/:filename    (full file path plus file name)
-    Example:  localhost:9999/list/vars/"/usr/local/wrm/modeldata/wrf.nc"
-
-    Return:  JSON Array of Variable Names
-    Example:  { "variables": [ "time_bnds", "tas", "level", "lon", "time", "lat" ] }
-"""
 
 import sys
 import netCDF4
 import bottle
 from bottle import request
 import json
-#filename = sys.argv[1]
 
 
 @bottle.route('/list/vars/:filename#".*"#')
@@ -70,6 +45,3 @@ def list_vars(filename):
       if (request.query.callback):
           return "%s(%s)" % (request.query.callback, failRet)
       return failRet
-  
-
-
