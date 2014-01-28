@@ -49,5 +49,12 @@ class TestTimeUnitsParse(unittest.TestCase):
 
         self.assertEquals(units, 'minutes')
 
+    def test_invalid_parse(self):
+        self.assertRaises(
+            ValueError,
+            utils.parse_time_units,
+            'parsecs since a made up date'
+        )
+
 if __name__ == '__main__':
     unittest.main()
