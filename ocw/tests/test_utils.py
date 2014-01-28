@@ -76,5 +76,12 @@ class TestBaseTimeStringParse(unittest.TestCase):
         
         self.assertEquals(base, '1988-06-10 00:00:00')
 
+    def test_invalid_time_base_string_parse(self):
+        self.assertRaises(
+            ValueError,
+            utils.parse_base_time_string,
+            'this string is not valid'
+        )
+
 if __name__ == '__main__':
     unittest.main()
