@@ -14,8 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-"""Module that demonstrates how to initialize the RESTful web services that 
-power the RCMET GUI"""
+''' OCW UI Backend web services initialization. '''
 
 from bottle import route, response, run, static_file, hook
 import list_vars_in_file
@@ -26,27 +25,29 @@ import run_rcmes_processing
 import dataset_helpers
 import directory_helpers
 
-@route('/')
-@route('/index.html')
-def index():
-    return "<a href='/hello'>Go to Hello World page</a>"
-
-@route('/hello')
-def hello():
-    return "Hello World!"
-
-@route('/api/status')
-def api_status():
-    return {'status':'online', 'key':'value'}
-
 @route('/static/evalResults/<filepath:path>')
 def get_eval_result_image(filepath):
+    ''' Return static file.
+    
+    Return static file specified by root + filepath where root defaults to:
+        /tmp/rcmet
+
+    The 'root' path should coincide with the work directory set used by the
+    OCW toolkit for processing.
+
+    :param filepath: The path component that when appended to the 'root' path
+        header specifies a file to return.
+    :type filepath: string
+
+    :returns: The requested file resource
+
+    '''
     return static_file(filepath, root="/tmp/rcmet")
 
 @hook('after_request')
 def enable_cors():
+    ''' Allow Cross-Origin Resource Sharing for all URLs. '''
     response.headers['Access-Control-Allow-Origin'] = '*'
 
 if __name__ == "__main__":
     run(host='localhost', port=8082)
-    
