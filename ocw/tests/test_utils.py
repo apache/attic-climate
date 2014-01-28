@@ -25,7 +25,7 @@ import netCDF4
 import ocw.utils as utils
 
 class TestDecodeTimes(unittest.TestCase):
-    test_model = "../ocw-ui/backend/tests/example_data/lat_lon_time.nc"
+    test_model = '../ocw-ui/backend/tests/example_data/lat_lon_time.nc'
 
     def setUp(self):
         self.netcdf = netCDF4.Dataset(os.path.abspath(self.test_model), mode='r')
@@ -34,6 +34,14 @@ class TestDecodeTimes(unittest.TestCase):
         times = utils.decode_time_values(self.netcdf, 'time')
 
         self.assertTrue(all([type(x) is datetime.datetime for x in times]))
+
+    def test_valid_time_processing(self):
+        start_time = datetime.datetime.strptime('1988-06-10 00:00:00', '%Y-%m-%d %H:%M:%S')
+        end_time = datetime.datetime.strptime('2008-01-27 00:00:00', '%Y-%m-%d %H:%M:%S')
+        times = utils.decode_time_values(self.netcdf, 'time')
+
+        self.assertEquals(times[0], start_time)
+        self.assertEquals(times[-1], end_time)
 
 if __name__ == '__main__':
     unittest.main()
