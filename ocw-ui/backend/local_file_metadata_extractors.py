@@ -24,8 +24,40 @@ from bottle import Bottle, request, route
 
 lfme_app = Bottle()
 
-@lfme_app.route('/list/latlon/<file_path:path>')
+@lfme_app.route('/list_latlon/<file_path:path>')
 def list_latlon(file_path):
+    ''' Retrieve lat/lon information from given file.
+    
+    :param file_path: Path to the NetCDF file from which lat/lon information
+        should be extracted
+    :type file_path: string:
+
+    :returns: Dictionary containing lat/lon information if successful, otherwise
+        failure information is returned.
+
+    * Example successful JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            'success': true,
+            'lat_name': The guessed latitude variable name,
+            'lon_name': the guessed longitude variable name,
+            'lat_min': The minimum latitude value,
+            'lat_max': The maximum latitude value,
+            'lon_min': The minimum longitude value,
+            'lon_max': The maximum longitude value
+        }
+
+    * Example failure JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            'success': false,
+            'variables': List of all variables present in the NetCDF file
+        }
+    '''
     in_file = netCDF4.Dataset(file_path, mode='r')
 
     var_names = set([key.encode().lower() for key in in_file.variables.keys()])
@@ -74,9 +106,8 @@ def list_latlon(file_path):
 
     success = found_lat_name and found_lon_name
     if success:
-        values = [int(success), lat_name, lon_name, lat_min, lat_max, lon_min, lon_max]
-        value_names = ['success', 'latname', 'lonname', 'latMin', 'latMax', 'lonMin', 'lonMax']
-        #output = dict(values)
+        values = [success, lat_name, lon_name, lat_min, lat_max, lon_min, lon_max]
+        value_names = ['success', 'lat_name', 'lon_name', 'lat_min', 'lat_max', 'lon_min', 'lon_max']
         output = dict(zip(value_names, values))
 
         if request.query.callback:
