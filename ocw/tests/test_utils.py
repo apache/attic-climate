@@ -70,5 +70,11 @@ class TestTimeBaseParse(unittest.TestCase):
             'days since 1988g06g10g00g00g00'
         )
 
+class TestBaseTimeStringParse(unittest.TestCase):
+    def test_valid_time_base_string_parse(self):
+        base = utils.parse_base_time_string('days since 1988-06-10 00:00:00')
+        
+        self.assertEquals(base, '1988-06-10 00:00:00')
+
 if __name__ == '__main__':
     unittest.main()
