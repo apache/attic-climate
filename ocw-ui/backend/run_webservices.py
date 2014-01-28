@@ -16,15 +16,17 @@
 #
 ''' OCW UI Backend web services initialization. '''
 
-from bottle import Bottle, get, hook, response
+from bottle import Bottle, route, hook, response, run
+from local_file_metadata_extractors import lfme_app
 
 app = Bottle()
+app.mount('/lfme/', lfme_app)
 
-@app.get('/')
+@app.route('/')
 def index():
     return "OCW Backend is running!"
 
-@app.get('/static/evalResults/<filepath:path>')
+@app.route('/static/evalResults/<filepath:path>')
 def get_eval_result_image(filepath):
     ''' Return static file.
     
