@@ -98,5 +98,17 @@ class TestTimeExtraction(unittest.TestCase):
 
         self.assertDictEqual(expected_return, response.json)
 
+    def test_failure_time_extract(self):
+        expected_return = {
+            "success": False,
+            "variables": ["invalid_lon", "invalid_time", "invalid_lat"]
+        } 
+
+        file_location = os.path.abspath('tests/example_data/lat_lon_time_invalid.nc')
+
+        response = test_app.get('/lfme/list_time/' + file_location)
+
+        self.assertDictEqual(expected_return, response.json)
+
 if __name__ == '__main__':
     unittest.main()
