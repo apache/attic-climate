@@ -56,5 +56,12 @@ class TestTimeUnitsParse(unittest.TestCase):
             'parsecs since a made up date'
         )
 
+class TestTimeBaseParse(unittest.TestCase):
+    def test_valid_time_base(self):
+        base_time = utils.parse_time_base('days since 1988-06-10 00:00:00')
+        start_time = datetime.datetime.strptime('1988-06-10 00:00:00', '%Y-%m-%d %H:%M:%S')
+
+        self.assertEquals(base_time, start_time)
+
 if __name__ == '__main__':
     unittest.main()
