@@ -111,17 +111,12 @@ def list_latlon(file_path):
         values = [success, lat_name, lon_name, lat_min, lat_max, lon_min, lon_max]
         value_names = ['success', 'lat_name', 'lon_name', 'lat_min', 'lat_max', 'lon_min', 'lon_max']
         output = dict(zip(value_names, values))
-
-        if request.query.callback:
-            return "%s(%s)" % (request.query.callback, output)
-        return output
-
     else:
-        output = {"success": success, "variables": var_names_list}
+        output = {'success': success, 'variables': var_names_list}
 
-        if request.query.callback:
-            return "%s(%s)" % (request.query.callback, output)
-        return output
+    if request.query.callback:
+        return '%s(%s)' % (request.query.callback, output)
+    return output
 
 @lfme_app.route('/list_time/<file_path:path>')
 def list_latlon(file_path):
@@ -178,14 +173,9 @@ def list_latlon(file_path):
             'start_time': start_time,
             'end_time': end_time
         }
-
-        if request.query.callback:
-            return "%s(%s)" % (request.query.callback, output)
-        return output
-
     else:
-        output = {"success": False, "variables": var_names_list}
+        output = {'success': False, 'variables': var_names_list}
 
-        if request.query.callback:
-            return "%s(%s)" % (request.query.callback, output)
-        return output
+    if request.query.callback:
+        return '%s(%s)' % (request.query.callback, output)
+    return output
