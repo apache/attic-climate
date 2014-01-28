@@ -22,6 +22,8 @@ import netCDF4
 
 from bottle import Bottle, request, route
 
+import ocw.utils
+
 lfme_app = Bottle()
 
 @lfme_app.route('/list_latlon/<file_path:path>')
@@ -121,3 +123,69 @@ def list_latlon(file_path):
             return "%s(%s)" % (request.query.callback, output)
         return output
 
+@lfme_app.route('/list_time/<file_path:path>')
+def list_latlon(file_path):
+    ''' Retrieve time information from provided file.
+
+    :param file_path: Path to the NetCDF file from which time information
+        should be extracted
+    :type file_path: String:
+
+    :returns: Dictionary containing time information if successful, otherwise
+        failure information is returned.
+
+    * Example successful JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            "success": true,
+            "time_name": The guessed time variable name,
+            "start_time": "1988-06-10 00:00:00",
+            "end_time": "2008-01-27 00:00:00"
+        }
+
+    * Example failure JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            "success": false
+            "variables": List of all variable names in the file
+        } 
+    '''
+    in_file = netCDF4.Dataset(file_path, mode='r')
+
+    var_names = set([key.encode().lower() for key in in_file.variables.keys()])
+    var_names_list = list(var_names)
+
+    time_name_guesses = set(['time', 'times', 't', 'date', 'dates', 'julian'])
+
+    # Find the intersection (if there is one) of the var names with the lat guesses
+    time_guesses = list(var_names & time_name_guesses)
+
+    if len(time_guesses) >= 1:
+        # Convert time data to datetime objects
+        time_var_name = time_guesses[0]
+        times = ocw.utils.decode_time_values(in_file, time_var_name)
+
+        start_time = str(min(times))
+        end_time = str(max(times))
+
+        output = {
+            'success': True,
+            'time_name': time_var_name,
+            'start_time': start_time,
+            'end_time': end_time
+        }
+
+        if request.query.callback:
+            return "%s(%s)" % (request.query.callback, output)
+        return output
+
+    else:
+        output = {"success": False, "variables": var_names_list}
+
+        if request.query.callback:
+            return "%s(%s)" % (request.query.callback, output)
+        return output
