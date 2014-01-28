@@ -43,5 +43,11 @@ class TestDecodeTimes(unittest.TestCase):
         self.assertEquals(times[0], start_time)
         self.assertEquals(times[-1], end_time)
 
+class TestTimeUnitsParse(unittest.TestCase):
+    def test_valid_parse(self):
+        units = utils.parse_time_units('minutes since a made up date')
+
+        self.assertEquals(units, 'minutes')
+
 if __name__ == '__main__':
     unittest.main()
