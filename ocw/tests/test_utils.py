@@ -63,5 +63,12 @@ class TestTimeBaseParse(unittest.TestCase):
 
         self.assertEquals(base_time, start_time)
 
+    def test_invalid_time_base(self):
+        self.assertRaises(
+            ValueError,
+            utils.parse_time_base,
+            'days since 1988g06g10g00g00g00'
+        )
+
 if __name__ == '__main__':
     unittest.main()
