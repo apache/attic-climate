@@ -27,13 +27,13 @@ class TestLatLonExtraction(unittest.TestCase):
 
     def test_successful_latlon_extract_jsonp(self):
         expected_return = {
-            'lon_min': -24.639999389648438,
-            'lat_max': -45.759998321533203,
-            'success': True,
-            'lon_name': 'lon',
-            'lat_name': 'lat',
-            'lon_max': 60.279998779296875,
-            'lat_min': -45.759998321533203
+            "success": True,
+            "lat_name": "lat",
+            "lon_name": "lon",
+            "lat_min": -45.759998321533203,
+            "lat_max": -45.759998321533203,
+            "lon_min": -24.639999389648438,
+            "lon_max": 60.279998779296875
         }
 
         file_location = os.path.abspath('tests/example_data/lat_lon_time.nc')
