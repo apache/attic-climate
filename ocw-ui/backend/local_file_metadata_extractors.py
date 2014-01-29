@@ -179,3 +179,43 @@ def list_latlon(file_path):
     if request.query.callback:
         return '%s(%s)' % (request.query.callback, output)
     return output
+
+@lfme_app.route('/list_vars/<file_path:path>')
+def list_vars(file_path):
+    ''' Retrieve variable names from file.
+
+    :param file_path: Path to the NetCDF file from which variable information
+        should be extracted
+    :type file_path: String:
+
+    :returns: Dictionary containing variable information if succesful, otherwise
+        failure information is returned.
+
+    * Example successful JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            "success": true,
+            "variables": List of variable names in the file
+        }
+
+    * Example failure JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            "success": false
+        }
+    '''
+    try:
+        in_file = netCDF4.Dataset(file_path, mode='r')
+    except RuntimeError:
+        output = {'success': False}
+    else:
+        output = {'success': True, 'variables': in_file.variables.keys()}
+        in_file.close()
+    finally:
+        if request.query.callback:
+          return "%s(%s)" % (request.query.callback, output)
+        return output
