@@ -152,5 +152,18 @@ class TestTimeExtraction(unittest.TestCase):
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
 
+class TestVariableExtraction(unittest.TestCase):
+    def test_successful_variable_extraact(self):
+        expected_return = {
+            'success': True,
+            'variables': ['lat', 'lon', 'time']
+        }
+
+        file_location = os.path.abspath('tests/example_data/lat_lon_time.nc')
+
+        response = test_app.get('/lfme/list_vars/' + file_location)
+
+        self.assertDictEqual(expected_return, response.json)
+
 if __name__ == '__main__':
     unittest.main()
