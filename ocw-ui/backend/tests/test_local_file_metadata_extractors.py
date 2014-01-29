@@ -192,5 +192,20 @@ class TestVariableExtraction(unittest.TestCase):
 
         self.assertDictEqual(expected_return, response.json)
 
+    def test_failure_variable_extract_jsonp(self):
+        expected_return = {'success': False}
+
+        response = test_app.get('/lfme/list_vars//fakepath?callback=test_callback')
+        json = response.text
+
+        # Strip out the callback functino and the json string from the response
+        # and check for proper content.
+        callback = json[:json.index('(')]
+        json = json[json.index('(') + 1 : json.rindex(')')]
+        json = literal_eval(json)
+
+        self.assertDictEqual(expected_return, json)
+        self.assertEqual(callback, "test_callback")
+
 if __name__ == '__main__':
     unittest.main()
