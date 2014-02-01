@@ -128,14 +128,21 @@ def getResults(dirPath):
     else:
         return returnJSON
 
-@dir_app.route('/getPathLeader/')
-def getPathLeader():
-    returnJSON = {"leader": PATH_LEADER}
+@dir_app.route('/path_leader/')
+def get_path_leader():
+    ''' Return the path leader used for clean path creation.
+
+    * Example JSON Response *
+
+    .. sourcecode: javascript
+
+        {'leader': '/usr/local/rcmes'}
+    '''
+    return_json = {'leader': PATH_LEADER}
 
     if request.query.callback:
-        return "%s(%s)" % (request.query.callback, returnJSON)
-    else:
-        return returnJSON
+        return "%s(%s)" % (request.query.callback, return_json)
+    return return_json
 
 def _get_clean_directory_path(path_leader, dir_path):
     ''' Return a cleaned directory path with a defined path prefix.
