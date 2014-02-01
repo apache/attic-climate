@@ -34,3 +34,11 @@ class TestDirectoryPathCleaner(unittest.TestCase):
 
         clean_path = _get_clean_directory_path(self.PATH_LEADER, '/.././bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
+
+    def test_directory_validity_check(self):
+        self.assertRaises(
+            ValueError,
+            _get_clean_directory_path,
+            self.PATH_LEADER,
+            '/bar/path/to/missing/directory'
+        )
