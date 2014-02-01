@@ -26,11 +26,36 @@ import sys
 dir_app = Bottle()
 
 PATH_LEADER = "/usr/local/rcmes"
+WORK_DIR = "/tmp/rcmet"
 
 @dir_app.route('/list/')
 @dir_app.route('/list/<dir_path:path>')
 def get_directory_info(dir_path='/'):
-    ''''''
+    ''' Return the listing of a supplied path.
+
+    :param dir_path: The directory path to list.
+    :type dir_path: String
+
+    :returns: Dictionary containing the directory listing if possible.
+
+    * Example successful JSON return *
+
+    .. sourcecode: javascript
+
+        {
+            'listing': [
+                '/bar/',
+                '/baz.txt',
+                '/test.txt'
+            ]
+        }
+
+    * Example failure JSON return *
+
+    .. sourcecode: javascript
+
+        {'listing': []}
+    '''
     try:
         clean_path = _get_clean_directory_path(PATH_LEADER, dir_path)
         dir_listing = os.listdir(clean_path)
@@ -55,8 +80,6 @@ def get_directory_info(dir_path='/'):
     if request.query.callback:
         return "%s(%s)" % (request.query.callback, {'listing': dir_info})
     return {'listing': dir_info}
-
-WORK_DIR = "/tmp/rcmet"
 
 @dir_app.route('/getResultDirInfo')
 def getResultDirInfo():
