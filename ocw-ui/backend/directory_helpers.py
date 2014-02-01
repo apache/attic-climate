@@ -124,10 +124,10 @@ def _get_clean_directory_path(path_leader, dir_path):
     # which could allow access to unacceptable paths. This also means that
     if dir_path[0] == '/': dir_path = dir_path[1:]
 
-    os.path.join(path_leader, dir_path)
+    dir_path = os.path.join(path_leader, dir_path)
     if not os.path.isdir(dir_path):
         cur_frame = sys._getframe().f_code
-        err = "{}.{}: Create path is not a valid directory {}".format(
+        err = "{}.{}: Created path is not a valid directory {}".format(
             cur_frame.co_filename,
             cur_frame.co_name,
             dir_path
