@@ -105,3 +105,22 @@ def getPathLeader():
         return "%s(%s)" % (request.query.callback, returnJSON)
     else:
         return returnJSON
+
+def _get_clean_directory_path(path_leader, dir_path):
+    ''''''
+    dir_path = re.sub('/\.\./|/\.\.|/\./|/\.', '/', dir_path)
+
+    # Prevents the directory path from being a substring of the path leader.
+    # os.path.join('/usr/local/rcmes', '/usr/local') gives '/usr/local'
+    # which could allow access to unacceptable paths.
+    if path_leader.startswith(dir_path):
+        cur_frame = sys._getframe().f_code
+        err = "{}.{}: Path leader {} cannot start with passed directory {}".format(
+            cur_frame.co_filename,
+            cur_frame.co_name,
+            path_leader,
+            dir_path
+        )
+        raise ValueError(err)
+
+    return os.path.join(path_leader, dir_path)
