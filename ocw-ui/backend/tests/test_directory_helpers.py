@@ -19,8 +19,13 @@ class TestDirectoryPathList(unittest.TestCase):
         open(PATH_LEADER + '/test.txt', 'a').close()
 
     def test_valid_path_listing(self):
-        expected_return = {"listing": ["/bar/", "/baz.txt", "/test.txt"]}
+        expected_return = {'listing': ['/bar/', '/baz.txt', '/test.txt']}
         response = test_app.get('http://localhost:8082/dir/list//')
+        self.assertDictEqual(response.json, expected_return)
+
+    def test_invalid_path_listing(self):
+        expected_return = {'listing': []}
+        response = test_app.get('http://localhost:8082/dir/list//usr/local')
         self.assertDictEqual(response.json, expected_return)
 
 class TestDirectoryPathCleaner(unittest.TestCase):
