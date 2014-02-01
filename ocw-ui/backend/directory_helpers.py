@@ -116,7 +116,7 @@ def getPathLeader():
 def _get_clean_directory_path(path_leader, dir_path):
     ''''''
     # Strip out any .. or . relative directories and remove duplicate slashes
-    dir_path = re.sub('/\.\./|/\.\.|/\./|/\.', '/', dir_path)
+    dir_path = re.sub('/[\./]*/?', '/', dir_path)
     dir_path = re.sub('//+', '/', dir_path)
 
     # Prevents the directory path from being a substring of the path leader.
