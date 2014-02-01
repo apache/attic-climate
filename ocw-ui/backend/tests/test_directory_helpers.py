@@ -24,3 +24,13 @@ class TestDirectoryPathCleaner(unittest.TestCase):
 
         clean_path = _get_clean_directory_path(self.PATH_LEADER, '/////bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
+
+    def test_relative_path_removal(self):
+        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/../bar')
+        self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
+
+        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/./bar')
+        self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
+
+        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/.././bar')
+        self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
