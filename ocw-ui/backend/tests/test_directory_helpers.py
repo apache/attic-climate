@@ -54,6 +54,25 @@ class TestResultDirectoryList(unittest.TestCase):
         response = test_app.get('http://localhost:8082/dir/results/')
         self.assertDictEqual(response.json, expected_return)
 
+class TestResultResultRetrieval(unittest.TestCase):
+    WORK_DIR = '/tmp/rcmes'
+
+    def test_no_test_directory_retreival(self):
+        if os.path.exists(self.WORK_DIR + '/foo'): os.rmdir(self.WORK_DIR + '/foo')
+
+        expected_return = {'listing': []}
+        response = test_app.get('http://localhost:8082/dir/results//foo')
+        self.assertDictEqual(response.json, expected_return)
+
+    def test_results_retreival(self):
+        if not os.path.exists(self.WORK_DIR): os.mkdir(self.WORK_DIR)
+        if not os.path.exists(self.WORK_DIR + '/foo'): os.mkdir(self.WORK_DIR + '/foo')
+
+        if not os.path.exists(self.WORK_DIR + '/foo/baz.txt'):
+            open(self.WORK_DIR + '/baz.txt', 'a').close()
+        if not os.path.exists(self.WORK_DIR + '/foo/test.txt'):
+            open(self.WORK_DIR + '/test.txt', 'a').close()
+
 class TestDirectoryPathCleaner(unittest.TestCase):
     PATH_LEADER = '/tmp/foo'
     VALID_CLEAN_DIR = '/tmp/foo/bar'

@@ -132,28 +132,58 @@ def get_result_dir_info():
         return "%s(%s)" % (request.query.callback, {'listing': dir_info})
     return {'listing': dir_info}
 
-@dir_app.route('/getResults/<dirPath:path>')
-def getResults(dirPath):
-    dirPath = WORK_DIR + dirPath
-    dirPath = dirPath.replace('/../', '/')
-    dirPath = dirPath.replace('/./', '/')
+@dir_app.route('/results/<dir_path:path>')
+def get_results(dir_path):
+    ''' Retrieve specific result files.
 
-    if os.path.isdir(dirPath):
-        listing = os.listdir(dirPath)
-        listingNoHidden = [f for f in listing if f[0] != '.']
-        joinedPaths = [os.path.join(dirPath, f) for f in listingNoHidden]
-        onlyFilesNoDirs = [f for f in joinedPaths if os.path.isfile(f)]
-        finalPaths = [p.replace(WORK_DIR, '') for p in onlyFilesNoDirs]
-        sorted(finalPaths, key=lambda s: s.lower())
-        returnJSON = finalPaths
+    :param dir_path: The relative results path to list.
+    :type dir_path: String
+
+    :returns: Dictionary of the requested result's directory listing.
+
+    * Successful JSON Response *
+
+    ..sourcecode: javascript
+
+        {
+            'listing': [
+                'file1',
+                'file2'
+            ]
+        }
+
+    * Failure JSON Response *
+
+    ..sourcecode: javascript
+
+        {
+            'listing': []
+        }
+    '''
+    dir_info = []
+
+    try:
+        clean_path = _get_clean_directory_path(WORK_DIR, dir_path)
+        dir_listing = os.listdir(clean_path)
+    except:
+        # ValueError - dir_path couldn't be 'cleaned'
+        # OSError - clean_path is not a directory
+        # Either way, we don't have any results to return!
+        pass
     else:
-        returnJSON = []
+        for obj in dir_listing:
+            # Ignore hidden files
+            if obj[0] == '.': continue
 
-    returnJSON = json.dumps(returnJSON)
+            # Create a path to the listed object and strip out the path leader.
+            obj = os.path.join(clean_path, obj)
+            dir_info.append(obj.replace(WORK_DIR, ''))
+
+        sorted(dir_info, key=lambda s: s.lower())
+
     if request.query.callback:
-        return "%s(%s)" % (request.query.callback, returnJSON)
-    else:
-        return returnJSON
+        return "%s(%s)" % (request.query.callback, {'listing': dir_info})
+    return {'listing': dir_info}
 
 @dir_app.route('/path_leader/')
 def get_path_leader():
