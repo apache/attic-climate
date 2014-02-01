@@ -56,15 +56,17 @@ def get_directory_info(dir_path='/'):
 
         {'listing': []}
     '''
+    dir_info = []
+
     try:
         clean_path = _get_clean_directory_path(PATH_LEADER, dir_path)
         dir_listing = os.listdir(clean_path)
     except:
         # ValueError - dir_path couldn't be 'cleaned'
         # OSError - clean_path is not a directory
-        dir_info = []
+        # Either way, we don't have anything to list for the directory!
+        pass
     else:
-        dir_info = []
         for obj in dir_listing:
             # Ignore hidden files
             if obj[0] == '.': continue
