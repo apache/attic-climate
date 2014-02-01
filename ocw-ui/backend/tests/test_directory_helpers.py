@@ -7,6 +7,22 @@ from ..directory_helpers import _get_clean_directory_path
 
 test_app = TestApp(app)
 
+class TestDirectoryPathList(unittest.TestCase):
+    PATH_LEADER = '/usr/local/rcmes'
+
+    if not os.path.exists(PATH_LEADER): os.mkdir(PATH_LEADER)
+    if not os.path.exists(PATH_LEADER + '/bar'):
+        os.mkdir(PATH_LEADER + '/bar')
+    if not os.path.exists(PATH_LEADER + '/baz.txt'):
+        open(PATH_LEADER + '/baz.txt', 'a').close()
+    if not os.path.exists(PATH_LEADER + '/test.txt'):
+        open(PATH_LEADER + '/test.txt', 'a').close()
+
+    def test_valid_path_listing(self):
+        expected_return = {"listing": ["/bar/", "/baz.txt", "/test.txt"]}
+        response = test_app.get('http://localhost:8082/dir/list//')
+        self.assertDictEqual(response.json, expected_return)
+
 class TestDirectoryPathCleaner(unittest.TestCase):
     PATH_LEADER = '/tmp/foo'
     VALID_CLEAN_DIR = '/tmp/foo/bar'
