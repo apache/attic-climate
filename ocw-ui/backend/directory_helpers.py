@@ -27,8 +27,9 @@ dir_app = Bottle()
 
 PATH_LEADER = "/usr/local/rcmes"
 
+@dir_app.route('/list/')
 @dir_app.route('/list/<dir_path:path>')
-def get_directory_info(dir_path):
+def get_directory_info(dir_path='/'):
     ''''''
     try:
         clean_path = _get_clean_directory_path(PATH_LEADER, dir_path)
@@ -52,8 +53,8 @@ def get_directory_info(dir_path):
         sorted(dir_info, key=lambda s: s.lower())
 
     if request.query.callback:
-        return "%s(%s)" % (request.query.callback, return_json)
-    return return_json
+        return "%s(%s)" % (request.query.callback, {'listing': dir_info})
+    return {'listing': dir_info}
 
 WORK_DIR = "/tmp/rcmet"
 
