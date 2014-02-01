@@ -26,7 +26,7 @@ import sys
 dir_app = Bottle()
 
 PATH_LEADER = "/usr/local/rcmes"
-WORK_DIR = "/tmp/rcmet"
+WORK_DIR = "/tmp/rcmes"
 
 @dir_app.route('/list/')
 @dir_app.route('/list/<dir_path:path>')
@@ -81,29 +81,56 @@ def get_directory_info(dir_path='/'):
         return "%s(%s)" % (request.query.callback, {'listing': dir_info})
     return {'listing': dir_info}
 
-@dir_app.route('/getResultDirInfo')
-def getResultDirInfo():
-    dirPath = WORK_DIR
-    dirPath = dirPath.replace('/../', '/')
-    dirPath = dirPath.replace('/./', '/')
+@dir_app.route('/results/')
+def get_result_dir_info():
+    ''' Retrieve results directory information.
 
-    if os.path.isdir(dirPath):
-        listing = os.listdir(dirPath)
-        directories=[d for d in os.listdir(os.getcwd()) if os.path.isdir(d)]
-        listingNoHidden = [f for f in listing if f[0] != '.']
-        joinedPaths = [os.path.join(dirPath, f) for f in listingNoHidden]
-        onlyDirs = [f for f in joinedPaths if os.path.isdir(f)]
-        finalPaths = [p.replace(WORK_DIR, '') for p in onlyDirs]
-        sorted(finalPaths, key=lambda s: s.lower())
-        returnJSON = finalPaths
+    The backend's results directory is determined by WORK_DIR. All the 
+    directories there are formatted and returned as results. If WORK_DIR does
+    not exist, an empty listing will be returned (shown as a 'failure below').
+
+    * Successful JSON Response *
+
+    ..sourcecode: javascript
+
+        {
+            'listing': [
+                '/bar',
+                '/foo'
+            ]
+        }
+
+    * Failure JSON Response *
+
+    ..sourcecode: javascript
+
+        {
+            'listing': []
+        }
+    '''
+    dir_info = []
+
+    try:
+        dir_listing = os.listdir(WORK_DIR)
+    except OSError:
+        # The WORK_DIR hasn't been created, so we don't have any results!
+        pass
     else:
-        returnJSON = []
+        for obj in dir_listing:
+            # Ignore hidden files
+            if obj[0] == '.': continue
 
-    returnJSON = json.dumps(returnJSON)
+            # Create a path to the listed object and strip the work dir leader.
+            # If the result isn't a directory, ignore it.
+            obj = os.path.join(WORK_DIR, obj)
+            if not os.path.isdir(obj): continue
+            dir_info.append(obj.replace(WORK_DIR, ''))
+
+        sorted(dir_info, key=lambda s: s.lower())
+
     if request.query.callback:
-        return "%s(%s)" % (request.query.callback, returnJSON)
-    else:
-        return returnJSON
+        return "%s(%s)" % (request.query.callback, {'listing': dir_info})
+    return {'listing': dir_info}
 
 @dir_app.route('/getResults/<dirPath:path>')
 def getResults(dirPath):

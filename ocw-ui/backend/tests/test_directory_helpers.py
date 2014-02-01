@@ -33,6 +33,27 @@ class TestDirectoryPathList(unittest.TestCase):
         response = test_app.get('http://localhost:8082/dir/list//fake/path')
         self.assertDictEqual(response.json, expected_return)
 
+class TestResultDirectoryList(unittest.TestCase):
+    WORK_DIR = '/tmp/rcmes'
+
+    def test_result_listing(self):
+        if not os.path.exists(self.WORK_DIR): os.mkdir(self.WORK_DIR)
+        if not os.path.exists(self.WORK_DIR + '/foo'): os.mkdir(self.WORK_DIR + '/foo')
+        if not os.path.exists(self.WORK_DIR + '/bar'): os.mkdir(self.WORK_DIR + '/bar')
+
+        expected_return = {'listing': ['/bar', '/foo']}
+        response = test_app.get('http://localhost:8082/dir/results/')
+        self.assertDictEqual(response.json, expected_return)
+
+    def test_missing_work_dir_listing(self):
+        if os.path.exists(self.WORK_DIR + '/foo'): os.rmdir(self.WORK_DIR + '/foo')
+        if os.path.exists(self.WORK_DIR + '/bar'): os.rmdir(self.WORK_DIR + '/bar')
+        if os.path.exists(self.WORK_DIR): os.rmdir(self.WORK_DIR)
+
+        expected_return = {'listing': []}
+        response = test_app.get('http://localhost:8082/dir/results/')
+        self.assertDictEqual(response.json, expected_return)
+
 class TestDirectoryPathCleaner(unittest.TestCase):
     PATH_LEADER = '/tmp/foo'
     VALID_CLEAN_DIR = '/tmp/foo/bar'
