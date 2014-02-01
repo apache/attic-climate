@@ -28,6 +28,11 @@ class TestDirectoryPathList(unittest.TestCase):
         response = test_app.get('http://localhost:8082/dir/list//usr/local')
         self.assertDictEqual(response.json, expected_return)
 
+    def test_nonexistent_path_listing(self):
+        expected_return = {'listing': []}
+        response = test_app.get('http://localhost:8082/dir/list//fake/path')
+        self.assertDictEqual(response.json, expected_return)
+
 class TestDirectoryPathCleaner(unittest.TestCase):
     PATH_LEADER = '/tmp/foo'
     VALID_CLEAN_DIR = '/tmp/foo/bar'
@@ -55,11 +60,3 @@ class TestDirectoryPathCleaner(unittest.TestCase):
 
         clean_path = _get_clean_directory_path(self.PATH_LEADER, '/.././bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
-
-    def test_directory_validity_check(self):
-        self.assertRaises(
-            ValueError,
-            _get_clean_directory_path,
-            self.PATH_LEADER,
-            '/bar/path/to/missing/directory'
-        )

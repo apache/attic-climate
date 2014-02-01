@@ -115,7 +115,20 @@ def getPathLeader():
         return returnJSON
 
 def _get_clean_directory_path(path_leader, dir_path):
-    ''''''
+    ''' Return a cleaned directory path with a defined path prefix.
+
+    'Clean' dir_path to remove any relative path components or duplicate 
+    slashes that could cause problems. The final clean path is then the
+    path_leader + dir_path.
+
+    :param path_leader: The path prefix that will be prepended to the cleaned
+        dir_path.
+    :type path_leader: String
+    :param dir_path: The path to clean.
+    :type path_leader: String
+    
+    :returns: The cleaned directory path with path_leader prepended.
+    '''
     # Strip out any .. or . relative directories and remove duplicate slashes
     dir_path = re.sub('/[\./]*/?', '/', dir_path)
     dir_path = re.sub('//+', '/', dir_path)
@@ -125,14 +138,4 @@ def _get_clean_directory_path(path_leader, dir_path):
     # which could allow access to unacceptable paths. This also means that
     if dir_path[0] == '/': dir_path = dir_path[1:]
 
-    dir_path = os.path.join(path_leader, dir_path)
-    if not os.path.isdir(dir_path):
-        cur_frame = sys._getframe().f_code
-        err = "{}.{}: Created path is not a valid directory {}".format(
-            cur_frame.co_filename,
-            cur_frame.co_name,
-            dir_path
-        )
-        raise ValueError(err)
-
-    return dir_path
+    return os.path.join(path_leader, dir_path)
