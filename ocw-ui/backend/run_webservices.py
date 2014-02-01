@@ -18,9 +18,11 @@
 
 from bottle import Bottle, route, hook, response, run
 from local_file_metadata_extractors import lfme_app
+from directory_helpers import dir_app
 
 app = Bottle()
 app.mount('/lfme/', lfme_app)
+app.mount('/dir/', dir_app)
 
 @app.route('/')
 def index():

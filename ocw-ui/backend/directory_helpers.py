@@ -14,43 +14,50 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-#!/usr/bin/env python
-"""
-    Provides helpers for listing retrieving directory information from the server.
-"""
 
-from bottle import request, route
+''' Endpoints for retrieving directory information from the server. '''
+
+from bottle import Bottle, request, route
 import os
 import json
+import re
+import sys
+
+dir_app = Bottle()
 
 PATH_LEADER = "/usr/local/rcmes"
 
-@route('/getDirInfo/<dirPath:path>')
-def getDirectoryInfo(dirPath):
-    dirPath = PATH_LEADER + dirPath
-    dirPath = dirPath.replace('/../', '/')
-    dirPath = dirPath.replace('/./', '/')
-
-    if os.path.isdir(dirPath):
-        listing = os.listdir(dirPath)
-        listingNoHidden = [f for f in listing if f[0] != '.']
-        joinedPaths = [os.path.join(dirPath, f) for f in listingNoHidden]
-        joinedPaths = [f + "/" if os.path.isdir(f) else f for f in joinedPaths]
-        finalPaths = [p.replace(PATH_LEADER, '') for p in joinedPaths]
-        sorted(finalPaths, key=lambda s: s.lower())
-        returnJSON = finalPaths
+@dir_app.route('/list/<dir_path:path>')
+def get_directory_info(dir_path):
+    ''''''
+    try:
+        clean_path = _get_clean_directory_path(PATH_LEADER, dir_path)
+        dir_listing = os.listdir(clean_path)
+    except:
+        # ValueError - dir_path couldn't be 'cleaned'
+        # OSError - clean_path is not a directory
+        dir_info = []
     else:
-        returnJSON = []
+        dir_info = []
+        for obj in dir_listing:
+            # Ignore hidden files
+            if obj[0] == '.': continue
 
-    returnJSON = json.dumps(returnJSON)
+            # Create a path to the listed object. If it's a directory add a
+            # trailing slash as a visual clue. Then strip out the path leader.
+            obj = os.path.join(clean_path, obj)
+            if os.path.isdir(obj): obj = obj + '/'
+            dir_info.append(obj.replace(PATH_LEADER, ''))
+
+        sorted(dir_info, key=lambda s: s.lower())
+
     if request.query.callback:
-        return "%s(%s)" % (request.query.callback, returnJSON)
-    else:
-        return returnJSON
+        return "%s(%s)" % (request.query.callback, return_json)
+    return return_json
 
 WORK_DIR = "/tmp/rcmet"
 
-@route('/getResultDirInfo')
+@dir_app.route('/getResultDirInfo')
 def getResultDirInfo():
     dirPath = WORK_DIR
     dirPath = dirPath.replace('/../', '/')
@@ -74,7 +81,7 @@ def getResultDirInfo():
     else:
         return returnJSON
 
-@route('/getResults/<dirPath:path>')
+@dir_app.route('/getResults/<dirPath:path>')
 def getResults(dirPath):
     dirPath = WORK_DIR + dirPath
     dirPath = dirPath.replace('/../', '/')
@@ -97,7 +104,7 @@ def getResults(dirPath):
     else:
         return returnJSON
 
-@route('/getPathLeader/')
+@dir_app.route('/getPathLeader/')
 def getPathLeader():
     returnJSON = {"leader": PATH_LEADER}
 
