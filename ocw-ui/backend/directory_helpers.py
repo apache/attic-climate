@@ -17,11 +17,9 @@
 
 ''' Endpoints for retrieving directory information from the server. '''
 
-from bottle import Bottle, request, route
+from bottle import Bottle, request
 import os
-import json
 import re
-import sys
 
 dir_app = Bottle()
 
