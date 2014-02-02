@@ -23,25 +23,58 @@ import requests
 
 rcmed_app = Bottle()
 
-@rcmed_app.route('/getObsDatasets')
-def getObservationDatasetData():
+@rcmed_app.route('/datasets/')
+def get_observation_dataset_data():
+    ''' Return a list of dataset information from JPL's RCMED.
+
+    * Example Return JSON Format *
+
+    ..sourcecode: javascript
+
+        [
+            {
+                "dataset_id": "17",
+                "shortname": "The dataset's short name",
+                "longname": "The dataset's, full name",
+                "source": "Where the dataset originated"
+            },
+            ...
+        ]
+    '''
     r = requests.get('http://rcmes.jpl.nasa.gov/query-api/datasets.php')
 
-    # Handle JSONP requests
     if (request.query.callback):
         return "%s(%s)" % (request.query.callback, r.text)
-    # Otherwise, just return JSON
-    else:
-        return r.text
+    return r.text
 
-@rcmed_app.route('/getDatasetParam')
-def getDatasetParameters():
+@rcmed_app.route('/parameters/')
+def get_dataset_parameters():
+    ''' Return dataset specific parameter information from JPL's RCMED.
+
+    * Example Call Format *
+
+    ..sourcecode: javascript
+
+        /parameters/?dataset=<dataset's short name>
+
+    * Example Return JSON Format *
+
+    ..sourcecode: javascript
+
+        [
+            {
+                "parameter_id": "80",
+                "shortname": "The dataset's short name",
+                "datasetshortname": "The dataset's short name again",
+                "longname": "The dataset's long name",
+                "units": "Units for the dataset's measurements"
+            }
+        ]
+
+    '''
     url = 'http://rcmes.jpl.nasa.gov/query-api/parameters.php?dataset=' + request.query.dataset
     r = requests.get(url)
 
-    # Handle JSONP requests
     if (request.query.callback):
         return "%s(%s)" % (request.query.callback, r.text)
-    # Otherwise, just return JSON
-    else:
-        return r.text
+    return r.text
