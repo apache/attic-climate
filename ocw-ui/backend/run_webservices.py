@@ -16,13 +16,15 @@
 #
 ''' OCW UI Backend web services initialization. '''
 
-from bottle import Bottle, route, hook, response, run
+from bottle import Bottle, response
 from local_file_metadata_extractors import lfme_app
 from directory_helpers import dir_app
+from rcmed_helpers import rcmed_app
 
 app = Bottle()
 app.mount('/lfme/', lfme_app)
 app.mount('/dir/', dir_app)
+app.mount('/rcmed/', rcmed_app)
 
 @app.route('/')
 def index():
@@ -45,7 +47,7 @@ def get_eval_result_image(filepath):
     :returns: The requested file resource
 
     '''
-    return static_file(filepath, root="/tmp/rcmet")
+    return app.static_file(filepath, root="/tmp/rcmet")
 
 @app.hook('after_request')
 def enable_cors():

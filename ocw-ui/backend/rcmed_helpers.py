@@ -21,9 +21,9 @@ from bottle import Bottle, request
 
 import requests
 
-dataset_app = Bottle()
+rcmed_app = Bottle()
 
-@dataset_app.route('/getObsDatasets')
+@rcmed_app.route('/getObsDatasets')
 def getObservationDatasetData():
     r = requests.get('http://rcmes.jpl.nasa.gov/query-api/datasets.php')
 
@@ -34,7 +34,7 @@ def getObservationDatasetData():
     else:
         return r.text
 
-@dataset_app.route('/getDatasetParam')
+@rcmed_app.route('/getDatasetParam')
 def getDatasetParameters():
     url = 'http://rcmes.jpl.nasa.gov/query-api/parameters.php?dataset=' + request.query.dataset
     r = requests.get(url)
