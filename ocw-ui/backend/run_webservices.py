@@ -16,7 +16,7 @@
 #
 ''' OCW UI Backend web services initialization. '''
 
-from bottle import Bottle, response
+from bottle import Bottle, response, static_file
 from local_file_metadata_extractors import lfme_app
 from directory_helpers import dir_app
 from rcmed_helpers import rcmed_app
@@ -30,8 +30,8 @@ app.mount('/rcmed/', rcmed_app)
 def index():
     return "OCW Backend is running!"
 
-@app.route('/static/evalResults/<filepath:path>')
-def get_eval_result_image(filepath):
+@app.route('/static/eval_results/<file_path:path>')
+def get_eval_result_image(file_path):
     ''' Return static file.
     
     Return static file specified by root + filepath where root defaults to:
@@ -45,9 +45,8 @@ def get_eval_result_image(filepath):
     :type filepath: string
 
     :returns: The requested file resource
-
     '''
-    return app.static_file(filepath, root="/tmp/rcmet")
+    return static_file(file_path, root="/tmp/ocw")
 
 @app.hook('after_request')
 def enable_cors():

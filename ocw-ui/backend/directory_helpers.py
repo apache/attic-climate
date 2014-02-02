@@ -23,8 +23,8 @@ import re
 
 dir_app = Bottle()
 
-PATH_LEADER = "/usr/local/rcmes"
-WORK_DIR = "/tmp/rcmes"
+PATH_LEADER = "/usr/local/ocw"
+WORK_DIR = "/tmp/ocw"
 
 @dir_app.route('/list/')
 @dir_app.route('/list/<dir_path:path>')
@@ -193,7 +193,7 @@ def get_path_leader():
 
     .. sourcecode: javascript
 
-        {'leader': '/usr/local/rcmes'}
+        {'leader': '/usr/local/ocw'}
     '''
     return_json = {'leader': PATH_LEADER}
 
@@ -221,7 +221,7 @@ def _get_clean_directory_path(path_leader, dir_path):
     dir_path = re.sub('//+', '/', dir_path)
 
     # Prevents the directory path from being a substring of the path leader.
-    # os.path.join('/usr/local/rcmes', '/usr/local') gives '/usr/local'
+    # os.path.join('/usr/local/ocw', '/usr/local') gives '/usr/local'
     # which could allow access to unacceptable paths. This also means that
     if dir_path[0] == '/': dir_path = dir_path[1:]
 

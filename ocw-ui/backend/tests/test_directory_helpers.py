@@ -8,7 +8,7 @@ from ..directory_helpers import _get_clean_directory_path
 test_app = TestApp(app)
 
 class TestDirectoryPathList(unittest.TestCase):
-    PATH_LEADER = '/usr/local/rcmes'
+    PATH_LEADER = '/usr/local/ocw'
 
     @classmethod
     def setUpClass(self):
@@ -25,6 +25,7 @@ class TestDirectoryPathList(unittest.TestCase):
         os.remove(self.PATH_LEADER + '/test.txt')
         os.remove(self.PATH_LEADER + '/baz.txt')
         os.rmdir(self.PATH_LEADER + '/bar')
+        os.rmdir(self.PATH_LEADER)
 
     def test_valid_path_listing(self):
         expected_return = {'listing': ['/bar/', '/baz.txt', '/test.txt']}
@@ -42,7 +43,7 @@ class TestDirectoryPathList(unittest.TestCase):
         self.assertDictEqual(response.json, expected_return)
 
 class TestResultDirectoryList(unittest.TestCase):
-    WORK_DIR = '/tmp/rcmes'
+    WORK_DIR = '/tmp/ocw'
 
     def setUp(self):
         if not os.path.exists(self.WORK_DIR): os.mkdir(self.WORK_DIR)
@@ -51,9 +52,9 @@ class TestResultDirectoryList(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        if not os.path.exists(self.WORK_DIR + '/foo'): os.rmdir(self.WORK_DIR + '/foo')
-        if not os.path.exists(self.WORK_DIR + '/bar'): os.rmdir(self.WORK_DIR + '/bar')
-        if not os.path.exists(self.WORK_DIR): os.rmdir(self.WORK_DIR)
+        if os.path.exists(self.WORK_DIR + '/foo'): os.rmdir(self.WORK_DIR + '/foo')
+        if os.path.exists(self.WORK_DIR + '/bar'): os.rmdir(self.WORK_DIR + '/bar')
+        if os.path.exists(self.WORK_DIR): os.rmdir(self.WORK_DIR)
 
     def test_result_listing(self):
         expected_return = {'listing': ['/bar', '/foo']}
@@ -70,7 +71,7 @@ class TestResultDirectoryList(unittest.TestCase):
         self.assertDictEqual(response.json, expected_return)
 
 class TestResultResultRetrieval(unittest.TestCase):
-    WORK_DIR = '/tmp/rcmes'
+    WORK_DIR = '/tmp/ocw'
 
     @classmethod
     def setUpClass(self):
@@ -84,14 +85,10 @@ class TestResultResultRetrieval(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        if os.path.exists(self.WORK_DIR + '/foo/baz.txt'):
-            os.remove(self.WORK_DIR + '/foo/baz.txt')
-
-        if os.path.exists(self.WORK_DIR + '/foo/test.txt'):
-            os.remove(self.WORK_DIR + '/foo/test.txt')
-
-        if not os.path.exists(self.WORK_DIR + '/foo'):
-            os.rmdirs(self.WORK_DIR + '/foo')
+        os.remove(self.WORK_DIR + '/foo/baz.txt')
+        os.remove(self.WORK_DIR + '/foo/test.txt')
+        os.rmdir(self.WORK_DIR + '/foo')
+        os.rmdir(self.WORK_DIR)
 
     def test_no_test_directory_retreival(self):
         expected_return = {'listing': []}
@@ -107,8 +104,15 @@ class TestDirectoryPathCleaner(unittest.TestCase):
     PATH_LEADER = '/tmp/foo'
     VALID_CLEAN_DIR = '/tmp/foo/bar'
 
-    if not os.path.exists(PATH_LEADER): os.mkdir(PATH_LEADER)
-    if not os.path.exists(VALID_CLEAN_DIR): os.mkdir(VALID_CLEAN_DIR)
+    @classmethod
+    def setUpClass(self):
+        if not os.path.exists(self.PATH_LEADER): os.mkdir(self.PATH_LEADER)
+        if not os.path.exists(self.VALID_CLEAN_DIR): os.mkdir(self.VALID_CLEAN_DIR)
+
+    @classmethod
+    def tearDownClass(self):
+        os.rmdir(self.VALID_CLEAN_DIR)
+        os.rmdir(self.PATH_LEADER)
 
     def test_valid_directory_path(self):
         clean_path = _get_clean_directory_path(self.PATH_LEADER, '/bar')
