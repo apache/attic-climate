@@ -14,16 +14,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-#!/usr/bin/env python
-"""
-    Provides Bottle services for interacting with RCMED
-"""
 
-from bottle import request, route
+''' Services for interacting with NASA JPL's Regional Climate Model Evaluation Database. '''
+
+from bottle import Bottle, request
 
 import requests
 
-@route('/getObsDatasets')
+dataset_app = Bottle()
+
+@dataset_app.route('/getObsDatasets')
 def getObservationDatasetData():
     r = requests.get('http://rcmes.jpl.nasa.gov/query-api/datasets.php')
 
@@ -34,7 +34,7 @@ def getObservationDatasetData():
     else:
         return r.text
 
-@route('/getDatasetParam')
+@dataset_app.route('/getDatasetParam')
 def getDatasetParameters():
     url = 'http://rcmes.jpl.nasa.gov/query-api/parameters.php?dataset=' + request.query.dataset
     r = requests.get(url)
