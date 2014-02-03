@@ -20,14 +20,13 @@
 import sys
 from ast import literal_eval
 
-from Bottle import Bottle, request
+from bottle import Bottle, request
 
 import ocw.data_source.local as local
 import ocw.data_source.rcmed as rcmed
-import ocw.dataset_processsor as dst
+import ocw.dataset_processor as dst
 from ocw.evaluation import Evaluation
 import ocw.metrics as metrics
-import ocw.plotter as plotter
 
 processing_app = Bottle()
 
