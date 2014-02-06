@@ -20,11 +20,11 @@
 import unittest
 import datetime as dt
 
-from ocw.metrics import Bias
+from ocw.metrics import Bias, TemporalStdDev
 from ocw.dataset import Dataset
 
 import numpy as np
-
+import numpy.testing as npt
 
 class TestBias(unittest.TestCase):
     '''Test the metrics.Bias metric.'''
@@ -56,6 +56,27 @@ class TestBias(unittest.TestCase):
         expected_result.fill(-300)
         self.assertTrue(np.array_equal(self.bias.run(self.reference_dataset, self.target_dataset), expected_result))
 
+
+class TestTemporalStdDev(unittest.TestCase):
+    '''Test the metrics.TemporalStdDev metric.'''
+    def setUp(self):
+        self.temporal_std_dev = TemporalStdDev()
+        #Initialize target dataset
+        self.target_lat = np.array([10, 12, 14, 16, 18])
+        self.target_lon = np.array([100, 102, 104, 106, 108])
+        self.target_time = np.array([dt.datetime(2000, x, 1) for x in range(1, 13)])
+        flat_array = np.array(range(300))
+        self.target_value = flat_array.reshape(12, 5, 5)
+        self.target_variable = 'prec'
+        self.target_dataset = Dataset(self.target_lat, self.target_lon, self.target_time,
+            self.target_value, self.target_variable)
+
+
+    def test_function_run(self):
+        '''Test TemporalStdDev function for target dataset.'''
+        expected_result = np.zeros((12, 5),)
+        expected_result.fill(7.90569415)
+        npt.assert_almost_equal(self.temporal_std_dev.run(self.target_dataset), expected_result)
 
 if __name__ == '__main__':
     unittest.main()
