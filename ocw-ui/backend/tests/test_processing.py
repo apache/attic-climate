@@ -42,6 +42,14 @@ class TestLocalDatasetLoad(unittest.TestCase):
         dataset = bp._load_local_dataset_object(dataset_object)
         self.assertEqual(dataset.variable, dataset_object['var_name'])
 
+class TestDatasetProessingHelper(unittest.TestCase):
+    def test_invalid_process_dataset_objects(self):
+        invalid_dataset_object = {'data_source_id': 3, 'dataset_info': {}}
+        self.assertRaises(
+                ValueError,
+                bp._process_dataset_object,
+                invalid_dataset_object, 'fake parameter')
+
 class TestRCMEDDatasetLoad(unittest.TestCase):
     def test_valid_load(self):
         metadata = rcmed.get_parameters_metadata()
