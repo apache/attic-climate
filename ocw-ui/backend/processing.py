@@ -135,10 +135,8 @@ def run_evaluation():
     lat_step = request.query['lat_degree_step']
     lon_step = request.query['lon_degree_step']
     lat_bins, lon_bins = _calculate_new_latlon_bins(eval_bounds, lat_step, lon_step)
-
-    # Re-bin the datasets
     ref_dataset = dsp.spatial_regrid(ref_dataset, lat_bins, lon_bins)
-    target_datasets = _spatially_regrid_datasets(target_datasets, lat_bins, lon_bins)
+    target_datasets =  [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in datasets]
 
     # Load metrics
     # Prime evaluation object with data
@@ -304,19 +302,3 @@ def _calculate_new_latlon_bins(eval_bounds, lat_grid_step, lon_grid_step):
     new_lats = np.arange(eval_bounds['min_lat'], eval_bounds['max_lat'], lat_grid_step)
     new_lons = np.arange(eval_bounds['min_lon'], eval_bounds['max_lon'], lon_grid_step)
     return (new_lats, new_lons)
-
-def _spatially_regrid_datasets(datasets, lat_bins, lon_bins):
-    ''' Spatially re-grid the passed datasets over the new lat/lon bins.
-
-    :param datasets: The datasets to be spatially re-gridded.
-    :type datasets: List of ocw.dataset.Dataset's
-    :param lat_bins: The new latitude bin values to spatially re-grid each
-        dataset over.
-    :type lat_bins: numpy.Array
-    :param lon_bins: The new longitude bin values to spatially re-grid each
-        dataset over.
-    :type lat_bins: numpy.Array
-
-    :returns: The List of spatially re-gridded datasets.
-    '''
-    return [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in datasets]
