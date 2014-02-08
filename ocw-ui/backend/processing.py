@@ -19,12 +19,13 @@
 
 import sys
 from ast import literal_eval
+from datetime import timedelta
 
 from bottle import Bottle, request
 
 import ocw.data_source.local as local
 import ocw.data_source.rcmed as rcmed
-import ocw.dataset_processor as dst
+import ocw.dataset_processor as dsp
 from ocw.evaluation import Evaluation
 import ocw.metrics as metrics
 
@@ -126,6 +127,9 @@ def run_evaluation():
     target_datasets = [_process_dataset_object(obj, eval_bounds) for obj in target_objects]
 
     # Do temporal re-bin based off of passed resolution
+    time_delta = timedelta(days=request.query['temporal_resolution'])
+    ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
+    target_datasets = [dsp.temporal_rebin(ds, time_delta) for ds in target_datasets]
 
     # Do spatial re=bin based off of reference dataset + lat/lon steps
     lat_step = request.query['lat_degree_step']
