@@ -193,7 +193,7 @@ def _process_dataset_object(dataset_object, eval_bounds):
 
     '''
     source_id = int(dataset_object['data_source_id'])
-    dataset_info = dataste_object['dataset_info']
+    dataset_info = dataset_object['dataset_info']
 
     # If we should load with local
     if source_id == 1:
