@@ -140,7 +140,7 @@ def run_evaluation():
     target_datasets =  [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in datasets]
 
     # Load metrics
-    metrics = _load_metrics(request.query['metrics'])
+    metrics = _load_metrics(literal_eval(request.query['metrics']))
 
     # Prime evaluation object with data
     # Run evaluation
