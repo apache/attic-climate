@@ -48,3 +48,6 @@ class TestMetricLoad(unittest.TestCase):
         metric_objs = backend.processing._load_metrics(['Bias', 'TemporalStdDev'])
         self.assertTrue(isinstance(metric_objs[0], metrics.Bias))
         self.assertTrue(isinstance(metric_objs[1], metrics.TemporalStdDev))
+
+    def test_invalid_metric_load(self):
+        self.assertRaises(ValueError, backend.processing._load_metrics, ['AAA'])
