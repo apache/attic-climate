@@ -1,6 +1,7 @@
 import os
 import unittest
 from urllib import urlretrieve
+import datetime as dt
 
 from webtest import TestApp
 
@@ -8,6 +9,7 @@ from backend.run_webservices import app
 import backend.processing as bp
 
 import ocw.metrics as metrics
+import ocw.data_source.rcmed as rcmed
 
 import numpy
 
@@ -39,6 +41,37 @@ class TestLocalDatasetLoad(unittest.TestCase):
 
         dataset = bp._load_local_dataset_object(dataset_object)
         self.assertEqual(dataset.variable, dataset_object['var_name'])
+
+class TestRCMEDDatasetLoad(unittest.TestCase):
+    def test_valid_load(self):
+        metadata = rcmed.get_parameters_metadata()
+        # Load TRMM from RCMED
+        dataset_dat = [m for m in metadata if m['parameter_id'] == '36'][0]
+
+        dataset_info = {
+            'dataset_id': int(dataset_dat['dataset_id']),
+            'parameter_id': int(dataset_dat['parameter_id'])
+        }
+
+        eval_bounds = {
+            'start_time': dt.datetime(1998, 02, 01),
+            'end_time': dt.datetime(1998, 03, 01),
+            'lat_min': -10,
+            'lat_max': 10,
+            'lon_min': -15,
+            'lon_max': 15
+        }
+
+        dataset = bp._load_rcmed_dataset_object(dataset_info, eval_bounds)
+        lat_min, lat_max, lon_min, lon_max = dataset.spatial_boundaries()
+        start_time, end_time = dataset.time_range()
+
+        self.assertTrue(eval_bounds['lat_min'] <= lat_min)
+        self.assertTrue(eval_bounds['lat_max'] >= lat_max)
+        self.assertTrue(eval_bounds['lon_min'] <= lon_min)
+        self.assertTrue(eval_bounds['lon_max'] >= lon_max)
+        self.assertTrue(eval_bounds['start_time'] <= start_time)
+        self.assertTrue(eval_bounds['end_time'] >= end_time)
 
 class TestMetricLoad(unittest.TestCase):
     def test_get_valid_metric_options(self):
