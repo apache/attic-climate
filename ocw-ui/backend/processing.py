@@ -92,7 +92,12 @@ def run_evaluation():
             'lat_min': The minimum latitude value,
             'lat_max': The maximum latitude value,
             'lon_min': The minimum longitude value,
-            'lon_max': The maximum longitude value
+            'lon_max': The maximum longitude value,
+
+            // The degree step that the latitude and longitude values should be
+            // re-binned to. Values must be > 0
+            'lat_degree_step': Integer > 0,
+            'lon_degree_step': Integer > 0,
 
             // NOTE: At the moment, subregion support is fairly minimal. This
             // will be addressed in the future. Ideally, the user should be able
@@ -112,6 +117,7 @@ def run_evaluation():
         'lon_min': request.query.lon_min,
         'lon_max': request.query.lon_max
     }
+
     # Load all the datasets
     ref_object = literal_eval(request.query['reference_dataset'])
     ref_dataset = _process_dataset_object(ref_object, eval_bounds)
@@ -120,7 +126,16 @@ def run_evaluation():
     target_datasets = [_process_dataset_object(obj, eval_bounds) for obj in target_objects]
 
     # Do temporal re-bin based off of passed resolution
+
     # Do spatial re=bin based off of reference dataset + lat/lon steps
+    lat_step = request.query['lat_degree_step']
+    lon_step = request.query['lon_degree_step']
+    lat_bins, lon_bins = _calculate_new_latlon_bins(eval_bounds, lat_step, lon_step)
+
+    # Re-bin the datasets
+    ref_dataset = dsp.spatial_regrid(ref_dataset, lat_bins, lon_bins)
+    target_datasets = _spatially_regrid_datasets(target_datasets, lat_bins, lon_bins)
+
     # Load metrics
     # Prime evaluation object with data
     # Run evaluation
@@ -259,3 +274,45 @@ def _load_rcmed_dataset_object(dataset_info, eval_bounds):
         eval_bounds['end_time']
     )
 
+def _calculate_new_latlon_bins(eval_bounds, lat_grid_step, lon_grid_step):
+    ''' Calculate the new lat/lon ranges for spatial re-binning.
+
+    :param eval_bounds: The time and lat/lon bounds for the evaluation.
+        Must be of the form:
+        {
+            'start_time': request.query.start_time,
+            'end_time': request.query.end_time,
+            'lat_min': request.query.lat_min,
+            'lat_max': request.query.lat_max,
+            'lon_min': request.query.lon_min,
+            'lon_max': request.query.lon_max
+        }
+    :type eval_bounds: Dictionary
+    :param lat_grid_step: The degree step between successive latitude values
+        in the newly created bins.
+    :type lat_grid_step: Integer > 0
+    :param lon_grid_step: The degree step between successive longitude values
+        in the newly created bins.
+    :type lat_grid_step: Integer > 0
+
+    :returns: The new lat/lon value lists as a tuple of the form (new_lats, new_lons)
+    '''
+    new_lats = np.arange(eval_bounds['min_lat'], eval_bounds['max_lat'], lat_grid_step)
+    new_lons = np.arange(eval_bounds['min_lon'], eval_bounds['max_lon'], lon_grid_step)
+    return (new_lats, new_lons)
+
+def _spatially_regrid_datasets(datasets, lat_bins, lon_bins):
+    ''' Spatially re-grid the passed datasets over the new lat/lon bins.
+
+    :param datasets: The datasets to be spatially re-gridded.
+    :type datasets: List of ocw.dataset.Dataset's
+    :param lat_bins: The new latitude bin values to spatially re-grid each
+        dataset over.
+    :type lat_bins: numpy.Array
+    :param lon_bins: The new longitude bin values to spatially re-grid each
+        dataset over.
+    :type lat_bins: numpy.Array
+
+    :returns: The List of spatially re-gridded datasets.
+    '''
+    return [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in datasets]
