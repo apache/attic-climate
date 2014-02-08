@@ -30,6 +30,8 @@ import ocw.dataset_processor as dsp
 from ocw.evaluation import Evaluation
 import ocw.metrics as metrics
 
+import numpy as np
+
 processing_app = Bottle()
 
 @processing_app.route('/run_evaluation/')
@@ -285,8 +287,6 @@ def _calculate_new_latlon_bins(eval_bounds, lat_grid_step, lon_grid_step):
     :param eval_bounds: The time and lat/lon bounds for the evaluation.
         Must be of the form:
         {
-            'start_time': request.query.start_time,
-            'end_time': request.query.end_time,
             'lat_min': request.query.lat_min,
             'lat_max': request.query.lat_max,
             'lon_min': request.query.lon_min,
@@ -302,8 +302,8 @@ def _calculate_new_latlon_bins(eval_bounds, lat_grid_step, lon_grid_step):
 
     :returns: The new lat/lon value lists as a tuple of the form (new_lats, new_lons)
     '''
-    new_lats = np.arange(eval_bounds['min_lat'], eval_bounds['max_lat'], lat_grid_step)
-    new_lons = np.arange(eval_bounds['min_lon'], eval_bounds['max_lon'], lon_grid_step)
+    new_lats = np.arange(eval_bounds['lat_min'], eval_bounds['lat_max'], lat_grid_step)
+    new_lons = np.arange(eval_bounds['lon_min'], eval_bounds['lon_max'], lon_grid_step)
     return (new_lats, new_lons)
 
 def _load_metrics(metric_names):
