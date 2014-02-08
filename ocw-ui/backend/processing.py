@@ -318,7 +318,9 @@ def _load_metrics(metric_names):
     :raises ValueError: If a metric name cannot be matched.
     '''
     instantiated_metrics = []
-    possible_metrics = _get_valid_metric_options()
+    metrics_map = _get_valid_metric_options()
+    possible_metrics = metrics_map.keys()
+
     for metric in metric_names:
         if metric not in possible_metrics:
             cur_frame = sys._getframe().f_code
@@ -329,28 +331,16 @@ def _load_metrics(metric_names):
             )
             raise ValueError(err)
 
-        metric_class = _load_metric_class_from_name(metric)
-        instantiated_metrics.append(metric_class())
+        instantiated_metrics.append(metrics_map[metric]())
 
     return instantiated_metrics
 
 def _get_valid_metric_options():
-    ''' Get valid metric names from the ocw.metrics module.
+    ''' Get valid metric options from the ocw.metrics module.
 
-    :returns: A dictionary of metric name, object pairs
+    :returns: A dictionary of metric (name, object) pairs
     '''
     invalid_metrics = ['Metric', 'UnaryMetric', 'BinaryMetric']
     return {name:obj
             for name, obj in inspect.getmembers(metrics)
             if inspect.isclass(obj) and name not in invalid_metrics}
-
-def _load_metric_class_from_name(metric_name):
-    ''' Load a metric class by name from ocw.metrics.
-
-    :param metric_name: The name of the metric class to load from ocw.metrics.
-    :type metric_name: String
-
-    :returns: The loaded metric Class
-    '''
-    module = __import__('ocw.metrics', fromlist=[metric_name])
-    return getattr(module, metric_name)
