@@ -145,7 +145,11 @@ def run_evaluation():
     metrics = _load_metrics(literal_eval(request.query['metrics']))
 
     # Prime evaluation object with data
+    evaluation = Evaluation(ref_dataset, target_datasets, metrics)
+
     # Run evaluation
+    evaluation.run()
+
     # Plot (I have no idea how this is going to work)
 
 def _process_dataset_object(dataset_object, eval_bounds):
