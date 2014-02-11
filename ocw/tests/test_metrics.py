@@ -74,8 +74,8 @@ class TestTemporalStdDev(unittest.TestCase):
 
     def test_function_run(self):
         '''Test TemporalStdDev function for target dataset.'''
-        expected_result = np.zeros((12, 5),)
-        expected_result.fill(7.90569415)
+        expected_result = np.zeros((5, 5),)
+        expected_result.fill(90.13878189)
         npt.assert_almost_equal(self.temporal_std_dev.run(self.target_dataset), expected_result)
 
 if __name__ == '__main__':
