@@ -21,6 +21,7 @@ from ast import literal_eval
 from datetime import timedelta
 import inspect
 import sys
+import os
 
 from bottle import Bottle, request
 
@@ -29,10 +30,14 @@ import ocw.data_source.rcmed as rcmed
 import ocw.dataset_processor as dsp
 from ocw.evaluation import Evaluation
 import ocw.metrics as metrics
+#import ocw.plotter as plotter
 
 import numpy as np
 
 processing_app = Bottle()
+
+# TODO: Factor this out of all but the main modules
+WORK_DIR = "/tmp/ocw"
 
 @processing_app.route('/run_evaluation/')
 def run_evaluation():
@@ -139,18 +144,19 @@ def run_evaluation():
     lon_step = request.query['lon_degree_step']
     lat_bins, lon_bins = _calculate_new_latlon_bins(eval_bounds, lat_step, lon_step)
     ref_dataset = dsp.spatial_regrid(ref_dataset, lat_bins, lon_bins)
-    target_datasets =  [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in datasets]
+    target_datasets =  [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in target_datasets]
 
     # Load metrics
-    metrics = _load_metrics(literal_eval(request.query['metrics']))
+    loaded_metrics = _load_metrics(literal_eval(request.query['metrics']))
 
     # Prime evaluation object with data
-    evaluation = Evaluation(ref_dataset, target_datasets, metrics)
+    evaluation = Evaluation(ref_dataset, target_datasets, loaded_metrics)
 
     # Run evaluation
     evaluation.run()
 
-    # Plot (I have no idea how this is going to work)
+    # Plot
+    _generate_evaluation_plots(evaluation, lat_bins, lon_bins)
 
 def _process_dataset_object(dataset_object, eval_bounds):
     ''' Convert an dataset object representation into an OCW Dataset
@@ -348,3 +354,164 @@ def _get_valid_metric_options():
     return {name:obj
             for name, obj in inspect.getmembers(metrics)
             if inspect.isclass(obj) and name not in invalid_metrics}
+
+def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
+    ''' Generate the Evaluation's plots
+
+    .. note: This doesn't support graphing evaluations with subregion data.
+
+    :param evaluation: A run Evaluation for which to generate plots.
+    :type evaluation: ocw.evaluation.Evaluation
+    :param lat_bins: The latitude bin values used in the evaluation.
+    :type lat_bins: List
+    :type lon_bins: The longitude bin values used in the evaluation.
+    :type lon_bins: List
+
+    :raises ValueError: If there aren't any results to graph.
+    '''
+    # TODO: Need to take into consideration the results 'versioning' that the backend currently uses
+
+    # TODO: Should be able to check for None here...
+    if evaluation.results == [] and evaluation.unary_results == []:
+        cur_frame = sys._getframe().f_code
+        err = "{}.{}: No results to graph".format(cur_frame.co_filename, cur_frame.co_name)
+        raise ValueError(err)
+
+    if evaluation.results != []:
+        for dataset_index, dataset in enumerate(evaluation.target_datasets):
+            for metric_index, metric in enumerate(evaluation.metrics):
+                results = evaluation.results[dataset_index][metric_index]
+                file_name = _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index)
+                plot_title = _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index)
+
+                plotter.draw_contour_map(
+                    results,
+                    lat_bins,
+                    lon_bins,
+                    fname=file_name,
+                    ptitle=plot_title
+                )
+
+    if evaluation.unary_results != []:
+        for metric_index, metric in enumerate(evaluation.unary_metrics):
+            for result_index, result in enumerate(evaluation.unary_results[metric_index]):
+                file_name = _generate_unary_eval_plot_file_path(evaluation, result_index, metric_index)
+                plot_title = _generate_unary_eval_plot_title(evaluation, result_index, metric_index)
+
+                plotter.draw_contrough_map(
+                    results,
+                    lat_bins,
+                    lon_bins,
+                    fname=file_name,
+                    ptitle=plot_title
+                )
+
+def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index):
+    ''' Generate a plot path for a given binary metric run over a specified target dataset.
+
+    :param evaluation: The Evaluation object from which to pull name information.
+    :type evaluation: ocw.evaluation.Evaluation
+    :param dataset_index: The index of the target dataset to use when generating the name.
+    :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
+    :param metric_index: The index of the metric to use when generating the name.
+    :type metric_index: Integer >= 0 < len(evaluation.metrics)
+
+    :returns: The full path for the requested metric run. The paths will always be placed in the
+        WORK_DIR set for the web services.
+    '''
+    plot_name = "{}_compared_to_{}_{}".format(
+        evaluation.ref_dataset.name.lower(),
+        evaluation.target_datasets[dataset_index].name.lower(),
+        evaluation.metrics[metric_index].__class__.__name__.lower()
+    )
+
+    return os.path.join(WORK_DIR, plot_name)
+
+def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index):
+    ''' Generate a plot path for a given unary metric run over a specified target dataset.
+
+    :param evaluation: The Evaluation object from which to pull name information.
+    :type evaluation: ocw.evaluation.Evaluation
+    :param dataset_index: The index of the target dataset to use when generating the name.
+    :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
+    :param metric_index: The index of the metric to use when generating the name.
+    :type metric_index: Integer >= 0 < len(evaluation.metrics)
+
+    :returns: The full path for the requested metric run. The paths will always be placed in the
+        WORK_DIR set for the web services.
+    '''
+    metric = evaluation.unary_metrics[metric_index]
+
+    # Unary metrics can be run over both the reference dataset and the target datasets. It's
+    # possible for an evaluation to only have one and not the other. If there is a reference
+    # dataset then the 0th result index refers to the result of the metric being run on the
+    # reference dataset. Any future indexes into the target dataset list must then be offset
+    # by one. If there's no reference dataset then we don't have to bother with any of this.
+    if evaluation.ref_dataset:
+        if dataset_index == 0:
+            plot_name = "{}_{}".format(
+                evaluation.ref_dataset.name.lower(),
+                metric.__class__.__name__.lower()
+            )
+
+            return os.path.join(WORK_DIR, plot_name)
+        else:
+            dataset_index -= 1
+
+    plot_name = "{}_{}".format(
+        evaluation.target_datasets[dataset_index].name.lower(),
+        metric.__class__.__name__.lower()
+    )
+
+    return os.path.join(WORK_DIR, plot_name)
+
+def _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index):
+    ''' Generate a plot title for a given binary metric run over a specified target dataset.
+
+    :param evaluation: The Evaluation object from which to pull name information.
+    :type evaluation: ocw.evaluation.Evaluation
+    :param dataset_index: The index of the target dataset to use when generating the name.
+    :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
+    :param metric_index: The index of the metric to use when generating the name.
+    :type metric_index: Integer >= 0 < len(evaluation.metrics)
+
+    :returns: The plot title for the requested metric run.
+    '''
+    return "{} of {} compared to {}".format(
+        evaluation.metrics[metric_index].__class__.__name__.lower(),
+        evaluation.ref_dataset.name,
+        evaluation.target_datasets[dataset_index].name
+    )
+
+def _generate_unary_eval_plot_title(evaluation, dataset_index, metric_index):
+    ''' Generate a plot title for a given unary metric run over a specified target dataset.
+
+    :param evaluation: The Evaluation object from which to pull name information.
+    :type evaluation: ocw.evaluation.Evaluation
+    :param dataset_index: The index of the target dataset to use when generating the name.
+    :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
+    :param metric_index: The index of the metric to use when generating the name.
+    :type metric_index: Integer >= 0 < len(evaluation.metrics)
+
+    :returns: The plot title for the requested metric run.
+    '''
+    metric = evaluation.unary_metrics[metric_index]
+
+    # Unary metrics can be run over both the reference dataset and the target datasets. It's
+    # possible for an evaluation to only have one and not the other. If there is a reference
+    # dataset then the 0th result index refers to the result of the metric being run on the
+    # reference dataset. Any future indexes into the target dataset list must then be offset
+    # by one. If there's no reference dataset then we don't have to bother with any of this.
+    if evaluation.ref_dataset:
+        if dataset_index == 0:
+            return "{} of {}".format(
+                metric.__class__.__name__,
+                evaluaton.ref_dataset.name
+            )
+        else:
+            dataset_index -= 1
+
+    return "{} of {}".format(
+        metric.__class__.__name__,
+        evaluation.target_datasets[dataset_index].name
+    )

@@ -10,6 +10,8 @@ import backend.processing as bp
 
 import ocw.metrics as metrics
 import ocw.data_source.rcmed as rcmed
+from ocw.dataset import Dataset
+from ocw.evaluation import Evaluation
 
 import numpy
 
@@ -110,3 +112,53 @@ class TestSpatialRebinHelpers(unittest.TestCase):
         lons = numpy.arange(eval_bounds['lon_min'], eval_bounds['lon_max'])
 
         new_lats, new_lons = bp._calculate_new_latlon_bins(eval_bounds, lat_step, lon_step)
+
+class TestFilePathCreation(unittest.TestCase):
+    def setUp(self):
+        self.full_evaluation = Evaluation(
+            _create_fake_dataset('Ref'),
+            [_create_fake_dataset('T1'), _create_fake_dataset('T2')],
+            [metrics.TemporalStdDev(), metrics.Bias(), metrics.Bias()]
+        )
+
+        self.unary_evaluation = Evaluation(
+            None,
+            [_create_fake_dataset('T1'), _create_fake_dataset('T2')],
+            [metrics.TemporalStdDev()]
+        )
+
+    def test_binary_metric_path_generation(self):
+        self.assertEquals(
+            bp._generate_binary_eval_plot_file_path(self.full_evaluation, 0, 1),
+            '/tmp/ocw/ref_compared_to_t1_bias'
+        )
+
+    def test_unary_metric_path_generation_full_eval(self):
+        self.assertEquals(
+            bp._generate_unary_eval_plot_file_path(self.full_evaluation, 0, 0),
+            '/tmp/ocw/ref_temporalstddev'
+        )
+
+        self.assertEquals(
+            bp._generate_unary_eval_plot_file_path(self.full_evaluation, 1, 0),
+            '/tmp/ocw/t1_temporalstddev'
+        )
+
+    def test_unary_metric_path_generation_partial_eval(self):
+        self.assertEquals(
+            bp._generate_unary_eval_plot_file_path(self.unary_evaluation, 0, 0),
+            '/tmp/ocw/t1_temporalstddev'
+        )
+
+        self.assertEquals(
+            bp._generate_unary_eval_plot_file_path(self.unary_evaluation, 1, 0),
+            '/tmp/ocw/t2_temporalstddev'
+        )
+
+def _create_fake_dataset(name):
+    lats = numpy.array(range(-10, 25, 1))
+    lons = numpy.array(range(-30, 40, 1))
+    times = numpy.array(range(8))
+    values = numpy.zeros((len(times), len(lats), len(lons)))
+
+    return Dataset(lats, lons, times, values, name=name)
