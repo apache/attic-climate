@@ -44,7 +44,7 @@ class Evaluation(object):
     A ``binary`` metric is a metric that runs over a reference dataset and
     target dataset. If you add a ``binary`` metric you are required to add a
     reference dataset and at least one target dataset. The ``binary`` metrics
-    are run over ever (reference dataset, target dataset) pair in the
+    are run over every (reference dataset, target dataset) pair in the
     Evaluation.
 
     An Evaluation must have at least one metric to be valid. 
