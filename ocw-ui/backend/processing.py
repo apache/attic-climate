@@ -51,19 +51,19 @@ def run_evaluation():
         {
             reference_dataset: {
                 // Id that tells us how we need to load this dataset.
-                'data_source_id': 1 == local, 2 == rcmed, 
+                'data_source_id': 1 == local, 2 == rcmed,
 
                 // Dict of data_source specific identifying information.
                 //
                 // if data_source_id == 1 == local:
                 // {
                 //     'id': The path to the local file on the server for loading.
-                //     'var_name': The variable data to pull from the file.      
+                //     'var_name': The variable data to pull from the file.
                 //     'lat_name': The latitude variable name.
                 //     'lon_name': The longitude variable name.
                 //     'time_name': The time variable name
                 // }
-                // 
+                //
                 // if data_source_id == 2 == rcmed:
                 // {
                 //     'dataset_id': The dataset id to grab from RCMED.
@@ -73,7 +73,7 @@ def run_evaluation():
             },
 
             // The list of target datasets to use in the Evaluation. The data
-            // format for the dataset objects should be the same as the 
+            // format for the dataset objects should be the same as the
             // reference_dataset above.
             'target_datasets': [{...}, {...}, ...],
 
@@ -85,7 +85,7 @@ def run_evaluation():
             // Same as above, but for lon
             'spatial_rebin_lon_step': The lon degree step to use when re-bin,
 
-            // The temporal resolution to use when doing a temporal re-bin 
+            // The temporal resolution to use when doing a temporal re-bin
             // This is a timedelta of days to use so daily == 1, monthly is
             // (1, 31], annual/yearly is (31, 366], and full is anything > 366.
             'temporal_resolution': Integer in range(1, 999),
@@ -114,7 +114,7 @@ def run_evaluation():
             // format that this data is passed.
             'subregion_information': Path to a subregion file on the server.
         }
-    
+
     '''
     # TODO: validate input parameters and return an error if not valid
 
@@ -132,19 +132,28 @@ def run_evaluation():
     ref_dataset = _process_dataset_object(ref_object, eval_bounds)
 
     target_objects = literal_eval(request.query['target_datasets'])
-    target_datasets = [_process_dataset_object(obj, eval_bounds) for obj in target_objects]
+    target_datasets = [_process_dataset_object(obj, eval_bounds)
+					   for obj
+					   in target_objects]
 
     # Do temporal re-bin based off of passed resolution
     time_delta = timedelta(days=request.query['temporal_resolution'])
     ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
-    target_datasets = [dsp.temporal_rebin(ds, time_delta) for ds in target_datasets]
+    target_datasets = [dsp.temporal_rebin(ds, time_delta)
+					   for ds
+					   in target_datasets]
 
     # Do spatial re=bin based off of reference dataset + lat/lon steps
     lat_step = request.query['lat_degree_step']
     lon_step = request.query['lon_degree_step']
-    lat_bins, lon_bins = _calculate_new_latlon_bins(eval_bounds, lat_step, lon_step)
+    lat_bins, lon_bins = _calculate_new_latlon_bins(eval_bounds,
+													lat_step,
+													lon_step)
+
     ref_dataset = dsp.spatial_regrid(ref_dataset, lat_bins, lon_bins)
-    target_datasets =  [dsp.spatial_regrid(ds, lat_bins, lon_bins) for ds in target_datasets]
+    target_datasets =  [dsp.spatial_regrid(ds, lat_bins, lon_bins)
+						for ds
+						in target_datasets]
 
     # Load metrics
     loaded_metrics = _load_metrics(literal_eval(request.query['metrics']))
@@ -161,26 +170,26 @@ def run_evaluation():
 def _process_dataset_object(dataset_object, eval_bounds):
     ''' Convert an dataset object representation into an OCW Dataset
 
-    The dataset_object must contain two pieces of information. The 
+    The dataset_object must contain two pieces of information. The
     `data_source_id` tells how to load the dataset, and the `dataset_info`
-    contains all the information necessary for the load. 
+    contains all the information necessary for the load.
 
     .. sourcecode: javascript
 
         // Id that tells us how we need to load this dataset.
-        'data_source_id': 1 == local, 2 == rcmed, 
+        'data_source_id': 1 == local, 2 == rcmed,
 
         // Dict of data_source specific identifying information.
         //
         // if data_source_id == 1 == local:
         // {
         //     'id': The path to the local file on the server for loading.
-        //     'var_name': The variable data to pull from the file.      
+        //     'var_name': The variable data to pull from the file.
         //     'lat_name': The latitude variable name.
         //     'lon_name': The longitude variable name.
         //     'time_name': The time variable name
         // }
-        // 
+        //
         // if data_source_id == 2 == rcmed:
         // {
         //     'dataset_id': The dataset id to grab from RCMED.
@@ -188,7 +197,7 @@ def _process_dataset_object(dataset_object, eval_bounds):
         // }
         'dataset_info': {..}
 
-    :param dataset_object: Dataset information of the above form to be 
+    :param dataset_object: Dataset information of the above form to be
         loaded into an OCW Dataset object.
     :type dataset_object: Dictionary
     :param eval_bounds: The evaluation bounds for this Evaluation. These
@@ -197,7 +206,7 @@ def _process_dataset_object(dataset_object, eval_bounds):
 
     :returns: dataset_object converted to an ocw.Dataset
 
-    :raises KeyError: If dataset_object is malformed and doesn't contain the 
+    :raises KeyError: If dataset_object is malformed and doesn't contain the
         keys `data_source_id` or `dataset_info`.
     :raises ValueError: If the data_source_id isn't valid.
 
@@ -280,16 +289,14 @@ def _load_rcmed_dataset_object(dataset_info, eval_bounds):
     :raises KeyError: If the required keys aren't present in the dataset_info or
         eval_bounds objects.
     '''
-    return rcmed.parameter_dataset(
-        dataset_info['dataset_id'],
-        dataset_info['parameter_id'],
-        eval_bounds['lat_min'],
-        eval_bounds['lat_max'],
-        eval_bounds['lon_min'],
-        eval_bounds['lon_max'],
-        eval_bounds['start_time'],
-        eval_bounds['end_time']
-    )
+    return rcmed.parameter_dataset(dataset_info['dataset_id'],
+								   dataset_info['parameter_id'],
+								   eval_bounds['lat_min'],
+								   eval_bounds['lat_max'],
+								   eval_bounds['lon_min'],
+								   eval_bounds['lon_max'],
+								   eval_bounds['start_time'],
+								   eval_bounds['end_time'])
 
 def _calculate_new_latlon_bins(eval_bounds, lat_grid_step, lon_grid_step):
     ''' Calculate the new lat/lon ranges for spatial re-binning.
@@ -312,14 +319,18 @@ def _calculate_new_latlon_bins(eval_bounds, lat_grid_step, lon_grid_step):
 
     :returns: The new lat/lon value lists as a tuple of the form (new_lats, new_lons)
     '''
-    new_lats = np.arange(eval_bounds['lat_min'], eval_bounds['lat_max'], lat_grid_step)
-    new_lons = np.arange(eval_bounds['lon_min'], eval_bounds['lon_max'], lon_grid_step)
+    new_lats = np.arange(eval_bounds['lat_min'],
+						 eval_bounds['lat_max'],
+						 lat_grid_step)
+    new_lons = np.arange(eval_bounds['lon_min'],
+						 eval_bounds['lon_max'],
+						 lon_grid_step)
     return (new_lats, new_lons)
 
 def _load_metrics(metric_names):
     ''' Load and create an instance of each requested metric.
 
-    :param metric_names: The names of the metrics that should be loaded and 
+    :param metric_names: The names of the metrics that should be loaded and
         instantiated from ocw.metrics for use in an evaluation.
     :type metric_names: List
 
@@ -374,50 +385,56 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
     # TODO: Should be able to check for None here...
     if evaluation.results == [] and evaluation.unary_results == []:
         cur_frame = sys._getframe().f_code
-        err = "{}.{}: No results to graph".format(cur_frame.co_filename, cur_frame.co_name)
+        err = "{}.{}: No results to graph".format(cur_frame.co_filename,
+												  cur_frame.co_name)
         raise ValueError(err)
 
     if evaluation.results != []:
         for dataset_index, dataset in enumerate(evaluation.target_datasets):
             for metric_index, metric in enumerate(evaluation.metrics):
                 results = evaluation.results[dataset_index][metric_index]
-                file_name = _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index)
-                plot_title = _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index)
+                file_name = _generate_binary_eval_plot_file_path(evaluation,
+																 dataset_index,
+																 metric_index)
+                plot_title = _generate_binary_eval_plot_title(evaluation,
+															  dataset_index,
+															  metric_index)
 
-                plotter.draw_contour_map(
-                    results,
-                    lat_bins,
-                    lon_bins,
-                    fname=file_name,
-                    ptitle=plot_title
-                )
+                plotter.draw_contour_map(results,
+										 lat_bins,
+										 lon_bins,
+										 fname=file_name,
+										 ptitle=plot_title)
 
     if evaluation.unary_results != []:
         for metric_index, metric in enumerate(evaluation.unary_metrics):
-            for result_index, result in enumerate(evaluation.unary_results[metric_index]):
-                file_name = _generate_unary_eval_plot_file_path(evaluation, result_index, metric_index)
-                plot_title = _generate_unary_eval_plot_title(evaluation, result_index, metric_index)
+			cur_unary_results = evaluation.unary_results[metric_index]
+			for result_index, result in enumerate(cur_unary_results):
+				file_name = _generate_unary_eval_plot_file_path(evaluation,
+																result_index,
+																metric_index)
+				plot_title = _generate_unary_eval_plot_title(evaluation,
+															 result_index,
+															 metric_index)
 
-                plotter.draw_contrough_map(
-                    results,
-                    lat_bins,
-                    lon_bins,
-                    fname=file_name,
-                    ptitle=plot_title
-                )
+				plotter.draw_contrough_map(results,
+										   lat_bins,
+										   lon_bins,
+										   fname=file_name,
+										   ptitle=plot_title)
 
 def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index):
     ''' Generate a plot path for a given binary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when 
+    :param dataset_index: The index of the target dataset to use when
 		generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
     :type metric_index: Integer >= 0 < len(evaluation.metrics)
 
-    :returns: The full path for the requested metric run. The paths will always 
+    :returns: The full path for the requested metric run. The paths will always
 		be placed in the WORK_DIR set for the web services.
     '''
     plot_name = "{}_compared_to_{}_{}".format(
@@ -433,22 +450,22 @@ def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index)
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when 
+    :param dataset_index: The index of the target dataset to use when
 		generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
     :type metric_index: Integer >= 0 < len(evaluation.metrics)
 
-    :returns: The full path for the requested metric run. The paths will always 
+    :returns: The full path for the requested metric run. The paths will always
 		be placed in the WORK_DIR set for the web services.
     '''
     metric = evaluation.unary_metrics[metric_index]
 
-    # Unary metrics can be run over both the reference dataset and the target 
-    # datasets. It's possible for an evaluation to only have one and not the 
-    # other. If there is a reference dataset then the 0th result index refers to 
-    # the result of the metric being run on the reference dataset. Any future 
-    # indexes into the target dataset list must then be offset by one. If 
+    # Unary metrics can be run over both the reference dataset and the target
+    # datasets. It's possible for an evaluation to only have one and not the
+    # other. If there is a reference dataset then the 0th result index refers to
+    # the result of the metric being run on the reference dataset. Any future
+    # indexes into the target dataset list must then be offset by one. If
     # there's no reference dataset then we don't have to bother with any of this.
     if evaluation.ref_dataset:
         if dataset_index == 0:
@@ -473,7 +490,7 @@ def _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index):
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when 
+    :param dataset_index: The index of the target dataset to use when
 		generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
@@ -492,7 +509,7 @@ def _generate_unary_eval_plot_title(evaluation, dataset_index, metric_index):
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when 
+    :param dataset_index: The index of the target dataset to use when
         generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
@@ -501,11 +518,11 @@ def _generate_unary_eval_plot_title(evaluation, dataset_index, metric_index):
     :returns: The plot title for the requested metric run.
     '''
 
-    # Unary metrics can be run over both the reference dataset and the target 
-    # datasets. It's possible for an evaluation to only have one and not the 
-    # other. If there is a reference dataset then the 0th result index refers to 
-    # the result of the metric being run on the reference dataset. Any future 
-    # indexes into the target dataset list must then be offset by one. If 
+    # Unary metrics can be run over both the reference dataset and the target
+    # datasets. It's possible for an evaluation to only have one and not the
+    # other. If there is a reference dataset then the 0th result index refers to
+    # the result of the metric being run on the reference dataset. Any future
+    # indexes into the target dataset list must then be offset by one. If
     # there's no reference dataset then we don't have to bother with any of this.
     if evaluation.ref_dataset:
         if dataset_index == 0:
