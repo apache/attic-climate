@@ -113,6 +113,9 @@ class TestSpatialRebinHelpers(unittest.TestCase):
 
         new_lats, new_lons = bp._calculate_new_latlon_bins(eval_bounds, lat_step, lon_step)
 
+        self.assertTrue(numpy.array_equal(lats, new_lats))
+        self.assertTrue(numpy.array_equal(lons, new_lons))
+
 class TestFilePathCreation(unittest.TestCase):
     def setUp(self):
         self.full_evaluation = Evaluation(
