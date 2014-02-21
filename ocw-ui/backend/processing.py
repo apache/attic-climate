@@ -484,34 +484,35 @@ def _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index):
     )
 
 def _generate_unary_eval_plot_title(evaluation, dataset_index, metric_index):
-    ''' Generate a plot title for a given unary metric run over a specified target dataset.
+    ''' Generate a plot title for a given unary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when generating the name.
+    :param dataset_index: The index of the target dataset to use when 
+        generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
     :type metric_index: Integer >= 0 < len(evaluation.metrics)
 
     :returns: The plot title for the requested metric run.
     '''
-    metric = evaluation.unary_metrics[metric_index]
 
-    # Unary metrics can be run over both the reference dataset and the target datasets. It's
-    # possible for an evaluation to only have one and not the other. If there is a reference
-    # dataset then the 0th result index refers to the result of the metric being run on the
-    # reference dataset. Any future indexes into the target dataset list must then be offset
-    # by one. If there's no reference dataset then we don't have to bother with any of this.
+    # Unary metrics can be run over both the reference dataset and the target 
+    # datasets. It's possible for an evaluation to only have one and not the 
+    # other. If there is a reference dataset then the 0th result index refers to 
+    # the result of the metric being run on the reference dataset. Any future 
+    # indexes into the target dataset list must then be offset by one. If 
+    # there's no reference dataset then we don't have to bother with any of this.
     if evaluation.ref_dataset:
         if dataset_index == 0:
             return "{} of {}".format(
-                metric.__class__.__name__,
-                evaluaton.ref_dataset.name
+                evaluation.unary_metrics[metric_index].__class__.__name__,
+                evaluation.ref_dataset.name
             )
         else:
             dataset_index -= 1
 
     return "{} of {}".format(
-        metric.__class__.__name__,
+        evaluation.unary_metrics[metric_index].__class__.__name__,
         evaluation.target_datasets[dataset_index].name
     )
