@@ -478,7 +478,7 @@ def _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index):
     :returns: The plot title for the requested metric run.
     '''
     return "{} of {} compared to {}".format(
-        evaluation.metrics[metric_index].__class__.__name__.lower(),
+        evaluation.metrics[metric_index].__class__.__name__,
         evaluation.ref_dataset.name,
         evaluation.target_datasets[dataset_index].name
     )

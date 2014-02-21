@@ -155,6 +155,26 @@ class TestFilePathCreation(unittest.TestCase):
             '/tmp/ocw/t2_temporalstddev'
         )
 
+class TestPlotTitleCreation(unittest.TestCase):
+    def setUp(self):
+        self.full_evaluation = Evaluation(
+            _create_fake_dataset('Ref'),
+            [_create_fake_dataset('T1'), _create_fake_dataset('T2')],
+            [metrics.TemporalStdDev(), metrics.Bias(), metrics.Bias()]
+        )
+
+        self.unary_evaluation = Evaluation(
+            None,
+            [_create_fake_dataset('T1'), _create_fake_dataset('T2')],
+            [metrics.TemporalStdDev()]
+        )
+
+    def test_binary_plot_title_generation(self):
+        self.assertEquals(
+            bp._generate_binary_eval_plot_title(self.full_evaluation, 0, 1),
+            'Bias of Ref compared to T1'
+        )
+
 def _create_fake_dataset(name):
     lats = numpy.array(range(-10, 25, 1))
     lons = numpy.array(range(-30, 40, 1))
