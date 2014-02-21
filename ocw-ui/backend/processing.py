@@ -407,17 +407,18 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
                 )
 
 def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index):
-    ''' Generate a plot path for a given binary metric run over a specified target dataset.
+    ''' Generate a plot path for a given binary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when generating the name.
+    :param dataset_index: The index of the target dataset to use when 
+		generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
     :type metric_index: Integer >= 0 < len(evaluation.metrics)
 
-    :returns: The full path for the requested metric run. The paths will always be placed in the
-        WORK_DIR set for the web services.
+    :returns: The full path for the requested metric run. The paths will always 
+		be placed in the WORK_DIR set for the web services.
     '''
     plot_name = "{}_compared_to_{}_{}".format(
         evaluation.ref_dataset.name.lower(),
@@ -428,25 +429,27 @@ def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index
     return os.path.join(WORK_DIR, plot_name)
 
 def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index):
-    ''' Generate a plot path for a given unary metric run over a specified target dataset.
+    ''' Generate a plot path for a given unary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when generating the name.
+    :param dataset_index: The index of the target dataset to use when 
+		generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
     :type metric_index: Integer >= 0 < len(evaluation.metrics)
 
-    :returns: The full path for the requested metric run. The paths will always be placed in the
-        WORK_DIR set for the web services.
+    :returns: The full path for the requested metric run. The paths will always 
+		be placed in the WORK_DIR set for the web services.
     '''
     metric = evaluation.unary_metrics[metric_index]
 
-    # Unary metrics can be run over both the reference dataset and the target datasets. It's
-    # possible for an evaluation to only have one and not the other. If there is a reference
-    # dataset then the 0th result index refers to the result of the metric being run on the
-    # reference dataset. Any future indexes into the target dataset list must then be offset
-    # by one. If there's no reference dataset then we don't have to bother with any of this.
+    # Unary metrics can be run over both the reference dataset and the target 
+    # datasets. It's possible for an evaluation to only have one and not the 
+    # other. If there is a reference dataset then the 0th result index refers to 
+    # the result of the metric being run on the reference dataset. Any future 
+    # indexes into the target dataset list must then be offset by one. If 
+    # there's no reference dataset then we don't have to bother with any of this.
     if evaluation.ref_dataset:
         if dataset_index == 0:
             plot_name = "{}_{}".format(
@@ -466,11 +469,12 @@ def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index)
     return os.path.join(WORK_DIR, plot_name)
 
 def _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index):
-    ''' Generate a plot title for a given binary metric run over a specified target dataset.
+    ''' Generate a plot title for a given binary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
     :type evaluation: ocw.evaluation.Evaluation
-    :param dataset_index: The index of the target dataset to use when generating the name.
+    :param dataset_index: The index of the target dataset to use when 
+		generating the name.
     :type dataset_index: Integer >= 0 < len(evaluation.target_datasets)
     :param metric_index: The index of the metric to use when generating the name.
     :type metric_index: Integer >= 0 < len(evaluation.metrics)
