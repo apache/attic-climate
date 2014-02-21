@@ -186,6 +186,17 @@ class TestPlotTitleCreation(unittest.TestCase):
             'TemporalStdDev of T1'
         )
 
+	def test_unary_plot_title_generation_partial_eval(self):
+		self.assertEquals(
+            bp._generate_unary_eval_plot_title(self.unary_evaluation, 0, 0),
+            'TemporalStdDev of T1'
+        )
+
+        self.assertEquals(
+            bp._generate_unary_eval_plot_title(self.unary_evaluation, 1, 0),
+            'TemporalStdDev of T2'
+        )
+
 def _create_fake_dataset(name):
     lats = numpy.array(range(-10, 25, 1))
     lons = numpy.array(range(-30, 40, 1))
