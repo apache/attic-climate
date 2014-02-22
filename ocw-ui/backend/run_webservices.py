@@ -27,15 +27,36 @@ app.mount('/dir/', dir_app)
 app.mount('/rcmed/', rcmed_app)
 
 @app.route('/')
+@app.route('/index.html')
 def index():
-    return "OCW Backend is running!"
+    raise static_file('index.html', root='./app')
+
+@app.route('/js/:path#.+#')
+def server_static(path):
+    return static_file(path, root='./app/js/')
+
+@app.route('/css/:path#.+#')
+def server_static(path):
+    return static_file(path, root='./app/css/')
+
+@app.route('/img/:path#.+#')
+def server_static(path):
+    return static_file(path, root='./app/img/')
+
+@app.route('/partials/:path#.+#')
+def server_static(path):
+    return static_file(path, root='./app/partials/')
+
+@app.route('/font/:path#.+#')
+def server_static(path):
+    return static_file(path, root='./app/font/')
 
 @app.route('/static/eval_results/<file_path:path>')
 def get_eval_result_image(file_path):
     ''' Return static file.
     
     Return static file specified by root + filepath where root defaults to:
-        /tmp/rcmet
+        /tmp/ocw
 
     The 'root' path should coincide with the work directory set used by the
     OCW toolkit for processing.
