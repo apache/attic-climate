@@ -159,31 +159,49 @@ class TestFilePathCreation(unittest.TestCase):
         )
 
     def test_binary_metric_path_generation(self):
+        time_stamp = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.assertEquals(
-            bp._generate_binary_eval_plot_file_path(self.full_evaluation, 0, 1),
-            '/tmp/ocw/ref_compared_to_t1_bias'
+            bp._generate_binary_eval_plot_file_path(self.full_evaluation,
+                                                    0, # dataset_index
+                                                    1, # metric_index
+                                                    time_stamp),
+            '/tmp/ocw/{}/ref_compared_to_t1_bias'.format(time_stamp)
         )
 
     def test_unary_metric_path_generation_full_eval(self):
+        time_stamp = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.assertEquals(
-            bp._generate_unary_eval_plot_file_path(self.full_evaluation, 0, 0),
-            '/tmp/ocw/ref_temporalstddev'
+            bp._generate_unary_eval_plot_file_path(self.full_evaluation,
+                                                   0, # dataset_index
+                                                   0, # metric_index
+                                                   time_stamp),
+            '/tmp/ocw/{}/ref_temporalstddev'.format(time_stamp)
         )
 
         self.assertEquals(
-            bp._generate_unary_eval_plot_file_path(self.full_evaluation, 1, 0),
-            '/tmp/ocw/t1_temporalstddev'
+            bp._generate_unary_eval_plot_file_path(self.full_evaluation,
+                                                   1, # dataset_index
+                                                   0, # metric_index
+                                                   time_stamp),
+            '/tmp/ocw/{}/t1_temporalstddev'.format(time_stamp)
         )
 
     def test_unary_metric_path_generation_partial_eval(self):
+        time_stamp = dt.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.assertEquals(
-            bp._generate_unary_eval_plot_file_path(self.unary_evaluation, 0, 0),
-            '/tmp/ocw/t1_temporalstddev'
+            bp._generate_unary_eval_plot_file_path(self.unary_evaluation,
+                                                   0, # dataset_index
+                                                   0, # metric_index
+                                                   time_stamp),
+            '/tmp/ocw/{}/t1_temporalstddev'.format(time_stamp)
         )
 
         self.assertEquals(
-            bp._generate_unary_eval_plot_file_path(self.unary_evaluation, 1, 0),
-            '/tmp/ocw/t2_temporalstddev'
+            bp._generate_unary_eval_plot_file_path(self.unary_evaluation,
+                                                   1, # dataset_index
+                                                   0, # metric_index
+                                                   time_stamp),
+            '/tmp/ocw/{}/t2_temporalstddev'.format(time_stamp)
         )
 
 class TestPlotTitleCreation(unittest.TestCase):

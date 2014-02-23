@@ -411,7 +411,10 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
 
     :raises ValueError: If there aren't any results to graph.
     '''
-    # TODO: Need to take into consideration the results 'versioning' that the backend currently uses
+    # Create time stamp version-ed WORK_DIR for plotting
+    eval_time_stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    eval_path = os.path.join(WORK_DIR, eval_time_stamp)
+    os.makedirs(eval_path)
 
     # TODO: Should be able to check for None here...
     if evaluation.results == [] and evaluation.unary_results == []:
@@ -433,7 +436,8 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
                 results = evaluation.results[dataset_index][metric_index]
                 file_name = _generate_binary_eval_plot_file_path(evaluation,
 																 dataset_index,
-																 metric_index)
+																 metric_index,
+                                                                 eval_time_stamp)
                 plot_title = _generate_binary_eval_plot_title(evaluation,
 															  dataset_index,
 															  metric_index)
@@ -451,7 +455,8 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
 			for result_index, result in enumerate(cur_unary_results):
 				file_name = _generate_unary_eval_plot_file_path(evaluation,
 																result_index,
-																metric_index)
+																metric_index,
+                                                                eval_time_stamp)
 				plot_title = _generate_unary_eval_plot_title(evaluation,
 															 result_index,
 															 metric_index)
@@ -485,7 +490,8 @@ def _calculate_grid_shape(reference_dataset, max_cols=6):
 
     return (num_rows, max_cols)
 
-def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index):
+def _generate_binary_eval_plot_file_path(evaluation, dataset_index,
+                                         metric_index, time_stamp):
     ''' Generate a plot path for a given binary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
@@ -505,9 +511,11 @@ def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index
         evaluation.metrics[metric_index].__class__.__name__.lower()
     )
 
-    return os.path.join(WORK_DIR, plot_name)
+    timestamped_workdir = os.path.join(WORK_DIR, time_stamp)
+    return os.path.join(timestamped_workdir, plot_name)
 
-def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index):
+def _generate_unary_eval_plot_file_path(evaluation, dataset_index,
+                                        metric_index, time_stamp):
     ''' Generate a plot path for a given unary metric run.
 
     :param evaluation: The Evaluation object from which to pull name information.
@@ -522,6 +530,7 @@ def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index)
 		be placed in the WORK_DIR set for the web services.
     '''
     metric = evaluation.unary_metrics[metric_index]
+    timestamped_workdir = os.path.join(WORK_DIR, time_stamp)
 
     # Unary metrics can be run over both the reference dataset and the target
     # datasets. It's possible for an evaluation to only have one and not the
@@ -536,7 +545,7 @@ def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index)
                 metric.__class__.__name__.lower()
             )
 
-            return os.path.join(WORK_DIR, plot_name)
+            return os.path.join(timestamped_workdir, plot_name)
         else:
             dataset_index -= 1
 
@@ -545,7 +554,7 @@ def _generate_unary_eval_plot_file_path(evaluation, dataset_index, metric_index)
         metric.__class__.__name__.lower()
     )
 
-    return os.path.join(WORK_DIR, plot_name)
+    return os.path.join(timestamped_workdir, plot_name)
 
 def _generate_binary_eval_plot_title(evaluation, dataset_index, metric_index):
     ''' Generate a plot title for a given binary metric run.
