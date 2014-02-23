@@ -152,6 +152,10 @@ class TestSpatialRegrid(unittest.TestCase, CustomAssertions):
         expected_data_shape = (len(self.input_dataset.times), len(self.new_lats), len(self.new_lons))
         self.assertSequenceEqual(regridded_data_shape, expected_data_shape)
 
+    def test_variable_propagation(self):
+        self.assertEquals(self.input_dataset.name, self.regridded_dataset.name)
+        self.assertEquals(self.input_dataset.variable, self.regridded_dataset.variable)
+
 class TestNormalizeDatasetDatetimes(unittest.TestCase):
     def setUp(self):
         self.monthly_dataset = ten_year_monthly_15th_dataset()
