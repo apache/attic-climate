@@ -389,6 +389,13 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
 												  cur_frame.co_name)
         raise ValueError(err)
 
+    if evaluation.ref_dataset:
+        grid_shape_dataset = evaluation.ref_dataset
+    else:
+        grid_shape_dataset = evaluation.target_datasets[0]
+
+    grid_shape = _calculate_grid_shape(grid_shape_dataset)
+
     if evaluation.results != []:
         for dataset_index, dataset in enumerate(evaluation.target_datasets):
             for metric_index, metric in enumerate(evaluation.metrics):
@@ -404,7 +411,8 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
 										 lat_bins,
 										 lon_bins,
 										 fname=file_name,
-										 ptitle=plot_title)
+										 ptitle=plot_title,
+                                         grid_shape=grid_shape)
 
     if evaluation.unary_results != []:
         for metric_index, metric in enumerate(evaluation.unary_metrics):
@@ -421,7 +429,30 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
 										   lat_bins,
 										   lon_bins,
 										   fname=file_name,
-										   ptitle=plot_title)
+										   ptitle=plot_title,
+                                           grid_shape=grid_shape)
+
+def _calculate_grid_shape(reference_dataset, max_cols=6):
+    ''' Calculate the plot grid shape given a reference dataset. 
+
+    :param reference_dataset: The dataset from which to strip out temporal
+        bin information and calculate grid shape.
+    :type reference_dataset: ocw.dataset.Dataset
+    :param max_cols: The maximum number of columns in the calculated grid shape.
+        Note that the calculated shape with always have max_cols as its column
+        count.
+    :type max_cols: Integer > 0
+
+    :returns: The grid shape to use as (num_rows, num_cols)
+    '''
+    temporal_bins = reference_dataset.values.shape[0]
+
+    num_rows = 1
+    while temporal_bins > max_cols:
+        temporal_bins -= max_cols
+        num_rows += 1
+
+    return (num_rows, max_cols)
 
 def _generate_binary_eval_plot_file_path(evaluation, dataset_index, metric_index):
     ''' Generate a plot path for a given binary metric run.
