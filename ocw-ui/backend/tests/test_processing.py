@@ -144,6 +144,20 @@ class TestCalculateGridShape(unittest.TestCase):
         shape = bp._calculate_grid_shape(ref_dataset, max_cols=3)
         self.assertEquals(shape, (3, 3))
 
+class TestBalanceGridShape(unittest.TestCase):
+    def test_balance_grid_shape(self):
+        # Test column imbalance
+        self.assertEquals(bp._balance_grid_shape(7, 2, 6), (3, 3))
+        self.assertEquals(bp._balance_grid_shape(7, 2, 4), (3, 3))
+        self.assertEquals(bp._balance_grid_shape(10, 2, 6), (3, 4))
+        self.assertEquals(bp._balance_grid_shape(20, 3, 7), (4, 5))
+
+        # Test row imbalance
+        self.assertEquals(bp._balance_grid_shape(7, 6, 2), (3, 3))
+        self.assertEquals(bp._balance_grid_shape(7, 4, 2), (3, 3))
+        self.assertEquals(bp._balance_grid_shape(10, 6, 2), (3, 4))
+        self.assertEquals(bp._balance_grid_shape(20, 7, 3), (4, 5))
+
 class TestFilePathCreation(unittest.TestCase):
     def setUp(self):
         self.full_evaluation = Evaluation(
