@@ -131,9 +131,14 @@ def run_evaluation():
     target_datasets = [_process_dataset_object(obj, eval_bounds)
 					   for obj
 					   in data['target_datasets']]
+    # Do temporal re-bin based off of passed resolution
+    time_delta = timedelta(days=data['temporal_resolution'])
+    ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
+    target_datasets = [dsp.temporal_rebin(ds, time_delta)
+					   for ds
+					   in target_datasets]
 
-    # TODO, Need to subset here! At the moment the start/end times aren't
-    # being used to subset.
+    # Subset the datasets
     subset = Bounds(eval_bounds['lat_min'],
                     eval_bounds['lat_max'],
                     eval_bounds['lon_min'],
@@ -141,12 +146,11 @@ def run_evaluation():
                     eval_bounds['start_time'],
                     eval_bounds['end_time'])
 
-    # Do temporal re-bin based off of passed resolution
-    time_delta = timedelta(days=data['temporal_resolution'])
-    ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
-    target_datasets = [dsp.temporal_rebin(ds, time_delta)
+    ref_dataset = dsp.subset(subset, ref_dataset)
+    target_datasets = [dsp.subset(subset, ds)
 					   for ds
 					   in target_datasets]
+
 
     # Do spatial re=bin based off of reference dataset + lat/lon steps
     lat_step = data['spatial_rebin_lat_step']

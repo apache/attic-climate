@@ -291,12 +291,13 @@ class TestRunEvaluation(unittest.TestCase):
             'metrics': ['Bias'],
             'start_time': '1989-01-01 00:00:00',
             'end_time': '2008-01-01 00:00:00',
-            'lat_min': -45.759998,
-            'lat_max': 42.240002,
-            'lon_min': -24.639999,
-            'lon_max': 60.279999,
+            'lat_min': -45.0,
+            'lat_max': 42.0,
+            'lon_min': -24.0,
+            'lon_max': 60.0,
             'subregion_information': None
         }
+
         test_app.post_json('/processing/run_evaluation/', data)
         result_dirs = [x for x in os.listdir(WORK_DIR)
                        if os.path.isdir(os.path.join(WORK_DIR, x))]
