@@ -58,7 +58,9 @@ def temporal_rebin(target_dataset, temporal_resolution):
     new_dataset = ds.Dataset(target_dataset.lats, 
                              target_dataset.lons, 
                              binned_dates, 
-                             binned_values)
+                             binned_values,
+                             target_dataset.variable,
+                             target_dataset.name)
     
     return new_dataset
 
