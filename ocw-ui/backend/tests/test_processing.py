@@ -5,6 +5,7 @@ import datetime as dt
 
 from webtest import TestApp
 
+from backend.config import WORK_DIR
 from backend.run_webservices import app
 import backend.processing as bp
 
@@ -51,7 +52,6 @@ class TestLocalDatasetLoad(unittest.TestCase):
 
     def test_custom_name_assignment(self):
         self.dataset_object['name'] = 'CustomName'
-        print self.dataset_object
         dataset = bp._load_local_dataset_object(self.dataset_object)
         self.assertEqual(dataset.name, self.dataset_object['name'])
 
@@ -245,6 +245,68 @@ class TestPlotTitleCreation(unittest.TestCase):
             bp._generate_unary_eval_plot_title(self.unary_evaluation, 1, 0),
             'TemporalStdDev of T2'
         )
+
+class TestRunEvaluation(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        if not os.path.exists('d1.nc'):
+            urlretrieve(FILE_LEADER + FILE_1, 'd1.nc')
+        if not os.path.exists('d2.nc'):
+            urlretrieve(FILE_LEADER + FILE_2, 'd2.nc')
+
+    @classmethod
+    def tearDownClass(self):
+        if os.path.exists('d1.nc'):
+            os.remove('d1.nc')
+        if os.path.exists('d2.nc'):
+            os.remove('d2.nc')
+
+    def test_full_evaluation(self):
+        data = {
+            'reference_dataset': {
+                'data_source_id': 1,
+                'dataset_info': {
+                    'id': os.path.abspath('d1.nc'),
+                    'var_name': 'tasmax',
+                    'lat_name': 'lat',
+                    'lon_name': 'lon',
+                    'time_name': 'time'
+                }
+            },
+            'target_datasets': [
+                {
+                    'data_source_id': 1,
+                    'dataset_info': {
+                        'id': os.path.abspath('d2.nc'),
+                        'var_name': 'tasmax',
+                        'lat_name': 'lat',
+                        'lon_name': 'lon',
+                        'time_name': 'time'
+                    }
+                }
+            ],
+            'spatial_rebin_lat_step': 1,
+            'spatial_rebin_lon_step': 1,
+            'temporal_resolution': 365,
+            'metrics': ['Bias'],
+            'start_time': '1989-01-01 00:00:00',
+            'end_time': '2008-01-01 00:00:00',
+            'lat_min': -45.759998,
+            'lat_max': 42.240002,
+            'lon_min': -24.639999,
+            'lon_max': 60.279999,
+            'subregion_information': None
+        }
+        test_app.post_json('/processing/run_evaluation/', data)
+        result_dirs = [x for x in os.listdir(WORK_DIR)
+                       if os.path.isdir(os.path.join(WORK_DIR, x))]
+
+        eval_dir = os.path.join(WORK_DIR, result_dirs[-1])
+        eval_files = [f for f in os.listdir(eval_dir)
+                      if os.path.isfile(os.path.join(eval_dir, f))]
+
+        self.assertTrue(len(eval_files) == 1)
+        self.assertEquals(eval_files[0], 'd1.nc_compared_to_d2.nc_bias.png')
 
 def _create_fake_dataset(name):
     lats = numpy.array(range(-10, 25, 1))
