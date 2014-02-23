@@ -61,12 +61,14 @@ def run_evaluation():
                 //     'lat_name': The latitude variable name.
                 //     'lon_name': The longitude variable name.
                 //     'time_name': The time variable name
+                //     'name': Optional dataset name
                 // }
                 //
                 // if data_source_id == 2 == rcmed:
                 // {
                 //     'dataset_id': The dataset id to grab from RCMED.
                 //     'parameter_id': The variable id value used by RCMED.
+                //     'name': Optional dataset name
                 // }
                 'dataset_info': {..}
             },
@@ -191,12 +193,14 @@ def _process_dataset_object(dataset_object, eval_bounds):
         //     'lat_name': The latitude variable name.
         //     'lon_name': The longitude variable name.
         //     'time_name': The time variable name
+        //     'name': Optional dataset name
         // }
         //
         // if data_source_id == 2 == rcmed:
         // {
         //     'dataset_id': The dataset id to grab from RCMED.
         //     'parameter_id': The variable id value used by RCMED.
+        //     'name': Optional dataset name
         // }
         'dataset_info': {..}
 
@@ -248,6 +252,7 @@ def _load_local_dataset_object(dataset_info):
             'lat_name': The latitude variable name,
             'lon_name': The longitude variable name,
             'time_name': The time variable name
+            'name': Optional dataset name
         }
     :type dataset_info: Dictionary
 
@@ -261,8 +266,14 @@ def _load_local_dataset_object(dataset_info):
     lat_name = dataset_info['lat_name']
     lon_name = dataset_info['lon_name']
     time_name = dataset_info['time_name']
+    # If a name is passed for the dataset, use it. Otherwise, use the file name.
+    name = (dataset_info['name'] 
+            if 'name' in dataset_info.keys() 
+            else path.split('/')[-1])
 
-    return local.load_file(path, var_name)
+    dataset =  local.load_file(path, var_name)
+    dataset.name = name
+    return dataset
 
 def _load_rcmed_dataset_object(dataset_info, eval_bounds):
     ''' Create an ocw.dataset.Dataset object from supplied data.
@@ -272,6 +283,7 @@ def _load_rcmed_dataset_object(dataset_info, eval_bounds):
         {
             'dataset_id': The dataset id to grab from RCMED.
             'parameter_id': The variable id value used by RCMED.
+            'name': Optional dataset name
         }
     :type dataset_info: Dictionary
 

@@ -32,8 +32,8 @@ class TestLocalDatasetLoad(unittest.TestCase):
         if os.path.exists('test.nc'):
             os.remove('test.nc')
 
-    def test_valid_load(self):
-        dataset_object = {
+    def setUp(self):
+        self.dataset_object = {
             'id': os.path.abspath('test.nc'),
             'var_name': 'tasmax',
             'lat_name': 'lat',
@@ -41,8 +41,19 @@ class TestLocalDatasetLoad(unittest.TestCase):
             'time_name': 'time'
         }
 
-        dataset = bp._load_local_dataset_object(dataset_object)
-        self.assertEqual(dataset.variable, dataset_object['var_name'])
+    def test_valid_load(self):
+        dataset = bp._load_local_dataset_object(self.dataset_object)
+        self.assertEqual(dataset.variable, self.dataset_object['var_name'])
+
+    def test_default_name_assignment(self):
+        dataset = bp._load_local_dataset_object(self.dataset_object)
+        self.assertEqual(dataset.name, 'test.nc')
+
+    def test_custom_name_assignment(self):
+        self.dataset_object['name'] = 'CustomName'
+        print self.dataset_object
+        dataset = bp._load_local_dataset_object(self.dataset_object)
+        self.assertEqual(dataset.name, self.dataset_object['name'])
 
 class TestDatasetProessingHelper(unittest.TestCase):
     def test_invalid_process_dataset_objects(self):
