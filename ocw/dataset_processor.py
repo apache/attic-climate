@@ -111,7 +111,9 @@ def spatial_regrid(target_dataset, new_latitudes, new_longitudes):
     regridded_dataset = ds.Dataset(new_latitudes, 
                                    new_longitudes, 
                                    target_dataset.times, 
-                                   new_values)
+                                   new_values,
+                                   target_dataset.variable,
+                                   target_dataset.name)
     return regridded_dataset
 
 def ensemble(datasets):
