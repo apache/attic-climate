@@ -89,7 +89,6 @@ class TestTemporalRebin(unittest.TestCase, CustomAssertions):
         bins = np.array(bins)
         bins.sort()
         self.assert1DArraysEqual(annual_dataset.times, bins)
-        
     
     def test_non_rebin(self):
         """This will take a monthly dataset and ask for a monthly rebin of 28 days.  The resulting
@@ -97,6 +96,14 @@ class TestTemporalRebin(unittest.TestCase, CustomAssertions):
         monthly_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, datetime.timedelta(days=28))
         good_times = self.ten_year_monthly_dataset.times
         self.assert1DArraysEqual(monthly_dataset.times, good_times)
+
+    def test_variable_propagation(self):
+        annual_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset,
+                                           datetime.timedelta(days=365))
+        self.assertEquals(annual_dataset.name,
+                          self.ten_year_monthly_dataset.name)
+        self.assertEquals(annual_dataset.variable,
+                          self.ten_year_monthly_dataset.variable)
 
 
 class TestRcmesSpatialRegrid(unittest.TestCase):
@@ -264,7 +271,7 @@ def ten_year_monthly_dataset():
     # Ten Years of monthly data
     times = np.array([datetime.datetime(year, month, 1) for year in range(2000, 2010) for month in range(1, 13)])
     values = np.ones([len(times), len(lats), len(lons)])
-    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name")
+    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name", name='foo')
     return input_dataset
 
 def ten_year_monthly_15th_dataset():
