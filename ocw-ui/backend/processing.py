@@ -21,6 +21,7 @@ from datetime import timedelta, datetime
 import inspect
 import sys
 import os
+import math
 
 from bottle import Bottle, request
 
@@ -485,14 +486,72 @@ def _calculate_grid_shape(reference_dataset, max_cols=6):
 
     :returns: The grid shape to use as (num_rows, num_cols)
     '''
-    temporal_bins = reference_dataset.values.shape[0]
+    total_temporal_bins = reference_dataset.values.shape[0]
+    temporal_bins = total_temporal_bins
 
     num_rows = 1
     while temporal_bins > max_cols:
         temporal_bins -= max_cols
         num_rows += 1
 
-    return (num_rows, max_cols)
+    return _balance_grid_shape(total_temporal_bins, num_rows, max_cols)
+    #return (num_rows, max_cols)
+
+def _balance_grid_shape(total_temporal_bins, num_rows, num_cols):
+    ''' Balance grid shape values to prevent large row/col discrepancies.
+
+    Often times _calculate_grid_shape will result in values where there is a
+    large difference between row/column count. This tries to balance out the
+    shape so that it is as square as possible.
+
+    :param total_temporal_bins: The total number of bins that the shape must
+        fit.
+    :type total_temporal_bins: Integer >= 1
+    :params num_rows: The number of rows.
+    :type num_rows: Integer >= 1
+    :params num_cols: The number of columns.
+    :type num_cols: Integer >= 1
+
+    :returns: The adjusted shape values so the difference between the number
+        of rows and the number of columns <= 1.
+    '''
+    while True:
+        if abs(num_rows - num_cols) <= 1:
+            # We might be able to reduce both.
+            if total_temporal_bins < (num_rows - 1) * (num_cols - 1):
+                num_rows -= 1
+                num_cols -= 1
+            # If not, then we're nearly done.
+            else:
+                # We might end up with a grid that is slightly too large. We
+                # tend to favor larger column numbers rather than rows, so we'll
+                # try to drop another column to get a tighter grid.
+                if total_temporal_bins <= num_rows * (num_cols - 1):
+                    num_cols -= 1
+
+                # Favor more columns or more rows in the final layout.
+                if num_rows > num_cols:
+                    num_rows, num_cols = num_cols, num_rows
+
+                break
+        else:
+            if num_rows > num_cols:
+                # When we have a delta >= 2, first we try to drop just one of the values.
+                if total_temporal_bins < (num_rows - 1) * num_cols:
+                        num_rows -= 1
+                # In certain cases we can't just drop a value yet we still have a delta
+                # that is >= 2. In that situation we need to trade a value between them.
+                elif total_temporal_bins < (num_rows - 1) * (num_cols + 1):
+                    num_rows -= 1
+                    num_cols += 1
+            else:
+                if total_temporal_bins < num_rows * (num_cols - 1):
+                        num_cols -= 1
+                elif total_temporal_bins < (num_rows + 1) * (num_cols - 1):
+                    num_rows += 1
+                    num_cols -= 1
+
+    return (int(num_rows), int(num_cols))
 
 def _generate_binary_eval_plot_file_path(evaluation, dataset_index,
                                          metric_index, time_stamp):
