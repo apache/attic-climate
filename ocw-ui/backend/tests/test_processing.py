@@ -298,6 +298,8 @@ class TestRunEvaluation(unittest.TestCase):
             'subregion_information': None
         }
 
+        # NOTE: Sometimes the file download will die if you use the this WebTest
+        # call for testing. If that is the case, download the files manually with wget.
         test_app.post_json('/processing/run_evaluation/', data)
         result_dirs = [x for x in os.listdir(WORK_DIR)
                        if os.path.isdir(os.path.join(WORK_DIR, x))]
