@@ -24,6 +24,8 @@ import os
 
 from bottle import Bottle, request
 
+from config import WORK_DIR
+
 import ocw.data_source.local as local
 import ocw.data_source.rcmed as rcmed
 import ocw.dataset_processor as dsp
@@ -35,9 +37,6 @@ import ocw.plotter as plotter
 import numpy as np
 
 processing_app = Bottle()
-
-# TODO: Factor this out of all but the main modules
-WORK_DIR = "/tmp/ocw"
 
 @processing_app.route('/run_evaluation/', method='POST')
 def run_evaluation():

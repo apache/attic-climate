@@ -21,10 +21,9 @@ from bottle import Bottle, request
 import os
 import re
 
-dir_app = Bottle()
+from config import WORK_DIR, PATH_LEADER
 
-PATH_LEADER = "/usr/local/ocw"
-WORK_DIR = "/tmp/ocw"
+dir_app = Bottle()
 
 @dir_app.route('/list/')
 @dir_app.route('/list/<dir_path:path>')
