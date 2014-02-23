@@ -116,6 +116,12 @@ class TestSpatialRebinHelpers(unittest.TestCase):
         self.assertTrue(numpy.array_equal(lats, new_lats))
         self.assertTrue(numpy.array_equal(lons, new_lons))
 
+class TestCalculateGridShape(unittest.TestCase):
+    def test_grid_shape_calculation(self):
+        ref_dataset = _create_fake_dataset('foo')
+        shape = bp._calculate_grid_shape(ref_dataset, max_cols=3)
+        self.assertEquals(shape, (3, 3))
+
 class TestFilePathCreation(unittest.TestCase):
     def setUp(self):
         self.full_evaluation = Evaluation(
