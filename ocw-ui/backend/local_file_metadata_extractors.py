@@ -19,6 +19,7 @@
 
 import sys
 import netCDF4
+import json
 
 from bottle import Bottle, request, route, response
 
@@ -83,8 +84,8 @@ def list_latlon(file_path):
         # Change 0 - 360 degree values to be -180 to 180
         lats[lats > 180] = lats[lats > 180] - 360
 
-        lat_min = lats.min()
-        lat_max = lats.max()
+        lat_min = float(lats.min())
+        lat_max = float(lats.max())
 
     # Attempt to determine the lon name
     found_lon_name = False
@@ -101,8 +102,8 @@ def list_latlon(file_path):
         # Change 0 - 360 degree values to be -180 to 180
         lons[lons > 180] = lons[lons > 180] - 360
 
-        lon_min = lons.min()
-        lon_max = lons.max()
+        lon_min = float(lons.min())
+        lon_max = float(lons.max())
 
     in_file.close()
 
@@ -114,12 +115,13 @@ def list_latlon(file_path):
     else:
         output = {'success': success, 'variables': var_names_list}
 
+    output = json.dumps(output)
     if request.query.callback:
         return '%s(%s)' % (request.query.callback, output)
     return output
 
 @lfme_app.route('/list_time/<file_path:path>')
-def list_latlon(file_path):
+def list_time(file_path):
     ''' Retrieve time information from provided file.
 
     :param file_path: Path to the NetCDF file from which time information
@@ -176,6 +178,7 @@ def list_latlon(file_path):
     else:
         output = {'success': False, 'variables': var_names_list}
 
+    output = json.dumps(output)
     if request.query.callback:
         return '%s(%s)' % (request.query.callback, output)
     return output
@@ -216,6 +219,7 @@ def list_vars(file_path):
         output = {'success': True, 'variables': in_file.variables.keys()}
         in_file.close()
     finally:
+        output = json.dumps(output)
         if request.query.callback:
           return "%s(%s)" % (request.query.callback, output)
         return output
