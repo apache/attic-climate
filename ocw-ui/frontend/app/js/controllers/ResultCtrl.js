@@ -24,11 +24,15 @@ function($rootScope, $scope, $http) {
     $scope.results = [];
 
     // Get all evaluation directories
-    $http.jsonp($rootScope.baseURL + '/getResultDirInfo?callback=JSON_CALLBACK')
+    $http.jsonp($rootScope.baseURL + '/dir/results/?callback=JSON_CALLBACK')
     .success(function(data) {
-      var removeItem = "/cache";
-      data.splice( $.inArray(removeItem,data) ,1 );
-      $scope.results = data.sort().reverse();
-    });
+		data = data['listing']
 
+		var cacheDirIndex = data.indexOf("/cache");
+		if (cacheDirIndex > -1) {
+			data.split(cacheDirIndex, 1)
+		}
+
+		$scope.results = data.sort().reverse();
+    });
 }]);
