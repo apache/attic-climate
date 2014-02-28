@@ -102,79 +102,98 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 	$scope.runEvaluation = function() {
 		$scope.runningEval = true;
 
-        // Containers for dataset information
-		var obsDatasetIds = [],
-		    obsDatasetParameterIds = [],
-			modelDatasetIds = [],
-			modelDatasetParameterIds = [],
-			modelDatasetTimes = [],
-			modelDatasetLats = [],
-			modelDatasetLons = [];
+		var data = {}
+		var settings = evaluationSettings.getSettings()
 
-        // Populate containers with information for each selected dataset
+		// Set dataset information
+
+		// Grab the reference dataset information
+		var ref_ds = settings.spatialSelect;
+
+		if (ref_ds == null) {
+			ref_ds = $scope.datasets[0];
+		}
+
+		data['reference_dataset'] = null;
+		data['target_datasets'] = [];
+
+		// Parse all the dataset information and generate the necessary objects for the backend
 		for (var i = 0; i < $scope.datasets.length; i++) {
-		    console.log($scope.datasets[i].id)
-			if ($scope.datasets[i]['isObs'] == 1) {
-				obsDatasetIds.push($scope.datasets[i].datasetId)
-				obsDatasetParameterIds.push($scope.datasets[i].id)
+			var dataset = {}
+			dataset['dataset_info'] = {}
+
+			if ($scope.datasets[i].isObs == 0) {
+				dataset['data_source_id'] = 1;
+				dataset['dataset_info']['dataset_id'] = $scope.datasets[i]['id'];
+				dataset['dataset_info']['var_name'] = $scope.datasets[i]['param'];
+				dataset['dataset_info']['lat_name'] = $scope.datasets[i]['lat'];
+				dataset['dataset_info']['lon_name'] = $scope.datasets[i]['lon'];
+				dataset['dataset_info']['time_name'] = $scope.datasets[i]['time'];
+				dataset['dataset_info']['name'] = $scope.datasets[i]['name'];
 			} else {
-				modelDatasetIds.push($scope.datasets[i].id)
-				modelDatasetParameterIds.push($scope.datasets[i].param)
-				modelDatasetTimes.push($scope.datasets[i].time)
-				modelDatasetLats.push($scope.datasets[i].lat)
-				modelDatasetLons.push($scope.datasets[i].lon)
+				dataset['data_source_id'] = 2;
+				dataset['dataset_info']['dataset_id'] = $scope.datasets[i]['datasetId'];
+				dataset['dataset_info']['parameter_id'] = $scope.datasets[i]['param'];
+				dataset['dataset_info']['name'] = $scope.datasets[i]['name'];
+			}
+
+			if ($scope.datasets[i].id === ref_ds.id) {
+				data['reference_dataset'] = dataset;
+			} else {
+				data['target_datasets'].push(dataset);
 			}
 		}
 
-		// TODO At the moment we aren't running all the metrics that the user selected. We're only
-		// running the first available metric that the user provides. If the user un-checks all
-		// metrics then the default of 'bias' is used.
-		var metricToRun = 'bias';
-		var settings = evaluationSettings.getSettings().metrics;
-		for (var i = 0; i < settings.length; i++) {
-			var setting = settings[i];
+		// TODO: These should be use customizable
+		// Set the spatial rebin grid steps
+		data['spatial_rebin_lat_step'] = 1;
+		data['spatial_rebin_lon_step'] = 1;
 
-			if (setting.select) {
-				metricToRun = setting.name;
-				break;
+		// Determine the temporal resolution to use when doing a temporal rebin. The
+		// value is used to determine the timedelta in days to use.
+		temporal_res = settings.temporal.selected;
+
+		if (temporal_res == 'daily') {
+			data['temporal_resolution'] = 1;
+		} else if (temporal_res == 'monthly') {
+			data['temporal_resolution'] = 30;
+		} else if (temporal_res == 'yearly') {
+			data['temporal_resolution'] = 365;
+		} else if (temporal_res == 'full') {
+			data['temporal_resolution'] = 999;
+		} else {
+			// Default to monthly just in case
+			data['temporal_resolution'] = 30;
+		}
+
+		// Load the Metrics for the evaluation
+		data['metrics'] = []
+		metrics = settings.metrics
+		for (var i = 0; i < metrics.length; i++) {
+			var metric = metrics[i];
+
+			if (metric.select) {
+				data['metrics'].push(metric.name)
 			}
-		};
+		}
 
-        // Prepare information to send to backend service
-		var data = {params: { 
-			'obsDatasetIds'    : obsDatasetIds,
-			'obsParameterIds'  : obsDatasetParameterIds,
-			
-			'startTime'        : $scope.displayParams.start + " 00:00:00",
-			'endTime'          : $scope.displayParams.end + " 00:00:00",
-			'latMin'           : $scope.displayParams.latMin,
-			'latMax'           : $scope.displayParams.latMax,
-			'lonMin'           : $scope.displayParams.lonMin,
-			'lonMax'           : $scope.displayParams.lonMax,
-			
-			'filelist'         : modelDatasetIds,
-			'modelVarName'     : modelDatasetParameterIds,
-			'modelTimeVarName' : modelDatasetTimes,
-			'modelLatVarName'  : modelDatasetLats,
-			'modelLonVarName'  : modelDatasetLons,
-			
-			'regridOption'     : ((evaluationSettings.getSettings().spatialSelect.isObs) ? 'obs' : 'model'),
-			'regridBasis'      : evaluationSettings.getSettings().spatialSelect.id,
-			'timeRegridOption' : evaluationSettings.getSettings().temporal.selected,
-			'metricOption'     : metricToRun,   // Should be a list of metrics to run
-			'subregionFile'    : evaluationSettings.getSettings().subregionFile,
-			'callback'         : 'JSON_CALLBACK',
-		}};
+		// Set the bound values for the evaluation
+		data['start_time'] =  $scope.displayParams.start + " 00:00:00",
+		data['end_time'] = $scope.displayParams.end + " 00:00:00",
+		data['lat_min'] = $scope.displayParams.latMin,
+		data['lat_max'] = $scope.displayParams.latMax,
+		data['lon_min'] = $scope.displayParams.lonMin,
+		data['lon_max'] = $scope.displayParams.lonMax,
 
-		$http.jsonp($rootScope.baseURL + '/rcmes/run/', data).
+		$http.post($rootScope.baseURL + '/processing/run_evaluation/', data).
 		success(function(data) {
-			var evalWorkDir = data['evalWorkDir'];
+			var evalWorkDir = data['eval_work_dir'];
 
 			$scope.runningEval = false;
 
 			$timeout(function() {
 				if (evalWorkDir !== undefined) {
-					window.location = "#/results/"+evalWorkDir;
+					window.location = "#/results/" + evalWorkDir;
 				} else {
 					window.location = "#/results";
 				}
