@@ -68,8 +68,8 @@ class Dataset:
         :rtype: (float, float, float, float)
 
         '''
-        return (min(self.lats), max(self.lats),
-                min(self.lons), max(self.lons))
+        return (float(min(self.lats)), float(max(self.lats)),
+                float(min(self.lons)), float(max(self.lons)))
 
 
     def time_range(self):
@@ -212,10 +212,10 @@ class Bounds(object):
 
         :raises: ValueError
         '''
-        self._lat_min = lat_min
-        self._lat_max = lat_max
-        self._lon_min = lon_min
-        self._lon_max = lon_max
+        self._lat_min = float(lat_min)
+        self._lat_max = float(lat_max)
+        self._lon_min = float(lon_min)
+        self._lon_max = float(lon_max)
         self._start = start
         self._end = end
 
