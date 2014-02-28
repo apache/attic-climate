@@ -101,8 +101,9 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 		 */
 		// TODO Make this use $HTTP
 		$scope.fetchFiles = function(path) {
-			$.get($scope.baseURL + '/getDirInfo/' + path, {},
+			$.get($scope.baseURL + '/dir/list/' + path, {},
 				 function(data) {
+					 data = data['listing']
 					 $scope.setNewData(data);
 					 $scope.updateAutoComplete();
 				 }, 'json');
@@ -121,8 +122,9 @@ App.Directives.directive('predictiveFileBrowserInput', function() {
 		 */
 		// TODO Why isn't this using $http?!?!?! Because I copy and pasted!!!!
 		$scope.fetchFilesAndFilter = function(path) {
-			$.get($scope.baseURL + '/getDirInfo/' + path, {},
+			$.get($scope.baseURL + '/dir/list/' + path, {},
 				 function(data) {
+					 data = data['listing']
 					 $scope.setNewData(data);
 					 $scope.filterResults();
 					 $scope.updateAutoComplete();
