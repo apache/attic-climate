@@ -24,7 +24,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 	$scope.fileAdded = false;
 
 	$scope.getObservations = function() {
-		$http.jsonp($rootScope.baseURL + '/getObsDatasets?callback=JSON_CALLBACK').
+		$http.jsonp($rootScope.baseURL + '/rcmed/datasets/?callback=JSON_CALLBACK').
 			success(function(data) {
 				$scope.availableObs = data;
 				$scope.availableObs.splice(0, 0, {longname: 'Please select an option'});
@@ -49,7 +49,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 	};
 
 	$scope.dataSelectUpdated = function() {
-		var urlString = $rootScope.baseURL + '/getDatasetParam?dataset=' + 
+		var urlString = $rootScope.baseURL + '/rcmed/parameters/?dataset=' +
 							$scope.datasetSelection["shortname"] + 
 							"&callback=JSON_CALLBACK";
 		$http.jsonp(urlString).
