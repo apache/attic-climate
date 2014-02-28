@@ -23,7 +23,7 @@ import sys
 import os
 import math
 
-from bottle import Bottle, request
+from bottle import Bottle, request, response
 
 from config import WORK_DIR
 
@@ -38,6 +38,11 @@ import ocw.plotter as plotter
 import numpy as np
 
 processing_app = Bottle()
+
+@processing_app.hook('after_request')
+def enable_cors():
+    ''' Allow Cross-Origin Resource Sharing for all URLs. '''
+    response.headers['Access-Control-Allow-Origin'] = '*'
 
 @processing_app.route('/run_evaluation/', method='POST')
 def run_evaluation():

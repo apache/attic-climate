@@ -20,7 +20,7 @@
 import sys
 import netCDF4
 
-from bottle import Bottle, request, route
+from bottle import Bottle, request, route, response
 
 import ocw.utils
 
@@ -219,3 +219,8 @@ def list_vars(file_path):
         if request.query.callback:
           return "%s(%s)" % (request.query.callback, output)
         return output
+
+@lfme_app.hook('after_request')
+def enable_cors():
+    ''' Allow Cross-Origin Resource Sharing for all URLs. '''
+    response.headers['Access-Control-Allow-Origin'] = '*'

@@ -17,7 +17,7 @@
 
 ''' Services for interacting with NASA JPL's Regional Climate Model Evaluation Database. '''
 
-from bottle import Bottle, request
+from bottle import Bottle, request, response
 
 import requests
 
@@ -78,3 +78,8 @@ def get_dataset_parameters():
     if (request.query.callback):
         return "%s(%s)" % (request.query.callback, r.text)
     return r.text
+
+@rcmed_app.hook('after_request')
+def enable_cors():
+    ''' Allow Cross-Origin Resource Sharing for all URLs. '''
+    response.headers['Access-Control-Allow-Origin'] = '*'

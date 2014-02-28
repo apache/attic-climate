@@ -17,7 +17,7 @@
 
 ''' Endpoints for retrieving directory information from the server. '''
 
-from bottle import Bottle, request
+from bottle import Bottle, request, response
 import os
 import re
 
@@ -199,6 +199,11 @@ def get_path_leader():
     if request.query.callback:
         return "%s(%s)" % (request.query.callback, return_json)
     return return_json
+
+@dir_app.hook('after_request')
+def enable_cors():
+    ''' Allow Cross-Origin Resource Sharing for all URLs. '''
+    response.headers['Access-Control-Allow-Origin'] = '*'
 
 def _get_clean_directory_path(path_leader, dir_path):
     ''' Return a cleaned directory path with a defined path prefix.

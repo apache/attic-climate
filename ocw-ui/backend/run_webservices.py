@@ -74,6 +74,7 @@ def get_eval_result_image(file_path):
 @app.hook('after_request')
 def enable_cors():
     ''' Allow Cross-Origin Resource Sharing for all URLs. '''
+    print "setting the friggen header"
     response.headers['Access-Control-Allow-Origin'] = '*'
 
 if __name__ == "__main__":
