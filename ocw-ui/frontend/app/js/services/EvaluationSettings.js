@@ -25,9 +25,9 @@ App.Services.service('evaluationSettings', function() {
 		],
 		'temporal': {
 			'options': ['daily', 'monthly', 'yearly'],
-			'selected': 'monthly',
+			'selected': 'yearly',
 		},
-		'spatialSelect': '',
+		'spatialSelect': null,
 	};
 
 	return {
