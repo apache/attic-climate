@@ -35,7 +35,7 @@ function($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 
 	// Grab the path leader information that the webserver is using to limit directory access.
 	$scope.pathLeader = 'False';
-	$http.jsonp($rootScope.baseURL + '/getPathLeader/?callback=JSON_CALLBACK').
+	$http.jsonp($rootScope.baseURL + '/dir/path_leader/?callback=JSON_CALLBACK').
 		success(function(data) {
 			$scope.pathLeader = data.leader;
 	});
@@ -71,11 +71,11 @@ function($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 		// Should check for fails and allow the user to make changes.
 		//
 		// Get model variables
-		var varsPromise = $http.jsonp($rootScope.baseURL + '/list/vars/"' + input + '"?callback=JSON_CALLBACK');
+		var varsPromise = $http.jsonp($rootScope.baseURL + '/lfme/list_vars/' + input + '?callback=JSON_CALLBACK');
 		// Get Lat and Lon variables
-		var latlonPromise = $http.jsonp($rootScope.baseURL + '/list/latlon/"' + input + '"?callback=JSON_CALLBACK');
+		var latlonPromise = $http.jsonp($rootScope.baseURL + '/lfme/list_latlon/' + input + '?callback=JSON_CALLBACK');
 		// Get Time variables
-		var timesPromise = $http.jsonp($rootScope.baseURL + '/list/time/"' + input + '"?callback=JSON_CALLBACK');
+		var timesPromise = $http.jsonp($rootScope.baseURL + '/lfme/list_time/' + input + '?callback=JSON_CALLBACK');
 
 		$q.all([varsPromise, latlonPromise, timesPromise]).then(
 			// Handle success fetches!
@@ -84,9 +84,9 @@ function($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 
 				// Handle lat/lon results
 				var data = arrayOfResults[1].data;
-				$scope.lats = [data.latname];
-				$scope.lons = [data.lonname];
-				$scope.latLonVals = [data.latMin, data.latMax, data.lonMin, data.lonMax];
+				$scope.lats = [data.lat_name];
+				$scope.lons = [data.lon_name];
+				$scope.latLonVals = [data.lat_min, data.lat_max, data.lon_min, data.lon_max];
 
 				// If there is more than one option for the user, tell them they need to pick one!
 				if ($scope.lats.length > 1) $scope.lats.splice(0, 0, "Please select an option");
@@ -97,7 +97,7 @@ function($rootScope, $scope, $http, $q, $timeout, selectedDatasetInformation) {
 
 				// Handle time results
 				var data = arrayOfResults[2].data
-				$scope.times = [data.timename];
+				$scope.times = [data.time_name];
 				$scope.timeVals = [data.start_time, data.end_time];
 
 				if ($scope.times.length > 1) $scope.times.splice(0, 0, "Please select an option");
