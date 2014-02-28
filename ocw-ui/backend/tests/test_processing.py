@@ -35,7 +35,7 @@ class TestLocalDatasetLoad(unittest.TestCase):
 
     def setUp(self):
         self.dataset_object = {
-            'id': os.path.abspath('test.nc'),
+            'dataset_id': os.path.abspath('test.nc'),
             'var_name': 'tasmax',
             'lat_name': 'lat',
             'lon_name': 'lon',
@@ -280,7 +280,7 @@ class TestRunEvaluation(unittest.TestCase):
             'reference_dataset': {
                 'data_source_id': 1,
                 'dataset_info': {
-                    'id': os.path.abspath('d1.nc'),
+                    'dataset_id': os.path.abspath('d1.nc'),
                     'var_name': 'tasmax',
                     'lat_name': 'lat',
                     'lon_name': 'lon',
@@ -291,7 +291,7 @@ class TestRunEvaluation(unittest.TestCase):
                 {
                     'data_source_id': 1,
                     'dataset_info': {
-                        'id': os.path.abspath('d2.nc'),
+                        'dataset_id': os.path.abspath('d2.nc'),
                         'var_name': 'tasmax',
                         'lat_name': 'lat',
                         'lon_name': 'lon',
