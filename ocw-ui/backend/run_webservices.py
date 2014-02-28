@@ -31,7 +31,7 @@ app.mount('/processing/', processing_app)
 @app.route('/')
 @app.route('/index.html')
 def index():
-    raise static_file('index.html', root='./app')
+    return static_file('index.html', root='./app')
 
 @app.route('/js/:path#.+#')
 def server_static(path):
