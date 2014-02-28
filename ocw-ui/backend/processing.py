@@ -21,7 +21,7 @@ from datetime import timedelta, datetime
 import inspect
 import sys
 import os
-import math
+import json
 
 from bottle import Bottle, request, response
 
@@ -99,7 +99,7 @@ def run_evaluation():
 
             // A list of the metric class names to use in the evaluation. The
             // names must match the class name exactly.
-            'metrics': [BiasMetric, TemporalStdDev, ...]
+            'metrics': [Bias, TemporalStdDev, ...]
 
             // The bounding values used in the Evaluation. Note that lat values
             // should range from -180 to 180 and lon values from -90 to 90.
@@ -120,15 +120,16 @@ def run_evaluation():
     '''
     # TODO: validate input parameters and return an error if not valid
 
+    eval_time_stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     data = request.json
 
     eval_bounds = {
         'start_time': datetime.strptime(data['start_time'], '%Y-%m-%d %H:%M:%S'),
         'end_time': datetime.strptime(data['end_time'], '%Y-%m-%d %H:%M:%S'),
-        'lat_min': data['lat_min'],
-        'lat_max': data['lat_max'],
-        'lon_min': data['lon_min'],
-        'lon_max': data['lon_max']
+        'lat_min': float(data['lat_min']),
+        'lat_max': float(data['lat_max']),
+        'lon_min': float(data['lon_min']),
+        'lon_max': float(data['lon_max'])
     }
 
     # Load all the datasets
@@ -137,6 +138,7 @@ def run_evaluation():
     target_datasets = [_process_dataset_object(obj, eval_bounds)
 					   for obj
 					   in data['target_datasets']]
+
     # Do temporal re-bin based off of passed resolution
     time_delta = timedelta(days=data['temporal_resolution'])
     ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
@@ -144,19 +146,18 @@ def run_evaluation():
 					   for ds
 					   in target_datasets]
 
-    # Subset the datasets
-    subset = Bounds(eval_bounds['lat_min'],
-                    eval_bounds['lat_max'],
-                    eval_bounds['lon_min'],
-                    eval_bounds['lon_max'],
-                    eval_bounds['start_time'],
-                    eval_bounds['end_time'])
+    ## Subset the datasets
+    #subset = Bounds(eval_bounds['lat_min'],
+                    #eval_bounds['lat_max'],
+                    #eval_bounds['lon_min'],
+                    #eval_bounds['lon_max'],
+                    #eval_bounds['start_time'],
+                    #eval_bounds['end_time'])
 
-    ref_dataset = dsp.subset(subset, ref_dataset)
-    target_datasets = [dsp.subset(subset, ds)
-					   for ds
-					   in target_datasets]
-
+    #ref_dataset = dsp.subset(subset, ref_dataset)
+    #target_datasets = [dsp.subset(subset, ds)
+					   #for ds
+					   #in target_datasets]
 
     # Do spatial re=bin based off of reference dataset + lat/lon steps
     lat_step = data['spatial_rebin_lat_step']
@@ -180,7 +181,9 @@ def run_evaluation():
     evaluation.run()
 
     # Plot
-    _generate_evaluation_plots(evaluation, lat_bins, lon_bins)
+    _generate_evaluation_plots(evaluation, lat_bins, lon_bins, eval_time_stamp)
+
+    return json.dumps({'eval_work_dir': eval_time_stamp})
 
 def _process_dataset_object(dataset_object, eval_bounds):
     ''' Convert an dataset object representation into an OCW Dataset
@@ -257,7 +260,7 @@ def _load_local_dataset_object(dataset_info):
     :param dataset_info: The necessary data to load a local dataset with
         ocw.data_source.local. Must be of the form:
         {
-            'id': The path to the local file for loading,
+            'dataset_id': The path to the local file for loading,
             'var_name': The variable data to pull from the file,
             'lat_name': The latitude variable name,
             'lon_name': The longitude variable name,
@@ -271,7 +274,7 @@ def _load_local_dataset_object(dataset_info):
     :raises KeyError: If the required keys aren't present in the dataset_info.
     :raises ValueError: If data_source.local could not load the requested file.
     '''
-    path = dataset_info['id']
+    path = dataset_info['dataset_id']
     var_name = dataset_info['var_name']
     lat_name = dataset_info['lat_name']
     lon_name = dataset_info['lon_name']
@@ -407,7 +410,7 @@ def _get_valid_metric_options():
             for name, obj in inspect.getmembers(metrics)
             if inspect.isclass(obj) and name not in invalid_metrics}
 
-def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
+def _generate_evaluation_plots(evaluation, lat_bins, lon_bins, eval_time_stamp):
     ''' Generate the Evaluation's plots
 
     .. note: This doesn't support graphing evaluations with subregion data.
@@ -416,13 +419,15 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
     :type evaluation: ocw.evaluation.Evaluation
     :param lat_bins: The latitude bin values used in the evaluation.
     :type lat_bins: List
-    :type lon_bins: The longitude bin values used in the evaluation.
+    :param lon_bins: The longitude bin values used in the evaluation.
     :type lon_bins: List
+    :param eval_time_stamp: The time stamp for the directory where
+        evaluation results should be saved.
+    :type eval_time_stamp: Time stamp of the form '%Y-%m-%d_%H-%M-%S'
 
     :raises ValueError: If there aren't any results to graph.
     '''
     # Create time stamp version-ed WORK_DIR for plotting
-    eval_time_stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     eval_path = os.path.join(WORK_DIR, eval_time_stamp)
     os.makedirs(eval_path)
 
@@ -451,7 +456,6 @@ def _generate_evaluation_plots(evaluation, lat_bins, lon_bins):
                 plot_title = _generate_binary_eval_plot_title(evaluation,
 															  dataset_index,
 															  metric_index)
-
                 plotter.draw_contour_map(results,
 										 lat_bins,
 										 lon_bins,
