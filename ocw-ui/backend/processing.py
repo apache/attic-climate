@@ -139,8 +139,17 @@ def run_evaluation():
 					   for obj
 					   in data['target_datasets']]
 
+    # Normalize the dataset time values so they break on consistent days of the
+    # month or time of the day, depending on how they will be rebinned.
+    resolution = data['temporal_resolution']
+    time_delta = timedelta(days=resolution)
+
+    time_step = 'daily' if resolution <= 31 else 'monthly'
+    ref_dataset = dsp.normalize_dataset_datetimes(ref_dataset, time_step)
+    target_datasets = [dsp.normalize_dataset_datetimes(ds, time_step)
+                       for ds in target_datasets]
+
     # Do temporal re-bin based off of passed resolution
-    time_delta = timedelta(days=data['temporal_resolution'])
     ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
     target_datasets = [dsp.temporal_rebin(ds, time_delta)
 					   for ds
