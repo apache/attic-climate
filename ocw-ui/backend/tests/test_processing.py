@@ -268,12 +268,12 @@ class TestRunEvaluation(unittest.TestCase):
         if not os.path.exists('d2.nc'):
             urlretrieve(FILE_LEADER + FILE_2, 'd2.nc')
 
-    @classmethod
-    def tearDownClass(self):
-        if os.path.exists('d1.nc'):
-            os.remove('d1.nc')
-        if os.path.exists('d2.nc'):
-            os.remove('d2.nc')
+    #@classmethod
+    #def tearDownClass(self):
+        #if os.path.exists('d1.nc'):
+            #os.remove('d1.nc')
+        #if os.path.exists('d2.nc'):
+            #os.remove('d2.nc')
 
     def test_full_evaluation(self):
         data = {
@@ -304,17 +304,19 @@ class TestRunEvaluation(unittest.TestCase):
             'temporal_resolution': 365,
             'metrics': ['Bias'],
             'start_time': '1989-01-01 00:00:00',
-            'end_time': '2008-01-01 00:00:00',
-            'lat_min': -45.0,
-            'lat_max': 42.0,
-            'lon_min': -24.0,
-            'lon_max': 60.0,
+            #'end_time': '2008-01-01 00:00:00',
+            'end_time': '1991-01-01 00:00:00',
+            'lat_min': -25.0,
+            'lat_max': 22.0,
+            'lon_min': -14.0,
+            'lon_max': 40.0,
             'subregion_information': None
         }
 
         # NOTE: Sometimes the file download will die if you use the this WebTest
         # call for testing. If that is the case, download the files manually with wget.
-        test_app.post_json('/processing/run_evaluation/', data)
+        #test_app.post_json('/processing/run_evaluation/', data)
+        bp.run_evaluation(data)
         result_dirs = [x for x in os.listdir(WORK_DIR)
                        if os.path.isdir(os.path.join(WORK_DIR, x))]
 
@@ -322,6 +324,7 @@ class TestRunEvaluation(unittest.TestCase):
         eval_files = [f for f in os.listdir(eval_dir)
                       if os.path.isfile(os.path.join(eval_dir, f))]
 
+        self.assertTrue(False)
         self.assertTrue(len(eval_files) == 1)
         self.assertEquals(eval_files[0], 'd1.nc_compared_to_d2.nc_bias.png')
 
