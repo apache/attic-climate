@@ -18,11 +18,20 @@
 **/
 
 // EvaluationSettings gives controllers access to the user's selected evaluation settings.
-App.Services.service('evaluationSettings', function() {
+App.Services.service('evaluationSettings', function($rootScope, $http) {
+    $http.get($rootScope.baseURL + '/processing/metrics/').then(function(data) {
+        metrics_data = data['data']['metrics'];
+        metrics = [];
+
+        for (var i = 0; i < metrics_data.length; ++i) {
+            metrics.push({'name': metrics_data[i], 'select': false});
+        }
+
+        settings['metrics'] = metrics;
+    });
+
 	var settings = {
-		'metrics': [ 
-			{'name': 'bias', 'select': true},
-		],
+        'metrics': [],
 		'temporal': {
 			'options': ['daily', 'monthly', 'yearly'],
 			'selected': 'yearly',
