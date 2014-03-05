@@ -108,21 +108,21 @@
                     <div class="row-fluid">
                       <div class="span2 offset1 text-center">North:</div>
                       <div class="span2 text-center">
-                        {{dataset.latlonVals.latMax}}
+                        {{dataset.latlonVals.latMax | number:2}}
                       </div>
                       <div class="span2 text-center">West:</div>
                       <div class="span2 text-center">
-                        {{dataset.latlonVals.lonMin}}
+                        {{dataset.latlonVals.lonMin | number:2}}
                       </div>
                     </div>
                     <div class="row-fluid">
                       <div class="span2 offset1 text-center">South:</div>
                       <div class="span2 text-center">
-                        {{dataset.latlonVals.latMin}}
+                        {{dataset.latlonVals.latMin | number:2}}
                       </div>
                       <div class="span2 text-center">East:</div>
                       <div class="span2 text-center">
-                        {{dataset.latlonVals.lonMax}}
+                        {{dataset.latlonVals.lonMax | number:2}}
                       </div>
                     </div>
                   </div>
