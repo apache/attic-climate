@@ -44,6 +44,17 @@ def enable_cors():
     ''' Allow Cross-Origin Resource Sharing for all URLs. '''
     response.headers['Access-Control-Allow-Origin'] = '*'
 
+@processing_app.route('/metrics/')
+def retrieve_metrics():
+    ''''''
+    valid_metrics = _get_valid_metric_options().keys()
+    output = json.dumps({'metrics': valid_metrics})
+    response.content_type = 'application/json'
+
+    if request.query.callback:
+        return '%s(%s)' % (request.query.callback, output)
+    return output
+
 @processing_app.route('/run_evaluation/', method='POST')
 def run_evaluation():
     ''' Run an OCW Evaluation.
@@ -144,7 +155,7 @@ def run_evaluation():
     resolution = data['temporal_resolution']
     time_delta = timedelta(days=resolution)
 
-    time_step = 'daily' if resolution <= 31 else 'monthly'
+    time_step = 'daily' if resolution == 1 else 'monthly'
     ref_dataset = dsp.normalize_dataset_datetimes(ref_dataset, time_step)
     target_datasets = [dsp.normalize_dataset_datetimes(ds, time_step)
                        for ds in target_datasets]
@@ -414,7 +425,7 @@ def _get_valid_metric_options():
 
     :returns: A dictionary of metric (name, object) pairs
     '''
-    invalid_metrics = ['Metric', 'UnaryMetric', 'BinaryMetric']
+    invalid_metrics = ['ABCMeta', 'Metric', 'UnaryMetric', 'BinaryMetric']
     return {name:obj
             for name, obj in inspect.getmembers(metrics)
             if inspect.isclass(obj) and name not in invalid_metrics}
