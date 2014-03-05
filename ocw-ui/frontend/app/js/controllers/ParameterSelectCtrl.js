@@ -225,6 +225,11 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 		if ($scope.displayParams.end > $scope.end)
 			$scope.displayParams.end = $scope.end;
 
+        $scope.displayParams.latMin = $scope.truncateFloat($scope.displayParams.latMin);
+        $scope.displayParams.latMax = $scope.truncateFloat($scope.displayParams.latMax);
+        $scope.displayParams.lonMin = $scope.truncateFloat($scope.displayParams.lonMin);
+        $scope.displayParams.lonMax = $scope.truncateFloat($scope.displayParams.lonMax);
+
 		$scope.$apply();
 		$rootScope.$broadcast('redrawOverlays', []);
 	}
@@ -262,10 +267,10 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			}
 
 			// Update the display parameters with the new valid overlap that we've found!
-			$scope.displayParams.latMin = latMin;
-			$scope.displayParams.latMax = latMax;
-			$scope.displayParams.lonMin = lonMin;
-			$scope.displayParams.lonMax = lonMax;
+			$scope.displayParams.latMin = $scope.truncateFloat(latMin);
+			$scope.displayParams.latMax = $scope.truncateFloat(latMax);
+			$scope.displayParams.lonMin = $scope.truncateFloat(lonMin);
+			$scope.displayParams.lonMax = $scope.truncateFloat(lonMax);
 			$scope.displayParams.start = (typeof start == 'undefined') ? "" : start.split(" ")[0];
 			$scope.displayParams.end = (typeof end == 'undefined') ? "" : end.split(" ")[0];
 
@@ -280,4 +285,12 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 			$scope.displayParams.areValid = true;
 			$rootScope.$broadcast('redrawOverlays', []);
 		}, true);
+
+    $scope.truncateFloat = function(floatVal) {
+        if (floatVal > 0) {
+            return Math.floor(floatVal);
+        } else {
+            return Math.ceil(floatVal);
+        }
+    }
 }]);
