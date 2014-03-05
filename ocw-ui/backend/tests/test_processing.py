@@ -326,6 +326,16 @@ class TestRunEvaluation(unittest.TestCase):
         self.assertTrue(len(eval_files) == 1)
         self.assertEquals(eval_files[0], 'd1.nc_compared_to_d2.nc_bias.png')
 
+class TestMetricNameRetrieval(unittest.TestCase):
+    def test_metric_name_retrieval(self):
+        invalid_metrics = ['ABCMeta', 'Metric', 'UnaryMetric', 'BinaryMetric']
+        data = test_app.get('/processing/metrics/').json
+        metrics = data['metrics']
+
+        self.assertTrue(invalid_metrics not in metrics)
+        self.assertTrue(len(metrics) > 0)
+        self.assertTrue('Bias' in metrics)
+
 def _create_fake_dataset(name):
     lats = numpy.array(range(-10, 25, 1))
     lons = numpy.array(range(-30, 40, 1))
