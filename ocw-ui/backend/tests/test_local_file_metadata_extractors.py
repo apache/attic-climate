@@ -1,5 +1,5 @@
 import os
-from ast import literal_eval
+from json import loads
 import unittest
 from webtest import TestApp
 
@@ -46,7 +46,7 @@ class TestLatLonExtraction(unittest.TestCase):
         # and check for proper content.
         callback = json[:json.index('(')]
         json = json[json.index('(') + 1 : json.rindex(')')]
-        json = literal_eval(json)
+        json = loads(json)
 
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
@@ -78,7 +78,7 @@ class TestLatLonExtraction(unittest.TestCase):
         # and check for proper content.
         callback = json[:json.index('(')]
         json = json[json.index('(') + 1 : json.rindex(')')]
-        json = literal_eval(json)
+        json = loads(json)
 
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
@@ -115,7 +115,7 @@ class TestTimeExtraction(unittest.TestCase):
         # and check for proper content.
         callback = json[:json.index('(')]
         json = json[json.index('(') + 1 : json.rindex(')')]
-        json = literal_eval(json)
+        json = loads(json)
 
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
@@ -147,7 +147,7 @@ class TestTimeExtraction(unittest.TestCase):
         # and check for proper content.
         callback = json[:json.index('(')]
         json = json[json.index('(') + 1 : json.rindex(')')]
-        json = literal_eval(json)
+        json = loads(json)
 
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
@@ -180,7 +180,7 @@ class TestVariableExtraction(unittest.TestCase):
         # and check for proper content.
         callback = json[:json.index('(')]
         json = json[json.index('(') + 1 : json.rindex(')')]
-        json = literal_eval(json)
+        json = loads(json)
 
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")
@@ -202,7 +202,7 @@ class TestVariableExtraction(unittest.TestCase):
         # and check for proper content.
         callback = json[:json.index('(')]
         json = json[json.index('(') + 1 : json.rindex(')')]
-        json = literal_eval(json)
+        json = loads(json)
 
         self.assertDictEqual(expected_return, json)
         self.assertEqual(callback, "test_callback")

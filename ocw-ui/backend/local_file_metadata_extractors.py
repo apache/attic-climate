@@ -115,9 +115,8 @@ def list_latlon(file_path):
     else:
         output = {'success': success, 'variables': var_names_list}
 
-    output = json.dumps(output)
     if request.query.callback:
-        return '%s(%s)' % (request.query.callback, output)
+        return '%s(%s)' % (request.query.callback, json.dumps(output))
     return output
 
 @lfme_app.route('/list_time/<file_path:path>')
@@ -178,9 +177,8 @@ def list_time(file_path):
     else:
         output = {'success': False, 'variables': var_names_list}
 
-    output = json.dumps(output)
     if request.query.callback:
-        return '%s(%s)' % (request.query.callback, output)
+        return '%s(%s)' % (request.query.callback, json.dumps(output))
     return output
 
 @lfme_app.route('/list_vars/<file_path:path>')
@@ -219,9 +217,8 @@ def list_vars(file_path):
         output = {'success': True, 'variables': in_file.variables.keys()}
         in_file.close()
     finally:
-        output = json.dumps(output)
         if request.query.callback:
-          return "%s(%s)" % (request.query.callback, output)
+            return "%s(%s)" % (request.query.callback, json.dumps(output))
         return output
 
 @lfme_app.hook('after_request')
