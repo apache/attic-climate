@@ -17,8 +17,11 @@
 
 import unittest
 import datetime
+import os
+
 from ocw import dataset_processor as dp
 from ocw import dataset as ds
+from ocw.data_source import local
 import numpy as np
 import numpy.ma as ma
 
@@ -268,6 +271,28 @@ class TestFailingSubset(unittest.TestCase):
         with self.assertRaises(ValueError):
             dp.subset(self.subregion, self.target_dataset)
 
+class TestNetCDFWrite(unittest.TestCase):
+    def setUp(self):
+        self.ds = ten_year_monthly_dataset()
+        self.file_name = 'test.nc'
+
+    def tearDown(self):
+        if os.path.isfile(self.file_name):
+            os.remove(self.file_name)
+
+    def test_file_write(self):
+        dp.write_netcdf(self.ds, self.file_name)
+        self.assertTrue(os.path.isfile(self.file_name))
+
+    def test_that_file_contents_are_valid(self):
+        dp.write_netcdf(self.ds, self.file_name)
+        new_ds = local.load_file(self.file_name, self.ds.variable)
+
+        self.assertEqual(self.ds.variable, new_ds.variable)
+        self.assertTrue(np.array_equal(self.ds.lats, new_ds.lats))
+        self.assertTrue(np.array_equal(self.ds.lons, new_ds.lons))
+        self.assertTrue(np.array_equal(self.ds.times, new_ds.times))
+        self.assertTrue(np.array_equal(self.ds.values, new_ds.values))
 
 def ten_year_monthly_dataset():
     lats = np.array(range(-89, 90, 2))

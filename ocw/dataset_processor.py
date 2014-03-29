@@ -23,6 +23,7 @@ import numpy.ma as ma
 import scipy.interpolate
 import scipy.ndimage
 from scipy.ndimage import map_coordinates
+import netCDF4
 
 import logging
 
@@ -209,6 +210,53 @@ def normalize_dataset_datetimes(dataset, timestep):
         dataset.variable,
         dataset.name
     )
+
+def write_netcdf(dataset, path, compress=True):
+    ''' Write a dataset to a NetCDF file.
+
+    :param dataset: The dataset to write.
+    :type dataset: ocw.dataset.Dataset
+
+    :param path: The output file path.
+    :type path: string
+    '''
+    out_file = netCDF4.Dataset(path, 'w', format='NETCDF4')
+
+    # Set attribute lenghts
+    lat_len = len(dataset.lats)
+    lon_len = len(dataset.lons)
+    time_len = len(dataset.times)
+
+    # Create attribute dimensions
+    lat_dim = out_file.createDimension('lat', lat_len)
+    lon_dim = out_file.createDimension('lon', lon_len)
+    time_dim = out_file.createDimension('time', time_len)
+
+    # Create variables
+    lats = out_file.createVariable('lat', 'f8', ('lat',), zlib=compress)
+    lons = out_file.createVariable('lon', 'f8', ('lon',), zlib=compress)
+    times = out_file.createVariable('time', 'f8', ('time',), zlib=compress)
+
+    var_name = dataset.variable if dataset.variable else 'var'
+    values = out_file.createVariable(var_name,
+                                    'f8',
+                                    ('time', 'lat', 'lon'),
+                                    zlib=compress)
+
+    # Set the time variable units
+    # We don't deal with hourly/minutely/anything-less-than-a-day data so
+    # we can safely stick with a 'days since' offset here. Note that the
+    # NetCDF4 helper date2num doesn't support 'months' or 'years' instead
+    # of days.
+    times.units = "days since %s" % dataset.times[0]
+
+    # Store the dataset's values
+    lats[:] = dataset.lats
+    lons[:] = dataset.lons
+    times[:] = netCDF4.date2num(dataset.times, times.units)
+    values[:] = dataset.values
+
+    out_file.close()
 
 def _rcmes_normalize_datetimes(datetimes, timestep):
     """ Normalize Dataset datetime values.
