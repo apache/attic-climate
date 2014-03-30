@@ -27,9 +27,9 @@ rcmed_app = Bottle()
 def get_observation_dataset_data():
     ''' Return a list of dataset information from JPL's RCMED.
 
-    * Example Return JSON Format *
+    **Example Return JSON Format**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         [
             {
@@ -51,15 +51,15 @@ def get_observation_dataset_data():
 def get_dataset_parameters():
     ''' Return dataset specific parameter information from JPL's RCMED.
 
-    * Example Call Format *
+    **Example Call Format**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         /parameters/?dataset=<dataset's short name>
 
-    * Example Return JSON Format *
+    **Example Return JSON Format**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         [
             {

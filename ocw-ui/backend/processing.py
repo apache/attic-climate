@@ -46,7 +46,20 @@ def enable_cors():
 
 @processing_app.route('/metrics/')
 def retrieve_metrics():
-    ''''''
+    ''' Retrieve available metric names.
+
+    **Example Return JSON Format**
+
+    .. sourcecode:: javascript
+
+        {
+            'metrics': [
+                'MetricName1',
+                'MetricName2',
+                ...
+            ]
+        }
+    '''
     valid_metrics = _get_valid_metric_options().keys()
     output = json.dumps({'metrics': valid_metrics})
     response.content_type = 'application/json'
@@ -59,10 +72,10 @@ def retrieve_metrics():
 def run_evaluation():
     ''' Run an OCW Evaluation.
 
-    run_evaluation expects the Evaluation parameters to be POSTed in
+    *run_evaluation* expects the Evaluation parameters to be POSTed in
     the following format.
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         {
             reference_dataset: {
@@ -127,7 +140,6 @@ def run_evaluation():
             // format that this data is passed.
             'subregion_information': Path to a subregion file on the server.
         }
-
     '''
     # TODO: validate input parameters and return an error if not valid
 

@@ -35,9 +35,9 @@ def get_directory_info(dir_path='/'):
 
     :returns: Dictionary containing the directory listing if possible.
 
-    * Example successful JSON return *
+    **Example successful JSON return**
 
-    .. sourcecode: javascript
+    .. sourcecode:: javascript
 
         {
             'listing': [
@@ -47,9 +47,9 @@ def get_directory_info(dir_path='/'):
             ]
         }
 
-    * Example failure JSON return *
+    **Example failure JSON return**
 
-    .. sourcecode: javascript
+    .. sourcecode:: javascript
 
         {'listing': []}
     '''
@@ -88,9 +88,9 @@ def get_result_dir_info():
     directories there are formatted and returned as results. If WORK_DIR does
     not exist, an empty listing will be returned (shown as a 'failure below').
 
-    * Successful JSON Response *
+    **Successful JSON Response**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         {
             'listing': [
@@ -99,9 +99,9 @@ def get_result_dir_info():
             ]
         }
 
-    * Failure JSON Response *
+    **Failure JSON Response**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         {
             'listing': []
@@ -140,9 +140,9 @@ def get_results(dir_path):
 
     :returns: Dictionary of the requested result's directory listing.
 
-    * Successful JSON Response *
+    **Successful JSON Response**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         {
             'listing': [
@@ -151,9 +151,9 @@ def get_results(dir_path):
             ]
         }
 
-    * Failure JSON Response *
+    **Failure JSON Response**
 
-    ..sourcecode: javascript
+    .. sourcecode:: javascript
 
         {
             'listing': []
@@ -188,9 +188,9 @@ def get_results(dir_path):
 def get_path_leader():
     ''' Return the path leader used for clean path creation.
 
-    * Example JSON Response *
+    **Example JSON Response**
 
-    .. sourcecode: javascript
+    .. sourcecode:: javascript
 
         {'leader': '/usr/local/ocw'}
     '''
