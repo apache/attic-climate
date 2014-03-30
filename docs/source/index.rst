@@ -17,6 +17,7 @@ Contents:
    ocw/metrics
    ocw/plotter
    data_source/data_sources
+   ui-backend/backend.rst
 
 
 Indices and tables
