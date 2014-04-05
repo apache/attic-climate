@@ -28,12 +28,7 @@ import numpy.ma as ma
 import logging
 logging.basicConfig(level=logging.CRITICAL)
 
-class CustomAssertions:
-    # Custom Assertions to handle Numpy Arrays
-    def assert1DArraysEqual(self, array1, array2):
-        self.assertSequenceEqual(tuple(array1), tuple(array2))
-
-class TestEnsemble(unittest.TestCase, CustomAssertions): 
+class TestEnsemble(unittest.TestCase): 
     def test_unequal_dataset_shapes(self):
         self.ten_year_dataset = ten_year_monthly_dataset()
         self.two_year_dataset = two_year_daily_dataset()
@@ -51,7 +46,7 @@ class TestEnsemble(unittest.TestCase, CustomAssertions):
         self.ensemble = dp.ensemble(self.datasets)
         self.ensemble_flat = self.ensemble.values.flatten()
         self.three_flat = self.three.values.flatten()
-        self.assert1DArraysEqual(self.ensemble_flat, self.three_flat)
+        np.testing.assert_array_equal(self.ensemble_flat, self.three_flat)
     
     def test_ensemble_name(self):
         self.ensemble_dataset_name = "Dataset Ensemble"
@@ -62,7 +57,7 @@ class TestEnsemble(unittest.TestCase, CustomAssertions):
         self.assertEquals(self.ensemble.name, self.ensemble_dataset_name)
         
 
-class TestTemporalRebin(unittest.TestCase, CustomAssertions):
+class TestTemporalRebin(unittest.TestCase):
     
     def setUp(self):
         self.ten_year_monthly_dataset = ten_year_monthly_dataset()
@@ -71,7 +66,7 @@ class TestTemporalRebin(unittest.TestCase, CustomAssertions):
     
     def test_monthly_to_annual_rebin(self):
         annual_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, datetime.timedelta(days=365))
-        self.assert1DArraysEqual(annual_dataset.times, self.ten_year_annual_times)
+        np.testing.assert_array_equal(annual_dataset.times, self.ten_year_annual_times)
     
     def test_monthly_to_full_rebin(self):
         full_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, datetime.timedelta(days=3650))
@@ -84,21 +79,21 @@ class TestTemporalRebin(unittest.TestCase, CustomAssertions):
         bins = list(set([datetime.datetime(time_reading.year, time_reading.month, 1) for time_reading in self.two_years_daily_dataset.times]))
         bins = np.array(bins)
         bins.sort()
-        self.assert1DArraysEqual(monthly_dataset.times, bins)
+        np.testing.assert_array_equal(monthly_dataset.times, bins)
     
     def test_daily_to_annual_rebin(self):
         annual_dataset = dp.temporal_rebin(self.two_years_daily_dataset, datetime.timedelta(days=366))
         bins = list(set([datetime.datetime(time_reading.year, 1, 1) for time_reading in self.two_years_daily_dataset.times]))
         bins = np.array(bins)
         bins.sort()
-        self.assert1DArraysEqual(annual_dataset.times, bins)
+        np.testing.assert_array_equal(annual_dataset.times, bins)
     
     def test_non_rebin(self):
         """This will take a monthly dataset and ask for a monthly rebin of 28 days.  The resulting
         dataset should have the same time values"""
         monthly_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, datetime.timedelta(days=28))
         good_times = self.ten_year_monthly_dataset.times
-        self.assert1DArraysEqual(monthly_dataset.times, good_times)
+        np.testing.assert_array_equal(monthly_dataset.times, good_times)
 
     def test_variable_propagation(self):
         annual_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset,
@@ -135,7 +130,7 @@ class TestRcmesSpatialRegrid(unittest.TestCase):
         self.assertEqual(regridded_values.shape, lats2.shape)
         self.assertEqual(regridded_values.shape, lons2.shape)
 
-class TestSpatialRegrid(unittest.TestCase, CustomAssertions):
+class TestSpatialRegrid(unittest.TestCase):
     
     def setUp(self):
         self.input_dataset = ten_year_monthly_dataset()
@@ -145,10 +140,10 @@ class TestSpatialRegrid(unittest.TestCase, CustomAssertions):
 
 
     def test_returned_lats(self):
-        self.assert1DArraysEqual(self.regridded_dataset.lats, self.new_lats)
+        np.testing.assert_array_equal(self.regridded_dataset.lats, self.new_lats)
 
     def test_returned_lons(self):
-        self.assert1DArraysEqual(self.regridded_dataset.lons, self.new_lons)
+        np.testing.assert_array_equal(self.regridded_dataset.lons, self.new_lons)
 
     def test_shape_of_values(self):
         regridded_data_shape = self.regridded_dataset.values.shape
@@ -358,10 +353,10 @@ class TestNetCDFWrite(unittest.TestCase):
         new_ds = local.load_file(self.file_name, self.ds.variable)
 
         self.assertEqual(self.ds.variable, new_ds.variable)
-        self.assertTrue(np.array_equal(self.ds.lats, new_ds.lats))
-        self.assertTrue(np.array_equal(self.ds.lons, new_ds.lons))
-        self.assertTrue(np.array_equal(self.ds.times, new_ds.times))
-        self.assertTrue(np.array_equal(self.ds.values, new_ds.values))
+        np.testing.assert_array_equal(self.ds.lats, new_ds.lats)
+        np.testing.assert_array_equal(self.ds.lons, new_ds.lons)
+        np.testing.assert_array_equal(self.ds.times, new_ds.times)
+        np.testing.assert_array_equal(self.ds.values, new_ds.values)
 
 def ten_year_monthly_dataset():
     lats = np.array(range(-89, 90, 2))

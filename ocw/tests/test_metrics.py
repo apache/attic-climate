@@ -54,7 +54,7 @@ class TestBias(unittest.TestCase):
         '''Test bias function between reference dataset and target dataset.'''
         expected_result = np.zeros((12, 5, 5), dtype=np.int)
         expected_result.fill(-300)
-        self.assertTrue(np.array_equal(self.bias.run(self.reference_dataset, self.target_dataset), expected_result))
+        np.testing.assert_array_equal(self.bias.run(self.reference_dataset, self.target_dataset), expected_result)
 
 
 class TestTemporalStdDev(unittest.TestCase):

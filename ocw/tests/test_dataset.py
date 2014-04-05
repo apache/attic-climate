@@ -96,11 +96,11 @@ class TestInvalidDatasetInit(unittest.TestCase):
         values = flat_array.reshape(len(times), len(lats), len(bad_lons))
 
         ds = Dataset(lats, bad_lons, times, values)
-        self.assertTrue(np.array_equal(ds.lons, np.arange(-180, 180)))
+        np.testing.assert_array_equal(ds.lons, np.arange(-180, 180))
     
     def test_reversed_lats(self):
         ds = Dataset(self.lat[::-1], self.lon, self.time, self.value)
-        self.assertTrue(np.array_equal(ds.lats, self.lat))
+        np.testing.assert_array_equal(ds.lats, self.lat)
 
 class TestDatasetFunctions(unittest.TestCase):
     def setUp(self):

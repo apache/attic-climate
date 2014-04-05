@@ -101,15 +101,15 @@ class TestNormalizeLatLonValues(unittest.TestCase):
         lats, lons, values = utils.normalize_lat_lon_values(self.lats,
                                                             self.lons,
                                                             self.values)
-        self.assertTrue(np.array_equal(lons, np.arange(-180, 180)))
+        np.testing.assert_array_equal(lons, np.arange(-180, 180))
         
     def test_lats_reversed(self):
     	lons2 = np.arange(-180, 180)
         lats, lons, values = utils.normalize_lat_lon_values(self.lats[::-1],
                                                             lons2,
                                                             self.values[:, ::-1, :])
-        self.assertTrue(np.array_equal(lats, self.lats))
-        self.assertTrue(np.array_equal(values, self.values))
+        np.testing.assert_array_equal(lats, self.lats)
+        np.testing.assert_array_equal(values, self.values)
     
     def test_lons_shift_values(self):
         expected_vals = np.array([[2, 3, 0, 1],
@@ -118,7 +118,7 @@ class TestNormalizeLatLonValues(unittest.TestCase):
         lats, lons, values = utils.normalize_lat_lon_values(self.lats2,
                                                             self.lons2,
                                                             self.values2)
-        self.assertTrue(np.array_equal(values, expected_vals))
+        np.testing.assert_array_equal(values, expected_vals)
         
     def test_shift_and_reversed(self):
         expected_vals = np.array([[10, 11, 8, 9],
@@ -127,7 +127,7 @@ class TestNormalizeLatLonValues(unittest.TestCase):
         lats, lons, values = utils.normalize_lat_lon_values(self.lats2[::-1],
                                                             self.lons2,
                                                             self.values2)
-        self.assertTrue(np.array_equal(values, expected_vals))
+        np.testing.assert_array_equal(values, expected_vals)
         
     def test_lats_not_sorted(self):
         self.assertRaises(ValueError, 
