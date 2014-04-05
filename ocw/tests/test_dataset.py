@@ -90,13 +90,17 @@ class TestInvalidDatasetInit(unittest.TestCase):
 
     def test_lons_values_incorrectly_gridded(self):
         times = np.array([dt.datetime(2000, x, 1) for x in range(1, 13)])
-        lats = np.array(range(-30, 30))
-        bad_lons = np.array(range(360))
-        flat_array = np.array(range(len(times) * len(lats) * len(bad_lons)))
+        lats = np.arange(-30, 30)
+        bad_lons = np.arange(360)
+        flat_array = np.arange(len(times) * len(lats) * len(bad_lons))
         values = flat_array.reshape(len(times), len(lats), len(bad_lons))
 
         ds = Dataset(lats, bad_lons, times, values)
-        self.assertTrue(np.array_equal(ds.lons, range(-180, 180)))
+        self.assertTrue(np.array_equal(ds.lons, np.arange(-180, 180)))
+    
+    def test_reversed_lats(self):
+        ds = Dataset(self.lat[::-1], self.lon, self.time, self.value)
+        self.assertTrue(np.array_equal(ds.lats, self.lat))
 
 class TestDatasetFunctions(unittest.TestCase):
     def setUp(self):

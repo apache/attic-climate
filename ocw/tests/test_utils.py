@@ -87,16 +87,61 @@ class TestBaseTimeStringParse(unittest.TestCase):
 class TestNormalizeLatLonValues(unittest.TestCase):
     def setUp(self):
         times = np.array([datetime.datetime(2000, x, 1) for x in range(1, 13)])
-        self.lats = np.array(range(-30, 30))
-        self.lons = np.array(range(360))
-        flat_array = np.array(range(len(times) * len(self.lats) * len(self.lons)))
+        self.lats = np.arange(-30, 30)
+        self.lons = np.arange(360)
+        flat_array = np.arange(len(times) * len(self.lats) * len(self.lons))
         self.values = flat_array.reshape(len(times), len(self.lats), len(self.lons))
+        self.lats2 = np.array([-30, 0, 30])
+        self.lons2 = np.array([0, 100, 200, 300])
+        self.values2 = np.arange(12).reshape(3, 4)
+        self.lats_unsorted = np.array([-30, 20, -50])
+        self.lons_unsorted = np.array([-30, 20, -50, 40])
 
     def test_full_lons_shift(self):
         lats, lons, values = utils.normalize_lat_lon_values(self.lats,
                                                             self.lons,
                                                             self.values)
-        self.assertTrue(np.array_equal(lons, range(-180, 180)))
-
+        self.assertTrue(np.array_equal(lons, np.arange(-180, 180)))
+        
+    def test_lats_reversed(self):
+    	lons2 = np.arange(-180, 180)
+        lats, lons, values = utils.normalize_lat_lon_values(self.lats[::-1],
+                                                            lons2,
+                                                            self.values[:, ::-1, :])
+        self.assertTrue(np.array_equal(lats, self.lats))
+        self.assertTrue(np.array_equal(values, self.values))
+    
+    def test_lons_shift_values(self):
+        expected_vals = np.array([[2, 3, 0, 1],
+                                  [6, 7, 4, 5],
+                                  [10, 11, 8, 9]])
+        lats, lons, values = utils.normalize_lat_lon_values(self.lats2,
+                                                            self.lons2,
+                                                            self.values2)
+        self.assertTrue(np.array_equal(values, expected_vals))
+        
+    def test_shift_and_reversed(self):
+        expected_vals = np.array([[10, 11, 8, 9],
+                                  [6, 7, 4, 5],
+                                  [2, 3, 0, 1]])
+        lats, lons, values = utils.normalize_lat_lon_values(self.lats2[::-1],
+                                                            self.lons2,
+                                                            self.values2)
+        self.assertTrue(np.array_equal(values, expected_vals))
+        
+    def test_lats_not_sorted(self):
+        self.assertRaises(ValueError, 
+                          utils.normalize_lat_lon_values,
+                          self.lats_unsorted,
+                          self.lons2,
+                          self.values2)
+                          
+    def test_lons_not_sorted(self):
+        self.assertRaises(ValueError, 
+                          utils.normalize_lat_lon_values,
+                          self.lats2,
+                          self.lons_unsorted,
+                          self.values2)
+    
 if __name__ == '__main__':
     unittest.main()
