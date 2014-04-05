@@ -46,7 +46,7 @@ def _get_time_base(time_format, since_index):
                     '%Y:%m:%d %H:%M:%S', '%Y-%m-%d %H-%M-%S', '%Y/%m/%d %H/%M/%S','%Y-%m-%d %H:%M:%S', '%Y/%m/%d %H:%M:%S', '%Y%m%d %H:%M:%S',
                     '%Y%m%d%H%M%S', '%Y-%m-%d-%H-%M-%S', '%Y/%m/%d/%H/%M/%S', '%Y:%m:%d:%H:%M:%S', '%Y-%m-%d-%H:%M:%S', '%Y-%m-%d %H:%M:%S',
                     '%Y/%m/%d%H:%M:%S', '%Y-%m-%d %H:%M','%Y/%m/%d %H:%M', '%Y:%m:%d %H:%M','%Y%m%d %H:%M',
-                    '%Y-%m-%d', '%Y/%m/%d', '%Y:%m:%d', '%Y%m%d'
+                    '%Y-%m-%d', '%Y/%m/%d', '%Y:%m:%d', '%Y%m%d', '%Y-%m-%d %H:%M:%S.%f'
                     ]
     count = 0
     for time_format in TIME_FORMATS:
