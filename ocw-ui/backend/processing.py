@@ -196,8 +196,8 @@ def run_evaluation():
                     start,
                     end)
 
-    ref_dataset = dsp.subset(subset, ref_dataset)
-    target_datasets = [dsp.subset(subset, ds)
+    ref_dataset = dsp.safe_subset(subset, ref_dataset)
+    target_datasets = [dsp.safe_subset(subset, ds)
                        for ds
                        in target_datasets]
     
