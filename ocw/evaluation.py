@@ -293,7 +293,7 @@ class Evaluation(object):
             unary_results.append([])
             # Unary metrics should be run over the reference Dataset also
             if self.ref_dataset:
-                unary_results[-1].append(metric.run(ref_dataset))
+                unary_results[-1].append(metric.run(self.ref_dataset))
 
             for target in self.target_datasets:
                 unary_results[-1].append(metric.run(target))
