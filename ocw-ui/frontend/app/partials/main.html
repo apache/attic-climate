@@ -17,10 +17,14 @@
     <h4>Select which dataset to use as the reference.</h4>
     <select ng-model="settings.spatialSelect" ng-options="dataset as dataset.name for dataset in datasets"></select>
     <hr />
+    <!-- Temporarily hidden for work on CLIMATE-365.-->
+    <div ng-hide=true>
     <h4>Select a file which will define the bounds of subregions.</h4>
     <form class="form-inline" autocomplete="off">
       <input id="subregionFileInput" predictive-file-browser-input ng-model="settings.subregionFile" type="text" class="input-xlarge" autocomplete="off" />
     </form>
+    </div>
+    <!--End hidden section for CLIMATE-365-->
   </div>
   <div class="modal-footer">
     <a href="#" class="btn btn-warning close">Close</a>
