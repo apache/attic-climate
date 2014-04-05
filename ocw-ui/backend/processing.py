@@ -365,14 +365,14 @@ def _load_rcmed_dataset_object(dataset_info, eval_bounds):
     :raises KeyError: If the required keys aren't present in the dataset_info or
         eval_bounds objects.
     '''
-    dataset = rcmed.parameter_dataset(dataset_info['dataset_id'],
-								      dataset_info['parameter_id'],
-								      eval_bounds['lat_min'],
-								      eval_bounds['lat_max'],
-								      eval_bounds['lon_min'],
-								      eval_bounds['lon_max'],
-								      eval_bounds['start_time'],
-								      eval_bounds['end_time'])
+    dataset = rcmed.parameter_dataset(int(dataset_info['dataset_id']),
+                                      int(dataset_info['parameter_id']),
+                                      eval_bounds['lat_min'],
+                                      eval_bounds['lat_max'],
+                                      eval_bounds['lon_min'],
+                                      eval_bounds['lon_max'],
+                                      eval_bounds['start_time'],
+                                      eval_bounds['end_time'])
 
     # If a name is passed for the dataset, use it. Otherwise, use the file name.
     if 'name'in dataset_info.keys():
