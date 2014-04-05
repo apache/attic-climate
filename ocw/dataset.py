@@ -26,6 +26,10 @@ import numpy
 import logging
 import datetime as dt
 
+import ocw.utils as utils
+
+from mpl_toolkits.basemap import shiftgrid
+
 logger = logging.getLogger(__name__)
 
 class Dataset:
@@ -52,6 +56,7 @@ class Dataset:
         :raises: ValueError
         '''
         self._validate_inputs(lats, lons, times, values)
+        lats, lons, values = utils.normalize_lat_lon_values(lats, lons, values)
 
         self.lats = lats
         self.lons = lons

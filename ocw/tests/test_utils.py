@@ -21,6 +21,7 @@ import os
 import datetime
 
 import netCDF4
+import numpy as np
 
 import ocw.utils as utils
 
@@ -82,6 +83,20 @@ class TestBaseTimeStringParse(unittest.TestCase):
             utils.parse_base_time_string,
             'this string is not valid'
         )
+
+class TestNormalizeLatLonValues(unittest.TestCase):
+    def setUp(self):
+        times = np.array([datetime.datetime(2000, x, 1) for x in range(1, 13)])
+        self.lats = np.array(range(-30, 30))
+        self.lons = np.array(range(360))
+        flat_array = np.array(range(len(times) * len(self.lats) * len(self.lons)))
+        self.values = flat_array.reshape(len(times), len(self.lats), len(self.lons))
+
+    def test_full_lons_shift(self):
+        lats, lons, values = utils.normalize_lat_lon_values(self.lats,
+                                                            self.lons,
+                                                            self.values)
+        self.assertTrue(np.array_equal(lons, range(-180, 180)))
 
 if __name__ == '__main__':
     unittest.main()
