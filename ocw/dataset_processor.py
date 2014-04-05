@@ -187,6 +187,45 @@ def subset(subregion, target_dataset):
         target_dataset.name
     )
 
+def safe_subset(subregion, target_dataset):
+    '''Safely subset given dataset with subregion information
+
+    A standard subset requires that the provided subregion be entirely contained
+    within the datasets bounds. `safe_subset` returns the overlap of the
+    subregion and dataset without returning an error.
+
+    :param subregion: The Bounds with which to subset the target Dataset.
+    :type subregion: ocw.dataset.Bounds
+    :param target_dataset: The Dataset object to subset.
+    :type target_dataset: ocw.dataset.Dataset
+
+    :returns: The subset-ed Dataset object
+    :rtype: Dataset
+    '''
+
+    lat_min, lat_max, lon_min, lon_max = target_dataset.spatial_boundaries()
+    start, end = target_dataset.time_range()
+
+    if subregion.lat_min < lat_min:
+        subregion.lat_min = lat_min
+
+    if subregion.lat_max > lat_max:
+        subregion.lat_max = lat_max
+
+    if subregion.lon_min < lon_min:
+        subregion.lon_min = lon_min
+
+    if subregion.lon_max > lon_max:
+        subregion.lon_max = lon_max
+
+    if subregion.start < start:
+        subregion.start = start
+
+    if subregion.end > end:
+        subregion.end = end
+
+    return subset(subregion, target_dataset)
+
 def normalize_dataset_datetimes(dataset, timestep):
     ''' Normalize Dataset datetime values.
 

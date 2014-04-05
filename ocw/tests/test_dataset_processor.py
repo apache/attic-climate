@@ -228,6 +228,75 @@ class TestSubset(unittest.TestCase):
                                 "time_end"   : 49}
         self.assertDictEqual(index_slices, control_index_slices)
 
+class TestSafeSubset(unittest.TestCase):
+    def setUp(self):
+        lats = np.array(range(-60, 61, 1))
+        lons = np.array(range(-170, 171, 1))
+        times = np.array([datetime.datetime(year, month, 1)
+                          for year in range(2000, 2010)
+                          for month in range(1, 13)])
+        values = np.ones([len(times), len(lats), len(lons)])
+        self.target_dataset = ds.Dataset(lats,
+                                         lons,
+                                         times,
+                                         values,
+                                         variable="test variable name",
+                                         name='foo')
+
+        self.spatial_out_of_bounds = ds.Bounds(
+            -165, 165,
+            -180, 180,
+            datetime.datetime(2001, 1, 1),
+            datetime.datetime(2004, 1, 1)
+        )
+
+        self.temporal_out_of_bounds = ds.Bounds(
+            -40, 40,
+            -160.25, 160.5,
+            datetime.datetime(1999, 1, 15),
+            datetime.datetime(2222, 2, 15)
+        )
+
+        self.everything_out_of_bounds = ds.Bounds(
+            -165, 165,
+            -180, 180,
+            datetime.datetime(1999, 1, 15),
+            datetime.datetime(2222, 2, 15)
+        )
+
+    def test_partial_spatial_overlap(self):
+        '''Ensure that safe_subset can handle out of bounds spatial values'''
+        ds = dp.safe_subset(self.spatial_out_of_bounds, self.target_dataset)
+        spatial_bounds = ds.spatial_boundaries()
+        self.assertEquals(spatial_bounds[0], -60)
+        self.assertEquals(spatial_bounds[1], 60)
+        self.assertEquals(spatial_bounds[2], -170)
+        self.assertEquals(spatial_bounds[3], 170)
+
+    def test_partial_temporal_overlap(self):
+        '''Ensure that safe_subset can handle out of bounds temporal values'''
+        ds = dp.safe_subset(self.temporal_out_of_bounds, self.target_dataset)
+        temporal_bounds = ds.time_range()
+        start = datetime.datetime(2000, 1, 1)
+        end = datetime.datetime(2009, 12, 1)
+
+        self.assertEquals(temporal_bounds[0], start)
+        self.assertEquals(temporal_bounds[1], end)
+
+    def test_entire_bounds_overlap(self):
+        ds = dp.safe_subset(self.everything_out_of_bounds, self.target_dataset)
+        spatial_bounds = ds.spatial_boundaries()
+        temporal_bounds = ds.time_range()
+        start = datetime.datetime(2000, 1, 1)
+        end = datetime.datetime(2009, 12, 1)
+
+        self.assertEquals(spatial_bounds[0], -60)
+        self.assertEquals(spatial_bounds[1], 60)
+        self.assertEquals(spatial_bounds[2], -170)
+        self.assertEquals(spatial_bounds[3], 170)
+        self.assertEquals(temporal_bounds[0], start)
+        self.assertEquals(temporal_bounds[1], end)
+
 class TestFailingSubset(unittest.TestCase):
     def setUp(self):
         self.target_dataset = ten_year_monthly_dataset()
