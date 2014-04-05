@@ -39,8 +39,7 @@ App.Directives.directive('previewMap', function($rootScope) {
 					worldCopyJump: true,
 				});
 
-				//create a CloudMade tile layer and add it to the map
-				L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {}).addTo(map);
+				L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {}).addTo(map);
 
 				// Zoom the map to the dataset bound regions (or at least try our best to do so)
 				var datasetBounds = [[scope.dataset.latlonVals.latMax, scope.dataset.latlonVals.lonMin], 

@@ -32,8 +32,7 @@ App.Directives.directive('leafletMap', function($rootScope) {
 				worldCopyJump: true,
 			});
 
-			//create a CloudMade tile layer and add it to the map
-			L.tileLayer('http://{s}.tile.cloudmade.com/57cbb6ca8cac418dbb1a402586df4528/997/256/{z}/{x}/{y}.png', {}).addTo($rootScope.map);
+			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {}).addTo($rootScope.map);
 		}
 	};
 });
