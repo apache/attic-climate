@@ -454,6 +454,12 @@ def _get_valid_metric_options():
     :returns: A dictionary of metric (name, object) pairs
     '''
     invalid_metrics = ['ABCMeta', 'Metric', 'UnaryMetric', 'BinaryMetric']
+
+    # Consider all Unary Metrics invalid. At the moment, the UI cannot handle
+    # running Unary Metrics.
+    unary_metrics = [cls.__name__ for cls in metrics.UnaryMetric.__subclasses__()]
+    invalid_metrics += unary_metrics
+
     return {name:obj
             for name, obj in inspect.getmembers(metrics)
             if inspect.isclass(obj) and name not in invalid_metrics}
