@@ -35,18 +35,40 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 			});
 	};
 
-	$scope.getObservationTimeRange = function(datasetID) {
-		var times = {
-			'1' : {'start' : '1989-01-01 00:00:00','end' : '2009-12-31 00:00:00'},	// ERA-Interim
-			'2' : {'start' : '2002-08-31 00:00:00','end' : '2010-01-01 00:00:00'},	// AIRS
-			'3' : {'start' : '1998-01-01 00:00:00','end' : '2010-01-01 00:00:00'},	// TRMM
-			'4' : {'start' : '1948-01-01 00:00:00','end' : '2010-01-01 00:00:00'},	// URD
-			'5' : {'start' : '2000-02-24 00:00:00','end' : '2010-05-30 00:00:00'},	// MODIS
-			'6' : {'start' : '1901-01-01 00:00:00','end' : '2006-12-01 00:00:00'}   // CRU
-		};
+    $scope.getObservationBounds = function() {
+        $scope.observationBounds = {};
 
-		return ((datasetID in times) ? times[datasetID] : false);
-	};
+		$http.get($rootScope.baseURL + '/rcmed/parameters/bounds/').
+        success(function(data) {
+            $scope.observationBounds = data;
+            $scope.observationBounds['default'] = {
+                'start': '1900-01-01 00:00:00',
+                'end': '2050-01-01 00:00:00',
+                'latMin': -90,
+                'latMax': 89,
+                'lonMin': -180,
+                'lonMax': 179,
+            };
+        }).
+        error(function(data) {
+            $scope.observationBounds['default'] = {
+                'start': '1900-01-01 00:00:00',
+                'end': '2050-01-01 00:00:00',
+                'latMin': -90,
+                'latMax': 89,
+                'lonMin': -180,
+                'lonMax': 179,
+            };
+        });
+    };
+
+    $scope.getBoundsByParameterId = function(parameterId) {
+        if (parameterId in $scope.observationBounds) {
+            return $scope.observationBounds[parameterId];
+        } else {
+            return $scope.observationBounds['default'];
+        }
+    };
 
 	$scope.dataSelectUpdated = function() {
 		var urlString = $rootScope.baseURL + '/rcmed/parameters/?dataset=' +
@@ -62,11 +84,6 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 	};
 
 	$scope.addObservation = function() {
-		// This is a horrible hack for temporarily getting a valid time range
-		// for the selected observation. Eventually we need to handle this more
-		// elegantly than indexing into an array...
-		var timeRange = $scope.getObservationTimeRange($scope.datasetSelection["dataset_id"]);
-
 		var newDataset = {};
 
 		newDataset['isObs'] = 1;
@@ -77,18 +94,23 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 		newDataset['id']    = $scope.parameterSelection['parameter_id'];
 		newDataset['param'] = $scope.parameterSelection['parameter_id'];
 		newDataset['paramName'] = $scope.parameterSelection['longname'];
-		// Save the (fake) lat/lon information. We test with the TRMM dataset. RCMED currently
-		// doesn't return bounding information. This functionality is being added soon. When that
-		// is the case these hard coded values should be removed.
-		newDataset['latlonVals'] = {"latMin": -49.875, "latMax": 49.875, "lonMin": -179.875, "lonMax": 179.875};
-		// Set some defaults for lat/lon variable names. This just helps us display stuff later.
+
+        bounds = $scope.getBoundsByParameterId(newDataset['id']);
+        newDataset['latlonVals'] = {
+            'latMin': bounds['lat_min'],
+            'latMax': bounds['lat_max'],
+            'lonMin': bounds['lon_min'],
+            'lonMax': bounds['lon_max'],
+        };
+        newDataset['timeVals'] = {
+            'start': bounds['start_date'],
+            'end': bounds['end_date'],
+        };
+
+        // Set some defaults for lat/lon/time variable names. This just helps
+        // us display stuff later.
 		newDataset['lat'] = "N/A";
 		newDataset['lon'] = "N/A";
-		// Save time range information. If we don't have saved data for this observation then
-		// we set the values to extreme values so they'll be ignored when calculating overlaps.
-		newDataset['timeVals'] = {"start": (timeRange) ? timeRange['start'] : "1901-01-01 00:00:00",
-								  "end": (timeRange) ? timeRange['end'] : "2050-01-01 00:00:00"};
-		// Set a default for the time variable names for display convenience.
 		newDataset['time'] = "N/A";
 
 		selectedDatasetInformation.addDataset(newDataset);
@@ -105,6 +127,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation) {
 		}, 2000);
 	};
 
-	// Grab the available observations from RCMED
-	$scope.getObservations();
+    // Grab the available observations from RCMED
+    $scope.getObservations();
+    $scope.getObservationBounds();
 }]);
