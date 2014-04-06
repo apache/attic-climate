@@ -28,7 +28,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 	$scope.latMax = 90;
 	$scope.lonMin = -180;
 	$scope.lonMax = 180;
-	$scope.start = "1980-01-01 00:00:00";
+	$scope.start = "1900-01-01 00:00:00";
 	$scope.end = "2030-01-01 00:00:00";
 
 	// The min/max lat/lon values that are displayed
@@ -245,7 +245,7 @@ function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, region
 					latMax        = 90,
 					lonMin        = -180,
 					lonMax        = 180,
-					start         = "1980-01-01 00:00:00",
+					start         = "1900-01-01 00:00:00",
 					end           = "2030-01-01 00:00:00",
 					datasetRegrid = false;
  				// Get the valid lat/lon range in the selected datasets.
