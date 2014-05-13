@@ -297,3 +297,5 @@ class Evaluation(object):
 
             for target in self.target_datasets:
                 unary_results[-1].append(metric.run(target))
+        return unary_results
+
