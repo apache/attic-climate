@@ -39,5 +39,5 @@ sudo apt-get install -y eog
 # Use the Easy-OCW Ubuntu install script to get everything
 # else installed!
 git clone http://www.github.com/apache/climate
-cp climate/easy_ocw/install-ubuntu-12_04.sh .
+cp climate/easy-ocw/install-ubuntu-12_04.sh .
 bash install-ubuntu-12_04.sh -q
