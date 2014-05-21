@@ -23,6 +23,7 @@ import numpy as np
 
 from mpl_toolkits.basemap import shiftgrid
 
+
 def decode_time_values(dataset, time_var_name):
     ''' Decode NetCDF time values into Python datetime objects.
 
@@ -61,8 +62,8 @@ def decode_time_values(dataset, time_var_name):
 def parse_time_units(time_format):
     ''' Parse units value from time units string.
 
-    The only units that are supported are: seconds, minutes, hours, days, 
-        months, or years. 
+    The only units that are supported are: seconds, minutes, hours, days,
+        months, or years.
 
     :param time_format: The time data units string from the dataset
         being processed. The string should be of the format
@@ -214,3 +215,33 @@ def normalize_lat_lon_values(lats, lons, values):
         data_out, lons_out = shiftgrid(180, data_out, lons_out, start=False)
 
     return lats_out, lons_out, data_out
+
+
+def reshape_monthly_to_annually(dataset):
+    ''' Reshaping monthly dataset to annually
+
+    Reshaping 3D array dataset's values with shape (num_month, num_lat, num_lon)
+    to 4D array with shape (num_year, 12, num_lat, num_lon).
+    Number 12 is constant which represents 12 months in one year
+    e.g. (24, 90, 180) to (2, 12, 90, 180)
+
+    :param dataset: Dataset object with full-year format
+    :type dataset: Open Climate Workbench Dataset Object
+
+    :returns: Dataset values with shape (num_year, num_month, num_lat, num_lon)
+    :rtype: Numpy array
+    '''
+
+    values = dataset.values
+    data_shape = values.shape
+    num_total_month = data_shape[0]
+    num_year = num_total_month / 12
+    num_month = 12
+    year_month_shape = num_year, num_month
+    lat_lon_shape = data_shape[1:]
+    # Make new shape (num_year, 12, num_lats, num_lons)
+    new_shape = tuple(year_month_shape + lat_lon_shape)
+    # Reshape data with new shape
+    values.shape = new_shape
+
+    return values

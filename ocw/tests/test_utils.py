@@ -19,10 +19,12 @@ import unittest
 import urllib
 import os
 import datetime
+from dateutil.relativedelta import relativedelta
 
 import netCDF4
 import numpy as np
 
+from ocw.dataset import Dataset
 import ocw.utils as utils
 
 class TestDecodeTimes(unittest.TestCase):
@@ -104,7 +106,7 @@ class TestNormalizeLatLonValues(unittest.TestCase):
         np.testing.assert_array_equal(lons, np.arange(-180, 180))
         
     def test_lats_reversed(self):
-    	lons2 = np.arange(-180, 180)
+        lons2 = np.arange(-180, 180)
         lats, lons, values = utils.normalize_lat_lon_values(self.lats[::-1],
                                                             lons2,
                                                             self.values[:, ::-1, :])
@@ -142,6 +144,32 @@ class TestNormalizeLatLonValues(unittest.TestCase):
                           self.lats2,
                           self.lons_unsorted,
                           self.values2)
-    
+
+class TestReshapeMonthlyToAnnually(unittest.TestCase):
+    ''' Testing function 'reshape_monthly_to_annually' from ocw.utils.py '''
+
+    def setUp(self):
+        self.lat = np.array([10, 12, 14, 16, 18])
+        self.lon = np.array([100, 102, 104, 106, 108])
+        self.time = np.array([datetime.datetime(2000, 1, 1) + relativedelta(months = x) for x in range(24)])
+        flat_array = np.array(range(600))
+        self.value = flat_array.reshape(24, 5, 5)
+        self.variable = 'prec'
+        self.test_dataset = Dataset(self.lat, self.lon, self.time, 
+                                    self.value, self.variable)
+
+    def test_reshape_full_year(self):
+        new_values = self.value.reshape(2,12,5,5)
+        np.testing.assert_array_equal(
+            utils.reshape_monthly_to_annually(self.test_dataset), new_values)
+
+    def test_reshape_not_full_year(self):
+        new_time = np.array([datetime.datetime(2000, 1, 1) + relativedelta(months = x) for x in range(26)])
+        flat_array = np.array(range(650))
+        value = flat_array.reshape(26, 5, 5)
+        bad_dataset = Dataset(self.lat, self.lon, new_time, value, self.variable)
+
+        self.assertRaises(ValueError,utils.reshape_monthly_to_annually,bad_dataset)
+
 if __name__ == '__main__':
     unittest.main()
