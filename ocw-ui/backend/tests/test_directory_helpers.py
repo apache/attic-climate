@@ -21,30 +21,26 @@ import unittest
 from webtest import TestApp
 
 from ..run_webservices import app
+from ..config import WORK_DIR, PATH_LEADER
 from ..directory_helpers import _get_clean_directory_path
 
 test_app = TestApp(app)
-WORK_DIR = '/tmp/ocw'
 
 class TestDirectoryPathList(unittest.TestCase):
-    PATH_LEADER = '/usr/local/ocw'
-
     @classmethod
     def setUpClass(self):
-        if not os.path.exists(self.PATH_LEADER): os.mkdir(self.PATH_LEADER)
-        if not os.path.exists(self.PATH_LEADER + '/bar'):
-            os.mkdir(self.PATH_LEADER + '/bar')
-        if not os.path.exists(self.PATH_LEADER + '/baz.txt'):
-            open(self.PATH_LEADER + '/baz.txt', 'a').close()
-        if not os.path.exists(self.PATH_LEADER + '/test.txt'):
-            open(self.PATH_LEADER + '/test.txt', 'a').close()
+        if not os.path.exists(PATH_LEADER + '/bar'):
+            os.mkdir(PATH_LEADER + '/bar')
+        if not os.path.exists(PATH_LEADER + '/baz.txt'):
+            open(PATH_LEADER + '/baz.txt', 'a').close()
+        if not os.path.exists(PATH_LEADER + '/test.txt'):
+            open(PATH_LEADER + '/test.txt', 'a').close()
 
     @classmethod
     def tearDownClass(self):
-        os.remove(self.PATH_LEADER + '/test.txt')
-        os.remove(self.PATH_LEADER + '/baz.txt')
-        os.rmdir(self.PATH_LEADER + '/bar')
-        os.rmdir(self.PATH_LEADER)
+        os.remove(PATH_LEADER + '/test.txt')
+        os.remove(PATH_LEADER + '/baz.txt')
+        os.rmdir(PATH_LEADER + '/bar')
 
     def test_valid_path_listing(self):
         expected_return = {'listing': ['/bar/', '/baz.txt', '/test.txt']}
@@ -128,36 +124,33 @@ class TestResultResultRetrieval(unittest.TestCase):
         self.assertDictEqual(response_json, expected_return)
 
 class TestDirectoryPathCleaner(unittest.TestCase):
-    PATH_LEADER = '/tmp/foo'
-    VALID_CLEAN_DIR = '/tmp/foo/bar'
+    VALID_CLEAN_DIR = os.path.join(PATH_LEADER, 'bar')
 
     @classmethod
     def setUpClass(self):
-        if not os.path.exists(self.PATH_LEADER): os.mkdir(self.PATH_LEADER)
         if not os.path.exists(self.VALID_CLEAN_DIR): os.mkdir(self.VALID_CLEAN_DIR)
 
     @classmethod
     def tearDownClass(self):
         os.rmdir(self.VALID_CLEAN_DIR)
-        os.rmdir(self.PATH_LEADER)
 
     def test_valid_directory_path(self):
-        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/bar')
+        clean_path = _get_clean_directory_path(PATH_LEADER, '/bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
 
     def test_duplicate_slash_removal(self):
-        clean_path = _get_clean_directory_path(self.PATH_LEADER, '//bar')
+        clean_path = _get_clean_directory_path(PATH_LEADER, '//bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
 
-        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/////bar')
+        clean_path = _get_clean_directory_path(PATH_LEADER, '/////bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
 
     def test_relative_path_removal(self):
-        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/../bar')
+        clean_path = _get_clean_directory_path(PATH_LEADER, '/../bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
 
-        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/./bar')
+        clean_path = _get_clean_directory_path(PATH_LEADER, '/./bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
 
-        clean_path = _get_clean_directory_path(self.PATH_LEADER, '/.././bar')
+        clean_path = _get_clean_directory_path(PATH_LEADER, '/.././bar')
         self.assertEquals(clean_path, self.VALID_CLEAN_DIR)
