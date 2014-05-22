@@ -14,7 +14,7 @@ def setup_package():
         urlretrieve(FILE_LEADER + FILE_2, '/tmp/d2.nc')
 
     if not os.path.exists(WORK_DIR):
-        os.mkdir(WORK_DIR)
+        os.makedirs(WORK_DIR)
 
     if not os.path.exists(PATH_LEADER):
-        os.mkdir(PATH_LEADER)
+        os.makedirs(PATH_LEADER)
