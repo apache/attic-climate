@@ -61,8 +61,19 @@ def _nice_intervals(data, nlevs):
     # Find the min and max levels by cutting off the tails of the distribution
     # This mitigates the influence of outliers
     data = data.ravel()
-    mnlvl = mstats.scoreatpercentile(data, 5)
-    mxlvl = mstats.scoreatpercentile(data, 95)
+    mn = mstats.scoreatpercentile(data, 5)
+    mx = mstats.scoreatpercentile(data, 95)
+    #if there min less than 0 then
+    #put 0 in center of color bar
+    if mn < 0:
+        level = max(abs(mn), abs(mx))
+        mnlvl = -1 * level
+        mxlvl = level
+    #if min is larger than 0 then
+    #have color bar between min and max
+    else:
+        mnlvl = mn
+        mxlvl = mx
     locator = mpl.ticker.MaxNLocator(nlevs)
     clevs = locator.tick_values(mnlvl, mxlvl)
 
@@ -70,6 +81,7 @@ def _nice_intervals(data, nlevs):
     # MaxNLocator gives values outside the domain of the input data
     clevs = clevs[(clevs >= mnlvl) & (clevs <= mxlvl)]
     return clevs
+
 
 def _best_grid_shape(nplots, oldshape):
     '''
