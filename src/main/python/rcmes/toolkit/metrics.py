@@ -993,7 +993,6 @@ def drawPortraitDiagramSingle(data, rowLabels, colLabels, cLevs, fName, fType = 
 
     # Save the figure
     fig.savefig('%s.%s' %(fName, fType))
-    plt.show()
 
 def drawPortraitDiagram(dataset, rowLabels, colLabels, fName, fType = 'png',
                               gridShape = (1, 1), xLabel = '', yLabel = '', cLabel = '',
@@ -1119,7 +1118,6 @@ def drawPortraitDiagram(dataset, rowLabels, colLabels, fName, fType = 'png',
     fig.text(.08, .53, xLabel, va = 'center', ha = 'center', rotation = 'vertical')
     fig.suptitle(pTitle, y = ymax + .04, fontsize = 16)
     fig.savefig('%s.%s' %(fName, fType), bbox_inches = 'tight', dpi = fig.dpi)
-    plt.show()
     fig.clf()
 
 def taylorDiagram(pltDat, pltTit, pltFileName, refName, legendPos, radMax):
@@ -1144,7 +1142,6 @@ def taylorDiagram(pltDat, pltTit, pltFileName, refName, legendPos, radMax):
     l = fig.legend (dia.samplePoints, [p.get_label() for p in dia.samplePoints ], handlelength=0., prop={'size':10}, numpoints=1, loc=legendPos)
     l.draw_frame(False)
     plt.savefig(pltFileName)
-    plt.show()
     pltDat = 0.
 
 def drawTimeSeriesSingle(dataset, times, labels, fName, fType = 'png', xLabel = '', yLabel ='', pTitle ='',
@@ -1207,7 +1204,6 @@ def drawTimeSeriesSingle(dataset, times, labels, fName, fType = 'png', xLabel = 
     ax.legend((lines), labels, loc = legendPos, ncol = 10, fontsize='x-small',
                        frameon=legendFrameOn)
     fig.savefig('%s.%s' %(fName, fType), bbox_inches = 'tight')
-    plt.show()
     fig.clf()
 
 
@@ -1271,7 +1267,6 @@ def pltXY(x, y, lineLabel, lineTyp, pltTit, xLabel, yLabel, pltName, xmin, xmax,
         l = legend(prop={'size':10},loc='best')
         l.set_zorder(20) # put the legend on top
     plt.savefig(pltName)
-    show()
     # release work arrays
     x=0.; y=0.
 
@@ -1300,7 +1295,6 @@ def pltSca1F(x, y, pltName, xLabel, yLabel, pmin, pmax, delP, pTit, pFname, xSca
     l = legend(prop={'size':8},loc='best')
     l.set_zorder(20)
     plt.savefig(pFname)
-    show()
     x=0.; y=0.
 
 
@@ -1349,7 +1343,6 @@ def pltSca6F(x, dName, pmin, pmax, delP, pTitle, pFname, xScale, yScale):
             label.set_rotation(0)
             label.set_fontsize(8)
     plt.savefig(pFname)
-    show()
     x=0.
 
 def drawContourMapSingle(data, lats, lons, cLevs, fName, fType = 'png',
@@ -1412,7 +1405,6 @@ def drawContourMapSingle(data, lats, lons, cLevs, fName, fType = 'png',
     # Add title and save the figure
     ax.set_title(pTitle)
     fig.savefig('%s.%s' %(fName, fType))
-    show()
 
 def drawCntrMap(data,lon,lat,titles,ncols,pFname):
     '''
@@ -1619,7 +1611,6 @@ def drawContourMap(dataset, lats, lons, fName, fType = 'png', gridShape = (1, 1)
     # Add figure title
     fig.suptitle(pTitle, y = ymax + .04, fontsize = 16)
     fig.savefig('%s.%s' %(fName, fType), bbox_inches = 'tight', dpi = fig.dpi)
-    plt.show()
     fig.clf()
 
 def drawSubRegions(subRegions, lats, lons, fName, fType = 'png', pTitle = '',
@@ -1704,7 +1695,6 @@ def drawSubRegions(subRegions, lats, lons, fName, fType = 'png', pTitle = '',
 
     # Save the figure
     fig.savefig('%s.%s' %(fName, fType), bbox_inches = 'tight', dpi = fig.dpi)
-    show()
     fig.clf()
 
 def metrics_plots(varName, numOBS, numMDL, nT, ngrdY, ngrdX, Times, lons, lats, allData, dataList, workdir, subRegions, timeStep, fileOutputOption):
