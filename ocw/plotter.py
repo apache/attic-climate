@@ -63,9 +63,10 @@ def _nice_intervals(data, nlevs):
     data = data.ravel()
     mn = mstats.scoreatpercentile(data, 5)
     mx = mstats.scoreatpercentile(data, 95)
-    #if there min less than 0 then
+    #if there min less than 0 and
+    # or max more than 0 
     #put 0 in center of color bar
-    if mn < 0:
+    if mn < 0 and mx > 0:
         level = max(abs(mn), abs(mx))
         mnlvl = -1 * level
         mxlvl = level
