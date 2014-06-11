@@ -111,7 +111,7 @@ def parse_time_base(time_format):
         '%Y:%m:%d:%H:%M:%S', '%Y-%m-%d-%H:%M:%S', '%Y-%m-%d %H:%M:%S',
         '%Y/%m/%d%H:%M:%S', '%Y-%m-%d %H:%M', '%Y/%m/%d %H:%M',
         '%Y:%m:%d %H:%M', '%Y%m%d %H:%M', '%Y-%m-%d', '%Y/%m/%d',
-        '%Y:%m:%d', '%Y%m%d', '%Y-%m-%d %H:%M:%S.%f'
+        '%Y:%m:%d', '%Y%m%d', '%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H',
     ]
 
     # Attempt to match the base time string with a possible format parsing string.

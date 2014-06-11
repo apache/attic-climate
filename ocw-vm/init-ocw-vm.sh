@@ -34,12 +34,12 @@ sudo apt-get install -y vim
 sudo apt-get install -y lightdm
 
 # XFCE
-sudo apt-get install -y xfce4
-sudo apt-get install -y xdg-utils
-sudo apt-get install -y eog
+#sudo apt-get install -y xfce4
+#sudo apt-get install -y xdg-utils
+#sudo apt-get install -y eog
 
 # Ubuntu Unity
-#sudo apt-get install -y ubuntu-desktop
+sudo apt-get install -y ubuntu-desktop
 
 # Use the Easy-OCW Ubuntu install script to get everything
 # else installed!
@@ -61,3 +61,43 @@ cd
 sudo rm -f Anaconda-1.9.2-Linux-x86_64.sh
 sudo rm -f basemap-1.0.7.tar.gz
 sudo rm -rf basemap-1.0.7
+
+mkdir /home/vagrant/Desktop
+
+# These links will only work if we're using the Unity desktop.
+# If you want to use the XFCE desktop you will need to change
+# the references to 'nautilus' to whatever file browser you
+# will be using.
+cat >/home/vagrant/Desktop/climate.desktop <<CODELINK
+[Desktop Entry]
+Name=Climate-Code
+Icon=utilities-terminal
+Exec=nautilus /home/vagrant/climate
+Terminal=false
+Type=Application
+CODELINK
+
+cat >/home/vagrant/Desktop/ui.desktop <<UISTART
+[Desktop Entry]
+Name=Climate-UI
+Icon=utilities-terminal
+Exec=/home/vagrant/Desktop/.ui.sh
+Terminal=true
+Type=Application
+UISTART
+
+cat >/home/vagrant/Desktop/.ui.sh <<UIBOOTUP
+#!/bin/bash
+export PATH=/home/vagrant/anaconda/bin:$PATH
+export PYTHONPATH=/home/vagrant/climate:/home/vagrant/climate/ocw
+cd ~/climate/ocw-ui/backend && python run_webservices.py
+UIBOOTUP
+
+# It is possible that these commands will need to be rerun once
+# the desktop environment has been updated. You will notice that
+# they aren't recognized as shortcuts if you need to rerun these
+# commands. If all is working properly, you should see terminal
+# icons with the names listed above (Climate-Code or Climate-UI).
+chmod +x ~/Desktop/climate.desktop
+chmod +x ~/Desktop/.ui.sh
+chmod +x ~/Desktop/ui.desktop
