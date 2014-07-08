@@ -156,10 +156,11 @@ def subset(subregion, target_dataset):
     '''
 
     # Ensure that the subregion information is well formed
-    if not _are_bounds_contained_by_dataset(subregion, target_dataset):
+    try:
+        _are_bounds_contained_by_dataset(subregion, target_dataset)
+    except ValueError as error_details
         error = (
-            "dataset_processor.subset received a subregion that is not "
-            "completely within the bounds of the target dataset."
+                "Unable to subset dataset:", error_details
         )
         logger.error(error)
         raise ValueError(error)
@@ -764,19 +765,43 @@ def _are_bounds_contained_by_dataset(bounds, dataset):
         Bounds
     :type dataset: Dataset
 
-    :returns: True if the Bounds are contained by the Dataset, False
-        otherwise
+    :returns: True if the Bounds are contained by the Dataset, Raises
+        a ValueError otherwise
     '''
     lat_min, lat_max, lon_min, lon_max = dataset.spatial_boundaries()
     start, end = dataset.time_range()
-    return (
-        lat_min <= bounds.lat_min <= lat_max and
-        lat_min <= bounds.lat_max <= lat_max and
-        lon_min <= bounds.lon_min <= lon_max and
-        lon_min <= bounds.lon_max <= lon_max and
-        start <= bounds.start <= end and
-        start <= bounds.end <= end
-    )
+    errors = []
+
+    # TODO:  THIS IS TERRIBLY inefficent and we need to use a geometry lib instead in the future
+    if not lat_min <= bounds.lat_min <= lat_max:
+        error = "bounds.lat_min: %s is not between lat_min: %s and lat_max: %s" % (bounds.lat_min, lat_min, lat_max)
+        errors.append(error)
+
+    if not lat_min <= bounds.lat_max <= lat_max:
+        error = "bounds.lat_max: %s is not between lat_min: %s and lat_max: %s" % (bounds.lat_max, lat_min, lat_max)
+        errors.append(error)
+
+    if not lon_min <= bounds.lon_min <= lon_max:
+        error = "bounds.lon_min: %s is not between lon_min: %s and lon_max: %s" % (bounds.lon_min, lon_min, lon_max)
+        errors.append(error)
+
+    if not lon_min <= bounds.lon_max <= lon_max:
+        error = "bounds.lon_max: %s is not between lon_min: %s and lon_max: %s" % (bounds.lon_max, lon_min, lon_max)
+        errors.append(error)
+
+    if not start <= bounds.start <= end:
+        error = "bounds.start: %s is not between start: %s and end: %s" % (bounds.start, start, end)
+        errors.append(error)
+
+    if not start <= bounds.end <= end:
+        error = "bounds.end: %s is not between start: %s and end: %s" % (bounds.end, start, end)
+        errors.append(error)
+
+    if len(errors) == 0:
+        return True
+    else:
+        error_message = '\n'.join(errors)
+        raise ValueError(error_message)
 
 def _get_subregion_slice_indices(subregion, target_dataset):
     '''Get the indices for slicing Dataset values to generate the subregion.
