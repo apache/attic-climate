@@ -156,14 +156,7 @@ def subset(subregion, target_dataset):
     '''
 
     # Ensure that the subregion information is well formed
-    try:
-        _are_bounds_contained_by_dataset(subregion, target_dataset)
-    except ValueError as error_details
-        error = (
-                "Unable to subset dataset:", error_details
-        )
-        logger.error(error)
-        raise ValueError(error)
+    _are_bounds_contained_by_dataset(subregion, target_dataset)
 
     # Get subregion indices into subregion data
     dataset_slices = _get_subregion_slice_indices(subregion, target_dataset)
