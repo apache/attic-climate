@@ -458,6 +458,36 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
 
+def draw_marker_on_map(lat, lon, fname, fmt='png', location_name=' ',gridshape=(1,1)):
+    '''
+    Purpose::
+        Draw a marker on a map
+
+    Input::
+        lat - latitude for plotting a marker
+        lon - longitude for plotting a marker
+        fname  - a string specifying the filename of the plot
+    '''   
+    fig = plt.figure()
+    fig.dpi = 300
+    ax = fig.add_subplot(111)
+    
+    m = Basemap(projection='cyl', resolution = 'c', llcrnrlat =lat-30, urcrnrlat = lat+30, llcrnrlon = lon-60, urcrnrlon = lon+60)
+    m.drawcoastlines(linewidth=1)
+    m.drawcountries(linewidth=1)
+    m.drawmapboundary(fill_color='aqua')
+    m.fillcontinents(color='coral',lake_color='aqua')
+    m.ax = ax
+   
+    xpt,ypt = m(lon,lat)
+    m.plot(xpt,ypt,'bo')  # plot a blue dot there
+    # put some text next to the dot, offset a little bit
+    # (the offset is in map projection coordinates)
+    plt.text(xpt+0.5, ypt+1.5,location_name+'\n(lon: %5.1f, lat: %3.1f)' % (lon, lat)) 
+                       
+    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.clf()
+
 def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
                      clabel='', ptitle='', subtitles=None, cmap=None,
                      clevs=None, nlevs=10, parallels=None, meridians=None,
@@ -882,3 +912,36 @@ class TaylorDiagram(object):
         r = np.linspace(std1, std2)
 
         return self.ax.plot(t,r,'red',linewidth=2)
+
+def draw_histogram(dataset_array, data_names, fname, fmt='png', nbins=10):
+    '''
+    Purpose::
+        Draw histograms
+
+    Input::
+        dataset_array - a list of data values [data1, data2, ....]
+        data_names    - a list of data names  ['name1','name2',....]
+        fname  - a string specifying the filename of the plot
+        bins - number of bins
+    '''    
+    fig = plt.figure()
+    fig.dpi = 300
+    ndata = len(dataset_array)
+   
+    data_min = 500.
+    data_max = 0.
+ 
+    for data in dataset_array:
+        data_min = np.min([data_min,data.min()]) 
+        data_max = np.max([data_max,data.max()]) 
+
+    bins = np.linspace(np.round(data_min), np.round(data_max+1), nbins)
+    for idata,data in enumerate(dataset_array):
+        ax = fig.add_subplot(ndata, 1, idata+1)
+        ax.hist(data, bins, alpha = 0.5, label=data_names[idata], normed = True)
+        leg = ax.legend()
+        leg.get_frame().set_alpha(0.5)
+        ax.set_xlim([data_min-(data_max-data_min)*0.15, data_max+(data_max-data_min)*0.15])
+        
+    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+ 
