@@ -33,12 +33,13 @@ def temporal_rebin(target_dataset, temporal_resolution):
     """ Rebin a Dataset to a new temporal resolution
     
     :param target_dataset: Dataset object that needs temporal rebinned
-    :type target_dataset: ocw.dataset.Dataset object
+    :type target_dataset: :class:`dataset.Dataset`
+
     :param temporal_resolution: The new temporal bin size
-    :type temporal_resolution: datetime.timedelta object
+    :type temporal_resolution: :class:`datetime.timedelta`
     
     :returns: A new temporally rebinned Dataset
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
     """
     # Decode the temporal resolution into a string format that 
     # _rcmes_calc_average_on_new_time_unit_K() can understand
@@ -69,14 +70,16 @@ def spatial_regrid(target_dataset, new_latitudes, new_longitudes):
     """ Regrid a Dataset using the new latitudes and longitudes
 
     :param target_dataset: Dataset object that needs spatially regridded
-    :type target_dataset: ocw.dataset.Dataset object
+    :type target_dataset: :class:`dataset.Dataset`
+
     :param new_latitudes: Array of latitudes
-    :type new_latitudes: 1d Numpy Array
+    :type new_latitudes: :class:`numpy.ndarray`
+
     :param new_longitudes: Array of longitudes
-    :type new_longitudes: 1d Numpy Array
+    :type new_longitudes: :class:`numpy.ndarray`
 
     :returns: A new spatially regridded Dataset
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
     """
     # Make masked array of shape (times, new_latitudes,new_longitudes)
     new_values = ma.zeros([len(target_dataset.times), 
@@ -123,10 +126,10 @@ def ensemble(datasets):
     
     :param datasets: Datasets to be used to compose the ensemble dataset from.
         All Datasets must be the same shape.
-    :type datasets: List of OCW Dataset Objects.
+    :type datasets: :class:`list` of :class:`dataset.Dataset`
     
     :returns: New Dataset with a name of 'Dataset Ensemble'
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
     """
     _check_dataset_shapes(datasets)
     dataset_values = [dataset.values for dataset in datasets]
@@ -145,12 +148,13 @@ def subset(subregion, target_dataset):
     '''Subset given dataset(s) with subregion information
 
     :param subregion: The Bounds with which to subset the target Dataset. 
-    :type subregion: Bounds
+    :type subregion: :class:`dataset.Bounds`
+
     :param target_dataset: The Dataset object to subset.
-    :type target_dataset: ocw.dataset.Dataset object
+    :type target_dataset: :class:`dataset.Dataset`
 
     :returns: The subset-ed Dataset object
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
 
     :raises: ValueError
     '''
@@ -189,12 +193,13 @@ def safe_subset(subregion, target_dataset):
     subregion and dataset without returning an error.
 
     :param subregion: The Bounds with which to subset the target Dataset.
-    :type subregion: ocw.dataset.Bounds
+    :type subregion: :class:`dataset.Bounds`
+
     :param target_dataset: The Dataset object to subset.
-    :type target_dataset: ocw.dataset.Dataset
+    :type target_dataset: :class:`dataset.Dataset`
 
     :returns: The subset-ed Dataset object
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
     '''
 
     lat_min, lat_max, lon_min, lon_max = target_dataset.spatial_boundaries()
@@ -227,13 +232,14 @@ def normalize_dataset_datetimes(dataset, timestep):
     Force monthly data to the first of the month at midnight.
 
     :param dataset: The Dataset which will have its time value normalized.
-    :type dataset: ocw.dataset.Dataset object
+    :type dataset: :class:`dataset.Dataset`
+
     :param timestep: The timestep of the Dataset's values. Either 'daily' or
         'monthly'.
-    :type timestep: String
+    :type timestep: :mod:`string`
 
     :returns: A new Dataset with normalized datetime values.
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
     '''
     new_times = _rcmes_normalize_datetimes(dataset.times, timestep)
     return ds.Dataset(
@@ -249,10 +255,10 @@ def write_netcdf(dataset, path, compress=True):
     ''' Write a dataset to a NetCDF file.
 
     :param dataset: The dataset to write.
-    :type dataset: ocw.dataset.Dataset
+    :type dataset: :class:`dataset.Dataset`
 
     :param path: The output file path.
-    :type path: string
+    :type path: :mod:`string`
     '''
     out_file = netCDF4.Dataset(path, 'w', format='NETCDF4')
 
@@ -300,6 +306,7 @@ def _rcmes_normalize_datetimes(datetimes, timestep):
 
     :param datetimes: The datetimes to normalize.
     :type datetimes: List of `datetime` values.
+
     :param timestep: The flag for how to normalize the datetimes.
     :type timestep: String
     """

@@ -40,7 +40,7 @@ class UnaryMetric(Metric):
 
         :param target_dataset: The dataset on which the current metric will
             be run.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The result of evaluating the metric on the target_dataset.
         '''
@@ -56,10 +56,11 @@ class BinaryMetric(Metric):
 
         :param ref_dataset: The Dataset to use as the reference dataset when
             running the evaluation.
-        :type ref_dataset: ocw.dataset.Dataset object
+        :type ref_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The Dataset to use as the target dataset when
             running the evaluation.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The result of evaluation the metric on the reference and 
             target dataset.
@@ -76,13 +77,14 @@ class Bias(BinaryMetric):
            Overrides BinaryMetric.run()
 
         :param ref_dataset: The reference dataset to use in this metric run.
-        :type ref_dataset: ocw.dataset.Dataset object
+        :type ref_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The difference between the reference and target datasets.
-        :rtype: Numpy Array
+        :rtype: :class:`numpy.ndarray`
         '''
         return ref_dataset.values - target_dataset.values
 
@@ -98,10 +100,10 @@ class TemporalStdDev(UnaryMetric):
 
         :param target_dataset: The target_dataset on which to calculate the 
             temporal standard deviation.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The temporal standard deviation of the target dataset
-        :rtype: Numpy Array
+        :rtype: :class:`ndarray`
         '''
         return target_dataset.values.std(axis=0, ddof=1)
 
@@ -116,10 +118,11 @@ class StdDevRatio(BinaryMetric):
             Overrides BinaryMetric.run()
 
         :param ref_dataset: The reference dataset to use in this metric run.
-        :type ref_dataset: ocw.dataset.Dataset object
+        :type ref_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The standard deviation ratio of the reference and target
         '''
@@ -136,10 +139,11 @@ class PatternCorrelation(BinaryMetric):
            Overrides BinaryMetric.run()
 
         :param ref_dataset: The reference dataset to use in this metric run.
-        :type ref_dataset: ocw.dataset.Dataset object
+        :type ref_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The correlation coefficient between a reference and target dataset.
         '''
@@ -162,10 +166,11 @@ class TemporalCorrelation(BinaryMetric):
 
         :param reference_dataset: The reference dataset to use in this metric
             run
-        :type reference_dataset: ocw.dataset.Dataset object
+        :type reference_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: A 2D array of temporal correlation coefficients and a 2D
             array of confidence levels associated with the temporal correlation
@@ -196,10 +201,11 @@ class TemporalMeanBias(BinaryMetric):
            Overrides BinaryMetric.run()
 
         :param ref_dataset: The reference dataset to use in this metric run.
-        :type ref_dataset: ocw.dataset.Dataset object
+        :type ref_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run.
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The mean bias between a reference and target dataset over time.
         '''
@@ -223,10 +229,11 @@ class SpatialMeanOfTemporalMeanBias(BinaryMetric):
 
         :param reference_dataset: The reference dataset to use in this metric
             run
-        :type reference_dataset: ocw.dataset.Dataset object
+        :type reference_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The bias averaged over time and domain
         '''
@@ -248,10 +255,11 @@ class RMSError(BinaryMetric):
 
         :param reference_dataset: The reference dataset to use in this metric
             run
-        :type reference_dataset: ocw.dataset.Dataset object
+        :type reference_dataset: :class:`dataset.Dataset`
+
         :param target_dataset: The target dataset to evaluate against the
             reference dataset in this metric run
-        :type target_dataset: ocw.dataset.Dataset object
+        :type target_dataset: :class:`dataset.Dataset`
 
         :returns: The RMS error, with the mean calculated over time and space
         '''

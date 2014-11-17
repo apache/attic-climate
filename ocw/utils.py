@@ -30,7 +30,7 @@ def decode_time_values(dataset, time_var_name):
     :param dataset: The dataset from which time values should be extracted.
     :type dataset: netCDF4.Dataset
     :param time_var_name: The name of the time variable in dataset.
-    :type time_var_name: String
+    :type time_var_name: :mod:`string`
 
     :returns: The list of converted datetime values.
 
@@ -67,7 +67,7 @@ def parse_time_units(time_format):
     :param time_format: The time data units string from the dataset
         being processed. The string should be of the format
         '<units> since <base time date>'
-    :type time_format: String
+    :type time_format: :mod:`string`
 
     :returns: The unit substring from the time units string
 
@@ -92,7 +92,7 @@ def parse_time_base(time_format):
     :param time_format: The time data units string from the dataset
         being processed. The string should be of the format
         '<units> since <base time date>'
-    :type time_format: String
+    :type time_format: :mod:`string`
 
     :returns: The base time as a datetime object.
 
@@ -143,7 +143,7 @@ def parse_base_time_string(time_format):
     :param time_format: The time data units string from the dataset
         being processed. The string should be of the format
         '<units> since <base time date>'
-    :type time_format: String
+    :type time_format: :mod:`string`
 
     :returns: The base time string split out of the time units information.
 
@@ -169,12 +169,12 @@ def normalize_lat_lon_values(lats, lons, values):
     expected range.
 
     :param lats: A 1D numpy array of sorted lat values.
-    :type lats: Numpy Array
+    :type lats: :class:`numpy.ndarray`
     :param lons: A 1D numpy array of sorted lon values.
-    :type lons: Numpy Array
+    :type lons: :class:`numpy.ndarray`
     :param values: A 3D array of data values.
 
-    :returns: A tuple of the form (adjust_lats, adjusted_lons, adjusted_values)
+    :returns: A :func:`tuple` of the form (adjust_lats, adjusted_lons, adjusted_values)
 
     :raises ValueError: If the lat/lon values are not sorted.
     '''
@@ -232,10 +232,10 @@ def reshape_monthly_to_annually(dataset):
     (24, 90, 180) -> (2, 12, 90, 180)
 
     :param dataset: Dataset object with full-year format
-    :type dataset: ocw.dataset.Dataset object
+    :type dataset: :class:`dataset.Dataset`
 
     :returns: Dataset values array with shape (num_year, 12, num_lat, num_lon)
-    :rtype: Numpy array
+    :rtype: :class:`numpy.ndarray`
     '''
 
     values = dataset.values[:]
@@ -257,11 +257,11 @@ def calc_climatology_year(dataset):
 
     :param dataset: Monthly binned Dataset object with an evenly divisible
         number of months.
-    :type dataset: ocw.dataset.Dataset object
+    :type dataset: :class:`dataset.Dataset`
 
     :returns: Mean values for each year (annual_mean) and mean values for all
         years (total_mean)
-    :rtype: A tuple of two numpy arrays
+    :rtype: A :func:`tuple` of two :class:`numpy.ndarray`
 
     :raise ValueError: If the number of monthly bins is not evenly divisible
         by 12.
@@ -285,16 +285,18 @@ def calc_climatology_season(month_start, month_end, dataset):
     ''' Calculate seasonal mean and time series for given months.
 
     :param month_start: An integer for beginning month (Jan=1)
-    :type month_start: Integer
+    :type month_start: :class:`int`
+
     :param month_end: An integer for ending month (Jan=1)
-    :type month_end: Integer
+    :type month_end: :class:`int`
+
     :param dataset: Dataset object with full-year format
-    :type dataset: ocw.dataset.Dataset object
+    :type dataset: :class:`dataset.Dataset`
 
     :returns:  
         t_series - monthly average over the given season
         means - mean over the entire season
-    :rtype: A tuple of two numpy arrays
+    :rtype: A :func:`tuple` of two :class:`numpy.ndarray`
     '''
 
     if month_start > month_end:
@@ -318,10 +320,10 @@ def calc_climatology_monthly(dataset):
 
     :param dataset: Monthly binned Dataset object with the number of months
         divisible by 12
-    :type dataset: ocw.dataset.Dataset object
+    :type dataset: :class:`dataset.Dataset`
 
     :returns: Mean values for each month of the year
-    :rtype: A 3D numpy array of shape (12, num_lats, num_lons)
+    :rtype: A 3D :class:`numpy.ndarray` of shape (12, num_lats, num_lons)
 
     :raise ValueError: If the number of monthly bins is not divisible by 12
     '''

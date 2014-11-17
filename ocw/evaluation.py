@@ -54,16 +54,19 @@ class Evaluation(object):
         '''Default Evaluation constructor.
 
         :param reference: The reference Dataset for the evaluation.
-        :type reference: Dataset
+        :type reference: :class:`dataset.Dataset`
+
         :param targets: A list of one or more target datasets for the 
                 evaluation.
-        :type targets: List of Datasets
+        :type targets: :class:`list` of :class:`dataset.Dataset`
+
         :param metrics: A list of one or more Metric instances to run 
                 in the evaluation.
-        :type metrics: List of Metrics
+        :type metrics: :class:`list` of :mod:`metrics`
+
         :param subregions: (Optional) Subregion information to use in the
                 evaluation. A subregion is specified with a Bounds object.
-        :type subregions: List of Bounds objects
+        :type subregions: :class:`list` of :class:`dataset.Bounds`
 
         :raises: ValueError 
         '''
@@ -138,7 +141,7 @@ class Evaluation(object):
         Evaluation is run with one or more metrics.
 
         :param target_dataset: The target Dataset to add to the Evaluation.
-        :type target_dataset: Dataset
+        :type target_dataset: :class:`dataset.Dataset`
 
         :raises ValueError: If a dataset to add isn't an instance of Dataset.
         '''
@@ -157,7 +160,7 @@ class Evaluation(object):
 
         :param target_datasets: The list of datasets that should be added to 
             the Evaluation.
-        :type target_datasets: List of Dataset objects
+        :type target_datasets: :class:`list` of :class:`dataset.Dataset`
 
         :raises ValueError: If a dataset to add isn't an instance of Dataset.
         '''
@@ -170,7 +173,7 @@ class Evaluation(object):
         A metric is an instance of a class which inherits from metrics.Metric.
 
         :param metric: The metric instance to add to the Evaluation.
-        :type metric: Metric
+        :type metric: :mod:`metrics`
 
         :raises ValueError: If the metric to add isn't a class that inherits
                 from metrics.Metric.
@@ -194,7 +197,7 @@ class Evaluation(object):
         A metric is an instance of a class which inherits from metrics.Metric.
 
         :param metrics: The list of metric instances to add to the Evaluation.
-        :type metrics: List of Metrics
+        :type metrics: :class:`list` of :mod:`metrics`
 
         :raises ValueError: If a metric to add isn't a class that inherits
                 from metrics.Metric.

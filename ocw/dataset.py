@@ -39,19 +39,24 @@ class Dataset:
         '''Default Dataset constructor
 
         :param lats: One dimensional numpy array of unique latitude values.
-        :type lats: numpy array
+        :type lats: :class:`numpy.ndarray`
+
         :param lons: One dimensional numpy array of unique longitude values.
-        :type lons: numpy array
+        :type lons: :class:`numpy.ndarray`
+
         :param times: One dimensional numpy array of unique python datetime 
             objects.
-        :type times: numpy array
+        :type times: :class:`numpy.ndarray`
+
         :param values: Three dimensional numpy array of parameter values with 
             shape [timesLength, latsLength, lonsLength]. 
-        :type values: numpy array
+        :type values: :class:`numpy.ndarray`
+
         :param variable: Name of the value variable.
-        :type variable: string
+        :type variable: :mod:`string`
+
         :param name: An optional string name for the Dataset.
-        :type variable: string
+        :type name: :mod:`string`
 
         :raises: ValueError
         '''
@@ -70,7 +75,8 @@ class Dataset:
 
         :returns: The Dataset's bounding latitude and longitude values as a
             tuple in the form (min_lat, max_lat, min_lon, max_lon)
-        :rtype: (float, float, float, float)
+        :rtype: :func:`tuple` of the form (:class:`float`, :class:`float`,
+            :class:`float`, :class:`float`).
 
         '''
         return (float(min(self.lats)), float(max(self.lats)),
@@ -82,7 +88,8 @@ class Dataset:
 
         :returns: The start and end date of the Dataset's temporal range as 
             a tuple in the form (start_time, end_time).
-        :rtype: (datetime, datetime)
+        :rtype: :func:`tuple` of the form (:class:`datetime.datetime`,
+            :class:`datetime.datetime`)
         '''
         sorted_time = numpy.sort(self.times)
         start_time = sorted_time[0]
@@ -98,7 +105,7 @@ class Dataset:
 
         :returns: The Dataset's latitudinal and longitudinal spatial resolution
             as a tuple of the form (lat_resolution, lon_resolution).
-        :rtype: (float, float)
+        :rtype: (:class:`float`, :class:`float`)
         '''
         sorted_lats = numpy.sort(list(set(self.lats)))
         sorted_lons = numpy.sort(list(set(self.lons)))
@@ -115,7 +122,7 @@ class Dataset:
             list of times is an unrecognized value a ValueError is raised.
 
         :returns: The temporal resolution.
-        :rtype: string
+        :rtype: :mod:`string`
         '''
         sorted_times = numpy.sort(self.times)
         time_resolution = sorted_times[1] - sorted_times[0]
@@ -221,22 +228,22 @@ class Bounds(object):
         '''Default Bounds constructor
 
         :param lat_min: The minimum latitude bound.
-        :type lat_min: float
+        :type lat_min: :class:`float`
         
         :param lat_max: The maximum latitude bound.
-        :type lat_max: float
+        :type lat_max: :class:`float`
 
         :param lon_min: The minimum longitude bound.
-        :type lon_min: float
+        :type lon_min: :class:`float`
         
         :param lon_max: The maximum longitude bound.
-        :type lon_max: float
+        :type lon_max: :class:`float`
 
         :param start: The starting datetime bound.
-        :type start: datetime
+        :type start: :class:`datetime.datetime`
 
         :param end: The ending datetime bound.
-        :type end: datetime
+        :type end: :class:`datetime.datetime`
 
         :raises: ValueError
         '''

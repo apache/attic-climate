@@ -118,29 +118,34 @@ def load_file(file_path,
     ''' Load a NetCDF file into a Dataset.
 
     :param file_path: Path to the NetCDF file to load.
-    :type file_path: String
+    :type file_path: :mod:`string`
+
     :param variable_name: The variable name to load from the NetCDF file.
-    :type variable_name: String
+    :type variable_name: :mod:`string`
+
     :param elevation_index: (Optional) The elevation index for which data should
         be returned. Climate data is often times 4 dimensional data. Some
         datasets will have readins at different height/elevation levels. OCW
         expects 3D data so a single layer needs to be stripped out when loading.
         By default, the first elevation layer is used. If desired you may
         specify the elevation value to use.
-    :type elevation_index: Integer
+    :type elevation_index: :class:`int`
+
     :param lat_name: (Optional) The latitude variable name to extract from the
         dataset.
-    :type lat_name: String
+    :type lat_name: :mod:`string`
+
     :param lon_name: (Optional) The longitude variable name to extract from the
         dataset.
-    :type lon_name: String
+    :type lon_name: :mod:`string`
+
     :param time_name: (Optional) The time variable name to extract from the
         dataset.
-    :type time_name: String
+    :type time_name: :mod:`string`
 
     :returns: An OCW Dataset object with the requested variable's data from
         the NetCDF file.
-    :rtype: ocw.dataset.Dataset object
+    :rtype: :class:`dataset.Dataset`
 
     :raises ValueError: When the specified file path cannot be loaded by ndfCDF4
         or when the lat/lon/time variable name cannot be determined
