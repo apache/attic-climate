@@ -312,7 +312,7 @@ def _get_parameter_info(parameters_metadata, parameter_id):
     return (database, time_step, realm, instrument, start_date, end_date, unit)
 
 
-def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_lon, start_time, end_time):
+def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_lon, start_time, end_time, name=''):
     '''Get data from one database(parameter).
 
     :param dataset_id: Dataset id.
@@ -331,6 +331,8 @@ def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_l
     :type start_time: Datetime
     :param end_time: End time 
     :type end_time: Datetime
+    :param name: (Optional) A name for the loaded dataset.
+    :type name: String
 
     :returns: An OCW Dataset object contained the requested data from RCMED.
     :rtype: ocw.dataset.Dataset object
@@ -346,4 +348,4 @@ def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_l
     values = _reshape_values(values, unique_lats_lons_times)
     values = _make_mask_array(values, parameter_id, parameters_metadata)
     
-    return Dataset(unique_lats_lons_times[0], unique_lats_lons_times[1], unique_times, values, parameter_name)
+    return Dataset(unique_lats_lons_times[0], unique_lats_lons_times[1], unique_times, values, parameter_name, name=name)

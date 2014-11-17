@@ -23,7 +23,7 @@ import datetime as dt
 class TestDap(unittest.TestCase):
     @classmethod
     def setup_class(self):
-        dataset = dap.load('http://test.opendap.org/dap/data/nc/sst.mnmean.nc.gz', 'sst')
+        self.dataset = dap.load('http://test.opendap.org/dap/data/nc/sst.mnmean.nc.gz', 'sst', name='foo')
 
     def test_dataset_is_returned(self):
         self.assertTrue(isinstance(self.dataset, Dataset))
@@ -40,6 +40,9 @@ class TestDap(unittest.TestCase):
     def test_valid_date_conversion(self):
         start = dt.datetime(1854, 1, 1)
         self.assertTrue(start == self.dataset.times[0])
+
+    def test_custom_dataset_name(self):
+        self.assertEquals(self.dataset.name, 'foo')
 
 if __name__ == '__main__':
     unittest.main()

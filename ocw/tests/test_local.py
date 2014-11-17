@@ -64,6 +64,11 @@ class test_load_file(unittest.TestCase):
         new_values = self.values[0,:,:,:]
         self.assertTrue(numpy.allclose(local.load_file(self.file_path, "value").values, new_values))
 
+    def test_custom_dataset_name(self):
+        '''Test adding a custom name to a dataset'''
+        ds = local.load_file(self.file_path, 'value', name='foo')
+        self.assertEqual(ds.name, 'foo')
+
 class test_get_netcdf_variable_names(unittest.TestCase):
     file_path = "http://zipper.jpl.nasa.gov/dist/"
     test_model = "AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc"

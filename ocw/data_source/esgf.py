@@ -34,6 +34,7 @@ def load_dataset(dataset_id,
                  esgf_password,
                  search_url=DEFAULT_ESGF_SEARCH,
                  elevation_index=0,
+                 name='',
                  **additional_constraints):
     ''' Load an ESGF dataset.
 
@@ -50,6 +51,8 @@ def load_dataset(dataset_id,
     :type search_url: String
     :param elevation_index: (Optional) The elevation level to strip out when
         loading the dataset using ocw.data_source.local.
+    :param name: (Optional) A name for the loaded dataset.
+    :type name: String
     :param additional_constraints: (Optional) Additional key,value pairs to
         pass as constraints to the search wrapper. These can be anything found
         on the ESGF metadata page for a dataset.
@@ -70,6 +73,7 @@ def load_dataset(dataset_id,
         _download_files([url], esgf_username, esgf_password)
         datasets.append(local.load_file('/tmp/' + url.split('/')[-1],
                                         var,
+                                        name=name,
                                         elevation_index=elevation_index))
 
     return datasets

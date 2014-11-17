@@ -112,6 +112,7 @@ def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
 def load_file(file_path,
               variable_name,
               elevation_index=0,
+              name='',
               lat_name=None,
               lon_name=None,
               time_name=None):
@@ -128,6 +129,8 @@ def load_file(file_path,
         By default, the first elevation layer is used. If desired you may
         specify the elevation value to use.
     :type elevation_index: Integer
+    :param name: (Optional) A name for the loaded dataset.
+    :type name: String
     :param lat_name: (Optional) The latitude variable name to extract from the
         dataset.
     :type lat_name: String
@@ -197,4 +200,4 @@ def load_file(file_path,
         else:
             values = values [:,:,:,elevation_index]
 
-    return Dataset(lats, lons, times, values, variable_name)
+    return Dataset(lats, lons, times, values, variable_name, name=name)
