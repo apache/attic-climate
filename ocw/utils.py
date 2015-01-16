@@ -191,11 +191,13 @@ def normalize_lat_lon_values(lats, lons, values):
 
     # If the lat values are unsorted then raise an exception
     if not lats_reversed and lats_decreasing.any():
-        raise ValueError('Latitudes must be sorted.')
+        #raise ValueError('Latitudes must be sorted.')
+        print 'Warning: Latitudes are not sorted'
 
     # Perform same checks now for lons
     if not lons_reversed and lons_decreasing.any():
-        raise ValueError('Longitudes must be sorted.')
+        #raise ValueError('Longitudes must be sorted.')
+        print 'Warning: Longitudes are not sorted'
 
     # Also check if lons go from [0, 360), and convert to [-180, 180)
     # if necessary
