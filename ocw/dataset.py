@@ -183,7 +183,8 @@ Expected shape (%s, %s, %s) but received (%s, %s, %s)""" % (time_count,
                                                             values.shape[2])
         if err_msg:
             logger.error(err_msg)
-            raise ValueError(err_msg)
+            #raise ValueError(err_msg)
+            print 'Warning: '+err_msg
 
     def __str__(self):
         lat_min, lat_max, lon_min, lon_max = self.spatial_boundaries()
