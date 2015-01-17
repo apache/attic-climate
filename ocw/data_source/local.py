@@ -26,6 +26,7 @@ import ocw.utils as utils
 import netCDF4
 import numpy
 import numpy.ma as ma
+import glob
 
 LAT_NAMES = ['x', 'rlat', 'rlats', 'lat', 'lats', 'latitude', 'latitudes']
 LON_NAMES = ['y', 'rlon', 'rlons', 'lon', 'lons', 'longitude', 'longitudes']
@@ -207,3 +208,176 @@ def load_file(file_path,
             values = values [:,:,:,elevation_index]
 
     return Dataset(lats, lons, times, values, variable_name, name=name)
+
+def load_files(file_path,
+              filename_pattern,
+              variable_name,
+              elevation_index=0,
+              name='',
+              lat_name=None,
+              lon_name=None,
+              time_name=None,
+              latitude_range=None,
+              longitude_range=None):
+    ''' Load multiple NetCDF files whose file names have common patterns into a Dataset.
+    The dataset can be spatially subset.
+
+    :param file_path: Directory to the NetCDF file to load.
+    :type file_path: :mod:`string`
+
+    :param filename_pattern: Path to the NetCDF file to load.
+    :type filename_pattern: :list:`string`
+
+    :param variable_name: The variable name to load from the NetCDF file.
+    :type variable_name: :mod:`string`
+
+    :param elevation_index: (Optional) The elevation index for which data should
+        be returned. Climate data is often times 4 dimensional data. Some
+        datasets will have readins at different height/elevation levels. OCW
+        expects 3D data so a single layer needs to be stripped out when loading.
+        By default, the first elevation layer is used. If desired you may
+        specify the elevation value to use.
+    :type elevation_index: :class:`int`
+
+    :param name: (Optional) A name for the loaded dataset.
+    :type name: :mod:`string`
+
+    :param lat_name: (Optional) The latitude variable name to extract from the
+        dataset.
+    :type lat_name: :mod:`string`
+
+    :param lon_name: (Optional) The longitude variable name to extract from the
+        dataset.
+    :type lon_name: :mod:`string`
+
+    :param time_name: (Optional) The time variable name to extract from the
+        dataset.
+    :type time_name: :mod:`string`
+
+    :param latitude_range: (Optional) southern and northern boundary of the sub-region
+    :type latitude_range: :list:float   
+
+    :param longitude_range: (Optional) western and eastern boundary of the sub-region
+    :type longitude_range: :list:float   
+
+    :returns: An OCW Dataset object with the requested variable's data from
+        the NetCDF file.
+    :rtype: :class:`dataset.Dataset`
+
+    :raises ValueError: When the specified file path cannot be loaded by ndfCDF4
+        or when the lat/lon/time variable name cannot be determined
+        automatically.
+    ''' 
+
+    netcdf_files= []
+    for pattern in filename_pattern:
+        netcdf_files.extend(glob.glob(file_path+pattern))
+    netcdf_files.sort() 
+
+    try:
+        netcdf = netCDF4.Dataset(netcdf_files[0], mode='r')
+    except RuntimeError:
+        err = "Dataset filepath is invalid. Please ensure it is correct."
+        raise ValueError(err)
+    except:
+        err = (
+            "The given file cannot be loaded. Please ensure that it is a valid "
+            "NetCDF file. If problems persist, report them to the project's "
+            "mailing list."
+        )
+        raise ValueError(err)
+
+    if not lat_name:
+        lat_name = _get_netcdf_variable_name(LAT_NAMES, netcdf, variable_name)
+    if not lon_name:
+        lon_name = _get_netcdf_variable_name(LON_NAMES, netcdf, variable_name)
+    if not time_name:
+        time_name = _get_netcdf_variable_name(TIME_NAMES, netcdf, variable_name)
+
+    lats = netcdf.variables[lat_name][:]
+    lons = netcdf.variables[lon_name][:]
+
+    if latitude_range and longitude_range:
+        if lats.ndim == 1:
+             x_index = numpy.where((lons>=numpy.min(longitude_range)) & (lons<=numpy.max(longitude_range)))[0]
+             y_index = numpy.where((lats>=numpy.min(latitude_range)) & (lats<=numpy.max(latitude_range)))[0] 
+             lats = lats[y_index]
+             lons = lons[x_index]
+        else:
+             y_index,x_index = numpy.where((lons>=numpy.min(longitude_range)) & (lons<=numpy.max(longitude_range)) & (lats>=numpy.min(latitude_range)) & (lats<=numpy.max(latitude_range)))
+             lats = lats[y_index, x_index]
+             lons = lons[y_index, x_index]
+    else:
+        y_index = np.arange(lats.shape[0]) 
+        x_index = np.arange(lons.shape[-1]) 
+
+    time_raw_values = netcdf.variables[time_name]
+    for attr, value in time_raw_values.__dict__.iteritems():
+        if 'unit' in attr.lower():
+            time_unit = value
+    times = netCDF4.num2date(time_raw_values[:], units = time_unit)
+    times = numpy.array(times)
+
+    # check the variable structure before reading data from the open file 
+    variable = netcdf.variables[variable_name]  
+    # If the values are 4D then we need to strip out the elevation index
+    if len(variable.shape) == 4:
+        # Determine the set of possible elevation dimension names excluding
+        # the list of names that are used for the lat, lon, and time values.
+        dims = netcdf.variables[variable_name].dimensions
+        dimension_names = [dim_name.encode() for dim_name in dims]
+        lat_lon_time_var_names = [lat_name, lon_name, time_name]
+
+        elev_names = set(dimension_names) - set(lat_lon_time_var_names)
+
+        # Grab the index value for the elevation values
+        level_index = dimension_names.index(elev_names.pop())
+
+        # Strip out the elevation values so we're left with a 3D array.
+        if level_index == 0:
+            values = variable[elevation_index,:,y_index,x_index]
+        elif level_index == 1:
+            values = variable[:,elevation_index,y_index,x_index]
+        else:
+            raise ValueError('The structure of this variable does not follow the community standard')
+        if len(netcdf_files) >1:
+            for netcdf_file in netcdf_files[1:]:
+                netcdf.close()
+                netcdf = netCDF4.Dataset(netcdf_file, mode='r')
+                time_raw_values = netcdf.variables[time_name]
+                for attr, value in time_raw_values.__dict__.iteritems():
+                    if 'unit' in attr.lower():
+                        time_unit = value
+                times = numpy.append(times, netCDF4.num2date(time_raw_values[:], units = time_unit))
+                if level_index == 0:
+                    values = numpy.concatenate((values, netcdf.variables[variable_name][elevation_index,:,y_index,x_index]), axis=0)
+                elif level_index == 1:
+                    values = numpy.concatenate((values, netcdf.variables[variable_name][:,elevation_index,y_index,x_index]), axis=0)
+
+    elif len(variable.shape) == 3:
+        values = variable[:,y_index,x_index]
+        
+        if len(netcdf_files) >1:
+            for netcdf_file in netcdf_files[1:]:
+                netcdf.close()
+                netcdf = netCDF4.Dataset(netcdf_file, mode='r')
+                time_raw_values = netcdf.variables[time_name]
+                for attr, value in time_raw_values.__dict__.iteritems():
+                    if 'unit' in attr.lower():
+                        time_unit = value
+                times = numpy.append(times, netCDF4.num2date(time_raw_values[:], units=time_unit))
+                values = numpy.concatenate((values, netcdf.variables[variable_name][:,y_index,x_index]), axis=0)
+    elif len(variable.shape) == 2:
+        values = (variable[y_index,x_index]).reshape((1,y_index.size,x_index.size))
+        if len(netcdf_files) >1:
+            for netcdf_file in netcdf_files[1:]:
+                netcdf.close()
+                netcdf = netCDF4.Dataset(netcdf_file, mode='r')
+                time_raw_values = netcdf.variables[time_name]
+                for attr, value in time_raw_values.__dict__.iteritems():
+                    if 'unit' in attr.lower():
+                        time_unit = value
+                times = numpy.append(times, netCDF4.num2date(time_raw_values[:], units=time_unit))
+                values = numpy.concatenate((values, (netcdf.variables[variable_name][y_index,x_index]).reshape((1,y_index.size,x_index.size))), axis=0)
+    return Dataset(lats, lons, times, values, variable_name, name=name)
+
