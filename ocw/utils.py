@@ -44,6 +44,11 @@ def decode_time_values(dataset, time_var_name):
     time_units = parse_time_units(time_format)
     time_base = parse_time_base(time_format)
 
+    count = 1
+    count_per_day = 0
+
+    print "in decode_time_values", time_format
+
     times = []
     arg = {}
     if time_units == 'months':
@@ -51,11 +56,44 @@ def decode_time_values(dataset, time_var_name):
         # this, a month == 30 days for our purposes.
         for time_val in time_data:
             times.append(time_base + relativedelta(months=int(time_val)))
-    else:
-        for time_val in time_data:
-            arg[time_units] = time_val
-            times.append(time_base + dt.timedelta(**arg))
+    elif time_units == 'days' or time_units =='day':
+        #print "dataset ", dataset.name
+        #print "time_data ", time_data
+        #dirty hack for the MERRA data, check the time before if it is the same, BUT need to find a different way for TRMM (3 hourly)
+        if time_data[0] == time_data[1]:
+            time_units == 'hours'
+            #count the number of times the same value occurs e.g. in MERRA this should be 24 as it is hrly data
+            while time_data[count_per_day] == time_data[count_per_day +1]:
+                count_per_day += 1
 
+            count_per_day +=1   
+            # print "count_per_day ", count_per_day
+            # print "time_base ", time_base
+            for time_val in time_data:
+                if count <= 24: #if firstTime == True:
+                    timeStep = time_val+ (count * (1.0/count_per_day))
+                    # print "***", time_data[1] , time_data[0]
+                    # timeStep = time_data[1] - time_data[0]
+                    # print "time_diff ", timeStep
+                    #firstTime = False
+                    if count == count_per_day: 
+                        count = 1
+
+                #print "time_val ", time_val, time_base
+                #hack for subdaily data
+                arg[time_units] = time_val
+                #print "arg ", arg, type(time_base)
+                times.append(time_base + dt.timedelta(timeStep))
+        else:
+            if time_data[1] - time_data[0] < 1:
+                time_units == "hours"
+                #print "time_base ", time_base
+                for time_val in time_data:
+                    times.append(time_base + dt.timedelta(time_val))
+            else:
+                #else data is daily not subdaily. ie time_units remains days. NOT TESTED
+                for time_val in time_data:
+                    times.append(time_base + relativedelta(days=int(time_val)))
     return times
 
 def parse_time_units(time_format):
@@ -102,7 +140,8 @@ def parse_time_base(time_format):
     '''
     base_time_string = parse_base_time_string(time_format)
 
-    time_format = time_format.strip()
+    time_format = base_time_string
+    #time_format = time_format.strip()
 
     possible_time_formats = [
         '%Y:%m:%d %H:%M:%S', '%Y-%m-%d %H-%M-%S', '%Y/%m/%d %H/%M/%S',
@@ -149,17 +188,27 @@ def parse_base_time_string(time_format):
 
     :raises ValueError: When the time_format parameter is malformed.
     '''
+    #dirty hack to get this to work with the file Baijun generated
+
     if 'since' not in time_format:
-        cur_frame = sys._getframe().f_code
-        err = "{}.{}: Invalid time_format value {} given".format(
-            cur_frame.co_filename,
-            cur_frame.co_name,
-            time_format
-        )
+        print "no since"
+        return "2006-06-01"
+    else:
+        return time_format.split('since')[1].strip()
 
-        raise ValueError(err)
+    # if 'since' not in time_format:
+    #     cur_frame = sys._getframe().f_code
+    #     err = "{}.{}: Invalid time_format value {} given".format(
+    #         cur_frame.co_filename,
+    #         cur_frame.co_name,
+    #         time_format
+    #     )
 
-    return time_format.split('since')[1].strip()
+    #     raise ValueError(err)
+
+    # print "time_format.split('since')[1].strip() ", time_format.split('since')[1].strip()
+
+    # return time_format.split('since')[1].strip()
 
 def normalize_lat_lon_values(lats, lons, values):
     ''' Normalize lat/lon values

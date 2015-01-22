@@ -290,6 +290,9 @@ def write_netcdf(dataset, path, compress=True):
     # of days.
     times.units = "days since %s" % dataset.times[0]
 
+    #TODO: consider getting this info from the file
+    values.missing_value = -9999
+
     # Store the dataset's values
     lats[:] = dataset.lats
     lons[:] = dataset.lons
