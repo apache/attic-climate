@@ -123,7 +123,10 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
     # Check if virtualenv is installed. If it's not, we'll install it for the user.
     if ! command -v virtualenv >/dev/null 2>&1; then
         task "Installing virtualenv ..."
-        sudo apt-get install -y python-virtualenv >> install_log
+        if [ ! -f virtualenv-*/virtualenv.py ]; then
+          wget --no-check-certificate https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.9.1.tar.gz || exit
+          tar xvfz virtualenv-*.tar.gz
+        fi
         subtask "done"
     fi
 
