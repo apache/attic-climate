@@ -132,7 +132,8 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
 
     # Create a new environment for OCW work
     task "Creating a new environment ..."
-    virtualenv ocw >> install_log
+    VIRTUALENV_LOG=/tmp/virtualenv.log
+    virtualenv ocw >> ${VIRTUALENV_LOG}
     source ocw/bin/activate
     subtask "done"
 fi
