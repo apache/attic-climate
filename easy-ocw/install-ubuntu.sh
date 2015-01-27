@@ -123,8 +123,7 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
     # Check if virtualenv is installed. If it's not, we'll install it for the user.
     if ! command -v virtualenv >/dev/null 2>&1; then
         task "Installing virtualenv ..."
-          curl -L -o virtualenv.py https://raw.github.com/pypa/virtualenv/master/virtualenv.py
-        fi
+        curl -L -o virtualenv.py https://raw.github.com/pypa/virtualenv/master/virtualenv.py
         subtask "done"
     fi
 
