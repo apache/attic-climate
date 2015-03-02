@@ -62,6 +62,7 @@ def temporal_rebin(target_dataset, temporal_resolution):
                              binned_dates, 
                              binned_values,
                              target_dataset.variable,
+                             target_dataset.units,
                              target_dataset.name)
     
     return new_dataset
@@ -117,6 +118,7 @@ def spatial_regrid(target_dataset, new_latitudes, new_longitudes):
                                    target_dataset.times, 
                                    new_values,
                                    target_dataset.variable,
+                                   target_dataset.units,
                                    target_dataset.name)
     return regridded_dataset
 
@@ -140,6 +142,7 @@ def ensemble(datasets):
                                   datasets[0].lons, 
                                   datasets[0].times,
                                   ensemble_values,
+                                  datasets[0].units,
                                   name="Dataset Ensemble")
     
     return ensemble_dataset
@@ -182,6 +185,7 @@ def subset(subregion, target_dataset):
             dataset_slices["lat_start"]:dataset_slices["lat_end"] + 1,
             dataset_slices["lon_start"]:dataset_slices["lon_end"] + 1],
         target_dataset.variable,
+        target_dataset.units,
         target_dataset.name
     )
 
@@ -248,6 +252,7 @@ def normalize_dataset_datetimes(dataset, timestep):
         np.array(new_times),
         dataset.values,
         dataset.variable,
+        dataset.units,
         dataset.name
     )
 
@@ -297,6 +302,33 @@ def write_netcdf(dataset, path, compress=True):
     values[:] = dataset.values
 
     out_file.close()
+
+def unit_conversion(dataset):
+    ''' convert the units of model water flux variables (precipitation, evaporation, runoff) into "mm/day" as necessary
+        refactored from do_data_prep.py
+
+    :param dataset: The dataset to convert.
+    :type dataset: :class:`dataset.Dataset`
+
+    returns: dataset with new units
+    rtype(:class::`dataset.Dataset`)
+
+    '''
+    if ('pr' in dataset.variable) or ('precip' in dataset.variable) or ('evspsbl' in dataset.variable) or ('mrro' in dataset.variable)or ('mrros'in dataset.variable):
+        if ('KG M-2 S-1' in dataset.units) or ('kg m-2 s-1' in dataset.units) or ('MM S-1' in dataset.units) or ('mm s-1' in dataset.units) or ('mm/sec' in dataset.units):
+            dataset.values = 86400. * dataset.values
+            dataset.units = 'mm/day'
+        else:
+            pass
+    elif ('SWE' in dataset.variable) or ('swe' in dataset.variable):
+        if (dataset.units=='m') or (dataset.units=='M') or (dataset.units=='meter') or (dataset.units=='METER'):
+            dataset.values = 1.e3 * dataset.values
+            dataset.units = 'km'
+        else:
+            pass
+
+    return dataset
+
 
 def _rcmes_normalize_datetimes(datetimes, timestep):
     """ Normalize Dataset datetime values.
