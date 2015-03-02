@@ -86,7 +86,7 @@ class Bias(BinaryMetric):
         :returns: The difference between the reference and target datasets.
         :rtype: :class:`numpy.ndarray`
         '''
-        return ref_dataset.values - target_dataset.values
+        return target_dataset.values - ref_dataset.values  
 
 
 class TemporalStdDev(UnaryMetric):
@@ -210,7 +210,7 @@ class TemporalMeanBias(BinaryMetric):
         :returns: The mean bias between a reference and target dataset over time.
         '''
 
-        diff = ref_dataset.values - target_dataset.values
+        diff = target_dataset.values - ref_dataset.values 
         if absolute:
             diff = abs(diff)
         mean_bias = diff.mean(axis=0)
@@ -238,7 +238,7 @@ class SpatialMeanOfTemporalMeanBias(BinaryMetric):
         :returns: The bias averaged over time and domain
         '''
 
-        bias = reference_dataset.values - target_dataset.values
+        bias = target_dataset.values - reference_dataset.values 
         return bias.mean()
 
 
