@@ -145,6 +145,7 @@ def create_netcdf_object():
         values[:] = values
         #Assign time info to time variable
         netCDF_file.variables['time'].units = 'months since 2001-01-01 00:00:00' 
+        netCDF_file.variables['value'].units = 'foo_units'
         netCDF_file.close()
         return file_path
 

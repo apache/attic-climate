@@ -236,6 +236,7 @@ class TestSafeSubset(unittest.TestCase):
                                          times,
                                          values,
                                          variable="test variable name",
+                                         units='test variable units',
                                          name='foo')
 
         self.spatial_out_of_bounds = ds.Bounds(
@@ -364,7 +365,7 @@ def ten_year_monthly_dataset():
     # Ten Years of monthly data
     times = np.array([datetime.datetime(year, month, 1) for year in range(2000, 2010) for month in range(1, 13)])
     values = np.ones([len(times), len(lats), len(lons)])
-    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name", name='foo')
+    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name", units='test variable units', name='foo')
     return input_dataset
 
 def ten_year_monthly_15th_dataset():
@@ -373,7 +374,7 @@ def ten_year_monthly_15th_dataset():
     # Ten Years of monthly data
     times = np.array([datetime.datetime(year, month, 15) for year in range(2000, 2010) for month in range(1, 13)])
     values = np.ones([len(times), len(lats), len(lons)])
-    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name")
+    input_dataset = ds.Dataset(lats, lons, times, values, variable="test variable name", units='test variable units')
     return input_dataset
 
 def two_year_daily_dataset():
@@ -381,7 +382,7 @@ def two_year_daily_dataset():
     lons = np.array(range(-179, 180, 2))
     times = np.array([datetime.datetime(2001, 1, 1) + datetime.timedelta(days=d) for d in range(730)])
     values = np.ones([len(times), len(lats), len(lons)])
-    dataset = ds.Dataset(lats, lons, times, values, variable='random data')
+    dataset = ds.Dataset(lats, lons, times, values, variable='random data',units='test variable units')
     return dataset    
 
 def two_year_daily_2hr_dataset():
@@ -389,7 +390,7 @@ def two_year_daily_2hr_dataset():
     lons = np.array(range(-179, 180, 2))
     times = np.array([datetime.datetime(2001, 1, 1) + datetime.timedelta(days=d, hours=2) for d in range(730)])
     values = np.ones([len(times), len(lats), len(lons)])
-    dataset = ds.Dataset(lats, lons, times, values, variable='random data')
+    dataset = ds.Dataset(lats, lons, times, values, variable='random data', units='test variable units')
     return dataset    
 
 def build_ten_cube_dataset(value):
