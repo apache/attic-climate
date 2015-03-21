@@ -159,9 +159,11 @@ class TestReshapeMonthlyToAnnually(unittest.TestCase):
                                     self.value, self.variable)
 
     def test_reshape_full_year(self):
+        new_times = np.array([datetime.datetime(1, 1, 1) + relativedelta(months = x) for x in range(12)])
         new_values = self.value.reshape(2, 12, 5, 5)
-        np.testing.assert_array_equal(
-            utils.reshape_monthly_to_annually(self.test_dataset), new_values)
+        values,times = utils.reshape_monthly_to_annually(self.test_dataset)
+        np.testing.assert_array_equal(values, new_values)
+        np.testing.assert_array_equal(times, new_times)
 
     def test_reshape_not_full_year(self):
         new_time = np.array([datetime.datetime(2000, 1, 1) + relativedelta(months = x) for x in range(26)])
@@ -215,7 +217,7 @@ class TestCalcClimatologyMonthly(unittest.TestCase):
         expected_result = np.ones(300).reshape(12, 5, 5)
         actual_result = utils.calc_climatology_monthly(self.dataset)
         np.testing.assert_array_equal(actual_result, expected_result)
-
+        
 
 if __name__ == '__main__':
     unittest.main()
