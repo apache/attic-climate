@@ -20,6 +20,7 @@
 import sys
 import datetime as dt
 import numpy as np
+import datetime
 
 from mpl_toolkits.basemap import shiftgrid
 from dateutil.relativedelta import relativedelta
@@ -222,8 +223,11 @@ def reshape_monthly_to_annually(dataset):
     Reshape a monthly binned dataset's 3D value array with shape
     (num_months, num_lats, num_lons) to a 4D array with shape
     (num_years, 12, num_lats, num_lons). This causes the data to be binned
-    annually while retaining its original shape.
-
+    annually while retaining its original shape. Follow COARDS climo stats 
+    calculation, the year can be given as 0 but the min year allowed in 
+    Python is 1
+    http://www.cgd.ucar.edu/cms/eaton/netcdf/CF-20010629.htm#climatology
+    
     It is assumed that the number of months in the dataset is evenly
     divisible by 12. If it is not you will receive error due to
     an invalid shape.
@@ -236,6 +240,10 @@ def reshape_monthly_to_annually(dataset):
 
     :returns: Dataset values array with shape (num_year, 12, num_lat, num_lon)
     :rtype: :class:`numpy.ndarray`
+
+    :returns: Dataset times array of length 12)
+    :rtype: :class:`numpy.ndarray`
+    
     '''
 
     values = dataset.values[:]
@@ -249,8 +257,11 @@ def reshape_monthly_to_annually(dataset):
     new_shape = tuple(year_month_shape + lat_lon_shape)
     # Reshape data with new shape
     values.shape = new_shape
-
-    return values
+    # determine times
+    # A year can commence from any month
+    first_month = dataset.times[0].month
+    times = np.array([datetime.datetime(1, first_month, 1) + relativedelta(months = x) for x in range(12)])
+    return values, np.array(times)
 
 def calc_climatology_year(dataset):
     ''' Calculate climatology of dataset's values for each year
@@ -273,7 +284,7 @@ def calc_climatology_year(dataset):
         raise ValueError('The dataset should be in full-time format.')
     else:
         # Get values reshaped to (num_year, 12, num_lats, num_lons)
-        values = reshape_monthly_to_annually(dataset)
+        values,_ = reshape_monthly_to_annually(dataset)
         # Calculate mean values over year (num_year, num_lats, num_lons)
         annually_mean = values.mean(axis=1)
         # Calculate mean values over all years (num_lats, num_lons)
@@ -303,11 +314,11 @@ def calc_climatology_season(month_start, month_end, dataset):
         # Offset the original array so that the the first month
         # becomes month_start, note that this cuts off the first year of data
         offset = slice(month_start - 1, month_start - 13)
-        reshape_data = reshape_monthly_to_annually(dataset[offset])
+        reshape_data,_ = reshape_monthly_to_annually(dataset[offset])
         month_index = slice(0, 13 - month_start + month_end)
     else:
         # Since month_start <= month_end, just take a slice containing those months
-        reshape_data = reshape_monthly_to_annually(dataset)
+        reshape_data,_ = reshape_monthly_to_annually(dataset)
         month_index = slice(month_start - 1, month_end)
     
     t_series = reshape_data[:, month_index].mean(axis=1)
@@ -335,5 +346,5 @@ def calc_climatology_monthly(dataset):
         )
         raise ValueError(error)
     else:
-        return reshape_monthly_to_annually(dataset).mean(axis=0)
+        return reshape_monthly_to_annually(dataset)[0].mean(axis=0)
 
