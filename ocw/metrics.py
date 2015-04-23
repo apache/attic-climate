@@ -267,3 +267,39 @@ class RMSError(BinaryMetric):
         sqdiff = (reference_dataset.values - target_dataset.values) ** 2
         return numpy.sqrt(sqdiff.mean())
 
+class calcTemporalCorrelation(BinaryMetric):
+    '''Calculate the temporal correlation (pearson's linear correlation coefficient) coefficient
+    
+    def run(self, eval_dataset, ref_dataset):
+    '''Assumption(s) ::
+        The first dimension of two datasets is the time axis.
+    
+    Input ::
+        evaluationData - model data array of any shape (N dimensional)
+        referenceData- observation data array of any shape (N dimensional)
+            
+    Output::
+        temporalCorelation - A (N-1)-D array of temporal correlation coefficients at each subregion
+        sigLev - A (N-1)-D array of confidence levels related to temporalCorelation 
+    
+    sigLev: the correlation between model and observation is significant at sigLev * 100 %
+    '''
+   
+    ndim = eval_dataset.values.ndim
+    if  ndim == 3:  # when the observational and model data are three dimensional arrays
+        nt, ny, nx = ref_dataset.values.shape
+        temporal_correlation = np.zeros([ny,nx])
+        siglev = np.zeros([ny, nx])
+        for iy in np.arange(ny):
+            for ix in np.arange(nx):
+                temporal_correlation[iy, ix], siglev[iy,ix] = stats.pearsonr(eval_dataset.values[:,iy,ix]),
+                                                                             ref_dataset.values[:,iy,ix])  
+                siglev[iy,ix] = 1.0- siglev[iy,ix]
+        
+    if ndim == 1:  # when two time series are given
+        temporal_correlation = 0.
+        siglev = 0.
+        temporal_correlation, siglev = stats.pearsonr(eval_dataset.values, ref_dataset.values)
+        siglev = 1.0 - siglev 
+    
+    return temporal_correlation, siglev     
