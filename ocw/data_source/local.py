@@ -19,11 +19,13 @@ import calendar
 from datetime import timedelta ,datetime
 import re
 import string
+from glob import glob
 
 from ocw.dataset import Dataset
 import ocw.utils as utils
 
 import netCDF4
+from pyhdf.SD import SD 
 import numpy
 import numpy.ma as ma
 
@@ -109,6 +111,61 @@ def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
     )
     raise ValueError(error)
 
+def load_merra_3d_files(file_path,
+                    filename_pattern,
+                    variable_name,
+                    name='',
+                    latitude_range=None,
+                    longitude_range=None):
+    ''' Load multiple MERRA reanalysis HDF files whose file names have common patterns into a Dataset.
+    The dataset can be spatially subset.
+    :param file_path: Directory to the NetCDF file to load.
+    :type file_path: :mod:`string`
+    :param filename_pattern: Path to the NetCDF file to load.
+    :type filename_pattern: :list:`string`
+    :param variable_name: The variable name to load from the NetCDF file.
+    :type variable_name: :mod:`string`
+    :param name: (Optional) A name for the loaded dataset.
+    :type name: :mod:`string`
+    :param latitude_range: (Optional) minimum and maximum latitudes for spatial subsetting
+    :type name: :list:float  ex) [-30, 20]
+    :param longitude_range: (Optional) minimum and maximum longitudes (Western and eastern boundaries) for spatial subsetting
+    :type name: :list:float  ex) [-170, 60]
+    :returns: An OCW Dataset object with the requested variable's data from
+        the NetCDF file.
+    :rtype: :class:`dataset.Dataset`
+    :raises ValueError: 
+    '''                  
+    
+    merra_files = []
+    for pattern in filename_pattern:
+        merra_files.extend(glob(file_path + pattern))
+    merra_files.sort()
+  
+    file_object_first = SD(merra_files[0])
+    lats = file_object_first.select('YDim')[:]
+    lons = file_object_first.select('XDim')[:]
+    
+    if latitude_range and longitude_range:
+        x_index = numpy.where((lons>=numpy.min(longitude_range)) & (lons<=numpy.max(longitude_range)))[0]
+        y_index = numpy.where((lats>=numpy.min(latitude_range)) & (lats<=numpy.max(latitude_range)))[0] 
+        lats = lats[y_index]
+        lons = lons[x_index]
+    else:
+        y_index = numpy.arange(len(lats))
+        x_index = numpy.arange(len(lons))
+
+    for ifile, file in enumerate(merra_files):
+        file_object = SD(file)
+        values0= file_object.select(variable_name)[:]
+        if ifile == 0:
+            times = netCDF4.num2date(file_object.select('Time')[:],units='seconds since 1993-01-01') 
+            values = values0[:,:,y_index.min():y_index.max()+1, x_index.min():x_index.max()+1]
+        else:
+            times = numpy.append(times, netCDF4.num2date(file_object.select('Time')[:],units='seconds since 1993-01-01'))
+            values = numpy.concatenate((values, values0[:,:,y_index.min():y_index.max()+1, x_index.min():x_index.max()+1])) 
+    return Dataset(lats, lons, times, values, variable_name, name=name)
+         
 def load_file(file_path,
               variable_name,
               variable_unit = None,
