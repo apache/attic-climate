@@ -359,20 +359,13 @@ def water_flux_unit_conversion(dataset):
     :returns: A Dataset with values converted to new units.
     :rtype: :class:`dataset.Dataset`
     '''
-    waterFluxVariables = ['pr', 'evspsbl', 'mrro', 'swe']
+    waterFluxVariables = ['pr', 'evspsbl', 'mrro']
     variable = dataset.variable.lower()
-
-    if any(subString in variable for subString in waterFluxVariables):
-        dataset_units = dataset.units.lower()
-        if variable in 'swe':
-            if any(unit in dataset_units for unit in ['m', 'meter']):
-                dataset.values = 1.e3 * dataset.values
-                dataset.units = 'km'
-        else:
-            if any(unit in dataset_units 
-                for unit in ['kg m-2 s-1', 'mm s-1', 'mm/sec']):
-                dataset.values = 86400. * dataset.values
-                dataset.units = 'mm/day'
+    dataset_units = dataset.units.lower()
+    if any(unit in dataset_units 
+        for unit in ['kg m-2 s-1', 'mm s-1', 'mm/sec']):
+        dataset.values = 86400. * dataset.values
+        dataset.units = 'mm/day'
 
     return dataset
 
