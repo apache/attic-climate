@@ -107,6 +107,7 @@ virtualenv environment, then feel free to ignore this message.$(tput setaf 0)
 VIRTUALENV_WARNING
 fi
 
+
 read -p "Press [Yy] to begin installation with the flag -e $(tput setaf 2)[RECOMMENDED]$(tput setaf 0)
 [OR] 
 Press [Nn] to continue with the normal installation..." yn
@@ -119,6 +120,7 @@ case $yn in
             ;;
     * ) echo "Please answer yes or no.." ;;
 esac
+fi
 
 header "Checking for pip ..."
 command -v pip >/dev/null 2>&1 || { 
