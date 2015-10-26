@@ -63,6 +63,7 @@ WITH_VIRTUAL_ENV=0
 WITH_HOMEBREW=0
 WITH_INTERACT=1
 INIT_PWD=$PWD
+
 while getopts ":h :e :q" FLAG
 do
     case $FLAG in
@@ -83,6 +84,8 @@ do
     esac
 done
 
+
+
 if [ $WITH_INTERACT == 1 ]; then
 cat << ENDINTRO
 A number of dependencies for OCW will now be installed. Please check the wiki
@@ -94,16 +97,30 @@ ENDINTRO
 
 if [ $WITH_VIRTUAL_ENV != 1 ]; then
 cat << VIRTUALENV_WARNING
+$(tput setaf 1)<------------------------------[WARNING!]----------------------------------> 
 It is highly recommended that you allow Easy OCW to install the dependencies
 into a virtualenv environment to ensure that your global Python install is
-not affected. If you're unsure, you should pass the -e flag
+not affected. If you're UNSURE, you should pass the -e flag
 to this script. If you aren't concerned, or you want to create your own
-virtualenv environment, then feel free to ignore this message.
+virtualenv environment, then feel free to ignore this message.$(tput setaf 0)
 
 VIRTUALENV_WARNING
 fi
 
-read -p "Press [ENTER] to begin installation ..."
+read -p "Press [Yy] to begin installation with the flag -e $(tput setaf 2)[RECOMMENDED]$(tput setaf 0)
+[OR] 
+Press [Nn] to continue with the normal installation..." yn
+case $yn in 
+    [Yy]* ) 
+            WITH_VIRTUAL_ENV=1
+            ;;
+    [Nn]* ) 
+            WITH_VIRTUAL_ENV=0 
+            ;;
+    * ) echo "Please answer yes or no.." ;;
+esac
+
+read -p "Press [Enter] to continue...."
 fi
 
 header "Checking for pip ..."
