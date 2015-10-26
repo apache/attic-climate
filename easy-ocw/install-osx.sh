@@ -120,9 +120,6 @@ case $yn in
     * ) echo "Please answer yes or no.." ;;
 esac
 
-read -p "Press [Enter] to continue...."
-fi
-
 header "Checking for pip ..."
 command -v pip >/dev/null 2>&1 || { 
     task "Unable to locate pip."
