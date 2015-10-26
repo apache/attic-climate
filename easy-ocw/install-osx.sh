@@ -97,7 +97,7 @@ ENDINTRO
 
 if [ $WITH_VIRTUAL_ENV != 1 ]; then
 cat << VIRTUALENV_WARNING
-$(tput setaf 1)<------------------------------[WARNING!]----------------------------------> 
+$(tput setaf 1)<-----------------------------[WARNING!]-----------------------------------> 
 It is highly recommended that you allow Easy OCW to install the dependencies
 into a virtualenv environment to ensure that your global Python install is
 not affected. If you're UNSURE, you should pass the -e flag
