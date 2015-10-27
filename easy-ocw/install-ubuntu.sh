@@ -104,7 +104,6 @@ to this script. If you aren't concerned, or you want to create your own
 virtualenv environment, then feel free to ignore this message.$(tput setaf 0)
 
 VIRTUALENV_WARNING
-fi
 
 read -p "Press [Yy] to begin installation with the flag -e $(tput setaf 2)[RECOMMENDED]$(tput setaf 0)
 [OR] 
@@ -118,6 +117,10 @@ case $yn in
             ;;
     * ) echo "Please answer yes or no.." ;;
 esac
+
+else 
+    read -p "Press [Enter] to continue..."
+fi
 
 echo -n "Please specify a full path to where your OCW download is then press [ENTER] ..."
 read ocw_path
