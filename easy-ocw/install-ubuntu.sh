@@ -101,11 +101,11 @@ It is highly recommended that you allow Easy OCW to install the dependencies
 into a virtualenv environment to ensure that your global Python install is
 not affected. If you're UNSURE, you should pass the -e flag
 to this script. If you aren't concerned, or you want to create your own
-virtualenv environment, then feel free to ignore this message.$(tput setaf 0)
+virtualenv environment, then feel free to ignore this message.$(tput sgr 0)
 
 VIRTUALENV_WARNING
 
-read -p "Press [Yy] to begin installation with the flag -e $(tput setaf 2)[RECOMMENDED]$(tput setaf 0)
+read -p "Press [Yy] to begin installation with the flag -e $(tput setaf 2)[RECOMMENDED]$(tput sgr 0)
 [OR] 
 Press [Nn] to continue with the normal installation..." yn
 case $yn in 
