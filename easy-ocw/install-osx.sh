@@ -156,11 +156,12 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
         read -n1 -p "Do you want to replace it with a clean install? y/n :" replace 
         if [ "$replace" == "y" ]; then
             echo ""
-            echo "WARNING this will delete all file and data in ~/ocw on your system."
-            read  -p "To confirm and proceed type YES or ENTER to quit:" confirm
-            if [ "$confirm" == "YES" ]; then
-                echo "Deleting contents of ~/ocw" >> install_log
-                rm -rf ~/ocw
+            echo "$(tput setaf 1)[WARNING!] This will delete all file and data in ~/ocw on your system.$(tput sgr 0)"
+            read -n1 -p "To confirm and proceed type y or press ENTER to quit:" confirm
+            if [ "$confirm" == "y" ]; then
+                echo ""
+                echo "Deleting contents of ~/ocw" 
+                rm -rf ~/ocw >> install_log
             else
                 echo ""
                 echo "Stopping Open Climate Workbench Installation"
