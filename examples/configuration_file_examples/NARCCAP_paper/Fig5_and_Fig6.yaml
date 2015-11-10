@@ -1,0 +1,50 @@
+workdir: ./                                      
+output_netcdf_filename: narccap_tas_annual_mean_1980-2003.nc
+
+# (RCMES will temporally subset data between month_start and month_end. If average_each_year is True (False), seasonal mean in each year is (not) calculated and used for metrics calculation.)
+time:
+    maximum_overlap_period: False
+    start_time: 1980-01-01
+    end_time: 2003-12-31
+    temporal_resolution: monthly
+    month_start: 1
+    month_end: 12
+    average_each_year: True  
+
+space:
+    min_lat: 23.75
+    max_lat: 49.75
+    min_lon: -125.75
+    max_lon: -66.75
+
+regrid:
+    regrid_on_reference: False
+    regrid_dlat: 0.50
+    regrid_dlon: 0.50
+
+datasets:
+    reference:
+        data_source: rcmed
+        data_name: CRU
+        dataset_id: 10
+        parameter_id: 38
+
+    targets:
+        data_source: local
+        path: ../data/temp.*ncep.monavg.nc                                                    
+        variable: temp    
+
+number_of_metrics_and_plots: 2
+
+metrics1: Map_plot_bias_of_multiyear_climatology
+
+plots1:
+    file_name: Fig5
+    subplots_array: !!python/tuple [4,2]
+
+metrics2: Taylor_diagram_spatial_pattern_of_multiyear_climatology
+
+plots2:
+    file_name: Fig6
+
+use_subregions: False
