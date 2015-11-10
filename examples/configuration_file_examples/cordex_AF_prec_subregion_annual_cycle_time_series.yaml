@@ -1,4 +1,4 @@
-workdir: ./
+workdir: ./CORDEX_AF_results
 output_netcdf_filename: cordex_AF_prec_monthly_mean_1990-2007.nc
 
 # (RCMES will temporally subset data between month_start and month_end. If average_each_year is True (False), seasonal mean in each year is (not) calculated and used for metrics calculation.)
@@ -31,7 +31,7 @@ datasets:
 
     targets:
         data_source: local
-        path: ./data/AFRICA*pr.nc                                
+        path: /users/dlnash/rcmes/climate/examples/configuration_file_examples/data/AFRICA*pr.nc                                
         variable: pr    
 
 number_of_metrics_and_plots: 1
