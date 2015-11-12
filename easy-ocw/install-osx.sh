@@ -63,6 +63,7 @@ WITH_VIRTUAL_ENV=0
 WITH_HOMEBREW=0
 WITH_INTERACT=1
 INIT_PWD=$PWD
+
 while getopts ":h :e :q" FLAG
 do
     case $FLAG in
@@ -83,6 +84,8 @@ do
     esac
 done
 
+
+
 if [ $WITH_INTERACT == 1 ]; then
 cat << ENDINTRO
 A number of dependencies for OCW will now be installed. Please check the wiki
@@ -94,16 +97,32 @@ ENDINTRO
 
 if [ $WITH_VIRTUAL_ENV != 1 ]; then
 cat << VIRTUALENV_WARNING
+$(tput setaf 1)<-----------------------------[WARNING!]-----------------------------------> 
 It is highly recommended that you allow Easy OCW to install the dependencies
 into a virtualenv environment to ensure that your global Python install is
-not affected. If you're unsure, you should pass the -e flag
+not affected. If you're UNSURE, you should pass the -e flag
 to this script. If you aren't concerned, or you want to create your own
-virtualenv environment, then feel free to ignore this message.
+virtualenv environment, then feel free to ignore this message.$(tput sgr 0)
 
 VIRTUALENV_WARNING
+read -p "Press [Yy] to begin installation with the flag -e $(tput setaf 2)[RECOMMENDED]$(tput sgr 0)
+[OR] 
+Press [Nn] to continue with the normal installation..." yn
+case $yn in 
+    [Yy]* ) 
+            WITH_VIRTUAL_ENV=1
+            ;;
+    [Nn]* ) 
+            WITH_VIRTUAL_ENV=0 
+            ;;
+    * ) echo "Please answer yes or no.." ;;
+esac
+
+else 
+    read -p "Press [Enter] to continue..."
+
 fi
 
-read -p "Press [ENTER] to begin installation ..."
 fi
 
 header "Checking for pip ..."
@@ -137,11 +156,12 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
         read -n1 -p "Do you want to replace it with a clean install? y/n :" replace 
         if [ "$replace" == "y" ]; then
             echo ""
-            echo "WARNING this will delete all file and data in ~/ocw on your system."
-            read  -p "To confirm and proceed type YES or ENTER to quit:" confirm
-            if [ "$confirm" == "YES" ]; then
-                echo "Deleting contents of ~/ocw" >> install_log
-                rm -rf ~/ocw
+            echo "$(tput setaf 1)[WARNING!] This will delete all file and data in ~/ocw on your system.$(tput sgr 0)"
+            read -n1 -p "To confirm and proceed type y or press ENTER to quit:" confirm
+            if [ "$confirm" == "y" ]; then
+                echo ""
+                echo "Deleting contents of ~/ocw" 
+                rm -rf ~/ocw >> install_log
             else
                 echo ""
                 echo "Stopping Open Climate Workbench Installation"
