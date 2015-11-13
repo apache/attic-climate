@@ -150,8 +150,12 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
         subtask "done"
     }
 
+    read -e -p "Enter the path where you want to install the ocw virtual environment..." ocw_path 
+
     header "Checking for previously installed  ocw virtual environment..."
-    if [ -e ~/ocw/bin/python ]; then
+    cd $ocw_path
+
+    if [ -e $ocw_path/ocw/bin/python ]; then
         echo "We found an existing 'ocw' virtualenv on your system in ~/ocw."
         read -n1 -p "Do you want to replace it with a clean install? y/n :" replace 
         if [ "$replace" == "y" ]; then
@@ -161,7 +165,7 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
             if [ "$confirm" == "y" ]; then
                 echo ""
                 echo "Deleting contents of ~/ocw" 
-                rm -rf ~/ocw >> install_log
+                rm -rf $ocw_path/ocw/bin/python >> install_log
             else
                 echo ""
                 echo "Stopping Open Climate Workbench Installation"
@@ -175,9 +179,16 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
         fi
     fi
 
+
+    #check if the file path exists.
+    while [ ! -d "$ocw_path" ];
+    do 
+        echo "Path not found..."
+        read -e -p "Please enter a valid path..." ocw_path
+    done 
+
     # Create a new environment for OCW work
     task "Creating a new environment in ~/ocw..."
-    cd ~
     virtualenv ocw >> install_log
     source ~/ocw/bin/activate >> install_log
     cd $INIT_PWD
