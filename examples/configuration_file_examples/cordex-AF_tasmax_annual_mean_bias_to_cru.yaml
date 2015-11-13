@@ -27,7 +27,7 @@ datasets:
         data_source: rcmed
         data_name: CRU
         dataset_id: 10
-        parameter_id: 37
+        parameter_id: 39
 
     targets:
         data_source: local

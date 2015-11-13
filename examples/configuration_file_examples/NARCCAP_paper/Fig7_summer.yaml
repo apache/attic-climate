@@ -1,0 +1,75 @@
+workdir: ./
+output_netcdf_filename: narccap_tas_JJA_mean_1980-2003.nc
+
+# (RCMES will temporally subset data between month_start and month_end. If average_each_year is True (False), seasonal mean in each year is (not) calculated and used for metrics calculation.)
+time:
+    maximum_overlap_period: False
+    start_time: 1980-01-01
+    end_time: 2003-12-31
+    temporal_resolution: monthly
+    month_start: 6
+    month_end: 8
+    average_each_year: True
+
+space:
+    min_lat: 23.75
+    max_lat: 49.75
+    min_lon: -125.75
+    max_lon: -66.75
+
+regrid:
+    regrid_on_reference: False
+    regrid_dlat: 0.50
+    regrid_dlon: 0.50
+
+datasets:
+    reference:
+        data_source: rcmed
+        data_name: CRU
+        dataset_id: 10
+        parameter_id: 38
+
+    targets:
+        data_source: local
+        path: ../data/temp*ncep.monavg.nc                                                    
+        variable: temp    
+
+number_of_metrics_and_plots: 1
+
+metrics1: Portrait_diagram_subregion_interannual_variability
+
+plots1:
+    file_name: Fig7_summer
+
+use_subregions: True 
+
+subregions:
+#subregion name (R01, R02, R03,....) followed by an array of boundaries [south, north, west, east]
+    R01: 
+      [42.75, 49.75, -123.75, -120.25]
+    R02:
+      [42.75, 49.75, -119.75, -112.75]
+    R03:
+      [37.25, 42.25, -123.75, -117.75]
+    R04: 
+      [32.25, 37.25, -122.75, -114.75]
+    R05:
+      [31.25, 37.25, -113.75, -108.25]
+    R06:
+      [31.25, 37.25, -108.25, -99.75]
+    R07:
+      [37.25, 43.25, -110.25, -103.75]
+    R08: 
+      [45.25, 49.25, -99.75, -90.25]
+    R09: 
+      [34.75, 45.25, -99.75, -90.25]
+    R10: 
+      [29.75, 34.75, -95.75, -84.75]
+    R11: 
+      [38.25, 44.75, -89.75, -80.25]
+    R12: 
+      [38.25, 44.75, -79.75, -70.25]
+    R13: 
+      [30.75, 38.25, -83.75, -75.25]
+    R14: 
+      [24.25, 30.75, -83.75, -80.25]

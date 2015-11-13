@@ -513,7 +513,7 @@ def manage_obs_screen(header, note=""):
 def run_screen(model_datasets, models_info, observations_info,
                overlap_start_time, overlap_end_time, overlap_min_lat,
                overlap_max_lat, overlap_min_lon, overlap_max_lon,
-               temp_grid_setting, spatial_grid_setting, reference_dataset, target_datasets, metric, working_directory, plot_title):
+               temp_grid_setting, spatial_grid_setting_lat, spatial_grid_setting_lon, reference_dataset, target_datasets, metric, working_directory, plot_title):
     '''Generates screen to show running evaluation process.
 
     :param model_datasets: list of model dataset objects
@@ -605,8 +605,8 @@ def run_screen(model_datasets, models_info, observations_info,
 
              screen.addstr(6, 4, "Spatially regridding...")
              screen.refresh()
-             new_lats = np.arange(overlap_min_lat, overlap_max_lat, spatial_grid_setting)
-             new_lons = np.arange(overlap_min_lon, overlap_max_lon, spatial_grid_setting)
+             new_lats = np.arange(overlap_min_lat, overlap_max_lat, spatial_grid_setting_lat)
+             new_lons = np.arange(overlap_min_lon, overlap_max_lon, spatial_grid_setting_lon)
              for i in range(len(obs_dataset)):
                   obs_dataset[i] = dsp.spatial_regrid(obs_dataset[i], new_lats, new_lons)
 
@@ -1056,7 +1056,8 @@ def settings_screen(header):
     temp_grid_option = "Observation"
     temp_grid_setting = obs_temp_res
     spatial_grid_option = "Observation"
-    spatial_grid_setting = obs_lat_res
+    spatial_grid_setting_lat = obs_lat_res
+    spatial_grid_setting_lon = obs_lon_res
     models_dict = {}
 
     for i in enumerate(models_info):
@@ -1240,20 +1241,26 @@ def settings_screen(header):
               new_spatial_grid_option = screen.getstr()
               if new_spatial_grid_option.lower() == 'model':
                    spatial_grid_option = 'Model'
-                   spatial_grid_setting = model_lat_res
+                   spatial_grid_setting_lat = model_lat_res
+                   spatial_grid_setting_lon = model_lon_res
                    note = "Spatial gridding option has changed successfully to {0}".format(spatial_grid_option)
               elif new_spatial_grid_option.lower() == 'observation':
                    spatial_grid_option = 'Observation'
-                   spatial_grid_setting = obs_lat_res
+                   spatial_grid_setting_lat = obs_lat_res
+                   spatial_grid_setting_lon = obs_lon_res
                    note = "Spatial gridding option has changed successfully to {0}".format(spatial_grid_option)
               elif new_spatial_grid_option.lower() == 'user':
-                   screen.addstr(26, x/2, "Please enter spatial resolution: ")
-                   user_res = screen.getstr()
+                   screen.addstr(26, x/2, "Please enter latitude spatial resolution: ")
+                   user_lat_res = screen.getstr()
+                   screen.addstr(27, x/2, "Please enter longitude spatial resolution: ")
+                   user_lon_res = screen.getstr()
                    try:
-                        user_res = float(user_res)
-                        spatial_grid_option = 'User: resolution {0}'.format(str(user_res))
-                        spatial_grid_setting = user_res
-                        note = "Spatial gridding option has changed successfully to {0}".format(spatial_grid_option)
+                        user_lat_res = float(user_lat_res)
+                        user_lon_res = float(user_lon_res)
+                        spatial_grid_option = 'User: resolution lat:{0}, lon:{1}'.format(str(user_lat_res), str(user_lon_res))
+                        spatial_grid_setting_lat = user_lat_res
+                        spatial_grid_setting_lon = user_lon_res
+                        note = "Spatial gridding option has changed successfully to user defined."
                    except:
                         note = "Spatial gridding option has not changed."
               else:
@@ -1367,7 +1374,7 @@ def settings_screen(header):
          if option.lower() == 'r':
               note = run_screen(model_datasets, models_info, observations_info, all_overlap_start_time, all_overlap_end_time, \
                          all_overlap_min_lat, all_overlap_max_lat, all_overlap_min_lon, all_overlap_max_lon, \
-                         temp_grid_setting, spatial_grid_setting, reference_dataset, target_datasets, metric, working_directory, plot_title)
+                         temp_grid_setting, spatial_grid_setting_lat, spatial_grid_setting_lon, reference_dataset, target_datasets, metric, working_directory, plot_title)
 
 
 ##############################################################

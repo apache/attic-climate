@@ -1,3 +1,20 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
 #Apache OCW lib immports
 import ocw.data_source.local as local
 import ocw.plotter as plotter
@@ -15,7 +32,7 @@ from matplotlib.patches import Polygon
 import string
 
 def Map_plot_bias_of_multiyear_climatology(obs_dataset, obs_name, model_datasets, model_names,
-                                      file_name, row, column):
+                                      file_name, row, column, map_projection=None):
     '''Draw maps of observed multi-year climatology and biases of models"'''
 
     # calculate climatology of observation data
@@ -42,7 +59,11 @@ def Map_plot_bias_of_multiyear_climatology(obs_dataset, obs_name, model_datasets
 
     string_list = list(string.ascii_lowercase) 
     ax = fig.add_subplot(row,column,1)
-    m = Basemap(ax=ax, projection ='cyl', llcrnrlat = lat_min, urcrnrlat = lat_max,
+    if map_projection == 'npstere':
+        m = Basemap(ax=ax, projection ='npstere', boundinglat=lat_min, lon_0=0,
+            resolution = 'l', fix_aspect=False)
+    else:
+        m = Basemap(ax=ax, projection ='cyl', llcrnrlat = lat_min, urcrnrlat = lat_max,
             llcrnrlon = lon_min, urcrnrlon = lon_max, resolution = 'l', fix_aspect=False)
     lons, lats = np.meshgrid(obs_dataset.lons, obs_dataset.lats)
 
@@ -58,7 +79,11 @@ def Map_plot_bias_of_multiyear_climatology(obs_dataset, obs_name, model_datasets
     clevs = plotter._nice_intervals(rcm_bias, 11)
     for imodel in np.arange(len(model_datasets)):
         ax = fig.add_subplot(row, column,2+imodel)
-        m = Basemap(ax=ax, projection ='cyl', llcrnrlat = lat_min, urcrnrlat = lat_max,
+        if map_projection == 'npstere':
+            m = Basemap(ax=ax, projection ='npstere', boundinglat=lat_min, lon_0=0,
+                resolution = 'l', fix_aspect=False)
+        else:
+            m = Basemap(ax=ax, projection ='cyl', llcrnrlat = lat_min, urcrnrlat = lat_max,
                 llcrnrlon = lon_min, urcrnrlon = lon_max, resolution = 'l', fix_aspect=False)
         m.drawcoastlines(linewidth=1)
         m.drawcountries(linewidth=1)
@@ -71,7 +96,6 @@ def Map_plot_bias_of_multiyear_climatology(obs_dataset, obs_name, model_datasets
 
     plt.subplots_adjust(hspace=0.01,wspace=0.05)
 
-    plt.show()
     fig.savefig(file_name,dpi=600,bbox_inches='tight')
 
 def Taylor_diagram_spatial_pattern_of_multiyear_climatology(obs_dataset, obs_name, model_datasets, model_names,
@@ -136,7 +160,6 @@ def Time_series_subregion(obs_subregion_mean, obs_name, model_subregion_mean, mo
     ax.legend(bbox_to_anchor=(-0.2, row/2), loc='center' , prop={'size':7}, frameon=False)  
 
     fig.subplots_adjust(hspace=0.7, wspace=0.5)
-    plt.show()
     fig.savefig(file_name, dpi=600, bbox_inches='tight')
 
 def Portrait_diagram_subregion(obs_subregion_mean, obs_name, model_subregion_mean, model_names, seasonal_cycle,
@@ -193,7 +216,6 @@ def Map_plot_subregion(subregions, ref_dataset, directory):
     for subregion in subregions:
         draw_screen_poly(subregion[1], m, 'w') 
         plt.annotate(subregion[0],xy=(0.5*(subregion[1][2]+subregion[1][3]), 0.5*(subregion[1][0]+subregion[1][1])), ha='center',va='center', fontsize=8) 
-    plt.show()
     fig.savefig(directory+'map_subregion', bbox_inches='tight')
 
 def draw_screen_poly(boundary_array, m, linecolor='k'):

@@ -1,3 +1,20 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
 #Apache OCW lib immports
 import ocw.dataset_processor as dsp
 import ocw.data_source.local as local
@@ -57,6 +74,8 @@ else:
     # TO DO: support ESGF
 
 ref_dataset =  dsp.normalize_dataset_datetimes(ref_dataset, temporal_resolution)
+if 'multiplying_factor' in ref_data_info.keys():
+    ref_dataset.values = ref_dataset.values*ref_data_info['multiplying_factor']
 
 """ Step 2: Load model NetCDF Files into OCW Dataset Objects """
 model_data_info = config['datasets']['targets']
@@ -191,8 +210,12 @@ if nmetrics > 0:
         print 'metrics '+str(imetric)+'/'+str(nmetrics)+': ', metrics_name
         if metrics_name == 'Map_plot_bias_of_multiyear_climatology':
             row, column = plot_info['subplots_array']
-            Map_plot_bias_of_multiyear_climatology(ref_dataset, ref_name, model_datasets, model_names,
-                                      file_name, row, column)
+            if 'map_projection' in plot_info.keys():
+                Map_plot_bias_of_multiyear_climatology(ref_dataset, ref_name, model_datasets, model_names,
+                                          file_name, row, column, map_projection=plot_info['map_projection'])
+            else:
+                Map_plot_bias_of_multiyear_climatology(ref_dataset, ref_name, model_datasets, model_names,
+                                          file_name, row, column)
         elif metrics_name == 'Taylor_diagram_spatial_pattern_of_multiyear_climatology':
             Taylor_diagram_spatial_pattern_of_multiyear_climatology(ref_dataset, ref_name, model_datasets, model_names,
                                       file_name)

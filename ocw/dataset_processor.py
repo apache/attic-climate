@@ -160,7 +160,7 @@ def temporal_rebin_with_time_index(target_dataset, nt_average):
     # nt2 is the length of time dimension in the rebinned dataset
     nt2 = nt/nt_average
     binned_dates = target_dataset.times[np.arange(nt2)*nt_average]
-    binned_values = np.zeros(np.insert(target_dataset.values.shape[1:],0,nt2))
+    binned_values = ma.zeros(np.insert(target_dataset.values.shape[1:],0,nt2))
     for it in np.arange(nt2):
         binned_values[it,:] = ma.average(target_dataset.values[nt_average*it:nt_average*it+nt_average,:], axis=0)
     new_dataset = ds.Dataset(target_dataset.lats,
@@ -1093,19 +1093,19 @@ def _are_bounds_contained_by_dataset(bounds, dataset):
     errors = []
 
     # TODO:  THIS IS TERRIBLY inefficent and we need to use a geometry lib instead in the future
-    if not lat_min <= bounds.lat_min <= lat_max:
+    if not np.round(lat_min,3) <= np.round(bounds.lat_min,3) <= np.round(lat_max,3):
         error = "bounds.lat_min: %s is not between lat_min: %s and lat_max: %s" % (bounds.lat_min, lat_min, lat_max)
         errors.append(error)
 
-    if not lat_min <= bounds.lat_max <= lat_max:
+    if not np.round(lat_min,3) <= np.round(bounds.lat_max,3) <= np.round(lat_max,3):
         error = "bounds.lat_max: %s is not between lat_min: %s and lat_max: %s" % (bounds.lat_max, lat_min, lat_max)
         errors.append(error)
 
-    if not lon_min <= bounds.lon_min <= lon_max:
+    if not np.round(lon_min,3) <= np.round(bounds.lon_min,3) <= np.round(lon_max,3):
         error = "bounds.lon_min: %s is not between lon_min: %s and lon_max: %s" % (bounds.lon_min, lon_min, lon_max)
         errors.append(error)
 
-    if not lon_min <= bounds.lon_max <= lon_max:
+    if not np.round(lon_min,3) <= np.round(bounds.lon_max,3) <= np.round(lon_max,3):
         error = "bounds.lon_max: %s is not between lon_min: %s and lon_max: %s" % (bounds.lon_max, lon_min, lon_max)
         errors.append(error)
 

@@ -27,6 +27,7 @@ from ocw.dataset import Dataset
 import ocw.utils as utils
 
 import netCDF4
+import h5py
 import numpy
 import numpy.ma as ma
 
@@ -532,3 +533,59 @@ def load_NLDAS_forcingA_files(file_path=None,
         file_object.close()
     times = numpy.array(times)
     return Dataset(lats, lons, times, values, variable_name, units=variable_unit, name=name)
+
+def load_GPM_IMERG_files(file_path=None,
+                      filename_pattern=None,
+                      filelist=None,
+                      variable_name='precipitationCal',
+                      name='GPM_IMERG'):
+    ''' Load multiple GPM Level 3 IMEGE files containing calibrated precipitation and generate an OCW Dataset obejct.
+    :param file_path: Directory to the HDF files to load.
+    :type file_path: :mod:`string`
+    :param filename_pattern: Path to the HDF files to load.
+    :type filename_pattern: :list:`string`
+    :param filelist: A list of filenames
+    :type filelist: :list:`string`
+    :param variable_name: The variable name to load from the HDF file.
+    :type variable_name: :mod:`string`
+    :param name: (Optional) A name for the loaded dataset.
+    :type name: :mod:`string`
+    :returns: An OCW Dataset object with the requested variable's data from
+        the HDF file.
+    :rtype: :class:`dataset.Dataset`
+    :raises ValueError:
+    '''
+
+    if not filelist:
+        GPM_files = []
+        for pattern in filename_pattern:
+            GPM_files.extend(glob(file_path + pattern))
+    else:
+        GPM_files = [line.rstrip('\n') for line in open(filelist)]
+
+    GPM_files.sort()
+
+    file_object_first = h5py.File(GPM_files[0])
+    lats = file_object_first['Grid']['lat'][:]
+    lons = file_object_first['Grid']['lon'][:]
+
+    lons, lats = numpy.meshgrid(lons, lats)
+
+    variable_unit = "mm/hr"
+
+    times = []
+    nfile = len(GPM_files)
+    for ifile, file in enumerate(GPM_files):
+        print 'Reading file '+str(ifile+1)+'/'+str(nfile), file
+        file_object = h5py.File(file)
+        time_struct_parsed = strptime(file[-39:-23],"%Y%m%d-S%H%M%S")
+        times.append(datetime(*time_struct_parsed[:6]))
+        values0= numpy.transpose(ma.masked_less(file_object['Grid'][variable_name][:], 0.))
+        values0= numpy.expand_dims(values0, axis=0)
+        if ifile == 0:
+            values = values0
+        else:
+            values = numpy.concatenate((values, values0))
+        file_object.close()
+    times = numpy.array(times)
+    return Dataset(lats, lons, times, values, variable_name, units=variable_unit, name=name)    
