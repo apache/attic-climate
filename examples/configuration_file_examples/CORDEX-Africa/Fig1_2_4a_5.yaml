@@ -1,0 +1,107 @@
+workdir: ./Kim_et_al_2013a
+output_netcdf_filename: Fig1_2_4a_5.nc
+
+# (RCMES will temporally subset data between month_start and month_end. 
+# If average_each_year is True (False), seasonal mean in each year is (not) calculated and used for metrics calculation.)
+time:
+    maximum_overlap_period: True 
+    start_time: 1990-01-01
+    end_time: 2007-12-31
+    temporal_resolution: monthly
+    month_start: 1
+    month_end: 12
+    average_each_year: False
+
+space:
+    min_lat: -45.76
+    max_lat: 42.24
+    min_lon: -24.64
+    max_lon: 60.28
+
+regrid:
+    regrid_on_reference: False
+    regrid_dlat: 0.44
+    regrid_dlon: 0.44
+
+datasets:
+    reference:
+        data_source: rcmed
+        data_name: CRU  
+        dataset_id: 10
+        parameter_id: 37
+
+    targets:
+        data_source: local
+        path: ./data/AFRICA*pr.nc                                
+        variable: pr    
+
+number_of_metrics_and_plots: 4
+
+metrics1: Map_plot_bias_of_multiyear_climatology
+
+plots1:
+    file_name: Fig1b_2a-j
+    subplots_array: !!python/tuple [3,4]
+
+metrics2: Taylor_diagram_spatial_pattern_of_multiyear_climatology
+
+plots2:
+    file_name: Fig2l
+
+metrics3: Timeseries_plot_subregion_annual_cycle
+
+plots3:
+    file_name: Fig5a-j
+    subplots_array: !!python/tuple [7,3]
+
+metrics4: Portrait_diagram_subregion_annual_cycle
+
+plots4:
+    file_name: Fig5k-l
+
+use_subregions: True 
+
+subregions:
+#subregion name (R01, R02, R03,....) followed by an array of boundaries [south, north, west, east]
+    R01:
+      [29.0, 36.5, -10.0, 0.0]
+    R02:
+      [29, 37.5, 0, 10]
+    R03:
+      [25, 32.5, 10, 20]
+    R04:
+      [25, 32.5, 20, 33]
+    R05:
+      [12, 20.0, -19.3, -10.2]
+    R06:
+      [15, 25.0, 15, 30]
+    R07:
+      [7.3, 15,  -10, 10]
+    R08:
+      [5, 7.3,  -10, 10]
+    R09:
+      [6.9, 15, 33.9, 40]
+    R10:
+      [2.2, 11.8, 44.2, 51.8]
+    R11:
+      [0, 10, 10, 25]
+    R12:
+      [-10, 0, 10, 25]
+    R13:
+      [-15, 0, 30, 40]
+    R14:
+      [-27.9, -21.4, 13.6, 20]
+    R15:
+      [-35, -27.9, 13.6, 20]
+    R16:
+      [-35, -21.4, 20, 35.7]
+    R17:
+      [-25.8, -11.7, 43.2, 50.3]
+    R18:
+      [25, 35.0, 33, 40]
+    R19:
+      [28, 35, 45, 50]
+    R20:
+      [13, 20.0, 43, 50]
+    R21:
+      [20, 27.5, 50, 58]
