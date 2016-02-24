@@ -148,24 +148,9 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
     subtask "done"
 fi
 
-# Install Continuum Analytics Anaconda Python distribution. This gives
-# almost all the dependencies that OCW needs in a single, easy to
-# install package.
-
-header "Installing Anaconda Python distribution ..."
-echo
-echo "*** NOTE *** When asked to update your PATH, you should respond YES."
-read -p "Press [ENTER] to continue ..."
-
-cd
-task "Downloading Anaconda ..."
-wget -O Anaconda-1.9.2-Linux-x86_64.sh "http://repo.continuum.io/archive/Anaconda-1.9.2-Linux-x86_64.sh" 2>> install_log
-subtask "done"
-
-task "Installing ..."
-bash Anaconda-1.9.2-Linux-x86_64.sh
-export PATH="${HOME}/anaconda/bin:$PATH"
-subtask "done"
+# Install miscellaneous Python packages with Pip.
+header "Installing additional Python packages"
+pip install -r ocw-pip-dependencies.txt >> install_log
 
 # Install Basemap. Conda cannot be used for this install since
 # it fails to analyse the dependencies (at the time of writing). This
@@ -196,11 +181,8 @@ subtask "done"
 
 cd
 
-# Install miscellaneous Python packages needed for OCW. Some of these
-# can be installed with Conda, but since none of them have an annoying
-# compiled component we just installed them with Pip.
-header "Installing additional Python packages"
-pip install -r ocw-pip-dependencies.txt >> install_log
+# Install OCW itself
+cd ${ocw_path}/.. && python setup.py install
 
 # Ensure that the climate code is included in the Python Path
 header "Updating PYTHONPATH with ocw executables ..."

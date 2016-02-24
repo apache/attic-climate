@@ -1,3 +1,5 @@
+numpy==1.10.4
+matplotlib==1.5.1
 requests==2.3.0
 bottle==0.11.6
 pydap==3.1.1
