@@ -903,7 +903,7 @@ def _rcmes_calc_average_on_new_time_unit(data, dates, unit):
     acceptable = (unit=='full')|(unit=='annual')|(unit=='monthly')|(unit=='daily')
     if not acceptable:
         print 'Error: unknown unit type selected for time averaging: EXIT'
-        return -1,-1,-1,-1
+        return -1,-1
 
     nt, ny, nx = data.shape
     if unit == 'full':
@@ -968,7 +968,7 @@ def _rcmes_calc_average_on_new_time_unit_K(data, dates, unit):
     acceptable = (unit=='full')|(unit=='annual')|(unit=='monthly')|(unit=='daily')
     if not acceptable:
         print 'Error: unknown unit type selected for time averaging: EXIT'
-        return -1,-1,-1,-1
+        return -1,-1
 
     # Calculate arrays of: annual timeseries: year (2007,2007),
     #                      monthly time series: year-month (200701,200702),
