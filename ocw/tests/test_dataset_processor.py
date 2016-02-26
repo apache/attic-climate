@@ -65,24 +65,24 @@ class TestTemporalRebin(unittest.TestCase):
         self.two_years_daily_dataset = two_year_daily_dataset()
     
     def test_monthly_to_annual_rebin(self):
-        annual_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, datetime.timedelta(days=365))
+        annual_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, 'annual')
         np.testing.assert_array_equal(annual_dataset.times, self.ten_year_annual_times)
     
     def test_monthly_to_full_rebin(self):
-        full_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, datetime.timedelta(days=3650))
+        full_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset, 'full')
         full_times = [datetime.datetime(2004, 12, 16)]
         self.assertEqual(full_dataset.times, full_times)
     
     def test_daily_to_monthly_rebin(self):
         """This test takes a really long time to run.  TODO: Figure out where the performance drag is"""
-        monthly_dataset = dp.temporal_rebin(self.two_years_daily_dataset, datetime.timedelta(days=31))
+        monthly_dataset = dp.temporal_rebin(self.two_years_daily_dataset, 'monthly')
         bins = list(set([datetime.datetime(time_reading.year, time_reading.month, 1) for time_reading in self.two_years_daily_dataset.times]))
         bins = np.array(bins)
         bins.sort()
         np.testing.assert_array_equal(monthly_dataset.times, bins)
     
     def test_daily_to_annual_rebin(self):
-        annual_dataset = dp.temporal_rebin(self.two_years_daily_dataset, datetime.timedelta(days=366))
+        annual_dataset = dp.temporal_rebin(self.two_years_daily_dataset, 'annual')
         bins = list(set([datetime.datetime(time_reading.year, 1, 1) for time_reading in self.two_years_daily_dataset.times]))
         bins = np.array(bins)
         bins.sort()
@@ -97,7 +97,7 @@ class TestTemporalRebin(unittest.TestCase):
 
     def test_variable_propagation(self):
         annual_dataset = dp.temporal_rebin(self.ten_year_monthly_dataset,
-                                           datetime.timedelta(days=365))
+                                           'annual')
         self.assertEquals(annual_dataset.name,
                           self.ten_year_monthly_dataset.name)
         self.assertEquals(annual_dataset.variable,
