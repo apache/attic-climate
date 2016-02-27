@@ -1,4 +1,4 @@
-#!/bin/bash
+
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -119,9 +119,11 @@ case $yn in
     * ) echo "Please answer yes or no.." ;;
 esac
 
-echo -n "Please specify a full path to where your OCW download is then press [ENTER] ..."
-read ocw_path
 fi
+
+# Find absolute path to the easy-ocw directory
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
 
 header "Checking for pip ..."
 command -v pip >/dev/null 2>&1 || { 
@@ -143,48 +145,47 @@ if [ $WITH_VIRTUAL_ENV == 1 ]; then
 
     # Create a new environment for OCW work
     task "Creating a new environment ..."
-    virtualenv ocw >> install_log
-    source ocw/bin/activate
+    virtualenv venv-ocw >> install_log
+    source venv-ocw/bin/activate
     subtask "done"
 fi
 
-# Install miscellaneous Python packages with Pip.
+# Install Continuum Analytics Miniconda Python distribution. This gives
+# almost all the dependencies that OCW needs in a single, easy to
+# install package.
+
+header "Installing Miniconda Python distribution ..."
+echo
+echo "*** NOTE *** When asked to update your PATH, you should respond YES and please do not change the default installation directory"
+read -p "Press [ENTER] to continue ..."
+
+
+task "Downloading Miniconda ..."
+wget -O Miniconda-latest-linux.sh "https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh" 2>> install_log
+subtask "done"
+
+task "Installing ..."
+bash Miniconda-latest-linux.sh
+subtask "done"
+
+header "Installing dependencies via conda"
+task "Reading and installing from ocw-conda-dependencies.txt"
+conda install --file ocw-conda-dependencies.txt >> install_log
+subtask "done"
+
+# Install miscellaneous Python packages needed for OCW. Some of these
+# can be installed with Conda, but since none of them have an annoying
+# compiled component we just installed them with Pip.
 header "Installing additional Python packages"
+task "Reading and installing from ocw-pip-dependencies.txt"
 pip install -r ocw-pip-dependencies.txt >> install_log
-
-# Install Basemap. Conda cannot be used for this install since
-# it fails to analyse the dependencies (at the time of writing). This
-# will install it manually. At some point, this should be replaced with
-# 'conda install basemap' once it is working again!
-header "Handling Basemap install ..."
-
-cd
-task "Downloading basemap ..."
-wget -O basemap-1.0.7.tar.gz "http://sourceforge.net/projects/matplotlib/files/matplotlib-toolkits/basemap-1.0.7/basemap-1.0.7.tar.gz/download" 2>> install_log
-tar xzf basemap-1.0.7.tar.gz >> install_log
 subtask "done"
 
-# Install GEOS
-task "Installing GEOS dependency ..."
-cd basemap-1.0.7/geos-3.3.3
-export GEOS_DIR=/usr/local
-./configure --prefix=$GEOS_DIR >> install_log
-sudo make >> install_log
-sudo make install >> install_log
-subtask "done"
-
-# Install basemap
-task "Installing Basemap ..."
+header "Installing ocw module"
 cd ..
 python setup.py install >> install_log
-subtask "done"
+subtask "finished installing ocw module"
 
-cd
+header "Installation completed. Please close the terminal and start to new one for the changes to take effect"
+header "For any issues with installation please contact dev@climate.apache.org"
 
-# Install OCW itself
-cd ${ocw_path}/.. && python setup.py install
-
-# Ensure that the climate code is included in the Python Path
-header "Updating PYTHONPATH with ocw executables ..."
-echo "export PYTHONPATH=${ocw_path}:${ocw_path}/ocw" >> ${HOME}/.bashrc
-subtask "done"
