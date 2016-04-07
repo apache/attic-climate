@@ -46,9 +46,11 @@ def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
     :param valid_var_names: The possible variable names to search for in 
         the netCDF object.
     :type valid_var_names: List of Strings
+
     :param netcdf: The netCDF Dataset object in which to check for
         valid_var_names.
     :type netcdf: netcdf4.Dataset
+
     :param netcdf_var: The relevant variable name to search over in the 
         netcdf object. This is used to narrow down the search for valid
         variable names by first checking the desired variable's dimension
@@ -118,21 +120,31 @@ def load_WRF_2d_files(file_path=None,
                       filelist=None,
                       variable_name='T2',
                       name=''):
-    ''' Load multiple WRF (or nuWRF) original output files containing 2D fields such as precipitation and surface variables into a Dataset.
+    ''' Load multiple WRF (or nuWRF) original output files containing 2D fields such 
+        as precipitation and surface variables into a Dataset.
+
     The dataset can be spatially subset.
+
     :param file_path: Directory to the NetCDF file to load.
     :type file_path: :mod:`string`
+
     :param filename_pattern: Path to the NetCDF file to load.
     :type filename_pattern: :list:`string`
+
     :param filelist: A list of filenames
     :type filelist: :list:`string`
+
     :param variable_name: The variable name to load from the NetCDF file.
     :type variable_name: :mod:`string`
+
     :param name: (Optional) A name for the loaded dataset.
     :type name: :mod:`string`
+
     :returns: An OCW Dataset object with the requested variable's data from
         the NetCDF file.
+
     :rtype: :class:`dataset.Dataset`
+
     :raises ValueError:
     '''
 
@@ -293,28 +305,37 @@ def load_multiple_files(file_path,
 
     :param file_path: directory name and common file name patterns where the NetCDF files to load are stored.
     :type file_path: :mod:`string`
+
     :param dataset_name: a name of dataset when reading a single file 
     :type dataset_name: :mod:'string'
+
     :param variable_name: The variable name to load from the NetCDF file.
     :type variable_name: :mod:`string`
+
     :param variable_unit: (Optional) The variable unit to load from the NetCDF file.
     :type variable_unit: :mod:`string`
+
     :param elevation_index: (Optional) The elevation index for which data should
         be returned. Climate data is often times 4 dimensional data. Some
         datasets will have readins at different height/elevation levels. OCW
         expects 3D data so a single layer needs to be stripped out when loading.
         By default, the first elevation layer is used. If desired you may
         specify the elevation value to use.
+
     :param lat_name: (Optional) The latitude variable name to extract from the
         dataset.
     :type lat_name: :mod:`string`
+
     :param lon_name: (Optional) The longitude variable name to extract from the
         dataset.
     :type lon_name: :mod:`string`
+
     :param time_name: (Optional) The time variable name to extract from the
         dataset.
     :type time_name: :mod:`string`
+
     :returns: An array of OCW Dataset objects, an array of dataset names
+
     :rtype: :class:`list`
     '''
 
@@ -347,17 +368,25 @@ def load_WRF_2d_files_RAIN(file_path=None,
                       filename_pattern=None,
                       filelist=None,
                       name=''):
-    ''' Load multiple WRF (or nuWRF) original output files containing 2D fields such as precipitation and surface variables into a Dataset.
+    ''' Load multiple WRF (or nuWRF) original output files containing 2D fields such as 
+    precipitation and surface variables into a Dataset.
+    
     The dataset can be spatially subset.
+
     :param file_path: Directory to the NetCDF file to load.
     :type file_path: :mod:`string`
+
     :param filename_pattern: Path to the NetCDF file to load.
     :type filename_pattern: :list:`string`
+
     :param name: (Optional) A name for the loaded dataset.
     :type name: :mod:`string`
+
     :returns: An OCW Dataset object with the requested variable's data from
         the NetCDF file.
+
     :rtype: :class:`dataset.Dataset`
+
     :raises ValueError:
     '''
 
@@ -413,34 +442,45 @@ def load_dataset_from_multiple_netcdf_files(variable_name,
                                             mask_file=None, mask_variable=None, mask_value=0):
     ''' Load multiple netCDF files from the same source (an observation or a model) into a Dataset.
     The dataset can be spatially subset.
+
     :param filelist: A text file including a list of filenames
     :type filelist: :mod:`string`
+
     :param variable_name: The variable name to load from the NetCDF file.
     :type variable_name: :mod:`string`
-    :param lat_name: (Optional) The latitude variable name to extract from the
-        dataset.
+
+    :param lat_name: (Optional) The latitude variable name to extract from the dataset.
     :type lat_name: :mod:`string`
-    :param lon_name: (Optional) The longitude variable name to extract from the
-        dataset.
+
+    :param lon_name: (Optional) The longitude variable name to extract from the dataset.
     :type lon_name: :mod:`string`
-    :param time_name: (Optional) The time variable name to extract from the
-        dataset.
+
+    :param time_name: (Optional) The time variable name to extract from the dataset.
     :type time_name: :mod:`string`
+
     :param name: (Optional) A name for the loaded dataset.
     :type name: :mod:`string`
+
     :param file_path: Directory to the NetCDF file to load.
     :type file_path: :mod:`string`
+
     :param filename_pattern: Path to the NetCDF file to load.
     :type filename_pattern: :list:`string`
+
     :param mask_file: A netcdf file with two-dimensional mask indices
     :type filelist: :mod:`string`
+
     :param mask_variable: The variable name to load from the mask_file.
     :type variable_name: :mod:`string`
+
     :param mask_value: an index for spatial subsetting a dataset 
     :type mask_value: :class:`int`
+
     :returns: An OCW Dataset object with the requested variable's data from
         the NetCDF file.
+
     :rtype: :class:`dataset.Dataset`
+
     :raises ValueError:
     '''
     nc_files = []
@@ -484,21 +524,31 @@ def load_NLDAS_forcingA_files(file_path=None,
                       filelist=None,
                       variable_name='APCPsfc_110_SFC_acc1h',
                       name=''):
-    ''' Load multiple NLDAS2 forcingAWRF files containing 2D fields such as precipitation and surface variables into a Dataset.
+    ''' Load multiple NLDAS2 forcingAWRF files containing 2D fields such as 
+    precipitation and surface variables into a Dataset.
+
     The dataset can be spatially subset.
+
     :param file_path: Directory to the NetCDF file to load.
     :type file_path: :mod:`string`
+
     :param filename_pattern: Path to the NetCDF file to load.
     :type filename_pattern: :list:`string`
+
     :param filelist: A list of filenames
     :type filelist: :list:`string`
+
     :param variable_name: The variable name to load from the NetCDF file.
     :type variable_name: :mod:`string`
+
     :param name: (Optional) A name for the loaded dataset.
     :type name: :mod:`string`
+
     :returns: An OCW Dataset object with the requested variable's data from
         the NetCDF file.
+
     :rtype: :class:`dataset.Dataset`
+
     :raises ValueError:
     '''
  
@@ -540,20 +590,29 @@ def load_GPM_IMERG_files(file_path=None,
                       filelist=None,
                       variable_name='precipitationCal',
                       name='GPM_IMERG'):
-    ''' Load multiple GPM Level 3 IMEGE files containing calibrated precipitation and generate an OCW Dataset obejct.
+    ''' Load multiple GPM Level 3 IMEGE files containing calibrated precipitation and 
+        generate an OCW Dataset obejct.
+
     :param file_path: Directory to the HDF files to load.
     :type file_path: :mod:`string`
+
     :param filename_pattern: Path to the HDF files to load.
     :type filename_pattern: :list:`string`
+
     :param filelist: A list of filenames
     :type filelist: :list:`string`
+
     :param variable_name: The variable name to load from the HDF file.
     :type variable_name: :mod:`string`
+
     :param name: (Optional) A name for the loaded dataset.
     :type name: :mod:`string`
+
     :returns: An OCW Dataset object with the requested variable's data from
         the HDF file.
+
     :rtype: :class:`dataset.Dataset`
+
     :raises ValueError:
     '''
 
