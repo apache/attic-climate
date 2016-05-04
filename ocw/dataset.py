@@ -151,15 +151,6 @@ class Dataset:
             time_resolution = 'monthly'
         elif num_days > 31:
             time_resolution = 'yearly'
-        else:
-            error = (
-                "Unable to calculate the temporal resolution for the "
-                "dataset. The number of days between two time values is "
-                "an unexpected value: " + str(num_days)
-            )
-
-            logger.error(error)
-            raise ValueError(error)
 
         return time_resolution
 
