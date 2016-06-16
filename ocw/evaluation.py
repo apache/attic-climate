@@ -363,10 +363,6 @@ def convert_evaluation_result(evaluation_result, subregion = False):
                 result = ma.zeros(result_shape)
                 for imodel in range(nmodel):
                     result[imodel,:] = evaluation_result[imodel][imetric]
-            else:
-                result = ma.zeros(nmodel)
-                for imodel in range(nmodel):
-                    result[imodel] = evaluation_result[imodel][imetric]
             results.append(result)
         return results
     else:
@@ -384,10 +380,6 @@ def convert_evaluation_result(evaluation_result, subregion = False):
                     result = ma.zeros(result_shape)
                     for imodel in range(nmodel):
                         result[imodel,:] = evaluation_result[imodel][imetric][isubregion]
-                else:
-                    result = ma.zeros(nmodel)
-                    for imodel in range(nmodel):
-                        result[imodel] = evaluation_result[imodel][imetric][isubregion]
                 subregion_results.append(result)
             results.append(subregion_results)
         return results
@@ -404,10 +396,6 @@ def convert_unary_evaluation_result(evaluation_result, subregion = False):
                 result = ma.zeros(result_shape)
                 for imodel in range(nmodel):
                     result[imodel,:] = evaluation_result[imetric][imodel]
-            else:
-                result = ma.zeros(nmodel)
-                for imodel in range(nmodel):
-                    result[imodel] = evaluation_result[imetric][imodel]
             results.append(result)
         return results
     else:
@@ -425,10 +413,6 @@ def convert_unary_evaluation_result(evaluation_result, subregion = False):
                     result = ma.zeros(result_shape)
                     for imodel in range(nmodel):
                         result[imodel,:] = evaluation_result[imetric][isubregion][imodel]
-                else:
-                    result = ma.zeros(nmodel) 
-                    for imodel in range(nmodel):
-                        result[imodel] = evaluation_result[imetric][isubregion][imodel]
                 subregion_results.append(result)
             results.append(subregion_results)
         return results
