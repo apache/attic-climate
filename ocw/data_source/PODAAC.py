@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from podaac import Podaac 
+from podaac_data_source import Podaac 
 import numpy as np
 from ocw.dataset import Dataset
 from netCDF4 import Dataset as netcdf_dataset
@@ -56,11 +56,8 @@ def load(variable ,datasetId='', datasetShortName='', bbox='', name=''):
 	# Opening the dataset using NETCDF module.
 	d = netcdf_dataset(granuleName, mode='r')
 	dataset = d[variable]
-
-
 	temp_dimensions = map(lambda x:x.lower(),dataset.dimensions)
 	dataset_dimensions = dataset.dimensions
-	
 	time = dataset_dimensions[temp_dimensions.index('time') if 'time' in temp_dimensions else 0]
 	lat = dataset_dimensions[temp_dimensions.index('lat') if 'lat' in temp_dimensions else 1]
 	lon = dataset_dimensions[temp_dimensions.index('lon') if 'lon' in temp_dimensions else 2]
@@ -69,8 +66,7 @@ def load(variable ,datasetId='', datasetShortName='', bbox='', name=''):
     # these values to datetime objects. Note that we use the main object's
     # time object and not the dataset specific reference to it. We need to
     # grab the 'units' from it and it fails on the dataset specific object.
-    times = np.array(_convert_times_to_datetime(d[time]))
-    
+	times = np.array(_convert_times_to_datetime(d[time]))
 	lats = np.array(dataset[lat][:])
 	lons = np.array(dataset[lon][:])
 	values = np.array(dataset[:])

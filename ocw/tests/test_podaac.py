@@ -16,7 +16,7 @@
 # under the License.
 
 
-import ocw.data_source.PODAAC as podaac
+import ocw.data_source.podaac
 import unittest
 import ocw.dataset as Dataset
 
