@@ -17,12 +17,12 @@
 
 package:
   name: podaacpy
-  version: "1.0.2"
+  version: "1.3.0"
 
 source:
-  fn: podaacpy-1.0.2.tar.gz
-  url: https://pypi.python.org/packages/07/67/dbcdf62cb4cf2850cc6356ec6f6490155c13e1ee79cf800ef5693b83f3e8/podaacpy-1.0.2.tar.gz
-  md5: 9395a3ec7402bbc0764675ebef2251bc
+  fn: podaacpy-1.3.0.tar.gz
+  url: https://pypi.python.org/packages/b9/4c/7c4a89f909d615370d15c850cb089755efe96992a98d2acdf94253a5b714/podaacpy-1.3.0.tar.gz
+  md5: 5157a05ae8c470c1ce78818631ad4f35
 #  patches:
    # List any patch files here
    # - fix.patch
@@ -78,7 +78,7 @@ test:
 about:
   home: https://github.com/lewismc/podaacpy
   license: Apache Software License
-  summary: 'PO.DAAC Python API'
+  summary: 'A python utility library for interacting with NASA JPLs PO.DAAC'
 
 # See
 # http://docs.continuum.io/conda/build.html for
