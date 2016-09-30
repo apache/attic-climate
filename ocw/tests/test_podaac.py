@@ -32,8 +32,10 @@ class TestPodaacDataSource(unittest.TestCase):
         cls.name = 'PO.DAAC_test_dataset'
         cls.file_path = os.path.dirname(os.path.abspath(__file__))
         cls.format = '.nc'
-        cls.dataset = podaac.load_dataset(
+        cls.dataset = podaac.load_level4_granule(
             cls.variable, cls.datasetId, cls.name)
+        cls.json = 'subset.json'
+        cls.granule_subset = podaac.subset_granule(cls.json)
 
     def test_is_dataset(self):
         self.assertTrue(isinstance(self.dataset, Dataset))
@@ -60,6 +62,9 @@ class TestPodaacDataSource(unittest.TestCase):
 
     def test_custom_name(self):
         self.assertEquals(self.dataset.name, self.name)
+
+    def test_granule_subset(self):
+        self.assertTrue()
 
 
 if __name__ == '__main__':
