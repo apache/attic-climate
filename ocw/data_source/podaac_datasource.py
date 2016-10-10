@@ -69,7 +69,7 @@ def subset_granule(input_file_path=''):
     podaac = Podaac()
     status = podaac.subset_status(podaac.granule_subset(input_file_path))
     print("Granule subsetting initiated with request tracking token '%s'." % status)
-    while status is not "200":
+    while status is not "done":
         print('...')
     return status
 
