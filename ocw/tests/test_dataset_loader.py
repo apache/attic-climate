@@ -22,7 +22,9 @@ import numpy as np
 from ocw.dataset import Dataset
 from ocw.dataset_loader import DatasetLoader
 
+
 class TestDatasetLoader(unittest.TestCase):
+
     def setUp(self):
         # Read netCDF file
         self.file_path = create_netcdf_object()
@@ -88,12 +90,14 @@ class TestDatasetLoader(unittest.TestCase):
         np.testing.assert_array_equal(self.loader.datasets[1].values,
                                       self.values2)
 
+
 def build_dataset(*args, **kwargs):
     '''
     Wrapper to Dataset constructor from fictitious 'foo' data_source.
     '''
     origin = {'source': 'foo'}
     return Dataset(*args, origin=origin, **kwargs)
+
 
 def create_netcdf_object():
     # To create the temporary netCDF file
@@ -138,7 +142,8 @@ def create_netcdf_object():
     values[:] = values_data
     # Assign time info to time variable
     netCDF_file.variables['time'].units = 'months since 2001-01-01 00:00:00'
-    netCDF_file.variables['alt_time'].units = 'months since 2001-04-01 00:00:00'
+    netCDF_file.variables[
+        'alt_time'].units = 'months since 2001-04-01 00:00:00'
     netCDF_file.variables['value'].units = 'foo_units'
     netCDF_file.close()
     return file_path

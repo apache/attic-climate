@@ -26,6 +26,7 @@ from ocw.metrics import Bias, TemporalStdDev
 
 
 class TestEvaluation(unittest.TestCase):
+
     def setUp(self):
         self.eval = Evaluation(None, [], [])
 

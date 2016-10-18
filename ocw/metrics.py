@@ -26,6 +26,7 @@ import numpy
 import numpy.ma as ma
 from scipy.stats import mstats
 
+
 class Metric(object):
     '''Base Metric Class'''
     __metaclass__ = ABCMeta
@@ -87,7 +88,8 @@ class Bias(BinaryMetric):
         :returns: The difference between the reference and target datasets.
         :rtype: :class:`numpy.ndarray`
         '''
-        return calc_bias(target_dataset.values,ref_dataset.values) 
+        return calc_bias(target_dataset.values, ref_dataset.values)
+
 
 class SpatialPatternTaylorDiagram(BinaryMetric):
     ''' Calculate the target to reference ratio of spatial standard deviation and pattern correlation'''
@@ -97,7 +99,7 @@ class SpatialPatternTaylorDiagram(BinaryMetric):
 
         .. note::
            Overrides BinaryMetric.run() 
-        
+
         :param ref_dataset: The reference dataset to use in this metric run.
         :type ref_dataset: :class:`dataset.Dataset`
 
@@ -148,7 +150,7 @@ class StdDevRatio(BinaryMetric):
 
         :returns: The standard deviation ratio of the reference and target
         '''
-       
+
         return calc_stddev_ratio(target_dataset.values, ref_dataset.values)
 
 
@@ -172,7 +174,8 @@ class PatternCorrelation(BinaryMetric):
         '''
         # stats.pearsonr returns correlation_coefficient, 2-tailed p-value
         # We only care about the correlation coefficient
-        # Docs at http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html
+        # Docs at
+        # http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.pearsonr.html
 
         return calc_correlation(target_dataset.values, ref_dataset.values)
 
@@ -205,9 +208,9 @@ class TemporalCorrelation(BinaryMetric):
         for i in numpy.arange(num_lats):
             for j in numpy.arange(num_lons):
                 coefficients[i, j] = calc_correlation(
-                        target_dataset.values[:, i, j],
-                        reference_dataset.values[:, i, j])
-        return coefficients 
+                    target_dataset.values[:, i, j],
+                    reference_dataset.values[:, i, j])
+        return coefficients
 
 
 class TemporalMeanBias(BinaryMetric):
@@ -229,7 +232,8 @@ class TemporalMeanBias(BinaryMetric):
         :returns: The mean bias between a reference and target dataset over time.
         '''
 
-        return calc_bias(target_dataset.values,ref_dataset.values, average_over_time=True) 
+        return calc_bias(target_dataset.values, ref_dataset.values, average_over_time=True)
+
 
 class RMSError(BinaryMetric):
     '''Calculate the Root Mean Square Difference (RMS Error), with the mean
@@ -255,7 +259,8 @@ class RMSError(BinaryMetric):
 
         return calc_rmse(target_dataset.values, reference_dataset.values)
 
-def calc_bias(target_array, reference_array, average_over_time = False):
+
+def calc_bias(target_array, reference_array, average_over_time=False):
     ''' Calculate difference between two arrays
 
     :param target_array: an array to be evaluated, as model output
@@ -270,19 +275,20 @@ def calc_bias(target_array, reference_array, average_over_time = False):
     :returns: Biases array of the target dataset
     :rtype: :class:'numpy.ma.core.MaskedArray'
     '''
-    
+
     bias = target_array - reference_array
     if average_over_time:
         return ma.average(bias, axis=0)
     else:
         return bias
 
+
 def calc_stddev(array, axis=None):
     ''' Calculate a sample standard deviation of an array along the array
 
     :param array: an array to calculate sample standard deviation
     :type array: :class:'numpy.ma.core.MaskedArray'
-    
+
     :param axis: Axis along which the sample standard deviation is computed.
     :type axis: 'int'
 
@@ -294,7 +300,7 @@ def calc_stddev(array, axis=None):
         return ma.std(array, axis=axis, ddof=1)
     else:
         return ma.std(array, ddof=1)
-        
+
 
 def calc_stddev_ratio(target_array, reference_array):
     ''' Calculate ratio of standard deivations of the two arrays
@@ -312,7 +318,8 @@ def calc_stddev_ratio(target_array, reference_array):
     :rtype: :class:'float'
     '''
 
-    return calc_stddev(target_array)/calc_stddev(reference_array)
+    return calc_stddev(target_array) / calc_stddev(reference_array)
+
 
 def calc_correlation(target_array, reference_array):
     '''Calculate the correlation coefficient between two arrays.
@@ -327,8 +334,9 @@ def calc_correlation(target_array, reference_array):
     :rtype: :class:'numpy.ma.core.MaskedArray'
     '''
 
-    return mstats.pearsonr(reference_array.flatten(), target_array.flatten())[0]  
-       
+    return mstats.pearsonr(reference_array.flatten(), target_array.flatten())[0]
+
+
 def calc_rmse(target_array, reference_array):
     ''' Calculate ratio of standard deivations of the two arrays
 
@@ -345,7 +353,8 @@ def calc_rmse(target_array, reference_array):
     :rtype: :class:'float'
     '''
 
-    return (ma.mean((calc_bias(target_array, reference_array))**2))**0.5 
+    return (ma.mean((calc_bias(target_array, reference_array))**2))**0.5
+
 
 def calc_histogram_overlap(hist1, hist2):
     ''' from Lee et al. (2014)
@@ -354,17 +363,18 @@ def calc_histogram_overlap(hist1, hist2):
     :param hist2: a histogram array with the same size as hist1
     :type hist2: :class:'numpy.ndarray'
     '''
-   
+
     hist1_flat = hist1.flatten()
     hist2_flat = hist2.flatten()
 
     if len(hist1_flat) != len(hist2_flat):
         err = "The two histograms have different sizes"
-        raise ValueError(err) 
+        raise ValueError(err)
     overlap = 0.
     for ii in len(hist1_flat):
         overlap = overlap + numpy.min(hist1_flat[ii], hist2_flat[ii])
     return overlap
+
 
 def calc_joint_histogram(data_array1, data_array2, bins_for_data1, bins_for_data2):
     ''' Calculate a joint histogram of two variables in data_array1 and data_array2
@@ -377,17 +387,20 @@ def calc_joint_histogram(data_array1, data_array2, bins_for_data1, bins_for_data
     :param bins_for_data2: histogram bin edges for data_array2
     :type bins_for_data2: :class:'numpy.ndarray'
     '''
-    if ma.count_masked(data_array1)!=0 or ma.count_masked(data_array2)!=0:
-        index = numpy.where((data_array1.mask == False) & (data_array2.mask==False)) 
+    if ma.count_masked(data_array1) != 0 or ma.count_masked(data_array2) != 0:
+        index = numpy.where((data_array1.mask == False) &
+                            (data_array2.mask == False))
         new_array1 = data_array1[index]
-        new_array2 = data_array2[index] 
+        new_array2 = data_array2[index]
     else:
         new_array1 = data_array1.flatten()
         new_array2 = data_array2.flatten()
 
-    histo2d, xedge, yedge = numpy.histogram2d(new_array1, new_array2, bins=[bins_for_data1, bins_for_data2])
+    histo2d, xedge, yedge = numpy.histogram2d(new_array1, new_array2, bins=[
+                                              bins_for_data1, bins_for_data2])
     return histo2d
- 
+
+
 def wet_spell_analysis(reference_array, threshold=0.1, nyear=1, dt=3.):
     ''' Characterize wet spells using sub-daily (hourly) data
 
@@ -405,29 +418,32 @@ def wet_spell_analysis(reference_array, threshold=0.1, nyear=1, dt=3.):
     '''
     nt = reference_array.shape[0]
     if reference_array.ndim == 3:
-        reshaped_array = reference_array.reshape[nt, reference_array.size/nt]
+        reshaped_array = reference_array.reshape[nt, reference_array.size / nt]
     else:
         reshaped_array = reference_array
-    xy_indices = np.where(reshaped_array.mask[0,:] == False)[0]
+    xy_indices = np.where(reshaped_array.mask[0, :] == False)[0]
 
-    nt_each_year = nt/nyear 
+    nt_each_year = nt / nyear
     spell_duration = []
     peak_rainfall = []
     total_rainfall = []
-   
+
     for index in xy_indices:
         for iyear in np.arange(nyear):
-            data0_temp = reshaped_array[nt_each_year*iyear:nt_each_year*(iyear+1),
-                                        index] 
-            # time indices when precipitation rate is smaller than the threshold [mm/hr]
-            t_index = np.where((data0_temp <= threshold) & (data0_temp.mask ==False))[0]
+            data0_temp = reshaped_array[nt_each_year * iyear:nt_each_year * (iyear + 1),
+                                        index]
+            # time indices when precipitation rate is smaller than the
+            # threshold [mm/hr]
+            t_index = np.where((data0_temp <= threshold) &
+                               (data0_temp.mask == False))[0]
             t_index = np.insert(t_index, 0, 0)
-            t_index = t_index + nt_each_year*iyear
-            for it in np.arange(t_index.size-1):
-                if t_index[it+1] - t_index[it] >1:
-                    data1_temp = data0_temp[t_index[it]+1:t_index[it+1]]
+            t_index = t_index + nt_each_year * iyear
+            for it in np.arange(t_index.size - 1):
+                if t_index[it + 1] - t_index[it] > 1:
+                    data1_temp = data0_temp[t_index[it] + 1:t_index[it + 1]]
                     if not ma.is_masked(data1_temp):
-                        spell_duration.append((t_index[it+1]-t_index[it]-1)*dt)
+                        spell_duration.append(
+                            (t_index[it + 1] - t_index[it] - 1) * dt)
                         peak_rainfall.append(data1_temp.max())
                         total_rainfall.append(data1_temp.sum())
     return np.array(spell_duration), np.array(peak_rainfall), np.array(total_rainfall)

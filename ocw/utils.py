@@ -385,13 +385,16 @@ def get_temporal_overlap(dataset_array):
 
 
 def calc_subregion_area_mean_and_std(dataset_array, subregions):
-    ''' Calculate area mean and standard deviation values for a given
+    ''' Calculate area mean and standard deviation values for a given \
         subregions using datasets on common grid points
-    :param dataset_array: An array of OCW Dataset Objects
-    :type list:
-    :param subregions: list of subregions
+
+    :param dataset_array: An array of OCW Dataset Objects \
+    :type list: :mod:'list'
+
+    :param subregions: list of subregions \
     :type subregions: :class:`numpy.ma.array`
-    :returns: area averaged time series for the dataset of shape
+
+    :returns: area averaged time series for the dataset of shape \
               (ntime, nsubregion)
     '''
 
@@ -450,6 +453,7 @@ def calc_area_weighted_spatial_average(dataset, area_weight=False):
 
     return spatial_average
 
+
 def shapefile_boundary(boundary_type, region_names):
     '''
     :param boundary_type: The type of spatial subset boundary
@@ -472,48 +476,50 @@ def shapefile_boundary(boundary_type, region_names):
     elif boundary_type == 'countries':
         for region_name in region_names:
             for iregion, region_info in enumerate(map_read.countries_info):
-                if region_info['COUNTRY'].replace(" ","").lower() == region_name.replace(" ","").lower():
+                if region_info['COUNTRY'].replace(" ", "").lower() == region_name.replace(" ", "").lower():
                     regions.append(np.array(map_read.countries[iregion]))
     return regions
+
 
 def CORDEX_boundary(domain_name):
     '''
     :param domain_name: CORDEX domain name (http://www.cordex.org/)
     :type domain_name: :mod:'string'
     '''
-    if domain_name =='southamerica':
-        return -57.61, 18.50, 254.28-360., 343.02-360.
-    elif domain_name =='centralamerica':
-        return -19.46, 34.83, 235.74-360., 337.78-360.
-    elif domain_name =='northamerica':
-        return  12.55, 75.88, 189.26-360., 336.74-360.
-    elif domain_name =='europe':
-        return  22.20, 71.84, 338.23-360., 64.4
-    elif domain_name =='africa':
-        return -45.76, 42.24, 335.36-360., 60.28
-    elif domain_name =='southasia':
+    if domain_name == 'southamerica':
+        return -57.61, 18.50, 254.28 - 360., 343.02 - 360.
+    elif domain_name == 'centralamerica':
+        return -19.46, 34.83, 235.74 - 360., 337.78 - 360.
+    elif domain_name == 'northamerica':
+        return 12.55, 75.88, 189.26 - 360., 336.74 - 360.
+    elif domain_name == 'europe':
+        return 22.20, 71.84, 338.23 - 360., 64.4
+    elif domain_name == 'africa':
+        return -45.76, 42.24, 335.36 - 360., 60.28
+    elif domain_name == 'southasia':
         return -15.23, 45.07, 19.88, 115.55
-    elif domain_name =='eastasia':
-        return  -0.10, 61.90, 51.59, 179.99
-    elif domain_name =='centralasia':
-        return  18.34, 69.37, 11.05, 139.13
-    elif domain_name =='australasia':
+    elif domain_name == 'eastasia':
+        return -0.10, 61.90, 51.59, 179.99
+    elif domain_name == 'centralasia':
+        return 18.34, 69.37, 11.05, 139.13
+    elif domain_name == 'australasia':
         return -52.36, 12.21, 89.25, 179.99
-    elif domain_name =='antartica':
-        return -89.48,-56.00, -179.00, 179.00
-    elif domain_name =='artic':
+    elif domain_name == 'antartica':
+        return -89.48, -56.00, -179.00, 179.00
+    elif domain_name == 'artic':
         return 46.06, 89.50, -179.00, 179.00
-    elif domain_name =='mediterranean':
-        return  25.63, 56.66, 339.79-360.00, 50.85
-    elif domain_name =='middleeastnorthafrica':
-        return  -7.00, 45.00, 333.00-360.00, 76.00
-    elif domain_name =='southeastasia':
-        return  -15.14, 27.26, 89.26, 146.96
+    elif domain_name == 'mediterranean':
+        return 25.63, 56.66, 339.79 - 360.00, 50.85
+    elif domain_name == 'middleeastnorthafrica':
+        return -7.00, 45.00, 333.00 - 360.00, 76.00
+    elif domain_name == 'southeastasia':
+        return -15.14, 27.26, 89.26, 146.96
     else:
         err = "Invalid CORDEX domain name"
         raise ValueError(err)
 
-def mask_using_shapefile_info(lons, lats, masked_regions, extract = True):
+
+def mask_using_shapefile_info(lons, lats, masked_regions, extract=True):
     if lons.ndim == 2 and lats.ndim == 2:
         lons_2d = lons
         lats_2d = lats
@@ -527,21 +533,23 @@ def mask_using_shapefile_info(lons, lats, masked_regions, extract = True):
         if iregion == 0:
             mask = mask0
         else:
-            mask = mask | mask0 
+            mask = mask | mask0
     if extract:
         mask = np.invert(mask)
     return mask
 
-def regrid_spatial_mask(target_lon, target_lat, mask_lon, mask_lat, mask_var, 
+
+def regrid_spatial_mask(target_lon, target_lat, mask_lon, mask_lat, mask_var,
                         user_mask_values, extract=True):
     target_lons, target_lats = convert_lat_lon_2d_array(target_lon, target_lat)
     mask_lons, mask_lats = convert_lat_lon_2d_array(mask_lon, mask_lat)
-   
+
     if target_lons != mask_lons or target_lats != mask_lats:
         mask_var_regridded = interpolate.griddata((mask_lons.flatten(), mask_lats.flatten()),
                                                   mask_var.flatten(),
-                                                  (target_lons.flatten(), target_lats.flatten()),
-                                                  method='nearest', 
+                                                  (target_lons.flatten(),
+                                                   target_lats.flatten()),
+                                                  method='nearest',
                                                   fill_value=-9999.).reshape(target_lons.shape)
     else:
         mask_var_regridded = mask_var
@@ -549,36 +557,38 @@ def regrid_spatial_mask(target_lon, target_lat, mask_lon, mask_lat, mask_var,
     mask_outside = ma.masked_equal(mask_var_regridded, -9999.).mask
     values_original = ma.array(mask_var)
     for shift in (-1, 1):
-            for axis in (0, 1):
-                q_shifted = np.roll(values_original, shift=shift, axis=axis)
-                idx = ~q_shifted.mask * values_original.mask
-                values_original.data[idx] = q_shifted[idx]
+        for axis in (0, 1):
+            q_shifted = np.roll(values_original, shift=shift, axis=axis)
+            idx = ~q_shifted.mask * values_original.mask
+            values_original.data[idx] = q_shifted[idx]
     # Make a masking map using nearest neighbour interpolation -use this to
     # determine locations with MDI and mask these
     qmdi = np.zeros_like(values_original)
     qmdi[values_original.mask == True] = 1.
     qmdi[values_original.mask == False] = 0.
     qmdi_r = map_coordinates(qmdi, [target_lats.flatten(
-     ), target_lons.flatten()], order=1).reshape(target_lons.shape)
+    ), target_lons.flatten()], order=1).reshape(target_lons.shape)
     mdimask = (qmdi_r != 0.0)
-    
+
     for value in user_mask_values:
         mask_var_regridded = ma.masked_equal(mask_var_regridded, value)
-    
+
     if extract:
         mask_out = np.invert(mask_var_regridded.mask | mdimask)
         return mask_out | mask_outside
-    else: 
-        mask_out = mask_var_regridded.mask | mdimask 
+    else:
+        mask_out = mask_var_regridded.mask | mdimask
         return mask_out | mask_outside
+
 
 def propagate_spatial_mask_over_time(data_array, mask):
     if data_array.ndim == 3 and mask.ndim == 2:
         nt = data_array.shape[0]
         for it in np.arange(nt):
             mask_original = data_array[it, :].mask
-            data_array.mask[it,:] =  mask | mask_original
-        return data_array 
+            data_array.mask[it, :] = mask | mask_original
+        return data_array
+
 
 def convert_lat_lon_2d_array(lon, lat):
     if lon.ndim == 1 and lat.ndim == 1:

@@ -29,7 +29,7 @@ import ocw.plotter as plotter
 
 # File URL leader
 FILE_LEADER = "http://zipper.jpl.nasa.gov/dist/"
-# Two Local Model Files 
+# Two Local Model Files
 FILE_1 = "AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc"
 FILE_2 = "AFRICA_UC-WRF311_CTL_ERAINT_MM_50km-rg_1989-2008_tasmax.nc"
 # Filename for the output image/plot (without file extension)
@@ -46,11 +46,13 @@ if not path.exists(FILE_2_PATH):
 """ Step 1: Load Local NetCDF Files into OCW Dataset Objects """
 print("Loading %s into an OCW Dataset Object" % (FILE_1_PATH,))
 knmi_dataset = local.load_file(FILE_1_PATH, "tasmax")
-print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" % (knmi_dataset.values.shape,))
+print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" %
+      (knmi_dataset.values.shape,))
 
 print("Loading %s into an OCW Dataset Object" % (FILE_2_PATH,))
 wrf_dataset = local.load_file(FILE_2_PATH, "tasmax")
-print("WRF_Dataset.values shape: (times, lats, lons) - %s \n" % (wrf_dataset.values.shape,))
+print("WRF_Dataset.values shape: (times, lats, lons) - %s \n" %
+      (wrf_dataset.values.shape,))
 
 """ Step 2: Temporally Rebin the Data into an Annual Timestep """
 print("Temporally Rebinning the Datasets to an Annual Timestep")
@@ -115,10 +117,10 @@ print("Generating a contour map using ocw.plotter.draw_contour_map()")
 lats = new_lats
 lons = new_lons
 fname = OUTPUT_PLOT
-gridshape = (4, 5) # 20 Years worth of plots. 20 rows in 1 column
+gridshape = (4, 5)  # 20 Years worth of plots. 20 rows in 1 column
 plot_title = "TASMAX Bias of WRF Compared to KNMI (1989 - 2008)"
 sub_titles = range(1989, 2009, 1)
 
-plotter.draw_contour_map(results, lats, lons, fname, 
-                         gridshape=gridshape, ptitle=plot_title, 
+plotter.draw_contour_map(results, lats, lons, fname,
+                         gridshape=gridshape, ptitle=plot_title,
                          subtitles=sub_titles)

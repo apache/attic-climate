@@ -26,6 +26,7 @@ import ocw.data_source.local as local
 
 
 class test_load_file(unittest.TestCase):
+
     def setUp(self):
         # Read netCDF file
         self.file_path = create_netcdf_object()
@@ -102,6 +103,7 @@ class test_load_file(unittest.TestCase):
 
 
 class TestLoadMultipleFiles(unittest.TestCase):
+
     def setUp(self):
         # Read netCDF file
         self.file_path = create_netcdf_object()
@@ -143,8 +145,8 @@ class TestLoadMultipleFiles(unittest.TestCase):
     def test_load_multiple_files_custom_dataset_name(self):
         """Test adding a custom name to a dataset"""
         dataset = local.load_multiple_files(self.file_path,
-                                                   "value",
-                                                   dataset_name='foo')
+                                            "value",
+                                            dataset_name='foo')
         self.assertEqual(dataset[0].name, 'foo')
 
     def test_dataset_origin(self):
@@ -156,6 +158,7 @@ class TestLoadMultipleFiles(unittest.TestCase):
 
 
 class TestLoadDatasetFromMultipleNetcdfFiles(unittest.TestCase):
+
     def setUp(self):
         self.file_path = create_netcdf_object()
         self.netCDF_file = netCDF4.Dataset(self.file_path, 'r+')
@@ -315,7 +318,8 @@ def create_netcdf_object():
     values[:] = values_data
     # Assign time info to time variable
     netCDF_file.variables['time'].units = 'months since 2001-01-01 00:00:00'
-    netCDF_file.variables['alt_time'].units = 'months since 2001-04-01 00:00:00'
+    netCDF_file.variables[
+        'alt_time'].units = 'months since 2001-04-01 00:00:00'
     netCDF_file.variables['value'].units = 'foo_units'
     netCDF_file.close()
     return file_path

@@ -29,6 +29,7 @@ import ocw.data_source.local as local
 from bs4 import BeautifulSoup
 import requests
 
+
 def load_dataset(dataset_id,
                  variable_name,
                  esgf_username,
@@ -104,6 +105,7 @@ def load_dataset(dataset_id,
 
     return datasets
 
+
 def _get_file_download_data(dataset_id, variable, url=DEFAULT_ESGF_SEARCH):
     ''''''
     url += '?type=File&dataset_id={}&variable={}'
@@ -129,6 +131,7 @@ def _get_file_download_data(dataset_id, variable, url=DEFAULT_ESGF_SEARCH):
                  for group in variable_groups]
 
     return zip(urls, variables)
+
 
 def _download_files(file_urls, username, password, download_directory='/tmp'):
     ''''''

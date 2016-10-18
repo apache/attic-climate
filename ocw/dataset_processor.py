@@ -208,14 +208,14 @@ def spatial_regrid(target_dataset, new_latitudes, new_longitudes,
     else:
         new_lons = new_longitudes
         new_lats = new_latitudes
-    
+
     ny_old, nx_old = lats.shape
     ny_new, nx_new = new_lats.shape
 
     for iy in np.arange(ny_old):
-        if not all(x<y for x,y in zip(lons[iy,:], lons[iy,1:])):
-            lons[iy,:][lons[iy,:] <0] = lons[iy,:][lons[iy,:] <0]+360.
-        
+        if not all(x < y for x, y in zip(lons[iy, :], lons[iy, 1:])):
+            lons[iy, :][lons[iy, :] < 0] = lons[iy, :][lons[iy, :] < 0] + 360.
+
     # Make masked array of shape (times, new_latitudes,new_longitudes)
     new_values = ma.zeros([len(target_dataset.times),
                            ny_new, nx_new])
@@ -258,7 +258,7 @@ def spatial_regrid(target_dataset, new_latitudes, new_longitudes,
                     mn = lats.min()
                     mx = lats.max()
                     new_lats_indices[iy, ix] = (
-                        ny_old - 1.) * (new_lats[iy, ix] - mn)/ (mx - mn)
+                        ny_old - 1.) * (new_lats[iy, ix] - mn) / (mx - mn)
                     mn = lons.min()
                     mx = lons.max()
                     new_lons_indices[iy, ix] = (
@@ -391,12 +391,12 @@ def subset(target_dataset, subregion, subregion_name=None, extract=True, user_ma
     if not subregion.start:
         subregion.start = target_dataset.times[0]
         subregion.end = target_dataset.times[-1]
-    
+
     if not subregion_name:
         subregion_name = target_dataset.name
 
     if hasattr(subregion, 'lat_min'):
-        _are_bounds_contained_by_dataset(target_dataset, subregion)   
+        _are_bounds_contained_by_dataset(target_dataset, subregion)
 
         if target_dataset.lats.ndim == 2 and target_dataset.lons.ndim == 2:
             start_time_index = np.where(
@@ -413,7 +413,8 @@ def subset(target_dataset, subregion, subregion_name=None, extract=True, user_ma
                     target_dataset.lons <= subregion.lon_min))
             for it in np.arange(nt):
                 target_dataset.values[it, y_index, x_index] = 1.e+20
-            target_dataset.values = ma.masked_equal(target_dataset.values, 1.e+20)
+            target_dataset.values = ma.masked_equal(
+                target_dataset.values, 1.e+20)
             return target_dataset
 
         elif target_dataset.lats.ndim == 1 and target_dataset.lons.ndim == 1:
@@ -445,22 +446,22 @@ def subset(target_dataset, subregion, subregion_name=None, extract=True, user_ma
                     dataset_slices["lon_start"]:dataset_slices["lon_end"] + 1]
             # Build new dataset with subset information
             return ds.Dataset(
-            # Slice the lats array with our calculated slice indices
+                # Slice the lats array with our calculated slice indices
                 target_dataset.lats[dataset_slices["lat_start"]:
                                     dataset_slices["lat_end"] + 1],
-            # Slice the lons array with our calculated slice indices
+                # Slice the lons array with our calculated slice indices
                 target_dataset.lons[dataset_slices["lon_start"]:
                                     dataset_slices["lon_end"] + 1],
-            # Slice the times array with our calculated slice indices
+                # Slice the times array with our calculated slice indices
                 target_dataset.times[dataset_slices["time_start"]:
                                      dataset_slices["time_end"] + 1],
-            # Slice the values array with our calculated slice indices
+                # Slice the values array with our calculated slice indices
                 subset_values,
                 variable=target_dataset.variable,
                 units=target_dataset.units,
                 name=subregion_name,
                 origin=target_dataset.origin
-                )
+            )
 
     if subregion.boundary_type == 'us_states' or subregion.boundary_type == 'countries':
         start_time_index = np.where(
@@ -469,17 +470,20 @@ def subset(target_dataset, subregion, subregion_name=None, extract=True, user_ma
         target_dataset = temporal_slice(
             target_dataset, start_time_index, end_time_index)
         nt, ny, nx = target_dataset.values.shape
-        spatial_mask = utils.mask_using_shapefile_info(target_dataset.lons, target_dataset.lats, 
-                                                       subregion.masked_regions, extract = extract)
-        target_dataset.values = utils.propagate_spatial_mask_over_time(target_dataset.values, mask=spatial_mask)
+        spatial_mask = utils.mask_using_shapefile_info(target_dataset.lons, target_dataset.lats,
+                                                       subregion.masked_regions, extract=extract)
+        target_dataset.values = utils.propagate_spatial_mask_over_time(
+            target_dataset.values, mask=spatial_mask)
         return target_dataset
-            
+
     if subregion.boundary_type == 'user':
-        spatial_mask = utils.regrid_spatial_mask(target_dataset.lons, target_dataset.lats, 
+        spatial_mask = utils.regrid_spatial_mask(target_dataset.lons, target_dataset.lats,
                                                  subregion.mask_longitude, subregion.mask_latitude, subregion.mask_variable,
-                                                 user_mask_values, extract = extract)
-        target_dataset.values = utils.propagate_spatial_mask_over_time(target_dataset.values, mask=spatial_mask)
+                                                 user_mask_values, extract=extract)
+        target_dataset.values = utils.propagate_spatial_mask_over_time(
+            target_dataset.values, mask=spatial_mask)
         return target_dataset
+
 
 def temporal_slice(target_dataset, start_time_index, end_time_index):
     '''Temporally slice given dataset(s) with subregion information. This does not
@@ -765,16 +769,17 @@ def water_flux_unit_conversion(dataset):
 
 
 def temperature_unit_conversion(dataset):
-    ''' Convert temperature units as necessary
-
+    ''' Convert temperature units as necessary \
     Automatically convert Celcius to Kelvin in the given dataset.
 
-    :param dataset: The dataset for which units should be updated.
+    :param dataset: The dataset for which units should be updated. \
     :type dataset; :class:`dataset.Dataset`
 
-    :returns: The dataset with (potentially) updated units.
+    :returns: The dataset with (potentially) updated units. \
     :rtype: :class:`dataset.Dataset`
+
     '''
+
     temperature_variables = ['temp', 'tas', 'tasmax', 'taxmin', 'T', 'tg']
     variable = dataset.variable.lower()
 
@@ -819,6 +824,7 @@ def _rcmes_normalize_datetimes(datetimes, timestep):
     :param timestep: The flag for how to normalize the datetimes.
     :type timestep: String
     """
+
     normalDatetimes = []
     if timestep.lower() == 'monthly':
         for inputDatetime in datetimes:
@@ -851,6 +857,7 @@ def mask_missing_data(dataset_array):
     the values at the grid point in all other datasets are masked.
     :param dataset_array: an array of OCW datasets
     '''
+
     mask_array = np.zeros(dataset_array[0].values.shape)
     for dataset in dataset_array:
         index = np.where(dataset.values.mask == True)
@@ -862,6 +869,7 @@ def mask_missing_data(dataset_array):
         masked_array.append(dataset)
     return [masked_dataset for masked_dataset in masked_array]
 
+
 def deseasonalize_dataset(dataset):
     '''Calculate daily climatology and subtract the climatology from
     the input dataset
@@ -872,18 +880,21 @@ def deseasonalize_dataset(dataset):
     :returns: A Dataset with values converted to new units.
     :rtype: :class:`dataset.Dataset`
     '''
-    days = [d.month*100. + d.day for d in dataset.times]
+
+    days = [d.month * 100. + d.day for d in dataset.times]
     days_sorted = np.unique(days)
     ndays = days_sorted.size
     nt, ny, nx = dataset.values.shape
     values_clim = ma.zeros([ndays, ny, nx])
     for iday, day in enumerate(days_sorted):
         t_index = np.where(days == day)[0]
-        values_clim[iday,:] = ma.mean(dataset.values[t_index,:], axis=0)
+        values_clim[iday, :] = ma.mean(dataset.values[t_index, :], axis=0)
     for iday, day in enumerate(days_sorted):
         t_index = np.where(days == day)[0]
-        dataset.values[t_index,:] = dataset.values[t_index,:] - values_clim[iday,:]
+        dataset.values[t_index, :] = dataset.values[
+            t_index, :] - values_clim[iday, :]
     return dataset
+
 
 def _rcmes_spatial_regrid(spatial_values, lat, lon, lat2, lon2, order=1):
     '''
@@ -1298,8 +1309,8 @@ def _congrid(a, newdims, method='linear', centre=False, minusone=False):
     old = np.array(a.shape)
     ndims = len(a.shape)
     if len(newdims) != ndims:
-        print("[congrid] dimensions error. " \
-              "This routine currently only supports " \
+        print("[congrid] dimensions error. "
+              "This routine currently only supports "
               "rebinning to the same number of dimensions.")
         return None
     newdims = np.asarray(newdims, dtype=float)
@@ -1353,8 +1364,8 @@ def _congrid(a, newdims, method='linear', centre=False, minusone=False):
         newa = scipy.ndimage.map_coordinates(a, newcoords)
         return newa
     else:
-        print("Congrid error: Unrecognized interpolation type.\n", \
-              "Currently only \'neighbour\', \'nearest\',\'linear\',", \
+        print("Congrid error: Unrecognized interpolation type.\n",
+              "Currently only \'neighbour\', \'nearest\',\'linear\',",
               "and \'spline\' are supported.")
         return None
 

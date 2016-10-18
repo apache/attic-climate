@@ -24,6 +24,7 @@ import datetime as dt
 
 
 class TestDatasetAttributes(unittest.TestCase):
+
     def setUp(self):
         self.lat = np.array([10, 12, 14, 16, 18])
         self.lon = np.array([100, 102, 104, 106, 108])
@@ -64,6 +65,7 @@ class TestDatasetAttributes(unittest.TestCase):
 
 
 class TestInvalidDatasetInit(unittest.TestCase):
+
     def setUp(self):
         self.lat = np.array([10, 12, 14, 16, 18])
         self.lon = np.array([100, 102, 104, 106, 108])
@@ -122,6 +124,7 @@ class TestInvalidDatasetInit(unittest.TestCase):
 
 
 class TestDatasetFunctions(unittest.TestCase):
+
     def setUp(self):
         self.lat = np.array([10, 12, 14, 16, 18])
         self.lon = np.array([100, 102, 104, 106, 108])
@@ -213,14 +216,18 @@ class TestDatasetFunctions(unittest.TestCase):
 
 
 class TestBounds(unittest.TestCase):
+
     def setUp(self):
         self.bounds_rectangular = Bounds(lat_min=-80, lat_max=80,                # Lats
-                             lon_min=-160, lon_max=160,               # Lons
-                             start=dt.datetime(2000, 1, 1),  # Start time
-                             end=dt.datetime(2002, 1, 1))  # End time
+                                         lon_min=-160, lon_max=160,               # Lons
+                                         start=dt.datetime(
+                                             2000, 1, 1),  # Start time
+                                         end=dt.datetime(2002, 1, 1))  # End time
         self.bounds_CORDEX = Bounds(boundary_type='CORDEX South Asia')
-        self.bounds_us_states = Bounds(boundary_type='us_states', us_states=['CA','NV','AZ'])
-        self.bounds_countries = Bounds(boundary_type='countries', countries=['United States','Canada','Mexico'])
+        self.bounds_us_states = Bounds(
+            boundary_type='us_states', us_states=['CA', 'NV', 'AZ'])
+        self.bounds_countries = Bounds(boundary_type='countries', countries=[
+                                       'United States', 'Canada', 'Mexico'])
 
     def test_keywords(self):
         self.assertEqual(self.bounds_rectangular.boundary_type, 'rectangular')
@@ -228,17 +235,18 @@ class TestBounds(unittest.TestCase):
         self.assertEqual(self.bounds_rectangular.lat_max, 80)
         self.assertEqual(self.bounds_rectangular.lon_min, -160)
         self.assertEqual(self.bounds_rectangular.lon_max, 160)
-        self.assertEqual(self.bounds_rectangular.start, dt.datetime(2000,1,1))
-        self.assertEqual(self.bounds_rectangular.end, dt.datetime(2002,1,1))
+        self.assertEqual(self.bounds_rectangular.start,
+                         dt.datetime(2000, 1, 1))
+        self.assertEqual(self.bounds_rectangular.end, dt.datetime(2002, 1, 1))
 
         self.assertEqual(self.bounds_CORDEX.boundary_type, 'CORDEX South Asia')
         self.assertEqual(self.bounds_CORDEX.lat_min, -15.23)
         self.assertEqual(self.bounds_CORDEX.lat_max, 45.07)
         self.assertEqual(self.bounds_CORDEX.lon_min, 19.88)
         self.assertEqual(self.bounds_CORDEX.lon_max, 115.55)
-        
+
         self.assertEqual(self.bounds_us_states.boundary_type, 'us_states')
-        
+
         self.assertEqual(self.bounds_countries.boundary_type, 'countries')
 
     # Temporal tests

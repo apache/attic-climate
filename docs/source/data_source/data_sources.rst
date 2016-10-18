@@ -22,6 +22,6 @@ ESGF Module
     :members:
 
 PODAAC Module
-===========
-.. automodule:: podaac
+=============
+.. automodule:: podaac_datasource
     :members:

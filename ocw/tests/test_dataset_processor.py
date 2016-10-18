@@ -30,6 +30,7 @@ logging.basicConfig(level=logging.CRITICAL)
 
 
 class TestTemporalSubset(unittest.TestCase):
+
     def setUp(self):
         self.ten_year_dataset = ten_year_monthly_dataset()
 
@@ -92,6 +93,7 @@ class TestTemporalSubset(unittest.TestCase):
 
 
 class TestTemporalRebinWithTimeIndex(unittest.TestCase):
+
     def setUp(self):
         self.ten_year_dataset = ten_year_monthly_dataset()
 
@@ -137,6 +139,7 @@ class TestTemporalRebinWithTimeIndex(unittest.TestCase):
 
 
 class TestVariableUnitConversion(unittest.TestCase):
+
     def setUp(self):
         self.ten_year_dataset = ten_year_monthly_dataset()
         self.ten_year_dataset.variable = 'temp'
@@ -199,6 +202,7 @@ class TestVariableUnitConversion(unittest.TestCase):
 
 
 class TestTemporalSlice(unittest.TestCase):
+
     def test_returned_dataset_times(self):
         ''' Tests returned dataset times values '''
         self.ten_year_dataset = ten_year_monthly_dataset()
@@ -224,6 +228,7 @@ class TestTemporalSlice(unittest.TestCase):
 
 
 class TestEnsemble(unittest.TestCase):
+
     def test_unequal_dataset_shapes(self):
         self.ten_year_dataset = ten_year_monthly_dataset()
         self.two_year_dataset = two_year_daily_dataset()
@@ -396,6 +401,7 @@ class TestSpatialRegrid(unittest.TestCase):
 
 
 class TestNormalizeDatasetDatetimes(unittest.TestCase):
+
     def setUp(self):
         self.monthly_dataset = ten_year_monthly_15th_dataset()
         self.daily_dataset = two_year_daily_2hr_dataset()
@@ -426,6 +432,7 @@ class TestNormalizeDatasetDatetimes(unittest.TestCase):
 
 
 class TestSubset(unittest.TestCase):
+
     def setUp(self):
         self.target_dataset = ten_year_monthly_dataset()
         self.name = 'foo'
@@ -508,6 +515,7 @@ class TestSubset(unittest.TestCase):
 
 
 class TestSafeSubset(unittest.TestCase):
+
     def setUp(self):
         lats = np.array(range(-60, 61, 1))
         lons = np.array(range(-170, 171, 1))
@@ -579,6 +587,7 @@ class TestSafeSubset(unittest.TestCase):
 
 
 class TestFailingSubset(unittest.TestCase):
+
     def setUp(self):
         self.target_dataset = ten_year_monthly_dataset()
         self.target_dataset.lats = np.array(range(-89, 88, 2))
@@ -623,6 +632,7 @@ class TestFailingSubset(unittest.TestCase):
 
 
 class TestNetCDFWrite(unittest.TestCase):
+
     def setUp(self):
         self.ds = ten_year_monthly_dataset()
         self.ds_2d = ten_year_monthly_dataset(latlon2d=True)

@@ -23,6 +23,7 @@ from ocw import plotter
 
 
 class TestNiceIntervalsFunction(unittest.TestCase):
+
     def test_nice_intervals(self):
         test_array = np.arange(0, 30)
         expected_array = np.arange(0, 30, 3)[1::]
@@ -46,6 +47,7 @@ class TestNiceIntervalsFunction(unittest.TestCase):
 
 
 class TestBestGridShapeFunction(unittest.TestCase):
+
     def test_returned_shape_small(self):
         nplots = 2
         oldshape = (2, 2)
@@ -75,6 +77,7 @@ class TestBestGridShapeFunction(unittest.TestCase):
 
 
 class TestFigshapeFunction(unittest.TestCase):
+
     def test_small_gridshape_size(self):
         gridshape = (2, 2)
         expected_width = 8.5

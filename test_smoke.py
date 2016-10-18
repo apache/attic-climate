@@ -56,8 +56,8 @@ def check_dependencies(file):
         except VersionConflict as vc:
             fail(dep)
             print("\nRequired version and installed version differ for the "
-                   "following package:\n"
-                   "Required version: " + dep)
+                  "following package:\n"
+                  "Required version: " + dep)
             dep_name = str(vc).split(' ')[0][1:]  # First element is '('
             dep_version = str(vc).split(' ')[1]
             print("Installed version: " + dep_name + "==" + dep_version)

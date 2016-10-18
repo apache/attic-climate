@@ -17,9 +17,12 @@
 
 '''
 Classes:
+
     Dataset - Container for a dataset's attributes and data.
+
     Bounds - Container for holding spatial and temporal bounds information
                 for operations on a Dataset.
+
 '''
 
 import os
@@ -117,7 +120,9 @@ class Dataset:
         :returns: The Dataset's latitudinal and longitudinal spatial resolution
             as a tuple of the form (lat_resolution, lon_resolution).
         :rtype: (:class:`float`, :class:`float`)
+
         '''
+
         if self.lats.ndim == 1 and self.lons.ndim == 1:
             sorted_lats = numpy.sort(list(set(self.lats)))
             sorted_lons = numpy.sort(list(set(self.lons)))
@@ -253,10 +258,10 @@ class Bounds(object):
     '''
 
     def __init__(self, boundary_type='rectangular',
-                       us_states=None, countries=None,
-                       user_mask_file=None, mask_variable_name=None, longitude_name=None, latitude_name=None,
-                       lat_min=-90, lat_max=90, lon_min=-180, lon_max=180,
-                       start=None, end=None):
+                 us_states=None, countries=None,
+                 user_mask_file=None, mask_variable_name=None, longitude_name=None, latitude_name=None,
+                 lat_min=-90, lat_max=90, lon_min=-180, lon_max=180,
+                 start=None, end=None):
         '''Default Bounds constructor
         :param boundary_type: The type of spatial subset boundary.
         :type boundary_type: :mod:`string'
@@ -298,34 +303,41 @@ class Bounds(object):
             self._end = None
 
         if boundary_type == 'us_states':
-            self.masked_regions = utils.shapefile_boundary(boundary_type, us_states)
+            self.masked_regions = utils.shapefile_boundary(
+                boundary_type, us_states)
         if boundary_type == 'countries':
-            self.masked_regions = utils.shapefile_boundary(boundary_type, countries)
+            self.masked_regions = utils.shapefile_boundary(
+                boundary_type, countries)
         if boundary_type == 'user':
             file_object = netCDF4.Dataset(user_mask_file)
             self.mask_variable = file_object.variables[mask_variable_name][:]
             mask_longitude = file_object.variables[longitude_name][:]
             mask_latitude = file_object.variables[latitude_name][:]
             if mask_longitude.ndim == 1 and mask_latitude.ndim == 1:
-                self.mask_longitude, self.mask_latitude = numpy.meshgrid(mask_longitude, mask_latitude)
+                self.mask_longitude, self.mask_latitude = numpy.meshgrid(
+                    mask_longitude, mask_latitude)
             elif mask_longitude.ndim == 2 and mask_latitude.ndim == 2:
                 self.mask_longitude = mask_longitude
                 self.mask_latitude = mask_latitude
         if boundary_type == 'rectangular':
-            if not (-90 <= float(lat_min) <=90) or float(lat_min) > float(lat_max):
-                error = "Attempted to set lat_min to invalid value: %s" % (lat_min)
+            if not (-90 <= float(lat_min) <= 90) or float(lat_min) > float(lat_max):
+                error = "Attempted to set lat_min to invalid value: %s" % (
+                    lat_min)
                 logger.error(error)
                 raise ValueError(error)
-            if not (-90 <= float(lat_max) <=90):
-                error = "Attempted to set lat_max to invalid value: %s" % (lat_max)
+            if not (-90 <= float(lat_max) <= 90):
+                error = "Attempted to set lat_max to invalid value: %s" % (
+                    lat_max)
                 logger.error(error)
                 raise ValueError(error)
-            if not (-180 <= float(lon_min) <=180) or float(lon_min) > float(lon_max):
-                error = "Attempted to set lon_min to invalid value: %s" % (lon_min)
+            if not (-180 <= float(lon_min) <= 180) or float(lon_min) > float(lon_max):
+                error = "Attempted to set lon_min to invalid value: %s" % (
+                    lon_min)
                 logger.error(error)
                 raise ValueError(error)
-            if not (-180 <= float(lon_max) <=180):
-                error = "Attempted to set lat_max to invalid value: %s" % (lon_max)
+            if not (-180 <= float(lon_max) <= 180):
+                error = "Attempted to set lat_max to invalid value: %s" % (
+                    lon_max)
                 logger.error(error)
                 raise ValueError(error)
 
@@ -334,7 +346,8 @@ class Bounds(object):
             self.lon_min = float(lon_min)
             self.lon_max = float(lon_max)
         if boundary_type[:6].upper() == 'CORDEX':
-            self.lat_min, self.lat_max, self.lon_min, self.lon_max = utils.CORDEX_boundary(boundary_type[6:].replace(" ","").lower())
+            self.lat_min, self.lat_max, self.lon_min, self.lon_max = utils.CORDEX_boundary(
+                boundary_type[6:].replace(" ", "").lower())
 
     @property
     def start(self):
@@ -363,4 +376,3 @@ class Bounds(object):
                 raise ValueError(error)
 
         self._end = value
-

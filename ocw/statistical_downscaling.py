@@ -20,7 +20,9 @@ import ocw.utils as utils
 import numpy as np
 from scipy.stats import percentileofscore, linregress
 
+
 class Downscaling:
+
     def __init__(self, ref_dataset, model_present, model_future):
         '''
         :param ref_dataset: The Dataset to use as the reference dataset (observation)
@@ -33,7 +35,7 @@ class Downscaling:
         self.ref_dataset = ref_dataset[~ref_dataset.mask].ravel()
         self.model_present = model_present.ravel()
         self.model_future = model_future.ravel()
-             
+
     description = "statistical downscaling methods"
 
     def Delta_addition(self):
@@ -41,12 +43,12 @@ class Downscaling:
            then add the difference to the observed distribution
 
         :returns: downscaled model_present and model_future
-        ''' 
-        ref = self.ref_dataset 
-        model_present = self.model_present 
-        model_future = self.model_future 
+        '''
+        ref = self.ref_dataset
+        model_present = self.model_present
+        model_future = self.model_future
 
-        return model_present, ref + np.mean(model_future-model_present)
+        return model_present, ref + np.mean(model_future - model_present)
 
     def Delta_correction(self):
         '''Calculate the mean difference between observation and present simulation,
@@ -58,7 +60,7 @@ class Downscaling:
         model_present = self.model_present
         model_future = self.model_future
 
-        return model_present+np.mean(ref) - np.mean(model_present), model_future + np.mean(ref) - np.mean(model_present)
+        return model_present + np.mean(ref) - np.mean(model_present), model_future + np.mean(ref) - np.mean(model_present)
 
     def Quantile_mapping(self):
         '''Remove the biases for each quantile value 
@@ -72,16 +74,16 @@ class Downscaling:
         model_future = self.model_future
         model_future_corrected = np.zeros(model_future.size)
 
-
         for ival, model_value in enumerate(model_present):
             percentile = percentileofscore(model_present, model_value)
-            model_present_corrected[ival] = np.percentile(ref, percentile) 
+            model_present_corrected[ival] = np.percentile(ref, percentile)
 
         for ival, model_value in enumerate(model_future):
             percentile = percentileofscore(model_future, model_value)
-            model_future_corrected[ival] = model_value + np.percentile(ref, percentile) - np.percentile(model_present, percentile) 
+            model_future_corrected[ival] = model_value + np.percentile(
+                ref, percentile) - np.percentile(model_present, percentile)
 
-        return model_present_corrected, model_future_corrected     
+        return model_present_corrected, model_future_corrected
 
     def Asynchronous_regression(self):
         '''Remove the biases by fitting a linear regression model with ordered observational and model datasets
@@ -94,18 +96,15 @@ class Downscaling:
         model_present = self.model_present
         model_present_sorted = np.sort(model_present)
         model_future = self.model_future
- 
-        ref = np.zeros(model_present.size)   # For linear regression, the size of reference data must be same as model data. 
+
+        # For linear regression, the size of reference data must be same as
+        # model data.
+        ref = np.zeros(model_present.size)
 
         for ival, model_value in enumerate(model_present_sorted):
             percentile = percentileofscore(model_present_sorted, model_value)
-            ref[ival] = np.percentile(ref_original, percentile)       
+            ref[ival] = np.percentile(ref_original, percentile)
 
-        slope, intercept = linregress(model_present_sorted, ref)[0:2] 
-        
-        return model_present*slope+intercept, model_future*slope+intercept
+        slope, intercept = linregress(model_present_sorted, ref)[0:2]
 
-
-
-
-
+        return model_present * slope + intercept, model_future * slope + intercept

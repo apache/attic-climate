@@ -31,13 +31,13 @@ import ocw.plotter as plotter
 import ssl
 
 if hasattr(ssl, '_create_unverified_context'):
-  ssl._create_default_https_context = ssl._create_unverified_context
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 # File URL leader
 FILE_LEADER = "http://zipper.jpl.nasa.gov/dist/"
 # This way we can easily adjust the time span of the retrievals
 YEARS = 3
-# Two Local Model Files 
+# Two Local Model Files
 MODEL = "AFRICA_KNMI-RACMO2.2b_CTL_ERAINT_MM_50km_1989-2008_tasmax.nc"
 # Filename for the output image/plot (without file extension)
 OUTPUT_PLOT = "cru_31_tmax_knmi_africa_bias_full"
@@ -51,7 +51,8 @@ else:
 """ Step 1: Load Local NetCDF File into OCW Dataset Objects """
 print("Loading %s into an OCW Dataset Object" % (MODEL,))
 knmi_dataset = local.load_file(MODEL, "tasmax")
-print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" % (knmi_dataset.values.shape,))
+print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" %
+      (knmi_dataset.values.shape,))
 
 """ Step 2: Fetch an OCW Dataset Object from the data_source.rcmed module """
 print("Working with the rcmed interface to get CRU3.1 Daily-Max Temp")
@@ -89,11 +90,12 @@ start_time = max([cru_start, knmi_start])
 # Grab the Min End Time
 end_time = min([cru_end, knmi_end])
 print("Overlap computed to be: %s to %s" % (start_time.strftime("%Y-%m-%d"),
-                                          end_time.strftime("%Y-%m-%d")))
+                                            end_time.strftime("%Y-%m-%d")))
 print("We are going to grab the first %s year(s) of data" % YEARS)
-end_time = datetime.datetime(start_time.year + YEARS, start_time.month, start_time.day)
+end_time = datetime.datetime(
+    start_time.year + YEARS, start_time.month, start_time.day)
 print("Final Overlap is: %s to %s" % (start_time.strftime("%Y-%m-%d"),
-                                          end_time.strftime("%Y-%m-%d")))
+                                      end_time.strftime("%Y-%m-%d")))
 
 print("Fetching data from RCMED...")
 cru31_dataset = rcmed.parameter_dataset(dataset_id,
@@ -106,30 +108,35 @@ cru31_dataset = rcmed.parameter_dataset(dataset_id,
                                         end_time)
 
 """ Step 3: Resample Datasets so they are the same shape """
-print("CRU31_Dataset.values shape: (times, lats, lons) - %s" % (cru31_dataset.values.shape,))
-print("KNMI_Dataset.values shape: (times, lats, lons) - %s" % (knmi_dataset.values.shape,))
+print("CRU31_Dataset.values shape: (times, lats, lons) - %s" %
+      (cru31_dataset.values.shape,))
+print("KNMI_Dataset.values shape: (times, lats, lons) - %s" %
+      (knmi_dataset.values.shape,))
 print("Our two datasets have a mis-match in time. We will subset on time to %s years\n" % YEARS)
 
 # Create a Bounds object to use for subsetting
-new_bounds = Bounds(lat_min=min_lat, lat_max=max_lat, lon_min=min_lon, lon_max=max_lon, start=start_time, end=end_time)
+new_bounds = Bounds(lat_min=min_lat, lat_max=max_lat, lon_min=min_lon,
+                    lon_max=max_lon, start=start_time, end=end_time)
 knmi_dataset = dsp.subset(knmi_dataset, new_bounds)
 
-print("CRU31_Dataset.values shape: (times, lats, lons) - %s" % (cru31_dataset.values.shape,))
-print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" % (knmi_dataset.values.shape,))
+print("CRU31_Dataset.values shape: (times, lats, lons) - %s" %
+      (cru31_dataset.values.shape,))
+print("KNMI_Dataset.values shape: (times, lats, lons) - %s \n" %
+      (knmi_dataset.values.shape,))
 
 print("Temporally Rebinning the Datasets to a Single Timestep")
-# To run FULL temporal Rebinning 
-knmi_dataset = dsp.temporal_rebin(knmi_dataset, temporal_resolution = 'full')
-cru31_dataset = dsp.temporal_rebin(cru31_dataset, temporal_resolution = 'full')
+# To run FULL temporal Rebinning
+knmi_dataset = dsp.temporal_rebin(knmi_dataset, temporal_resolution='full')
+cru31_dataset = dsp.temporal_rebin(cru31_dataset, temporal_resolution='full')
 
 print("KNMI_Dataset.values shape: %s" % (knmi_dataset.values.shape,))
 print("CRU31_Dataset.values shape: %s \n\n" % (cru31_dataset.values.shape,))
- 
+
 """ Spatially Regrid the Dataset Objects to a 1/2 degree grid """
 # Using the bounds we will create a new set of lats and lons on 0.5 degree step
 new_lons = np.arange(min_lon, max_lon, 0.5)
 new_lats = np.arange(min_lat, max_lat, 0.5)
- 
+
 # Spatially regrid datasets using the new_lats, new_lons numpy arrays
 print("Spatially Regridding the KNMI_Dataset...")
 knmi_dataset = dsp.spatial_regrid(knmi_dataset, new_lats, new_lons)
@@ -137,7 +144,7 @@ print("Spatially Regridding the CRU31_Dataset...")
 cru31_dataset = dsp.spatial_regrid(cru31_dataset, new_lats, new_lons)
 print("Final shape of the KNMI_Dataset:%s" % (knmi_dataset.values.shape, ))
 print("Final shape of the CRU31_Dataset:%s" % (cru31_dataset.values.shape, ))
- 
+
 """ Step 4:  Build a Metric to use for Evaluation - Bias for this example """
 # You can build your own metrics, but OCW also ships with some common metrics
 print("Setting up a Bias metric to use for evaluation")
@@ -152,7 +159,7 @@ print("Making the Evaluation definition")
 bias_evaluation = evaluation.Evaluation(knmi_dataset, [cru31_dataset], [bias])
 print("Executing the Evaluation using the object's run() method")
 bias_evaluation.run()
- 
+
 """ Step 6: Make a Plot from the Evaluation.results """
 # The Evaluation.results are a set of nested lists to support many different
 # possible Evaluation scenarios.
@@ -162,18 +169,20 @@ bias_evaluation.run()
 # Accessing the actual results when we have used 1 metric and 1 dataset is
 # done this way:
 print("Accessing the Results of the Evaluation run")
-results = bias_evaluation.results[0][0,:]
- 
+results = bias_evaluation.results[0][0, :]
+
 # From the bias output I want to make a Contour Map of the region
 print("Generating a contour map using ocw.plotter.draw_contour_map()")
- 
+
 lats = new_lats
 lons = new_lons
 fname = OUTPUT_PLOT
-gridshape = (1, 1)  # Using a 1 x 1 since we have a single Bias for the full time range
-plot_title = "TASMAX Bias of KNMI Compared to CRU 3.1 (%s - %s)" % (start_time.strftime("%Y/%d/%m"), end_time.strftime("%Y/%d/%m"))
+# Using a 1 x 1 since we have a single Bias for the full time range
+gridshape = (1, 1)
+plot_title = "TASMAX Bias of KNMI Compared to CRU 3.1 (%s - %s)" % (
+    start_time.strftime("%Y/%d/%m"), end_time.strftime("%Y/%d/%m"))
 sub_titles = ["Full Temporal Range"]
- 
+
 plotter.draw_contour_map(results, lats, lons, fname,
-                         gridshape=gridshape, ptitle=plot_title, 
+                         gridshape=gridshape, ptitle=plot_title,
                          subtitles=sub_titles)

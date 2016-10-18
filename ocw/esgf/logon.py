@@ -25,8 +25,8 @@ from pyesgf.logon import LogonManager
 
 from ocw.esgf.constants import JPL_MYPROXY_SERVER_DN, JPL_HOSTNAME
 
-def logon(openid, password):
 
+def logon(openid, password):
     '''
     Function to retrieve a short-term X.509 certificate that can be used to authenticate with ESGF.
     The certificate is written in the location ~/.esg/credentials.pem.

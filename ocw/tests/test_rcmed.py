@@ -27,6 +27,7 @@ import ocw.data_source.rcmed as rcmed
 
 class CustomAssertions:
     # Custom Assertions to handle Numpy Arrays
+
     def assert1DArraysEqual(self, array1, array2):
         self.assertSequenceEqual(tuple(array1), tuple(array2))
 

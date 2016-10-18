@@ -20,7 +20,7 @@ from getpass import getpass
 import ssl
 
 if hasattr(ssl, '_create_unverified_context'):
-  ssl._create_default_https_context = ssl._create_unverified_context
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 dataset_id = 'obs4MIPs.CNES.AVISO.zos.mon.v20110829|esgf-data.jpl.nasa.gov'
 variable = 'zosStderr'

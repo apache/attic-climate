@@ -21,9 +21,9 @@ from setuptools import find_packages, setup
 
 # Package data
 # ------------
-_author       = 'Apache Open Climate Workbench'
-_author_email  = 'dev@climate.apache.org'
-_classifiers  = [
+_author = 'Apache Open Climate Workbench'
+_author_email = 'dev@climate.apache.org'
+_classifiers = [
     'Environment :: Console',
     'Intended Audience :: Developers',
     'Intended Audience :: Information Technology',
@@ -36,18 +36,19 @@ _classifiers  = [
     'Topic :: Internet :: WWW/HTTP',
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
-_description  = 'Apache Open Climate Workbench'
-_download_url  = 'http://pypi.python.org/pypi/ocw/'
+_description = 'Apache Open Climate Workbench'
+_download_url = 'http://pypi.python.org/pypi/ocw/'
 _requirements = []
-_keywords     = ['climate analysis', 'workbench', 'rebinning', 'metrics', 'computation', 'visualization']
-_license      = 'Apache License, Version 2.0'
-_long_description    = 'The Apache Open Climate Workbench provides tools for the evaluation and analysis of climate models.'
-_name         = 'ocw'
-_namespaces   = []
-_test_suite    = 'ocw.tests'
-_url          = 'http://climate.apache.org/'
-_version      = '1.2.0'
-_zip_safe      = False
+_keywords = ['climate analysis', 'workbench', 'rebinning',
+             'metrics', 'computation', 'visualization']
+_license = 'Apache License, Version 2.0'
+_long_description = 'The Apache Open Climate Workbench provides tools for the evaluation and analysis of climate models.'
+_name = 'ocw'
+_namespaces = []
+_test_suite = 'ocw.tests'
+_url = 'http://climate.apache.org/'
+_version = '1.2.0'
+_zip_safe = False
 
 # Setup Metadata
 # --------------

@@ -65,6 +65,7 @@ class TestDecodeTimes(unittest.TestCase):
 
 
 class TestTimeUnitsParse(unittest.TestCase):
+
     def test_valid_parse(self):
         units = utils.parse_time_units('minutes since a made up date')
 
@@ -79,6 +80,7 @@ class TestTimeUnitsParse(unittest.TestCase):
 
 
 class TestTimeBaseParse(unittest.TestCase):
+
     def test_valid_time_base(self):
         base_time = utils.parse_time_base('days since 1988-06-10 00:00:00')
         start_time = datetime.datetime.strptime(
@@ -95,6 +97,7 @@ class TestTimeBaseParse(unittest.TestCase):
 
 
 class TestBaseTimeStringParse(unittest.TestCase):
+
     def test_valid_time_base_string_parse(self):
         base = utils.parse_base_time_string('days since 1988-06-10 00:00:00')
 
@@ -109,6 +112,7 @@ class TestBaseTimeStringParse(unittest.TestCase):
 
 
 class TestNormalizeLatLonValues(unittest.TestCase):
+
     def setUp(self):
         times = np.array([datetime.datetime(2000, x, 1) for x in range(1, 13)])
         self.lats = np.arange(-30, 30)
@@ -203,6 +207,7 @@ class TestNormalizeLatLonValues(unittest.TestCase):
 
 
 class TestGetTemporalOverlap(unittest.TestCase):
+
     def setUp(self):
         self.lat = np.array([10, 12, 14, 16, 18])
         self.lon = np.array([100, 102, 104, 106, 108])
@@ -265,6 +270,7 @@ class TestReshapeMonthlyToAnnually(unittest.TestCase):
 
 
 class TestCalcTemporalMean(unittest.TestCase):
+
     def setUp(self):
         self.lat = np.array([10, 12, 14])
         self.lon = np.array([100, 102, 104])
@@ -286,6 +292,7 @@ class TestCalcTemporalMean(unittest.TestCase):
 
 
 class TestCalcAreaWeightedSpatialAverage(unittest.TestCase):
+
     def setUp(self):
         self.lat = np.array([10, 12, 14])
         self.lon = np.array([100, 102, 104])

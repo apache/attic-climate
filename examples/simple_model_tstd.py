@@ -59,7 +59,8 @@ std = metrics.TemporalStdDev()
 # Evaluation can take in multiple targets and metrics, so we need to convert
 # our examples into Python lists.  Evaluation will iterate over the lists
 print "Making the Evaluation definition"
-# Temporal STD Metric gets one target dataset then reference dataset should be None
+# Temporal STD Metric gets one target dataset then reference dataset
+# should be None
 std_evaluation = evaluation.Evaluation(None, [knmi_dataset], [std])
 print "Executing the Evaluation using the object's run() method"
 std_evaluation.run()
@@ -80,7 +81,7 @@ print "The results are of type: %s" % type(results)
 print "Generating a contour map using ocw.plotter.draw_contour_map()"
 
 fname = OUTPUT_PLOT
-gridshape = (4, 5) # 20 Years worth of plots. 20 rows in 1 column
+gridshape = (4, 5)  # 20 Years worth of plots. 20 rows in 1 column
 plot_title = "TASMAX Temporal Standard Deviation (1989 - 2008)"
 sub_titles = range(1989, 2009, 1)
 

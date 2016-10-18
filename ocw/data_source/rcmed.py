@@ -22,7 +22,8 @@ Classes:
     https://rcmes.jpl.nasa.gov/query-api/query.php?
 '''
 
-import urllib, urllib2
+import urllib
+import urllib2
 import re
 import json
 import numpy as np
@@ -58,7 +59,7 @@ def get_parameters_metadata():
     return param_info_list
 
 
-def _make_mask_array(values, parameter_id, parameters_metadata):  
+def _make_mask_array(values, parameter_id, parameters_metadata):
     '''Created masked array to deal with missing values
 
     :param values: Numpy array of values which may contain missing values
@@ -89,7 +90,7 @@ def _reshape_values(values, unique_values):
     :type values: numpy array
     :param unique_values: Tuple of unique latitudes, longitudes and times data.
     :type unique_values: Tuple 
-    
+
     :returns: Reshaped values data
     :rtype: Numpy array
     '''
@@ -116,11 +117,12 @@ def _calculate_time(unique_times, time_step):
     '''
 
     time_format = "%Y-%m-%d %H:%M:%S"
-    unique_times = np.array([datetime.strptime(time, time_format) for time in unique_times])
-    #There is no need to sort time.
-    #This function may required still in RCMES
-    #unique_times.sort()
-    #This function should be moved to the data_process.
+    unique_times = np.array(
+        [datetime.strptime(time, time_format) for time in unique_times])
+    # There is no need to sort time.
+    # This function may required still in RCMES
+    # unique_times.sort()
+    # This function should be moved to the data_process.
 
     return unique_times
 
@@ -157,10 +159,10 @@ def _get_data(url):
     '''
 
     string = urllib2.urlopen(url)
-    data_string = string.read()    
+    data_string = string.read()
     index_of_data = re.search('data: \r\n', data_string)
     data = data_string[index_of_data.end():len(data_string)]
-    data = data.split('\r\n') 
+    data = data.split('\r\n')
 
     lats = []
     lons = []
@@ -168,15 +170,16 @@ def _get_data(url):
     values = []
     times = []
 
-    for i in range(len(data) - 1):  # Because the last row is empty, "len(data)-1" is used.
+    # Because the last row is empty, "len(data)-1" is used.
+    for i in range(len(data) - 1):
         row = data[i].split(',')
         lats.append(np.float32(row[0]))
         lons.append(np.float32(row[1]))
         # Level is not currently supported in Dataset class.
-        #levels.append(np.float32(row[2]))
+        # levels.append(np.float32(row[2]))
         times.append(row[3])
         values.append(np.float32(row[4]))
-    
+
     lats = np.array(lats)
     lons = np.array(lons)
     times = np.array(times)
@@ -259,12 +262,12 @@ def _generate_query_url(dataset_id, parameter_id, min_lat, max_lat, min_lon, max
     start_time = start_time.strftime("%Y%m%dT%H%MZ")
     end_time = end_time.strftime("%Y%m%dT%H%MZ")
 
-    query = [('datasetId',dataset_id), ('parameterId',parameter_id), ('latMin',min_lat), ('latMax',max_lat),
-             ('lonMin', min_lon), ('lonMax',max_lon), ('timeStart', start_time), ('timeEnd', end_time)]
+    query = [('datasetId', dataset_id), ('parameterId', parameter_id), ('latMin', min_lat), ('latMax', max_lat),
+             ('lonMin', min_lon), ('lonMax', max_lon), ('timeStart', start_time), ('timeEnd', end_time)]
 
     query_url = urllib.urlencode(query)
     url_request = URL + query_url
-    
+
     return url_request
 
 
@@ -310,7 +313,7 @@ def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_l
 
     :param min_lon: Minimum longitude
     :type min_lon: :class:`float`
-    
+
     :param max_lon: Maximum longitude
     :type max_lon: :class:`float`
 
@@ -326,10 +329,12 @@ def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_l
     :returns: An OCW Dataset object contained the requested data from RCMED.
     :rtype: :class:`dataset.Dataset`
     '''
-    
+
     parameters_metadata = get_parameters_metadata()
-    parameter_name, time_step, _, _, _, _, parameter_units = _get_parameter_info(parameters_metadata, parameter_id)
-    url = _generate_query_url(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_lon, start_time, end_time, time_step)
+    parameter_name, time_step, _, _, _, _, parameter_units = _get_parameter_info(
+        parameters_metadata, parameter_id)
+    url = _generate_query_url(dataset_id, parameter_id, min_lat,
+                              max_lat, min_lon, max_lon, start_time, end_time, time_step)
     lats, lons, times, values = _get_data(url)
 
     unique_lats_lons_times = _make_unique(lats, lons, times)
@@ -342,7 +347,7 @@ def parameter_dataset(dataset_id, parameter_id, min_lat, max_lat, min_lon, max_l
         'dataset_id': dataset_id,
         'parameter_id': parameter_id
     }
-    
+
     return Dataset(unique_lats_lons_times[0],
                    unique_lats_lons_times[1],
                    unique_times,

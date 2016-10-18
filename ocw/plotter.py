@@ -27,6 +27,7 @@ import numpy.ma as ma
 # Set the default colormap to coolwarm
 mpl.rc('image', cmap='coolwarm')
 
+
 def set_cmap(name):
     '''
     Sets the default colormap (eg when setting cmap=None in a function)
@@ -42,6 +43,7 @@ def set_cmap(name):
     # the cmap rc value improperly
     cmap = plt.get_cmap(name)
     mpl.rc('image', cmap=cmap.name)
+
 
 def _nice_intervals(data, nlevs):
     '''
@@ -63,15 +65,15 @@ def _nice_intervals(data, nlevs):
     data = data.ravel()
     mn = mstats.scoreatpercentile(data, 5)
     mx = mstats.scoreatpercentile(data, 95)
-    #if there min less than 0 and
-    # or max more than 0 
-    #put 0 in center of color bar
+    # if there min less than 0 and
+    # or max more than 0
+    # put 0 in center of color bar
     if mn < 0 and mx > 0:
         level = max(abs(mn), abs(mx))
         mnlvl = -1 * level
         mxlvl = level
-    #if min is larger than 0 then
-    #have color bar between min and max
+    # if min is larger than 0 then
+    # have color bar between min and max
     else:
         mnlvl = mn
         mxlvl = mx
@@ -102,7 +104,8 @@ def _best_grid_shape(nplots, oldshape):
     size = nrows * ncols
     diff = size - nplots
     if diff < 0:
-        raise ValueError('gridshape=(%d, %d): Cannot fit enough subplots for data' %(nrows, ncols))
+        raise ValueError(
+            'gridshape=(%d, %d): Cannot fit enough subplots for data' % (nrows, ncols))
     else:
         # If the user enters an excessively large number of
         # rows and columns for gridshape, automatically
@@ -119,6 +122,7 @@ def _best_grid_shape(nplots, oldshape):
 
         newshape = nrows, ncols
         return newshape
+
 
 def _fig_size(gridshape, aspect=None):
     '''
@@ -149,8 +153,9 @@ def _fig_size(gridshape, aspect=None):
 
     return width, height
 
+
 def draw_taylor_diagram(results, names, refname, fname, fmt='png',
-                        gridshape=(1,1), ptitle='', subtitles=None,
+                        gridshape=(1, 1), ptitle='', subtitles=None,
                         pos='upper right', frameon=True, radmax=1.5):
     ''' Draw a Taylor diagram.
 
@@ -176,7 +181,7 @@ def draw_taylor_diagram(results, names, refname, fname, fmt='png',
 
     :param ptitle: (Optional) plot title.
     :type ptitle: :mod:`string`
-    
+
     :param subtitles: (Optional) list of strings specifying the title for each
         subplot.
     :type subtitles: :class:`list` of :mod:`string`
@@ -212,7 +217,8 @@ def draw_taylor_diagram(results, names, refname, fname, fmt='png',
         rect = str(rect[0]) + str(rect[1]) + str(rect[2])
 
         # Create Taylor Diagram object
-        dia = TaylorDiagram(1, fig=fig, rect=rect, label=refname, radmax=radmax)
+        dia = TaylorDiagram(1, fig=fig, rect=rect,
+                            label=refname, radmax=radmax)
         for i, (stddev, corrcoef) in enumerate(data):
             dia.add_sample(stddev, corrcoef, marker='$%d$' % (i + 1), ms=6,
                            label=names[i])
@@ -230,8 +236,9 @@ def draw_taylor_diagram(results, names, refname, fname, fmt='png',
     # Add title and save the figure
     fig.suptitle(ptitle)
     plt.tight_layout(.05, .05)
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
+
 
 def draw_subregions(subregions, lats, lons, fname, fmt='png', ptitle='',
                     parallels=None, meridians=None, subregion_masks=None):
@@ -301,9 +308,11 @@ def draw_subregions(subregions, lats, lons, fname, fmt='png', ptitle='',
         dlatlon = np.round(length, decimals=-1)
 
     if meridians is None:
-        meridians = np.r_[np.arange(0, -180, -dlatlon)[::-1], np.arange(0, 180, dlatlon)]
+        meridians = np.r_[
+            np.arange(0, -180, -dlatlon)[::-1], np.arange(0, 180, dlatlon)]
     if parallels is None:
-        parallels = np.r_[np.arange(0, -90, -dlatlon)[::-1], np.arange(0, 90, dlatlon)]
+        parallels = np.r_[np.arange(0, -90, -dlatlon)
+                          [::-1], np.arange(0, 90, dlatlon)]
 
     # Draw parallels / meridians
     m.drawmeridians(meridians, labels=[0, 0, 0, 1], linewidth=.75, fontsize=10)
@@ -336,14 +345,16 @@ def draw_subregions(subregions, lats, lons, fname, fmt='png', ptitle='',
 
         # Label the subregion
         xm, ym = x.mean(), y.mean()
-        m.plot(xm, ym, marker='$%s$' %("R"+str(i+1)), markersize=12, color='k')
+        m.plot(xm, ym, marker='$%s$' %
+               ("R" + str(i + 1)), markersize=12, color='k')
 
     # Add the title
     ax.set_title(ptitle)
 
     # Save the figure
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
+
 
 def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
                      xlabel='', ylabel='', ptitle='', subtitles=None,
@@ -372,7 +383,7 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
 
     :param xlabel: (Optional) x-axis title.
     :type xlabel: :mod:`string`
-    
+
     :param ylabel: (Optional) y-axis title.
     :type ylabel: :mod:`string`
 
@@ -381,7 +392,7 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
 
     :param subtitles: (Optional) list of titles for each subplot.
     :type subtitles: :class:`list` of :mod:`string`
-    
+
     :param label_month: (Optional) flag to toggle drawing month labels on the
         x-axis.
     :type label_month: :class:`bool`
@@ -389,7 +400,7 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     :param yscale: (Optional) y-axis scale value, 'linear' for linear and 'log'
         for log base 10.
     :type yscale: :mod:`string`
-    
+
     :param aspect: (Optional) approximate aspect ratio of each subplot
         (width / height). Default is 8.5 / 5.5
     :type aspect: :class:`float`
@@ -458,7 +469,8 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
 
     # Create a master axes rectangle for figure wide labels
     fax = fig.add_subplot(111, frameon=False)
-    fax.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    fax.tick_params(labelcolor='none', top='off',
+                    bottom='off', left='off', right='off')
     fax.set_ylabel(ylabel)
     fax.set_title(ptitle, fontsize=16)
     fax.title.set_y(1.04)
@@ -470,7 +482,7 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     cax.set_xticks([])
     cax.set_yticks([])
     cax.legend((lines), labels, loc='upper center', ncol=10, fontsize='small',
-                   mode='expand', frameon=False)
+               mode='expand', frameon=False)
 
     # Note that due to weird behavior by axes_grid, it is more convenient to
     # place the x-axis label relative to the colorbar axes instead of the
@@ -485,11 +497,12 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
             xtick.set_rotation(30)
 
     # Save the figure
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
 
-def draw_barchart(results, yvalues, fname, ptitle='', fmt='png', 
-                     xlabel='', ylabel=''):
+
+def draw_barchart(results, yvalues, fname, ptitle='', fmt='png',
+                  xlabel='', ylabel=''):
     ''' Draw a barchart.
 
     :param results: 1D array of  data.
@@ -509,36 +522,38 @@ def draw_barchart(results, yvalues, fname, ptitle='', fmt='png',
 
     :param xlabel: (Optional) x-axis title.
     :type xlabel: :mod:`string`
-    
+
     :param ylabel: (Optional) y-axis title.
     :type ylabel: :mod:`string`
 
     '''
 
-    y_pos = list(range(len(yvalues))) 
-    fig = plt.figure() 
+    y_pos = list(range(len(yvalues)))
+    fig = plt.figure()
     fig.set_size_inches((11., 8.5))
     fig.dpi = 300
     ax = plt.subplot(111)
     plt.barh(y_pos, results, align="center", height=0.8, linewidth=0)
     plt.yticks(y_pos, yvalues)
-    plt.tick_params(axis="both", which="both", bottom="on", top="off",labelbottom="on", left="off", right="off", labelleft="on")
+    plt.tick_params(axis="both", which="both", bottom="on", top="off",
+                    labelbottom="on", left="off", right="off", labelleft="on")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
-    ymin = min(y_pos) 
+    ymin = min(y_pos)
     ymax = max(y_pos)
-    ymin = min((ymin - ((ymax - ymin) * 0.1)/2),0.5) 
+    ymin = min((ymin - ((ymax - ymin) * 0.1) / 2), 0.5)
     ymax = ymax + ((ymax - ymin) * 0.1)
     ax.set_ylim((ymin, ymax))
     plt.xlabel(xlabel)
     plt.tight_layout()
-       
+
     # Save the figure
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
 
-def draw_marker_on_map(lat, lon, fname, fmt='png', location_name=' ',gridshape=(1,1)):
+
+def draw_marker_on_map(lat, lon, fname, fmt='png', location_name=' ', gridshape=(1, 1)):
     '''
     Purpose::
         Draw a marker on a map
@@ -547,31 +562,34 @@ def draw_marker_on_map(lat, lon, fname, fmt='png', location_name=' ',gridshape=(
         lat - latitude for plotting a marker
         lon - longitude for plotting a marker
         fname  - a string specifying the filename of the plot
-    '''   
+    '''
     fig = plt.figure()
     fig.dpi = 300
     ax = fig.add_subplot(111)
-    
-    m = Basemap(projection='cyl', resolution = 'c', llcrnrlat =lat-30, urcrnrlat = lat+30, llcrnrlon = lon-60, urcrnrlon = lon+60)
+
+    m = Basemap(projection='cyl', resolution='c', llcrnrlat=lat -
+                30, urcrnrlat=lat + 30, llcrnrlon=lon - 60, urcrnrlon=lon + 60)
     m.drawcoastlines(linewidth=1)
     m.drawcountries(linewidth=1)
     m.drawmapboundary(fill_color='aqua')
-    m.fillcontinents(color='coral',lake_color='aqua')
+    m.fillcontinents(color='coral', lake_color='aqua')
     m.ax = ax
-   
-    xpt,ypt = m(lon,lat)
-    m.plot(xpt,ypt,'bo')  # plot a blue dot there
+
+    xpt, ypt = m(lon, lat)
+    m.plot(xpt, ypt, 'bo')  # plot a blue dot there
     # put some text next to the dot, offset a little bit
     # (the offset is in map projection coordinates)
-    plt.text(xpt+0.5, ypt+1.5,location_name+'\n(lon: %5.1f, lat: %3.1f)' % (lon, lat)) 
-                       
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    plt.text(xpt + 0.5, ypt + 1.5, location_name +
+             '\n(lon: %5.1f, lat: %3.1f)' % (lon, lat))
+
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
+
 
 def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
                      clabel='', ptitle='', subtitles=None, cmap=None,
                      clevs=None, nlevs=10, parallels=None, meridians=None,
-                     extend='neither', aspect=8.5/2.5):
+                     extend='neither', aspect=8.5 / 2.5):
     ''' Draw a multiple panel contour map plot.
 
     :param dataset: 3D array of data to be plotted with shape (nT, nLat, nLon).
@@ -609,7 +627,7 @@ def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
 
     :param clevs: (Optional) contour levels values.
     :type clevs: :class:`list` of :class:`int` or :class:`float`
-    
+
     :param nlevs: (Optional) target number of contour levels if clevs is None.
     :type nlevs: :class:`int`
 
@@ -667,8 +685,8 @@ def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
     lonmax = lons.max()
     latmin = lats.min()
     latmax = lats.max()
-    m = Basemap(projection = 'cyl', llcrnrlat = latmin, urcrnrlat = latmax,
-                llcrnrlon = lonmin, urcrnrlon = lonmax, resolution = 'l')
+    m = Basemap(projection='cyl', llcrnrlat=latmin, urcrnrlat=latmax,
+                llcrnrlon=lonmin, urcrnrlon=lonmax, resolution='l')
 
     # Convert lats and lons to projection coordinates
     if lats.ndim == 1 and lons.ndim == 1:
@@ -692,11 +710,13 @@ def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
     elif length <= 5:
         dlatlon = 5
     else:
-        dlatlon = np.round(length, decimals = -1)
+        dlatlon = np.round(length, decimals=-1)
     if meridians is None:
-        meridians = np.r_[np.arange(0, -180, -dlatlon)[::-1], np.arange(0, 180, dlatlon)]
+        meridians = np.r_[
+            np.arange(0, -180, -dlatlon)[::-1], np.arange(0, 180, dlatlon)]
     if parallels is None:
-        parallels = np.r_[np.arange(0, -90, -dlatlon)[::-1], np.arange(0, 90, dlatlon)]
+        parallels = np.r_[np.arange(0, -90, -dlatlon)
+                          [::-1], np.arange(0, 90, dlatlon)]
 
     x, y = m(lons, lats)
     for i, ax in enumerate(grid):
@@ -720,7 +740,8 @@ def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
             ax.set_title(subtitles[i], fontsize='small')
 
     # Add colorbar
-    cbar = fig.colorbar(cs, cax=ax.cax, drawedges=True, orientation='horizontal', extendfrac='auto')
+    cbar = fig.colorbar(cs, cax=ax.cax, drawedges=True,
+                        orientation='horizontal', extendfrac='auto')
     cbar.set_label(clabel)
     cbar.set_ticks(clevs)
     cbar.ax.tick_params(labelsize=6)
@@ -739,8 +760,9 @@ def draw_contour_map(dataset, lats, lons, fname, fmt='png', gridshape=(1, 1),
 
     # Add figure title
     fig.suptitle(ptitle, y=ymax + .06, fontsize=16)
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
+
 
 def draw_portrait_diagram(results, rowlabels, collabels, fname, fmt='png',
                           gridshape=(1, 1), xlabel='', ylabel='', clabel='',
@@ -761,7 +783,7 @@ def draw_portrait_diagram(results, rowlabels, collabels, fname, fmt='png',
 
     :param fname: Filename of the plot.
     :type fname: :mod:`string`
-    
+
     :param fmt: (Optional) filetype for the output.
     :type fmt: :mod:`string`
 
@@ -817,7 +839,8 @@ def draw_portrait_diagram(results, rowlabels, collabels, fname, fmt='png',
     # the input data too
     prows, pcols = results.shape[1:]
     if len(rowlabels) != prows or len(collabels) != pcols:
-        raise ValueError('rowlabels and collabels must have %d and %d elements respectively' %(prows, pcols))
+        raise ValueError(
+            'rowlabels and collabels must have %d and %d elements respectively' % (prows, pcols))
 
     # Set up the figure
     width, height = _fig_size(gridshape)
@@ -853,7 +876,8 @@ def draw_portrait_diagram(results, rowlabels, collabels, fname, fmt='png',
     # Do the plotting
     for i, ax in enumerate(grid):
         data = results[i]
-        cs = ax.matshow(data, cmap=cmap, aspect='auto', origin='lower', norm=norm)
+        cs = ax.matshow(data, cmap=cmap, aspect='auto',
+                        origin='lower', norm=norm)
 
         # Add grid lines
         ax.xaxis.set_ticks(np.arange(data.shape[1] + 1))
@@ -873,11 +897,12 @@ def draw_portrait_diagram(results, rowlabels, collabels, fname, fmt='png',
         # Add axes title
         if subtitles is not None:
             ax.text(0.5, 1.04, subtitles[i], va='center', ha='center',
-                    transform = ax.transAxes, fontsize='small')
+                    transform=ax.transAxes, fontsize='small')
 
     # Create a master axes rectangle for figure wide labels
     fax = fig.add_subplot(111, frameon=False)
-    fax.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    fax.tick_params(labelcolor='none', top='off',
+                    bottom='off', left='off', right='off')
     fax.set_ylabel(ylabel)
     fax.set_title(ptitle, fontsize=16)
     fax.title.set_y(1.04)
@@ -899,8 +924,9 @@ def draw_portrait_diagram(results, rowlabels, collabels, fname, fmt='png',
     cax.title.set_y(1.5)
 
     # Save the figure
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)
     fig.clf()
+
 
 class TaylorDiagram(object):
     """ Taylor diagram helper class
@@ -929,18 +955,18 @@ class TaylorDiagram(object):
         tr = PolarAxes.PolarTransform()
 
         # Correlation labels
-        rlocs = np.concatenate((np.arange(10)/10.,[0.95,0.99]))
+        rlocs = np.concatenate((np.arange(10) / 10., [0.95, 0.99]))
         tlocs = np.arccos(rlocs)        # Conversion to polar angles
         gl1 = GF.FixedLocator(tlocs)    # Positions
-        tf1 = GF.DictFormatter(dict(zip(tlocs, map(str,rlocs))))
+        tf1 = GF.DictFormatter(dict(zip(tlocs, map(str, rlocs))))
 
         # Standard deviation axis extent
         self.smin = 0
-        self.smax = radmax*self.refstd
+        self.smax = radmax * self.refstd
 
         ghelper = FA.GridHelperCurveLinear(tr,
-                                           extremes=(0,np.pi/2, # 1st quadrant
-                                                     self.smin,self.smax),
+                                           extremes=(0, np.pi / 2,  # 1st quadrant
+                                                     self.smin, self.smax),
                                            grid_locator1=gl1,
                                            tick_formatter1=tf1,
                                            )
@@ -958,7 +984,7 @@ class TaylorDiagram(object):
         ax.axis["top"].label.set_axis_direction("top")
         ax.axis["top"].label.set_text("Correlation")
 
-        ax.axis["left"].set_axis_direction("bottom") # "X axis"
+        ax.axis["left"].set_axis_direction("bottom")  # "X axis"
         ax.axis["left"].label.set_text("Standard deviation")
 
         ax.axis["right"].set_axis_direction("top")   # "Y axis"
@@ -977,9 +1003,9 @@ class TaylorDiagram(object):
         # print "Reference std:", self.refstd
         l, = self.ax.plot([0], self.refstd, 'k*',
                           ls='', ms=10, label=label)
-        t = np.linspace(0, np.pi/2)
+        t = np.linspace(0, np.pi / 2)
         r = np.zeros_like(t) + self.refstd
-        self.ax.plot(t,r, 'k--', label='_')
+        self.ax.plot(t, r, 'k--', label='_')
 
         # Collect sample points for latter use (e.g. legend)
         self.samplePoints = [l]
@@ -990,7 +1016,7 @@ class TaylorDiagram(object):
         command."""
 
         l, = self.ax.plot(np.arccos(corrcoef), stddev,
-                          *args, **kwargs) # (theta,radius)
+                          *args, **kwargs)  # (theta,radius)
         self.samplePoints.append(l)
 
         return l
@@ -998,10 +1024,11 @@ class TaylorDiagram(object):
     def add_rms_contours(self, levels=5, **kwargs):
         """Add constant centered RMS difference contours."""
 
-        rs,ts = np.meshgrid(np.linspace(self.smin,self.smax),
-                            np.linspace(0,np.pi/2))
+        rs, ts = np.meshgrid(np.linspace(self.smin, self.smax),
+                             np.linspace(0, np.pi / 2))
         # Compute centered RMS difference
-        rms = np.sqrt(self.refstd**2 + rs**2 - 2*self.refstd*rs*np.cos(ts))
+        rms = np.sqrt(self.refstd**2 + rs**2 - 2 *
+                      self.refstd * rs * np.cos(ts))
 
         contours = self.ax.contour(ts, rs, rms, levels, **kwargs)
 
@@ -1011,16 +1038,17 @@ class TaylorDiagram(object):
 
         t = np.linspace(np.arccos(corr1), np.arccos(corr2))
         r = np.zeros_like(t) + std
-        return self.ax.plot(t,r,'red', linewidth=2)
+        return self.ax.plot(t, r, 'red', linewidth=2)
 
-    def add_contours(self,std1,corr1,std2,corr2, **kwargs):
+    def add_contours(self, std1, corr1, std2, corr2, **kwargs):
         """Add a line between two points
         [std1, corr1] and [std2, corr2]"""
 
         t = np.linspace(np.arccos(corr1), np.arccos(corr2))
         r = np.linspace(std1, std2)
 
-        return self.ax.plot(t,r,'red',linewidth=2)
+        return self.ax.plot(t, r, 'red', linewidth=2)
+
 
 def draw_histogram(dataset_array, data_names, fname, fmt='png', nbins=10):
     '''
@@ -1032,25 +1060,25 @@ def draw_histogram(dataset_array, data_names, fname, fmt='png', nbins=10):
         data_names    - a list of data names  ['name1','name2',....]
         fname  - a string specifying the filename of the plot
         bins - number of bins
-    '''    
+    '''
     fig = plt.figure()
     fig.dpi = 300
     ndata = len(dataset_array)
-   
+
     data_min = 500.
     data_max = 0.
- 
-    for data in dataset_array:
-        data_min = np.min([data_min,data.min()]) 
-        data_max = np.max([data_max,data.max()]) 
 
-    bins = np.linspace(np.round(data_min), np.round(data_max+1), nbins)
-    for idata,data in enumerate(dataset_array):
-        ax = fig.add_subplot(ndata, 1, idata+1)
-        ax.hist(data, bins, alpha = 0.5, label=data_names[idata], normed = True)
+    for data in dataset_array:
+        data_min = np.min([data_min, data.min()])
+        data_max = np.max([data_max, data.max()])
+
+    bins = np.linspace(np.round(data_min), np.round(data_max + 1), nbins)
+    for idata, data in enumerate(dataset_array):
+        ax = fig.add_subplot(ndata, 1, idata + 1)
+        ax.hist(data, bins, alpha=0.5, label=data_names[idata], normed=True)
         leg = ax.legend()
         leg.get_frame().set_alpha(0.5)
-        ax.set_xlim([data_min-(data_max-data_min)*0.15, data_max+(data_max-data_min)*0.15])
-        
-    fig.savefig('%s.%s' %(fname, fmt), bbox_inches='tight', dpi=fig.dpi)
- 
+        ax.set_xlim([data_min - (data_max - data_min) * 0.15,
+                     data_max + (data_max - data_min) * 0.15])
+
+    fig.savefig('%s.%s' % (fname, fmt), bbox_inches='tight', dpi=fig.dpi)

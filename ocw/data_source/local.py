@@ -16,7 +16,7 @@
 # under the License.
 
 import calendar
-from datetime import timedelta ,datetime
+from datetime import timedelta, datetime
 from time import strptime
 from glob import glob
 import re
@@ -113,6 +113,7 @@ def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
     )
     raise ValueError(error)
 
+
 def load_WRF_2d_files(file_path=None,
                       filename_pattern=None,
                       filelist=None,
@@ -154,18 +155,19 @@ def load_WRF_2d_files(file_path=None,
     WRF_files.sort()
 
     file_object_first = netCDF4.Dataset(WRF_files[0])
-    lats = file_object_first.variables['XLAT'][0,:]
-    lons = file_object_first.variables['XLONG'][0,:]
+    lats = file_object_first.variables['XLAT'][0, :]
+    lons = file_object_first.variables['XLONG'][0, :]
 
     times = []
     nfile = len(WRF_files)
     for ifile, file in enumerate(WRF_files):
-        print('Reading file '+str(ifile+1)+'/'+str(nfile), file)
+        print('Reading file ' + str(ifile + 1) + '/' + str(nfile), file)
         file_object = netCDF4.Dataset(file)
-        time_struct_parsed = strptime(file[-19:],"%Y-%m-%d_%H:%M:%S")
+        time_struct_parsed = strptime(file[-19:], "%Y-%m-%d_%H:%M:%S")
         for ihour in numpy.arange(24):
-            times.append(datetime(*time_struct_parsed[:6]) + timedelta(hours=ihour))
-        values0= file_object.variables[variable_name][:]
+            times.append(
+                datetime(*time_struct_parsed[:6]) + timedelta(hours=ihour))
+        values0 = file_object.variables[variable_name][:]
         if ifile == 0:
             values = values0
             variable_unit = file_object.variables[variable_name].units
@@ -175,9 +177,10 @@ def load_WRF_2d_files(file_path=None,
     times = numpy.array(times)
     return Dataset(lats, lons, times, values, variable_name, units=variable_unit, name=name)
 
+
 def load_file(file_path,
               variable_name,
-              variable_unit = None,
+              variable_unit=None,
               elevation_index=0,
               name='',
               lat_name=None,
@@ -229,14 +232,14 @@ def load_file(file_path,
     try:
         netcdf = netCDF4.Dataset(file_path, mode='r')
     except IOError:
-        err = "Dataset filepath '%s' is invalid. Please ensure it is correct." %file_path
+        err = "Dataset filepath '%s' is invalid. Please ensure it is correct." % file_path
         raise ValueError(err)
     except:
         err = (
             "The given file '%s' cannot be loaded. Either the path is invalid or the given file is invalid. "
             "Please ensure that it is a valid "
             "NetCDF file. If problems persist, report them to the project's "
-            "mailing list." %file_path
+            "mailing list." % file_path
         )
         raise ValueError(err)
 
@@ -245,7 +248,8 @@ def load_file(file_path,
     if lon_name is None:
         lon_name = _get_netcdf_variable_name(LON_NAMES, netcdf, variable_name)
     if time_name is None:
-        time_name = _get_netcdf_variable_name(TIME_NAMES, netcdf, variable_name)
+        time_name = _get_netcdf_variable_name(
+            TIME_NAMES, netcdf, variable_name)
 
     lats = netcdf.variables[lat_name][:]
     lons = netcdf.variables[lon_name][:]
@@ -271,13 +275,13 @@ def load_file(file_path,
 
         # Strip out the elevation values so we're left with a 3D array.
         if level_index == 0:
-            values = values [elevation_index,:,:,:]
+            values = values[elevation_index, :, :, :]
         elif level_index == 1:
-            values = values [:,elevation_index,:,:]
+            values = values[:, elevation_index, :, :]
         elif level_index == 2:
-            values = values [:,:,elevation_index,:]
-        else: #pragma: no cover
-            values = values [:,:,:,elevation_index]
+            values = values[:, :, elevation_index, :]
+        else:  # pragma: no cover
+            values = values[:, :, :, elevation_index]
 
     origin = {
         'source': 'local',
@@ -286,10 +290,12 @@ def load_file(file_path,
         'lon_name': lon_name,
         'time_name': time_name
     }
-    if elevation_index != 0: origin['elevation_index'] = elevation_index
+    if elevation_index != 0:
+        origin['elevation_index'] = elevation_index
 
     return Dataset(lats, lons, times, values, variable=variable_name,
                    units=variable_unit, name=name, origin=origin)
+
 
 def load_multiple_files(file_path,
                         variable_name,
@@ -346,19 +352,20 @@ def load_multiple_files(file_path,
         prefix = os.path.commonprefix(data_filenames)
         postfix = os.path.commonprefix(data_filenames_reversed)[::-1]
         for element in data_filenames:
-            data_name.append(element.replace(prefix,'').replace(postfix,''))
+            data_name.append(element.replace(prefix, '').replace(postfix, ''))
 
     datasets = []
-    for ifile,filename in enumerate(data_filenames):
+    for ifile, filename in enumerate(data_filenames):
         datasets.append(load_file(filename, variable_name, variable_unit, name=data_name[ifile],
-                        lat_name=lat_name, lon_name=lon_name, time_name=time_name))
+                                  lat_name=lat_name, lon_name=lon_name, time_name=time_name))
 
     return datasets
 
+
 def load_WRF_2d_files_RAIN(file_path=None,
-                      filename_pattern=None,
-                      filelist=None,
-                      name=''):
+                           filename_pattern=None,
+                           filelist=None,
+                           name=''):
     ''' Load multiple WRF (or nuWRF) original output files containing 2D \
         fields such as precipitation and surface variables into a Dataset. \
     The dataset can be spatially subset.
@@ -385,45 +392,50 @@ def load_WRF_2d_files_RAIN(file_path=None,
             WRF_files.extend(glob(file_path + pattern))
         WRF_files.sort()
     else:
-        WRF_files=[line.rstrip('\n') for line in open(filelist)]
+        WRF_files = [line.rstrip('\n') for line in open(filelist)]
 
     file_object_first = netCDF4.Dataset(WRF_files[0])
-    lats = file_object_first.variables['XLAT'][0,:]
-    lons = file_object_first.variables['XLONG'][0,:]
+    lats = file_object_first.variables['XLAT'][0, :]
+    lons = file_object_first.variables['XLONG'][0, :]
 
     times = []
     nfile = len(WRF_files)
     for ifile, file in enumerate(WRF_files):
-        print('Reading file '+str(ifile+1)+'/'+str(nfile), file)
+        print('Reading file ' + str(ifile + 1) + '/' + str(nfile), file)
         file_object = netCDF4.Dataset(file)
-        time_struct_parsed = strptime(file[-19:],"%Y-%m-%d_%H:%M:%S")
+        time_struct_parsed = strptime(file[-19:], "%Y-%m-%d_%H:%M:%S")
         for ihour in range(24):
-            times.append(datetime(*time_struct_parsed[:6]) + timedelta(hours=ihour))
+            times.append(
+                datetime(*time_struct_parsed[:6]) + timedelta(hours=ihour))
         if ifile == 0:
-            values0= file_object.variables['RAINC'][:]+file_object.variables['RAINNC'][:]
+            values0 = file_object.variables['RAINC'][
+                :] + file_object.variables['RAINNC'][:]
         else:
-            values0= numpy.concatenate((values0, file_object.variables['RAINC'][:]+file_object.variables['RAINNC'][:]))
+            values0 = numpy.concatenate((values0, file_object.variables['RAINC'][
+                                        :] + file_object.variables['RAINNC'][:]))
         file_object.close()
-    times= numpy.array(times)
+    times = numpy.array(times)
     years = numpy.array([d.year for d in times])
     ncycle = numpy.unique(years).size
-    print('ncycle=',ncycle)
+    print('ncycle=', ncycle)
     nt, ny, nx = values0.shape
-    values = numpy.zeros([nt-ncycle*24, ny, nx])
+    values = numpy.zeros([nt - ncycle * 24, ny, nx])
     times2 = []
-    nt2 = nt/ncycle
+    nt2 = nt / ncycle
     # remove the first day in each year
-    nt3 = nt2-24
+    nt3 = nt2 - 24
     t_index = 0
     for icycle in numpy.arange(ncycle):
-        for it in numpy.arange(nt3)+24:
-            values[t_index,:] = values0[icycle*nt2+it,:]-values0[icycle*nt2+it-1,:]
-            times2.append(times[icycle*nt2+it])
-            t_index = t_index +1
+        for it in numpy.arange(nt3) + 24:
+            values[t_index, :] = values0[icycle * nt2 + it, :] - \
+                values0[icycle * nt2 + it - 1, :]
+            times2.append(times[icycle * nt2 + it])
+            t_index = t_index + 1
     variable_name = 'PREC'
-    variable_unit= 'mm/hr'
+    variable_unit = 'mm/hr'
     times2 = numpy.array(times2)
     return Dataset(lats, lons, times2, values, variable_name, units=variable_unit, name=name)
+
 
 def load_dataset_from_multiple_netcdf_files(variable_name,
                                             lat_name=None, lon_name=None, time_name=None,
@@ -486,9 +498,9 @@ def load_dataset_from_multiple_netcdf_files(variable_name,
 
     dataset0 = load_file(nc_files[0], variable_name, lat_name=lat_name,
                          lon_name=lon_name, time_name=time_name)
-    if dataset0.lons.ndim == 1 and dataset0.lats.ndim ==1:
+    if dataset0.lons.ndim == 1 and dataset0.lats.ndim == 1:
         lons, lats = numpy.meshgrid(dataset0.lons, dataset0.lats)
-    elif dataset0.lons.ndim == 2 and dataset0.lats.ndim ==2:
+    elif dataset0.lons.ndim == 2 and dataset0.lats.ndim == 2:
         lons = dataset0.lons
         lats = dataset0.lats
 
@@ -499,25 +511,26 @@ def load_dataset_from_multiple_netcdf_files(variable_name,
     times = []
     nfile = len(nc_files)
     for ifile, file in enumerate(nc_files):
-        print('NC file '+str(ifile+1)+'/'+str(nfile), file)
-        file_object0= load_file(file, variable_name, lat_name=lat_name,
-                                lon_name=lon_name, time_name=time_name)
-        values0= file_object0.values
+        print('NC file ' + str(ifile + 1) + '/' + str(nfile), file)
+        file_object0 = load_file(file, variable_name, lat_name=lat_name,
+                                 lon_name=lon_name, time_name=time_name)
+        values0 = file_object0.values
         times.extend(file_object0.times)
         if mask_file:
-            values0 = values0[:,y_index, x_index]
+            values0 = values0[:, y_index, x_index]
         if ifile == 0:
             data_values = values0
         else:
-            data_values= numpy.concatenate((data_values, values0))
+            data_values = numpy.concatenate((data_values, values0))
     times = numpy.array(times)
     return Dataset(lats, lons, times, data_values, variable_name, name=name)
 
+
 def load_NLDAS_forcingA_files(file_path=None,
-                      filename_pattern=None,
-                      filelist=None,
-                      variable_name='APCPsfc_110_SFC_acc1h',
-                      name=''):
+                              filename_pattern=None,
+                              filelist=None,
+                              variable_name='APCPsfc_110_SFC_acc1h',
+                              name=''):
     ''' Load multiple NLDAS2 forcingAWRF files containing 2D fields such \
         as precipitation and surface variables into a Dataset. The dataset \
         can be spatially subset.
@@ -561,9 +574,9 @@ def load_NLDAS_forcingA_files(file_path=None,
     times = []
     nfile = len(NLDAS_files)
     for ifile, file in enumerate(NLDAS_files):
-        print('Reading file '+str(ifile+1)+'/'+str(nfile), file)
+        print('Reading file ' + str(ifile + 1) + '/' + str(nfile), file)
         file_object = netCDF4.Dataset(file)
-        time_struct_parsed = strptime(file[-20:-7],"%Y%m%d.%H%M")
+        time_struct_parsed = strptime(file[-20:-7], "%Y%m%d.%H%M")
         times.append(datetime(*time_struct_parsed[:6]))
 
         values0 = file_object.variables[variable_name][:]
@@ -577,11 +590,12 @@ def load_NLDAS_forcingA_files(file_path=None,
     times = numpy.array(times)
     return Dataset(lats, lons, times, values, variable_name, units=variable_unit, name=name)
 
+
 def load_GPM_IMERG_files(file_path=None,
-                      filename_pattern=None,
-                      filelist=None,
-                      variable_name='precipitationCal',
-                      name='GPM_IMERG'):
+                         filename_pattern=None,
+                         filelist=None,
+                         variable_name='precipitationCal',
+                         name='GPM_IMERG'):
     ''' Load multiple GPM Level 3 IMEGE files containing calibrated \
         precipitation and generate an OCW Dataset obejct.
 
@@ -627,12 +641,13 @@ def load_GPM_IMERG_files(file_path=None,
     times = []
     nfile = len(GPM_files)
     for ifile, file in enumerate(GPM_files):
-        print('Reading file '+str(ifile+1)+'/'+str(nfile), file)
+        print('Reading file ' + str(ifile + 1) + '/' + str(nfile), file)
         file_object = h5py.File(file)
-        time_struct_parsed = strptime(file[-39:-23],"%Y%m%d-S%H%M%S")
+        time_struct_parsed = strptime(file[-39:-23], "%Y%m%d-S%H%M%S")
         times.append(datetime(*time_struct_parsed[:6]))
-        values0= numpy.transpose(ma.masked_less(file_object['Grid'][variable_name][:], 0.))
-        values0= numpy.expand_dims(values0, axis=0)
+        values0 = numpy.transpose(ma.masked_less(
+            file_object['Grid'][variable_name][:], 0.))
+        values0 = numpy.expand_dims(values0, axis=0)
         if ifile == 0:
             values = values0
         else:
