@@ -21,7 +21,7 @@ help()
 {
 cat << ENDHELP
 
-Easy OCW assists with the building of the Apache Open Climate Workbench and 
+Easy OCW assists with the building of the Apache Open Climate Workbench and
 its dependencies.
 
 Flags:
@@ -112,7 +112,7 @@ else
 fi
 
 header "Checking for conda ..."
-command -v conda >/dev/null 2>&1 || { 
+command -v conda >/dev/null 2>&1 || {
     task "Unable to locate conda."
     if ! [ -f Miniconda-latest-linux.sh ]; then
 		task "Downloading Miniconda ..."
@@ -126,6 +126,7 @@ command -v conda >/dev/null 2>&1 || {
 }
 
 header "Creating venv-ocw environment and installing dependencies"
+conda config --add channels conda-forge
 conda create --name venv-ocw -y --file ocw-conda-dependencies.txt
 task "Activating venv-ocw virtual environment"
 source activate venv-ocw
@@ -137,7 +138,7 @@ header "Conda Information"
 echo "------------------------------------------------------------------"
 conda info -a
 
-echo 
+echo
 task "Installing python-dev"
 sudo apt-get -y install python-dev >> install_log 2>&1
 subtask "done"
