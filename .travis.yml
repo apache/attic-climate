@@ -26,7 +26,7 @@ notifications:
 install:
   - sudo apt-get update
   - source easy-ocw/install-ubuntu.sh
-  - pip install python-coveralls
+  - pip install python-coveralls bottle
 # Workaround to get travis build working with matplotlib
 before_script:
   - "export DISPLAY=:99.0"
