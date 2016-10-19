@@ -111,7 +111,7 @@ def load_level4_granule(variable, datasetId='', name=''):
     # but conventions aren't always followed and all dimensions aren't always present so
     # see if we can make some educated deductions before defaulting to just pulling the first three
     # columns.
-    temp_dimensions = map(lambda x: x.lower(), dataset.dimensions)
+    temp_dimensions = list(map(lambda x: x.lower(), dataset.dimensions))
     dataset_dimensions = dataset.dimensions
     time = dataset_dimensions[temp_dimensions.index(
         'time') if 'time' in temp_dimensions else 0]
