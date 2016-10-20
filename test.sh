@@ -26,10 +26,11 @@ echo ""
 cp .noserc $HOME/.noserc
 
 # Exclude dap tests if using python 3
+NOSE_FLAGS=''
 if [[ "$1" != "2.7" ]]; then
-  export NOSE_EXCLUDE_TESTS=ocw.tests.test_dap.TestDap
+  NOSE_FLAGS='-I test_dap'
 fi
 
 echo "---------------- Running Unit Tests ---------------"
-nosetests
+nosetests $NOSE_FLAGS
 echo "---------------- All Tests successfully completed ---------------"

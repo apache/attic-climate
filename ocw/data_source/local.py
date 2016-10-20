@@ -31,9 +31,9 @@ import h5py
 import numpy
 import numpy.ma as ma
 
-LAT_NAMES = ['y', 'rlat', 'rlats', 'lat', 'lats', 'latitude', 'latitudes']
-LON_NAMES = ['x', 'rlon', 'rlons', 'lon', 'lons', 'longitude', 'longitudes']
-TIME_NAMES = ['time', 'times', 'date', 'dates', 'julian']
+LAT_NAMES = [b'y', b'rlat', b'rlats', b'lat', b'lats', b'latitude', b'latitudes']
+LON_NAMES = [b'x', b'rlon', b'rlons', b'lon', b'lons', b'longitude', b'longitudes']
+TIME_NAMES = [b'time', b'times', b'date', b'dates', b'julian']
 
 
 def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
@@ -78,7 +78,7 @@ def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
         # earlier. If the dimension's name matches then that variable is
         # potentially what we want to return to the user.
         possible_vars = []
-        for var in netcdf.variables.keys():
+        for var in list(netcdf.variables.keys()):
             var_dimensions = netcdf.variables[var].dimensions
 
             # Skip any dimensions are > 1D
@@ -96,7 +96,7 @@ def _get_netcdf_variable_name(valid_var_names, netcdf, netcdf_var):
             return possible_vars[0]
 
     # Check for valid variable names in netCDF variable names
-    variables = netcdf.variables.keys()
+    variables = list(netcdf.variables.keys())
     vars_lower = [var.encode().lower() for var in variables]
 
     intersect = set(valid_var_names).intersection(vars_lower)
