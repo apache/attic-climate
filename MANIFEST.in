@@ -2,3 +2,4 @@ include distribute_setup.py
 recursive-include docs *.txt
 recursive-include ocw/shape *
 include README.md
+include LICENSE.txt
