@@ -25,7 +25,11 @@ echo ""
 # nosetests config file should be in home directory
 cp .noserc $HOME/.noserc
 
+# Exclude dap tests if using python 3
+if [[ "$1" != "2.7" ]]; then
+  export NOSE_EXCLUDE_TESTS=ocw.tests.test_dap.TestDap
+fi
+
 echo "---------------- Running Unit Tests ---------------"
 nosetests
 echo "---------------- All Tests successfully completed ---------------"
-

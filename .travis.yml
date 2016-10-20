@@ -17,23 +17,49 @@
 language: python
 python:
   - "2.7"
-  - "3.2"
-  - "3.3"
   - "3.4"
   - "3.5"
 notifications:
   email: false
 install:
   - sudo apt-get update
-  - source easy-ocw/install-ubuntu.sh
-  - pip install python-coveralls
+  # We do this conditionally because it saves us some downloading if the
+  # version is the same.
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      DEPS=deps_py2.txt;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      DEPS=deps_py3.txt;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  
+  # Useful for debugging any issues with conda
+  - conda info -a
+  
+  # Add conda-forge to search so all dependencies can be resolved
+  - conda config --add channels conda-forge
+  - conda create -q -n test-environment nose python=$TRAVIS_PYTHON_VERSION --file $DEPS
+
+  # Need this to exclude pydap test for python 3
+  - pip install nose-exclude
+  
+  # Install ocw
+  - source activate test-environment
+  - python setup.py install
+  
 # Workaround to get travis build working with matplotlib
 before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
+
 script:
   - chmod a+x test.sh
-  - ./test.sh
+  - ./test.sh $TRAVIS_PYTHON_VERSION
 after_success:
   - coveralls

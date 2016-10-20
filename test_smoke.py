@@ -21,9 +21,13 @@ from ocw.tests.test_local import create_netcdf_object
 from ocw.data_source import local
 from ocw import dataset_processor as dsp
 import os
+import six
 
-PIP_DEPENDENCIES_FILE = 'easy-ocw/ocw-pip-dependencies.txt'
-CONDA_DEPENDENCIES_FILE = 'easy-ocw/ocw-conda-dependencies.txt'
+if six.PY3:
+    DEPENDENCIES_FILE = 'deps_py3.txt'
+else:
+    DEPENDENCIES_FILE = 'deps_py2.txt'
+
 SUCCESS_MARK = '\033[92m' + u'\u2713' + '\033[0m'
 FAILURE_MARK = '\033[91m' + u'\u274C' + '\033[0m'
 
@@ -123,11 +127,9 @@ def end(dataset=None):
 
 
 def main():
-    pip_file = open(PIP_DEPENDENCIES_FILE, 'r')
-    conda_file = open(CONDA_DEPENDENCIES_FILE, 'r')
+    dep_file = open(DEPENDENCIES_FILE, 'r')
     print("Checking installed dependencies\n")
-    check_dependencies(conda_file)
-    check_dependencies(pip_file)
+    check_dependencies(dep_file)
     success("\nDependencies")
     dataset = check_dataset_loading()
     check_some_dataset_functions(dataset)

@@ -21,11 +21,9 @@ Classes:
 '''
 
 import ocw.data_source.local as local
-import ocw.data_source.esgf as esgf
 import ocw.data_source.rcmed as rcmed
-import ocw.data_source.dap as dap
 import ocw.data_source.podaac_datasource as podaac
-
+import warnings
 
 class DatasetLoader:
     '''Generate a list of OCW Dataset objects from a variety of sources.'''
@@ -95,11 +93,19 @@ class DatasetLoader:
         self._source_loaders = {
             'local': local.load_multiple_files,
             'local_split': local.load_dataset_from_multiple_netcdf_files,
-            'esgf': esgf.load_dataset,
             'rcmed': rcmed.parameter_dataset,
-            'dap': dap.load,
             'podaac': podaac.load_dataset
         }
+        
+        # Exclude esgf and dap for python 3 until they are compatible
+        try:
+            import ocw.data_source.esgf as esgf
+            import ocw.data_source.dap as dap
+            self._source_loaders['dap'] = dap.load
+            self._source_loaders['esgf'] = esgf.load_dataset
+        except ImportError:
+            warnings.warn('dap and esgf loaders missing. If these are needed, '
+                          'fallback to python 2.7.x.')
 
     def add_source_loader(self, loader_name, loader_func):
         '''
