@@ -94,7 +94,7 @@ class DatasetLoader:
             'local': local.load_multiple_files,
             'local_split': local.load_dataset_from_multiple_netcdf_files,
             'rcmed': rcmed.parameter_dataset,
-            'podaac': podaac.load_dataset
+            'podaac': podaac.load_level4_granule
         }
         
         # Exclude esgf and dap for python 3 until they are compatible
