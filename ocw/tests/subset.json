@@ -1,0 +1,12 @@
+{
+    "email":"yournamem@emailaddress.com",
+    "query":[
+        {
+            "datasetId":"PODAAC-ASOP2-25X01",
+            "granuleIds":["ascat_20160409_113000_metopa_49153_eps_o_250_2401_ovw.l2.nc"],
+            "bbox":"-180,-90,180,90",
+            "variables":["wvc_index","model_speed","model_dir","ice_prob","ice_age","wvc_quality_flag","wind_speed","wind_dir","bs_distance","lat","lon","time"],
+            "compact":false
+        }
+    ]
+}

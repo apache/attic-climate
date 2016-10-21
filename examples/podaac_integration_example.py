@@ -25,8 +25,8 @@ variable = 'uwnd'
 name = 'PO.DAAC_test_dataset'
 OUTPUT_PLOT = "ccmp_temporal_std"
 """ Step 1: Load Local NetCDF Files into OCW Dataset Objects """
-print("Loading %s dataset into an OCW dataset objects" % datasetShortName)
-ccmp_dataset = podaac.load_dataset(
+print("Loading %s dataset short name into a OCW dataset object." % datasetId)
+ccmp_dataset = podaac.load_level4_granule(
     variable=variable, datasetId=datasetId, name=name)
 print("CCMP_Dataset.values shape: (times, lats, lons) - %s \n" %
       (ccmp_dataset.values.shape,))

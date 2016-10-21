@@ -16,6 +16,7 @@
 # under the License.
 
 from podaac.podaac import Podaac
+from podaac.podaac_utils import PodaacUtils
 import numpy as np
 from ocw.dataset import Dataset
 from netCDF4 import Dataset as netcdf_dataset
@@ -41,9 +42,39 @@ def convert_times_to_datetime(time):
     parsed_time = utime(units)
     return [parsed_time.num2date(x) for x in time[:]]
 
+def list_available_extract_granule_dataset_ids():
+    '''Convenience function which returns an up-to-date \
+        list of available granule dataset id's which can be \
+        used in the granule extraction service.
 
-def load_dataset(variable, datasetId='', name=''):
-    '''Loads a Dataset from PODAAC
+    :returns: a comma-seperated list of granule dataset id's.
+
+    '''
+    podaac_utils = PodaacUtils()
+    return podaac_utils.list_available_extract_granule_dataset_ids()
+
+def subset_granule(input_file_path=''):
+    '''Subset Granule service allows users to Submit subset jobs. \
+        Use of this service should be preceded by a Granule Search in \
+        order to identify and generate a list of granules to be subsetted.
+
+    :param input_file_path: path to a json file which contains the \
+        the request that you want to send to PO.DAAC
+    :type input_file_path: :mod:`string`
+
+    :returns: a token on successful request reception. This can be \
+        further used to check the status of the request.
+
+    '''
+    podaac = Podaac()
+    status = podaac.subset_status(podaac.granule_subset(input_file_path))
+    print("Granule subsetting initiated with request tracking token '%s'." % status)
+    while status is not "done":
+        print('...')
+    return status
+
+def load_level4_granule(variable, datasetId='', name=''):
+    '''Loads a Level4 gridded Dataset from PODAAC
 
     :param variable: The name of the variable to read from the dataset.
     :type variable: :mod:`string`
@@ -80,7 +111,7 @@ def load_dataset(variable, datasetId='', name=''):
     # but conventions aren't always followed and all dimensions aren't always present so
     # see if we can make some educated deductions before defaulting to just pulling the first three
     # columns.
-    temp_dimensions = map(lambda x: x.lower(), dataset.dimensions)
+    temp_dimensions = list(map(lambda x: x.lower(), dataset.dimensions))
     dataset_dimensions = dataset.dimensions
     time = dataset_dimensions[temp_dimensions.index(
         'time') if 'time' in temp_dimensions else 0]

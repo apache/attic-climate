@@ -32,8 +32,13 @@ class TestPodaacDataSource(unittest.TestCase):
         cls.name = 'PO.DAAC_test_dataset'
         cls.file_path = os.path.dirname(os.path.abspath(__file__))
         cls.format = '.nc'
-        cls.dataset = podaac.load_dataset(
+        cls.dataset = podaac.load_level4_granule(
             cls.variable, cls.datasetId, cls.name)
+        #Until we can retrieve the subset data download link programmatically,
+        #we will need to skip this test. More information can be see at 
+        #https://podaac.jpl.nasa.gov/forum/viewtopic.php?f=53&t=424&p=790
+        #cls.json = 'subset.json'
+        #cls.granule_subset = podaac.subset_granule(cls.json)
 
     def test_is_dataset(self):
         self.assertTrue(isinstance(self.dataset, Dataset))
@@ -60,6 +65,12 @@ class TestPodaacDataSource(unittest.TestCase):
 
     def test_custom_name(self):
         self.assertEquals(self.dataset.name, self.name)
+
+    def test_granule_subset(self):
+        #Until we can retrieve the subset data download link programmatically,
+        #we will need to skip this test. More information can be see at 
+        #https://podaac.jpl.nasa.gov/forum/viewtopic.php?f=53&t=424&p=790
+        pass
 
 
 if __name__ == '__main__':
