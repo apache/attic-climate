@@ -25,7 +25,12 @@ echo ""
 # nosetests config file should be in home directory
 cp .noserc $HOME/.noserc
 
-echo "---------------- Running Unit Tests ---------------"
-nosetests
-echo "---------------- All Tests successfully completed ---------------"
+# Exclude dap tests if using python 3
+NOSE_FLAGS=''
+if [[ "$1" != "2.7" ]]; then
+  NOSE_FLAGS='-I test_dap'
+fi
 
+echo "---------------- Running Unit Tests ---------------"
+nosetests $NOSE_FLAGS
+echo "---------------- All Tests successfully completed ---------------"

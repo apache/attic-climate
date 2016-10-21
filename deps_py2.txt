@@ -1,0 +1,14 @@
+numpy
+scipy
+matplotlib
+basemap
+netcdf4
+h5py
+bottle
+pydap
+python-dateutil
+mock
+webtest
+myproxyclient
+esgf-pyclient
+podaacpy
