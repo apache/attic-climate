@@ -23,7 +23,7 @@ import os
 sys.path.insert(0, os.path.abspath('../../ocw'))
 sys.path.insert(0, os.path.abspath('../../ocw/data_source'))
 sys.path.insert(0, os.path.abspath('../../ocw-ui/backend'))
-sys.path.insert(0, os.path.abspath('../../ocw-config-runner'))
+sys.path.insert(0, os.path.abspath('../../ocw_config_runner'))
 
 
 # -- General configuration -----------------------------------------------

@@ -23,6 +23,7 @@ import yaml
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
+
 def export_evaluation_to_config(evaluation, file_path='./exported_eval.yaml'):
     ''' Export an evaluation to a config file
 
@@ -40,6 +41,7 @@ def export_evaluation_to_config(evaluation, file_path='./exported_eval.yaml'):
     config['subregions'] = generate_subregion_information(evaluation)
 
     yaml.dump(config, file(file_path, 'w'))
+
 
 def generate_dataset_information(evaluation):
     ''' Generate dataset config file output for a given Evaluation object.
@@ -63,6 +65,7 @@ def generate_dataset_information(evaluation):
         ]
 
     return datasets
+
 
 def generate_dataset_config(dataset):
     ''' Generate dataset config file output for a given Dataset object.
@@ -99,6 +102,7 @@ def generate_dataset_config(dataset):
 
     return info
 
+
 def generate_metric_information(evaluation):
     ''' Generate metric config file output from a given Evaluation object.
 
@@ -113,6 +117,7 @@ def generate_metric_information(evaluation):
     binary_metrics = [x.__class__.__name__ for x in evaluation.metrics]
 
     return unary_metrics + binary_metrics
+
 
 def generate_evaluation_information(evaluation):
     ''' Generate evaluation-related config file output.
@@ -159,6 +164,7 @@ def generate_evaluation_information(evaluation):
 
     return eval_config
 
+
 def generate_subregion_information(evaluation):
     ''' Generate subregion config file output from a given Evaluation object.
 
@@ -174,6 +180,7 @@ def generate_subregion_information(evaluation):
         subregions.append([s.lat_min, s.lat_max, s.lon_min, s.lon_max])
 
     return subregions
+
 
 def _extract_local_dataset_info(dataset):
     ''''''
@@ -194,6 +201,7 @@ def _extract_local_dataset_info(dataset):
 
     return dataset_info
 
+
 def _extract_rcmed_dataset_info(dataset):
     ''''''
     dataset_info = {'optional_args': {}}
@@ -213,6 +221,7 @@ def _extract_rcmed_dataset_info(dataset):
 
     return dataset_info
 
+
 def _extract_esgf_dataset_info(dataset):
     ''''''
     dataset_info = {'optional_args': {}}
@@ -225,6 +234,7 @@ def _extract_esgf_dataset_info(dataset):
 
     return dataset_info
 
+
 def _extract_dap_dataset_info(dataset):
     ''''''
     dataset_info = {'optional_args': {}}
@@ -234,6 +244,7 @@ def _extract_dap_dataset_info(dataset):
     dataset_info['variable'] = dataset.variable
 
     return dataset_info
+
 
 def _calc_temporal_bin_size(datasets):
     ''''''
@@ -249,6 +260,7 @@ def _calc_temporal_bin_size(datasets):
     else:
         return 999
 
+
 def _calc_spatial_lat_lon_grid(datasets):
     ''''''
     lat_min, lat_max, lon_min, lon_max = datasets[0].spatial_boundaries()
@@ -263,10 +275,13 @@ def _calc_spatial_lat_lon_grid(datasets):
 
     # We need to add an extra step value onto the end so when we generate a
     # range with these values we don't lose one that we're expecting.
-    if lat_max != 90: lat_max += lat_step
-    if lon_max != 180: lon_max += lon_step
+    if lat_max != 90:
+        lat_max += lat_step
+    if lon_max != 180:
+        lon_max += lon_step
 
     return ((lat_min, lat_max, lat_step), (lon_min, lon_max, lon_step))
+
 
 def _calc_subset_config(datasets):
     ''''''
