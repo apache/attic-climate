@@ -379,19 +379,13 @@ def _get_colors(num_colors):
     :param num_colors: The number of unique colors to generate.
     :return: A color map with num_colors.
     """
-    colors=[]
-    for i in np.arange(0., 360., 360. / num_colors):
-        hue = i / 360.
-        lightness = (50 + np.random.rand() * 10) / 100.
-        saturation = (90 + np.random.rand() * 10) / 100.
-        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
-    return colors
-
+    cmap = plt.get_cmap()
+    return [cmap(1. * i / num_colors) for i in range(num_colors)]
 
 def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
                      xlabel='', ylabel='', ptitle='', subtitles=None,
                      label_month=False, yscale='linear', aspect=None,
-                     cycle_colors=True):
+                     cycle_colors=True, cmap=None):
     ''' Draw a time series plot.
 
     :param results: 3D array of time series data.
@@ -437,7 +431,22 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     :param aspect: (Optional) approximate aspect ratio of each subplot
         (width / height). Default is 8.5 / 5.5
     :type aspect: :class:`float`
+
+    :param cycle_colors: (Optional) flag to toggle whether to allow matlibplot
+        to re-use colors when plotting or force an evenly distributed range.
+    :type cycle_colors: :class:`bool`
+
+    :param cmap: (Optional) string or :class:`matplotlib.colors.LinearSegmentedColormap`
+        instance denoting the colormap. This must be able to be recognized by
+        `Matplotlib's get_cmap function <http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap>`_.
+        Maps like rainbow and spectral with wide spectrum of colors are nice choices. tab20, tab20b,
+        and tab20c are good if the plot has less than 20 datasets.
+    :type cmap: :mod:`string` or :class:`matplotlib.colors.LinearSegmentedColormap`
+
     '''
+    if cmap is not None:
+        set_cmap(cmap)
+
     # Handle the single plot case.
     if results.ndim == 2:
         results = results.reshape(1, *results.shape)
@@ -472,7 +481,6 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
         data = results[i]
 
         if not cycle_colors:
-            #ax.set_prop_cycle('color', _set_color_cycle(data.shape[0])
             ax.set_prop_cycle('color', _get_colors(data.shape[0]))
 
         if label_month:
