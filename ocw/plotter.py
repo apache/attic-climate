@@ -368,7 +368,7 @@ def draw_subregions(subregions, lats, lons, fname, fmt='png', ptitle='',
     fig.clf()
 
 
-def _set_color_cycle(num_colors):
+def _set_color_cycle(num_colors, cmap):
     """
     matplotlib will recycle colors after a certain number.  This can make
     line type charts confusing as colors will be reused.  This function
@@ -378,13 +378,14 @@ def _set_color_cycle(num_colors):
     :param num_colors: The number of unique colors to generate.
     :return: A color map with num_colors.
     """
-    cmap = cm.get_cmap('spectral')
+    cmap = plt.get_cmap(cmap)
     return [cmap(1. * i / num_colors) for i in range(num_colors)]
 
 
 def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
                      xlabel='', ylabel='', ptitle='', subtitles=None,
-                     label_month=False, yscale='linear', aspect=None):
+                     label_month=False, yscale='linear', aspect=None,
+                     cycle_colors=True, cmap=None):
     ''' Draw a time series plot.
 
     :param results: 3D array of time series data.
@@ -464,7 +465,8 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     for i, ax in enumerate(grid):
         data = results[i]
 
-        ax.set_prop_cycle('color', _set_color_cycle(data.shape[0]))
+        if not cycle_colors:
+            ax.set_prop_cycle('color', _set_color_cycle(data.shape[0], cmap))
 
         if label_month:
             xfmt = mpl.dates.DateFormatter('%b')
