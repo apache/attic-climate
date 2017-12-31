@@ -439,8 +439,8 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     :param cmap: (Optional) string or :class:`matplotlib.colors.LinearSegmentedColormap`
         instance denoting the colormap. This must be able to be recognized by
         `Matplotlib's get_cmap function <http://matplotlib.org/api/cm_api.html#matplotlib.cm.get_cmap>`_.
-        Maps like rainbow and spectral with wide spectrum of colors are nice choices. tab20, tab20b,
-        and tab20c are good if the plot has less than 20 datasets.
+        Maps like rainbow and spectral with wide spectrum of colors are nice choices when used with
+        the cycle_colors option. tab20, tab20b, and tab20c are good if the plot has less than 20 datasets.
     :type cmap: :mod:`string` or :class:`matplotlib.colors.LinearSegmentedColormap`
 
     '''
