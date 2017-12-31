@@ -379,7 +379,6 @@ def _get_colors(num_colors):
     :param num_colors: The number of unique colors to generate.
     :return: A color map with num_colors.
     """
-
     colors=[]
     for i in np.arange(0., 360., 360. / num_colors):
         hue = i/360.
