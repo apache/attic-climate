@@ -600,14 +600,23 @@ def draw_barchart(results, yvalues, fname, ptitle='', fmt='png',
 
 
 def draw_marker_on_map(lat, lon, fname, fmt='png', location_name=' ', gridshape=(1, 1)):
-    '''
-    Purpose::
-        Draw a marker on a map
+    '''Draw a marker on a map.
 
-    Input::
-        lat - latitude for plotting a marker
-        lon - longitude for plotting a marker
-        fname  - a string specifying the filename of the plot
+    :param lat: Latitude for plotting a marker.
+    :type lat: :class:`float`
+
+    :param lon: Longitude for plotting a marker.
+    :type lon: :class:`float`
+
+    :param fname: The filename of the plot.
+    :type fname: :class:`string`
+
+    :param fmt: (Optional) Filetype for the output.
+    :type fmt: :class:`string`
+
+    :param location_name: (Optional) A label for the map marker.
+    :type location_name: :class:`string`
+
     '''
     fig = plt.figure()
     fig.dpi = 300
@@ -1098,14 +1107,22 @@ class TaylorDiagram(object):
 
 def draw_histogram(dataset_array, data_names, fname, fmt='png', nbins=10):
     '''
-    Purpose::
-        Draw histograms
+    Purpose:: Draw a histogram for the input dataset.
 
-    Input::
-        dataset_array - a list of data values [data1, data2, ....]
-        data_names    - a list of data names  ['name1','name2',....]
-        fname  - a string specifying the filename of the plot
-        bins - number of bins
+    :param dataset_array: A list of data values [data1, data2, ....].
+    :type dataset_array: :class:`list` of :class:`float`
+
+    :param data_names: A list of data names  ['name1','name2',....].
+    :type data_names: :class:`list` of :class:`string`
+
+    :param fname: The filename of the plot.
+    :type fname: :class:`string`
+
+    :param fmt: (Optional) Filetype for the output.
+    :type fmt: :class:`string`
+
+    :param bins: (Optional) Number of bins.
+    :type bins: :class:`integer`
     '''
     fig = plt.figure()
     fig.dpi = 300
