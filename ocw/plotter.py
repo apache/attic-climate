@@ -16,6 +16,7 @@
 # under the License.
 
 from tempfile import TemporaryFile
+import colorsys
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -368,18 +369,24 @@ def draw_subregions(subregions, lats, lons, fname, fmt='png', ptitle='',
     fig.clf()
 
 
-def _set_color_cycle(num_colors):
+def _get_colors(num_colors):
     """
     matplotlib will recycle colors after a certain number.  This can make
     line type charts confusing as colors will be reused.  This function
-    provides an even distribution of colors across the default color map
-    to ensure uniqueness.
+    provides a distribution of colors across the default color map
+    to better approximate uniqueness.
 
     :param num_colors: The number of unique colors to generate.
     :return: A color map with num_colors.
     """
-    cmap = plt.get_cmap('spectral')
-    return [cmap(1. * i / num_colors) for i in range(num_colors)]
+
+    colors=[]
+    for i in np.arange(0., 360., 360. / num_colors):
+        hue = i/360.
+        lightness = (50 + np.random.rand() * 10)/100.
+        saturation = (90 + np.random.rand() * 10)/100.
+        colors.append(colorsys.hls_to_rgb(hue, lightness, saturation))
+    return colors
 
 
 def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
@@ -466,7 +473,8 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
         data = results[i]
 
         if not cycle_colors:
-            ax.set_prop_cycle('color', _set_color_cycle(data.shape[0]))
+            #ax.set_prop_cycle('color', _set_color_cycle(data.shape[0])
+            ax.set_prop_cycle('color', _get_colors(data.shape[0]))
 
         if label_month:
             xfmt = mpl.dates.DateFormatter('%b')
