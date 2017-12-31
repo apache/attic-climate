@@ -29,9 +29,16 @@ angular.module('ocwUiApp')
 .directive('predictiveFileBrowserInput', function() {
 	var link = function($scope, $elem, $attrs) {
 		$scope.autocomplete = [];
-		
+
 		// Set id to use this directive correctly in multiple places
-		$scope.id = 'autoCompletePath'+ $elem.context.id
+		/*
+		This had been written as $elem.context.id, but $elem is an object (jQuery.fn.init)
+		and the object did not have a context or id attribute. This was
+		throwing an error to the console and the list of files was not being displayed.
+		Replaced with $attrs.id.
+		*/
+		$scope.id = 'autoCompletePath' + $attrs.id;
+
 		/*
 		 * We need a place to dump our auto-completion options
 		 */
@@ -43,8 +50,8 @@ angular.module('ocwUiApp')
 			var val = $(e.target).text();
 			$($elem).val(val);
 			// Need to trigger the input box's "input" event so Angular updates the model!
-			$elem.trigger('input'); 
-			
+			$elem.trigger('input');
+
 			// If the user selected a directory, find more results..
 			if (val[val.length - 1] == '/') {
 				$scope.fetchFiles($($elem).val());
@@ -152,7 +159,7 @@ angular.module('ocwUiApp')
 			$scope.possibleCompletes = $scope.autocomplete;
 		};
 
-		/* 
+		/*
 		 * Handle <TAB> presses.
 		 *
 		 * Attempt to auto-complete options when the user presses <TAB>.
@@ -220,7 +227,7 @@ angular.module('ocwUiApp')
 			}
 		};
 
-		/* 
+		/*
 		 * Handle all other key presses in the input box
 		 *
 		 * Filter the auto-complete options as the user types to ensure that only options
@@ -236,7 +243,7 @@ angular.module('ocwUiApp')
 			$scope.updateAutoComplete();
 		};
 
-		/* 
+		/*
 		 * When a path is auto-completed with <TAB> we need to check to see if it points
 		 * to a directory. If it does, we still need to fetch results!
 		 */
@@ -247,7 +254,7 @@ angular.module('ocwUiApp')
 			}
 		};
 
-		/* 
+		/*
 		 * Calculate the greatest common prefix of the passed options.
 		 *
 		 * Params:
@@ -275,7 +282,7 @@ angular.module('ocwUiApp')
 			return longestString.slice(0, index - 1);
 		};
 
-		/* 
+		/*
 		 * Filter the auto-complete options based on the current input.
 		 */
 		$scope.filterResults = function() {
