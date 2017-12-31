@@ -402,7 +402,7 @@ def trim_dataset(dataset):
     ''' Trim datasets such that first and last year of data have all 12 months
 
     :param dataset: Dataset object
-    :type dataset: :class:`dataset.Dataset
+    :type dataset: :class:`dataset.Dataset`
 
     :returns: Slice index for trimmed dataset
     '''
@@ -653,7 +653,7 @@ def _force_unicode(s, encoding='utf-8'):
 def calculate_temporal_trends(dataset):
     ''' Calculate temporal trends in dataset.values
     :param dataset: The dataset from which time values should be extracted.
-    :type dataset: :class:`dataset.Dataset'
+    :type dataset: :class:`dataset.Dataset`
 
     :returns: Arrays of the temporal trend and standard error
     :rtype: :class:`numpy.ma.core.MaskedArray`
@@ -675,13 +675,13 @@ def calculate_temporal_trends(dataset):
 def calculate_ensemble_temporal_trends(timeseries_array, number_of_samples=1000):
     ''' Calculate temporal trends in an ensemble of time series
     :param timeseries_array: Two dimensional array. 1st index: model, 2nd index: time.
-    :type timeseries_array: :class:`numpy.ndarray'
+    :type timeseries_array: :class:`numpy.ndarray`
 
     :param sampling: A list whose elements are one-dimensional numpy arrays
-    :type timeseries_array: :class:`list'
+    :type timeseries_array: :class:`list`
 
     :returns: temporal trend and estimated error from bootstrapping
-    :rtype: :float:`float','float'
+    :rtype: :class:`float`, :class:`float`
     '''
 
     nmodels, nt = timeseries_array.shape
@@ -701,13 +701,13 @@ def calculate_ensemble_temporal_trends(timeseries_array, number_of_samples=1000)
 def calculate_temporal_trend_of_time_series(x,y):
     ''' Calculate least-square trends (a) in y = ax+b and a's standard error
     :param x: time series
-    :type x: :class:`numpy.ndarray'
+    :type x: :class:`numpy.ndarray`
 
     :param x: time series
-    :type x: :class:`numpy.ndarray'
+    :type x: :class:`numpy.ndarray`
 
     :returns: temporal trend and standard error
-    :rtype: :float:`float','float'
+    :rtype: :class:`float`, :class:`float`
     '''
     slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
     return slope, std_err
