@@ -16,17 +16,18 @@
 # under the License.
 
 from tempfile import TemporaryFile
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.colors import BoundaryNorm
-from matplotlib import rcParams, cm
-from matplotlib.patches import Polygon
-from matplotlib.collections import PatchCollection
-from mpl_toolkits.basemap import Basemap
-from mpl_toolkits.axes_grid1 import ImageGrid
-import scipy.stats.mstats as mstats
 import numpy as np
 import numpy.ma as ma
+import scipy.stats.mstats as mstats
+from matplotlib import cm, rcParams
+from matplotlib.collections import PatchCollection
+from matplotlib.colors import BoundaryNorm
+from matplotlib.patches import Polygon
+from mpl_toolkits.axes_grid1 import ImageGrid
+from mpl_toolkits.basemap import Basemap
 
 import ocw.utils as utils
 
@@ -367,6 +368,20 @@ def draw_subregions(subregions, lats, lons, fname, fmt='png', ptitle='',
     fig.clf()
 
 
+def _set_color_cycle(num_colors):
+    """
+    matplotlib will recycle colors after a certain number.  This can make
+    line type charts confusing as colors will be reused.  This function
+    provides an even distribution of colors across the default color map
+    to ensure uniqueness.
+
+    :param num_colors: The number of unique colors to generate.
+    :return: A color map with num_colors.
+    """
+    cmap = cm.get_cmap('spectral')
+    return [cmap(1. * i / num_colors) for i in range(num_colors)]
+
+
 def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
                      xlabel='', ylabel='', ptitle='', subtitles=None,
                      label_month=False, yscale='linear', aspect=None):
@@ -448,6 +463,9 @@ def draw_time_series(results, times, labels, fname, fmt='png', gridshape=(1, 1),
     # Make the plots
     for i, ax in enumerate(grid):
         data = results[i]
+
+        ax.set_prop_cycle('color', _set_color_cycle(data.shape[0]))
+
         if label_month:
             xfmt = mpl.dates.DateFormatter('%b')
             xloc = mpl.dates.MonthLocator()
