@@ -29,7 +29,7 @@ angular.module('ocwUiApp')
 .directive('predictiveFileBrowserInput', function() {
 	var link = function($scope, $elem, $attrs) {
 		$scope.autocomplete = [];
-  console.log($attrs)
+
 		// Set id to use this directive correctly in multiple places
 		/*
 		This had been written as $elem.context.id, but $elem is an object (jQuery.fn.init)
