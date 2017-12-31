@@ -157,6 +157,11 @@ wrf311_dataset = dsp.temporal_rebin(
     wrf311_dataset, temporal_resolution='annual')
 cru31_dataset = dsp.temporal_rebin(cru31_dataset, temporal_resolution='annual')
 
+# Rebinning annual pushes the start date to the middle of the year
+# i.e. 1989-07-02 and effectively makes a single entry for the year.
+start_time, end_time = knmi_dataset.temporal_boundaries()
+end_time = start_time
+
 # Running Temporal Rebin early helps negate the issue of datasets being on different
 # days of the month (1st vs. 15th)
 # Create a Bounds object to use for subsetting
@@ -214,7 +219,7 @@ print("Generating a contour map using ocw.plotter.draw_contour_map()")
 lats = new_lats
 lons = new_lons
 fname = OUTPUT_PLOT
-gridshape = (3, 1)  # Using a 3 x 1 since we have a 1 year of data for 3 models
+gridshape = (3, start_time.year - end_time.year + 1)  # Using a 3 x N since we have a N year(s) of data for 3 models
 plotnames = ["KNMI", "WRF311", "ENSEMBLE"]
 for i in np.arange(3):
     plot_title = "TASMAX Bias of CRU 3.1 vs. %s (%s - %s)" % (
