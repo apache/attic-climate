@@ -33,48 +33,52 @@ class DatasetLoader:
 
         Each keyword argument can be information for a dataset in dictionary
         form. For example:
-        ``
+
         >>> loader_opt1 = {'loader_name': 'rcmed', 'name': 'cru',
-                           'dataset_id': 10, 'parameter_id': 34}
+                            'dataset_id': 10, 'parameter_id': 34}
         >>> loader_opt2 = {'path': './data/TRMM_v7_3B43_1980-2010.nc,
-                           'variable': 'pcp'}
+                            'variable': 'pcp'}
         >>> loader = DatasetLoader(loader_opt1, loader_opt2)
-        ``
+
 
         Or more conveniently if the loader configuration is defined in a
         yaml file named config_file (see RCMES examples):
-        ``
+
         >>> import yaml
         >>> config = yaml.load(open(config_file))
         >>> obs_loader_config = config['datasets']['reference']
         >>> loader = DatasetLoader(*obs_loader_config)
-        ``
+
 
         As shown in the first example, the dictionary for each argument should
         contain a loader name and parameters specific to the particular loader.
         Once the configuration is entered, the datasets may be loaded using:
-        ``
+
         >>> loader.load_datasets()
         >>> obs_datasets = loader.datasets
-        ``
+
 
         Additionally, each dataset must have a ``loader_name`` keyword. This may
         be one of the following:
+
         * ``'local'`` - One or multiple dataset files in a local directory
         * ``'local_split'`` - A single dataset split accross multiple files in a
-                              local directory
-        * ``'esgf'`` - Download the dataset from the Earth System Grid
-                       Federation
+                            local directory
+        * ``'esgf'``    - Download the dataset from the Earth System Grid
+                        Federation
         * ``'rcmed'`` - Download the dataset from the Regional Climate Model
                         Evaluation System Database
         * ``'dap'`` - Download the dataset from an OPeNDAP URL
-        * ``'podaac'`` - Download the dataset from Physical Oceanography
+        * ``'podaac'``  - Download the dataset from Physical Oceanography
                         Distributed Active Archive Center
+
 
         Users who wish to load datasets from loaders not described above may
         define their own custom dataset loader function and incorporate it as
         follows:
+
         >>> loader.add_source_loader('my_loader_name', my_loader_func)
+
 
         :param loader_opts: Dictionaries containing the each dataset loader
                             configuration, representing the keyword arguments of
@@ -84,7 +88,7 @@ class DatasetLoader:
         :type loader_opts: :class:`dict`
 
         :raises KeyError: If an invalid argument is passed to a data source
-        loader function.
+                            loader function.
         '''
         # dataset loader config
         self.set_loader_opts(*loader_opts)
@@ -115,8 +119,8 @@ class DatasetLoader:
         :type loader_name: :mod:`string`
 
         :param loader_func: Reference to a custom defined function. This should
-        return an OCW Dataset object, and have an origin which satisfies
-        origin['source'] == loader_name.
+                            return an OCW Dataset object, and have an origin which satisfies
+                            origin['source'] == loader_name.
         :type loader_func: :class:`callable`
         '''
         self._source_loaders[loader_name] = loader_func
