@@ -117,10 +117,10 @@ class Dataset:
 
            If self.lats and self.lons are from curvilinear coordinates,
            the output resolutions are approximate values.
+
         :returns: The Dataset's latitudinal and longitudinal spatial resolution
             as a tuple of the form (lat_resolution, lon_resolution).
         :rtype: (:class:`float`, :class:`float`)
-
         '''
 
         if self.lats.ndim == 1 and self.lons.ndim == 1:
@@ -142,6 +142,7 @@ class Dataset:
 
         :returns: The temporal resolution.
         :rtype: :mod:`string`
+
         '''
         sorted_times = numpy.sort(self.times)
         time_resolution = sorted_times[1] - sorted_times[0]
@@ -264,7 +265,7 @@ class Bounds(object):
                  start=None, end=None):
         '''Default Bounds constructor
         :param boundary_type: The type of spatial subset boundary.
-        :type boundary_type: :mod:`string'
+        :type boundary_type: :mod:`string`
 
 
         :param lat_min: The minimum latitude bound.

@@ -55,7 +55,7 @@ def get_dataset_parameters():
 
     **Example Call Format**
 
-    .. sourcecode:: javascript
+    .. sourcecode:: text
 
         /parameters/?dataset=<dataset's short name>
 
@@ -121,7 +121,7 @@ def get_parameters_bounds():
 
     **Example Call Format**
 
-    .. sourcecode:: javascript
+    .. sourcecode:: text
 
         /parameters/bounds/
 
