@@ -159,7 +159,7 @@ def run_evaluation():
 
     eval_time_stamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     data = request.json
-    print(data)
+
     eval_bounds = {
         'start_time': datetime.strptime(data['start_time'], '%Y-%m-%d %H:%M:%S'),
         'end_time': datetime.strptime(data['end_time'], '%Y-%m-%d %H:%M:%S'),
