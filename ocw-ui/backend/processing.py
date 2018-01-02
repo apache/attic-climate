@@ -216,8 +216,9 @@ def run_evaluation():
                        in target_datasets]
     
     # Do temporal re-bin based off of passed resolution
-    ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
-    target_datasets = [dsp.temporal_rebin(ds, time_delta)
+    temporal_resolution_type = data['temporal_resolution_type']
+    ref_dataset = dsp.temporal_rebin(ref_dataset, temporal_resolution_type)
+    target_datasets = [dsp.temporal_rebin(ds, temporal_resolution_type)
                        for ds
                        in target_datasets]
 
