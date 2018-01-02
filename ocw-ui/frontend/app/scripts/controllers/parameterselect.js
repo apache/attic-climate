@@ -27,8 +27,8 @@
  * Controller of the ocwUiApp
  */
 angular.module('ocwUiApp')
-.controller('ParameterSelectCtrl', ['$rootScope', '$scope', '$http', '$timeout', 
-						   'selectedDatasetInformation', 'regionSelectParams', 'evaluationSettings', 
+.controller('ParameterSelectCtrl', ['$rootScope', '$scope', '$http', '$timeout',
+						   'selectedDatasetInformation', 'regionSelectParams', 'evaluationSettings',
   function($rootScope, $scope, $http, $timeout, selectedDatasetInformation, regionSelectParams, evaluationSettings) {
     $scope.datasets = selectedDatasetInformation.getDatasets();
 
@@ -145,6 +145,8 @@ angular.module('ocwUiApp')
         data['temporal_resolution'] = 30;
       }
 
+      data['temporal_resolution_type'] = temporal_res;
+
       // Load the Metrics for the evaluation
       data['metrics'] = []
       var metrics = settings.metrics
@@ -177,7 +179,7 @@ angular.module('ocwUiApp')
             window.location = "#/results";
           }
         }, 100);
-        
+
       }).error(function() {
         $scope.runningEval = false;
       });
@@ -192,13 +194,13 @@ angular.module('ocwUiApp')
       if (parseFloat($scope.displayParams.latMax) > parseFloat($scope.latMax))
         $scope.displayParams.latMax = $scope.latMax;
 
-      if (parseFloat($scope.displayParams.lonMin) < parseFloat($scope.lonMin)) 
+      if (parseFloat($scope.displayParams.lonMin) < parseFloat($scope.lonMin))
         $scope.displayParams.lonMin = $scope.lonMin;
 
-      if (parseFloat($scope.displayParams.lonMax) > parseFloat($scope.lonMax)) 
+      if (parseFloat($scope.displayParams.lonMax) > parseFloat($scope.lonMax))
         $scope.displayParams.lonMax = $scope.lonMax;
 
-      if ($scope.displayParams.start < $scope.start) 
+      if ($scope.displayParams.start < $scope.start)
         $scope.displayParams.start = $scope.start;
 
       if ($scope.displayParams.end > $scope.end)
@@ -213,8 +215,8 @@ angular.module('ocwUiApp')
       $rootScope.$broadcast('redrawOverlays', []);
     }
 
-    $scope.unwatchDatasets = $scope.$watch('datasets', 
-      function() { 
+    $scope.unwatchDatasets = $scope.$watch('datasets',
+      function() {
         var numDatasets = $scope.datasets.length;
         $scope.displayParams.areValid = false;
         $scope.areInUserRegridState = false;
@@ -230,7 +232,7 @@ angular.module('ocwUiApp')
           // Get the valid lat/lon range in the selected datasets.
           for (var i = 0; i < numDatasets; i++) {
             var curDataset = $scope.datasets[i];
-    
+
             latMin = (curDataset['latlonVals']['latMin'] > latMin) ? curDataset['latlonVals']['latMin'] : latMin;
             latMax = (curDataset['latlonVals']['latMax'] < latMax) ? curDataset['latlonVals']['latMax'] : latMax;
             lonMin = (curDataset['latlonVals']['lonMin'] > lonMin) ? curDataset['latlonVals']['lonMin'] : lonMin;

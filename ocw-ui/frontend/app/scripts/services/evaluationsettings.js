@@ -42,7 +42,7 @@ angular.module('ocwUiApp')
     var settings = {
       'metrics': [],
       'temporal': {
-        'options': ['daily', 'monthly', 'yearly'],
+        'options': ['daily', 'monthly', 'annual', 'full'],
         'selected': 'yearly',
       },
       'spatialSelect': null,

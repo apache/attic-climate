@@ -33,11 +33,14 @@ sys.path.insert(0, os.path.abspath('../../ocw-config-runner'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+# Note that 'sphinxcontrib.autohttp.bottle' is currently broken in Sphinx > 1.56
+# Remove from the extension list if documentation fails on Sphinx hard failure.
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.ifconfig',
     'sphinxcontrib.httpdomain',
+    'sphinxcontrib.autohttp.bottle',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
