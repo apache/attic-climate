@@ -203,12 +203,12 @@ def run_evaluation():
             day_offset = end.day - 1
             end -= timedelta(days=day_offset)
 
-    subset = Bounds(eval_bounds['lat_min'],
-                    eval_bounds['lat_max'],
-                    eval_bounds['lon_min'],
-                    eval_bounds['lon_max'],
-                    start,
-                    end)
+    subset = Bounds(lat_min=eval_bounds['lat_min'],
+                    lat_max=eval_bounds['lat_max'],
+                    lon_min=eval_bounds['lon_min'],
+                    lon_max=eval_bounds['lon_max'],
+                    start=start,
+                    end=end)
 
     ref_dataset = dsp.safe_subset(ref_dataset, subset)
     target_datasets = [dsp.safe_subset(ds, subset)
@@ -216,8 +216,9 @@ def run_evaluation():
                        in target_datasets]
     
     # Do temporal re-bin based off of passed resolution
-    ref_dataset = dsp.temporal_rebin(ref_dataset, time_delta)
-    target_datasets = [dsp.temporal_rebin(ds, time_delta)
+    temporal_resolution_type = data['temporal_resolution_type']
+    ref_dataset = dsp.temporal_rebin(ref_dataset, temporal_resolution_type)
+    target_datasets = [dsp.temporal_rebin(ds, temporal_resolution_type)
                        for ds
                        in target_datasets]
 

@@ -14,13 +14,44 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-''' OCW UI Backend web services initialization. '''
+""" OCW UI Backend web services initialization. """
 
+import os
+import sys
 from bottle import Bottle, response, static_file
 from local_file_metadata_extractors import lfme_app
 from directory_helpers import dir_app
 from rcmed_helpers import rcmed_app
 from processing import processing_app
+
+
+def link_to_frontend():
+    """
+    The backend expects a link to a directory called frontend at the same level.
+    Attempt to create one if it does not exist.
+    """
+    backend_path = os.path.dirname(os.path.realpath(__file__))
+    link_path = backend_path + '/frontend'
+    frontend_path = backend_path.replace('backend', 'frontend')
+
+    if not os.path.isdir(link_path):
+        print("Expected to find a linked directory to the frontend.")
+        print("Checking default location %s." % frontend_path)
+        if os.path.isdir(frontend_path):
+            print("Attempting to create linked directory to %s." % frontend_path)
+            os.symlink(frontend_path, link_path)
+        else:
+            print("Frontend directory not found in %s." % frontend_path)
+            print("Either install the frontend to the default directory "
+                  "or manually create a link in the backend directory called "
+                  "'frontend' to the directory where the front end is installed.")
+            return 1
+
+    return 0
+
+
+if link_to_frontend():
+    sys.exit(1)
 
 app = Bottle()
 app.mount('/lfme/', lfme_app)
