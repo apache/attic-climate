@@ -16,12 +16,18 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-'''
+"""
 OCW module to download a file from ESGF.
 
-'''
+"""
+
+from __future__ import print_function
 
 import sys
+from os.path import expanduser, join
+
+from ocw.esgf.constants import ESGF_CREDENTIALS
+
 if sys.version_info[0] >= 3:
     from http.client import HTTPSConnection
     from urllib.request import build_opener
@@ -35,15 +41,12 @@ else:
     from urllib2 import build_opener
     from urllib2 import HTTPCookieProcessor
     from urllib2 import HTTPSHandler
-from os.path import expanduser, join
-
-from ocw.esgf.constants import ESGF_CREDENTIALS
 
 
 class HTTPSClientAuthHandler(HTTPSHandler):
-    '''
+    """
     HTTP handler that transmits an X509 certificate as part of the request
-    '''
+    """
 
     def __init__(self, key, cert):
         HTTPSHandler.__init__(self)
@@ -51,34 +54,44 @@ class HTTPSClientAuthHandler(HTTPSHandler):
         self.cert = cert
 
     def https_open(self, req):
+        """
+        Opens the https connection.
+        :param req:  The https request object.
+        :return: An addinfourl object for the request.
+        """
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host, timeout=300):
-        return HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+        """
+        Create an HTTPSConnection object.
+        :param host: The ESGF server to connect to.
+        :param timeout: Connection timeout in seconds.
+        :return:
+        """
+        return HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
 
 
 def download(url, toDirectory="/tmp"):
-    '''
+    """
     Function to download a single file from ESGF.
-
     :param url: the URL of the file to download
     :param toDirectory: target directory where the file will be written
-    '''
+    """
 
     # setup HTTP handler
-    certFile = expanduser(ESGF_CREDENTIALS)
-    opener = build_opener(HTTPSClientAuthHandler(certFile, certFile))
+    cert_file = expanduser(ESGF_CREDENTIALS)
+    opener = build_opener(HTTPSClientAuthHandler(cert_file, cert_file))
     opener.add_handler(HTTPCookieProcessor())
 
     # download file
-    localFilePath = join(toDirectory, url.split('/')[-1])
-    print("\nDownloading url: %s to local path: %s ..." % (url, localFilePath))
-    localFile = open(localFilePath, 'w')
-    webFile = opener.open(url)
-    localFile.write(webFile.read())
+    local_file_path = join(toDirectory, url.split('/')[-1])
+    print("\nDownloading url: %s to local path: %s ..." % (url, local_file_path))
+    local_file = open(local_file_path, 'w')
+    web_file = opener.open(url)
+    local_file.write(web_file.read())
 
     # cleanup
-    localFile.close()
-    webFile.close()
+    local_file.close()
+    web_file.close()
     opener.close()
     print("... done")

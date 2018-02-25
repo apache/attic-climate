@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-'''Module containing constant parameters for ESGF RCMES integration.'''
+"""Module containing constant parameters for ESGF RCMES integration."""
 
 # default location of ESGF user credentials
 ESGF_CREDENTIALS = "~/.esg/credentials.pem"

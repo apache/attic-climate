@@ -16,17 +16,19 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-'''
+"""
 RCMES module to execute a faceted search for ESGF files.
 
-'''
+"""
+
+from __future__ import print_function
 
 from pyesgf.search import SearchConnection
 
 from ocw.esgf.constants import JPL_SEARCH_SERVICE_URL
 
 
-class SearchClient():
+class SearchClient(object):
     """
     Simple ESGF search client for RCMES.
     This class is a thin layer on top of the esgfpy-client package.
@@ -36,7 +38,7 @@ class SearchClient():
     def __init__(self, searchServiceUrl=JPL_SEARCH_SERVICE_URL, distrib=True):
         """
         :param searchServiceUrl: URL of ESGF search service to query
-        :param distrib: True to execute a federation-wide search, 
+        :param distrib: True to execute a federation-wide search,
                         False to search only the specified search service
         """
         connection = SearchConnection(searchServiceUrl, distrib=distrib)
@@ -66,8 +68,10 @@ class SearchClient():
 
     def getFacets(self, facet):
         """
-        :return: a dictionary of (facet value, facet count) for the specified facet and current constraints.
-        Example (for facet='project'): {u'COUND': 4, u'CMIP5': 2657, u'obs4MIPs': 7} 
+        :return: a dictionary of (facet value, facet count) for the specified facet
+        and current constraints.
+
+        Example (for facet='project'): {u'COUND': 4, u'CMIP5': 2657, u'obs4MIPs': 7}
         """
         return self.context.facet_counts[facet]
 
@@ -82,7 +86,7 @@ class SearchClient():
             print("\nSearching files for dataset=%s with constraints: %s" %
                   (dataset.dataset_id, self.constraints))
             files = dataset.file_context().search(**self.constraints)
-            for file in files:
-                print('Found file=%s' % file.download_url)
-                urls.append(file.download_url)
+            for current_file in files:
+                print('Found file=%s' % current_file.download_url)
+                urls.append(current_file.download_url)
         return urls

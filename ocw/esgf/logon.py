@@ -16,28 +16,28 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-'''
+"""
 RCMES module to logon onto the ESGF.
-'''
+"""
 import os
 
 from pyesgf.logon import LogonManager
 
-from ocw.esgf.constants import JPL_MYPROXY_SERVER_DN, JPL_HOSTNAME
+from ocw.esgf.constants import JPL_HOSTNAME, JPL_MYPROXY_SERVER_DN
 
 
 def logon(openid, password):
-    '''
+    """
     Function to retrieve a short-term X.509 certificate that can be used to authenticate with ESGF.
     The certificate is written in the location ~/.esg/credentials.pem.
     The trusted CA certificates are written in the directory ~/.esg/certificates.
-    '''
+    """
     # Must configure the DN of the JPL MyProxy server if using a JPL openid
     if JPL_HOSTNAME in openid:
         os.environ['MYPROXY_SERVER_DN'] = JPL_MYPROXY_SERVER_DN
 
-    lm = LogonManager()
+    logon_manager = LogonManager()
 
-    lm.logon_with_openid(openid, password, bootstrap=True)
+    logon_manager.logon_with_openid(openid, password, bootstrap=True)
 
-    return lm.is_logged_on()
+    return logon_manager.is_logged_on()

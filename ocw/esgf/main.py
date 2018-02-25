@@ -16,21 +16,23 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-'''
+"""
 Example main program for ESGF-RCMES integration.
-    
-'''
+
+"""
+
+from __future__ import print_function
+
+from ocw.esgf.download import download
+from ocw.esgf.logon import logon
+from ocw.esgf.search import SearchClient
 
 # constant parameters
 DATA_DIRECTORY = "/tmp"
 
-from ocw.esgf.logon import logon
-from ocw.esgf.search import SearchClient
-from ocw.esgf.download import download
-
 
 def main():
-    '''Example driver program'''
+    """Example driver program"""
 
     username = raw_input('Enter your ESGF Username:\n')
     password = raw_input('Enter your ESGF Password:\n')
@@ -42,8 +44,8 @@ def main():
         print("...done.")
 
     # step 2: execute faceted search for files
-    urls = main_obs4mips()
-    #urls = main_cmip5()
+    # urls = main_obs4mips()
+    urls = main_cmip5()
 
     # step 3: download file(s)
     for i, url in enumerate(urls):
@@ -53,66 +55,66 @@ def main():
 
 
 def main_cmip5():
-    '''
+    """
     Example workflow to search for CMIP5 files
-    '''
+    """
 
-    searchClient = SearchClient(
+    search_client = SearchClient(
         searchServiceUrl="http://pcmdi9.llnl.gov/esg-search/search", distrib=False)
 
-    print('\nAvailable projects=%s' % searchClient.getFacets('project'))
-    searchClient.setConstraint(project='CMIP5')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable projects=%s' % search_client.getFacets('project'))
+    search_client.setConstraint(project='CMIP5')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable models=%s' % searchClient.getFacets('model'))
-    searchClient.setConstraint(model='INM-CM4')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable models=%s' % search_client.getFacets('model'))
+    search_client.setConstraint(model='INM-CM4')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable experiments=%s' % searchClient.getFacets('experiment'))
-    searchClient.setConstraint(experiment='historical')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable experiments=%s' % search_client.getFacets('experiment'))
+    search_client.setConstraint(experiment='historical')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable time frequencies=%s' %
-          searchClient.getFacets('time_frequency'))
-    searchClient.setConstraint(time_frequency='mon')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable time frequencies=%s' % search_client.getFacets('time_frequency'))
+    search_client.setConstraint(time_frequency='mon')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable CF standard names=%s' %
-          searchClient.getFacets('cf_standard_name'))
-    searchClient.setConstraint(cf_standard_name='air_temperature')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable CF standard names=%s' % search_client.getFacets('cf_standard_name'))
+    search_client.setConstraint(cf_standard_name='air_temperature')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    urls = searchClient.getFiles()
+    urls = search_client.getFiles()
+
     return urls
 
 
 def main_obs4mips():
-    '''
+    """
     Example workflow to search for obs4MIPs files.
-    '''
+    """
 
-    searchClient = SearchClient(distrib=False)
+    search_client = SearchClient(distrib=False)
 
     # obs4MIPs
-    print('\nAvailable projects=%s' % searchClient.getFacets('project'))
-    searchClient.setConstraint(project='obs4MIPs')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable projects=%s' % search_client.getFacets('project'))
+    search_client.setConstraint(project='obs4MIPs')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable variables=%s' % searchClient.getFacets('variable'))
-    searchClient.setConstraint(variable='hus')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable variables=%s' % search_client.getFacets('variable'))
+    search_client.setConstraint(variable='hus')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable time frequencies=%s' %
-          searchClient.getFacets('time_frequency'))
-    searchClient.setConstraint(time_frequency='mon')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasets())
+    print('\nAvailable time frequencies=%s' % search_client.getFacets('time_frequency'))
+    search_client.setConstraint(time_frequency='mon')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    print('\nAvailable models=%s' % searchClient.getFacets('model'))
-    searchClient.setConstraint(model='Obs-MLS')
-    print("Number of Datasets=%d" % searchClient.getNumberOfDatasetsi())
+    print('\nAvailable models=%s' % search_client.getFacets('model'))
+    search_client.setConstraint(model='Obs-MLS')
+    print("Number of Datasets=%d" % search_client.getNumberOfDatasets())
 
-    urls = searchClient.getFiles()
+    urls = search_client.getFiles()
+
     return urls
+
 
 if __name__ == '__main__':
     main()
