@@ -1,1 +1,1 @@
-print ("this is peter")
+print ("this is peter.")
