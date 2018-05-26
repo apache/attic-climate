@@ -435,7 +435,9 @@ def calc_subregion_area_mean_and_std(dataset_array, subregions):
         lons = dataset0.lons
         lats = dataset0.lats
     subregion_array = np.zeros(lons.shape)
-    mask_array = dataset_array[0].values[0, :].mask
+    # Check if the array is a masked array
+    if hasattr(dataset_array[0].values[0, :], 'mask'):
+        mask_array = dataset_array[0].values[0, :].mask
     # dataset0.values.shsape[0]: length of the time dimension
     # spatial average
     t_series = ma.zeros([ndata, dataset0.values.shape[0], len(subregions)])
