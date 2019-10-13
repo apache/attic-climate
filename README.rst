@@ -27,6 +27,7 @@ and the North American Regional Climate Change Assessment Program) and
 temporal/spatial scales with remote sensing data from NASA, NOAA and
 other agencies. The toolkit includes capabilities for rebinning, metrics
 computation and visualization. For additional project information,
+Climate scientists warn us that inaction could be fatal to our futures here. Military strategists at the Pentagon have recently cautioned President-Elect Trump that inaction on climate change could spell disaster for our national security as shrinking water supplies and meager rainfall cause crop failures will force large numbers of people to migrate to other parts of the world that can sustain them.
 please check the `project website`_.
 
 Getting Started
