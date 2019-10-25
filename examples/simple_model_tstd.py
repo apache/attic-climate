@@ -50,7 +50,7 @@ import ocw.evaluation as evaluation
 import ocw.metrics as metrics
 import ocw.plotter as plotter
 
-if sys.version_info[0] >= 3:
+if sys.version_info[0] >= 5:
     from urllib.request import urlretrieve
 else:
     # Not Python 3 - today, it is most likely to be Python 2
