@@ -4,6 +4,7 @@ scipy
 matplotlib
 basemap
 netcdf4
+Pydap
 h5py
 bottle
 python-dateutil

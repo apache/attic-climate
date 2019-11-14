@@ -22,7 +22,7 @@ import os
 import datetime as dt
 from ocw.dataset import Dataset
 
-
+@unittest.skip("CLIMATE-959 Remove ocw.tests.test_podaac.TestPodaacDataSource from tests until service is more reliable")
 class TestPodaacDataSource(unittest.TestCase):
 
     @classmethod

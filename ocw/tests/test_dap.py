@@ -17,10 +17,14 @@
 
 import unittest
 import datetime as dt
-import ocw.data_source.dap as dap
+try:
+    import ocw.data_source.dap as dap
+except ImportError:
+    warnings.warn('dap loaders missing. If this is needed, upgrade to python >=3.5.x.')
+import platform
 from ocw.dataset import Dataset
 
-
+@unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
 class TestDap(unittest.TestCase):
 
     @classmethod
@@ -49,25 +53,32 @@ class TestDap(unittest.TestCase):
         cls.name2 = 'foo2'
         cls.dataset2 = dap.load(cls.url2, 'scale_factor', name=cls.name)'''
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_dataset_is_returned(self):
         self.assertTrue(isinstance(self.dataset, Dataset))
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_correct_lat_shape(self):
         self.assertEquals(len(self.dataset.lats), 29)
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_correct_lon_shape(self):
         self.assertEquals(len(self.dataset.lons), 26)
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_correct_time_shape(self):
         self.assertEquals(len(self.dataset.times), 1)
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_valid_date_conversion(self):
         start = dt.datetime(2006, 6, 7, 12)
         self.assertTrue(start == self.dataset.times[0])
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_custom_dataset_name(self):
         self.assertEquals(self.dataset.name, self.name)
 
+    @unittest.skipIf(platform.python_version() < (3.5), "Pydap not supported in Python < 3.5")
     def test_dataset_origin(self):
         self.assertEquals(self.dataset.origin['source'], 'dap')
         self.assertEquals(self.dataset.origin['url'], self.url)
