@@ -16,3 +16,4 @@ esgf-pyclient
 podaacpy
 networkx
 netcdftime
+seaborn
