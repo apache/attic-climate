@@ -95,3 +95,6 @@ You will need to have installed the project dependencies first. Checkout the `Ge
 .. _the project website: https://climate.apache.org/api/current/index.html
 .. _Getting Started: https://cwiki.apache.org/confluence/display/CLIMATE/Getting+Started
 .. _Easy OCW: https://cwiki.apache.org/confluence/display/CLIMATE/Easy-OCW+-+A+Guide+to+Simplifying+OCW+Installation
+
+Happy Coding!!
+All the best
